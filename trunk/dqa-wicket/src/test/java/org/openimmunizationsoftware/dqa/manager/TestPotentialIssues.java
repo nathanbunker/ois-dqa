@@ -9,6 +9,7 @@ public class TestPotentialIssues extends TestCase
   public void testPotentialIssues()
   {
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
+
     assertNotNull(pi.GeneralAuthorizationException);
     assertNotNull(pi.GeneralConfigurationException);
     assertNotNull(pi.GeneralParseException);
@@ -138,6 +139,8 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.PatientDeathDateIsInFuture);
     assertNotNull(pi.PatientDeathDateIsInvalid);
     assertNotNull(pi.PatientDeathDateIsMissing);
+    assertNotNull(pi.PatientDeathIndicatorIsInconsistent);
+    assertNotNull(pi.PatientDeathIndicatorIsMissing);
     assertNotNull(pi.PatientEthnicityIsDeprecated);
     assertNotNull(pi.PatientEthnicityIsIgnored);
     assertNotNull(pi.PatientEthnicityIsInvalid);
@@ -242,7 +245,6 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.VaccinationAdminDateIsAfterPatientDeathDate);
     assertNotNull(pi.VaccinationAdminDateIsAfterSystemEntryDate);
     assertNotNull(pi.VaccinationAdminDateIsBeforeBirth);
-    assertNotNull(pi.VaccinationAdminDateIsReportedLate);
     assertNotNull(pi.VaccinationAdminDateIsBeforeOrAfterExpectedVaccineUsageRange);
     assertNotNull(pi.VaccinationAdminDateIsBeforeOrAfterLicensedVaccineRange);
     assertNotNull(pi.VaccinationAdminDateIsBeforeOrAfterWhenExpectedForPatientAge);
@@ -252,6 +254,7 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.VaccinationAdminDateIsOn15ThDayOfMonth);
     assertNotNull(pi.VaccinationAdminDateIsOnFirstDayOfMonth);
     assertNotNull(pi.VaccinationAdminDateIsOnLastDayOfMonth);
+    assertNotNull(pi.VaccinationAdminDateIsReportedLate);
     assertNotNull(pi.VaccinationAdminDateEndIsDifferentFromStartDate);
     assertNotNull(pi.VaccinationAdminDateEndIsMissing);
     assertNotNull(pi.VaccinationAdministeredAmountIsInvalid);
@@ -297,8 +300,6 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.VaccinationCvxCodeIsMissing);
     assertNotNull(pi.VaccinationCvxCodeIsUnrecognized);
     assertNotNull(pi.VaccinationCvxCodeAndCptCodeAreInconsistent);
-    assertNotNull(pi.VaccinationDeathIndicatorIsInconsistent);
-    assertNotNull(pi.VaccinationDeathIndicatorIsMissing);
     assertNotNull(pi.VaccinationFacilityIdIsDeprecated);
     assertNotNull(pi.VaccinationFacilityIdIsIgnored);
     assertNotNull(pi.VaccinationFacilityIdIsInvalid);
@@ -355,6 +356,5 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.VaccinationSystemEntryTimeIsInFuture);
     assertNotNull(pi.VaccinationSystemEntryTimeIsInvalid);
     assertNotNull(pi.VaccinationSystemEntryTimeIsMissing);
-
   }
 }
