@@ -141,6 +141,8 @@ public class PotentialIssues
   public PotentialIssue PatientDeathDateIsInFuture = null;
   public PotentialIssue PatientDeathDateIsInvalid = null;
   public PotentialIssue PatientDeathDateIsMissing = null;
+  public PotentialIssue PatientDeathIndicatorIsInconsistent = null;
+  public PotentialIssue PatientDeathIndicatorIsMissing = null;
   public PotentialIssue PatientEthnicityIsDeprecated = null;
   public PotentialIssue PatientEthnicityIsIgnored = null;
   public PotentialIssue PatientEthnicityIsInvalid = null;
@@ -245,7 +247,6 @@ public class PotentialIssues
   public PotentialIssue VaccinationAdminDateIsAfterPatientDeathDate = null;
   public PotentialIssue VaccinationAdminDateIsAfterSystemEntryDate = null;
   public PotentialIssue VaccinationAdminDateIsBeforeBirth = null;
-  public PotentialIssue VaccinationAdminDateIsReportedLate = null;
   public PotentialIssue VaccinationAdminDateIsBeforeOrAfterExpectedVaccineUsageRange = null;
   public PotentialIssue VaccinationAdminDateIsBeforeOrAfterLicensedVaccineRange = null;
   public PotentialIssue VaccinationAdminDateIsBeforeOrAfterWhenExpectedForPatientAge = null;
@@ -255,6 +256,7 @@ public class PotentialIssues
   public PotentialIssue VaccinationAdminDateIsOn15ThDayOfMonth = null;
   public PotentialIssue VaccinationAdminDateIsOnFirstDayOfMonth = null;
   public PotentialIssue VaccinationAdminDateIsOnLastDayOfMonth = null;
+  public PotentialIssue VaccinationAdminDateIsReportedLate = null;
   public PotentialIssue VaccinationAdminDateEndIsDifferentFromStartDate = null;
   public PotentialIssue VaccinationAdminDateEndIsMissing = null;
   public PotentialIssue VaccinationAdministeredAmountIsInvalid = null;
@@ -300,8 +302,6 @@ public class PotentialIssues
   public PotentialIssue VaccinationCvxCodeIsMissing = null;
   public PotentialIssue VaccinationCvxCodeIsUnrecognized = null;
   public PotentialIssue VaccinationCvxCodeAndCptCodeAreInconsistent = null;
-  public PotentialIssue VaccinationDeathIndicatorIsInconsistent = null;
-  public PotentialIssue VaccinationDeathIndicatorIsMissing = null;
   public PotentialIssue VaccinationFacilityIdIsDeprecated = null;
   public PotentialIssue VaccinationFacilityIdIsIgnored = null;
   public PotentialIssue VaccinationFacilityIdIsInvalid = null;
@@ -360,31 +360,353 @@ public class PotentialIssues
   public PotentialIssue VaccinationSystemEntryTimeIsMissing = null;
 
   public static enum Field {
-    GENERAL_AUTHORIZATION, GENERAL_CONFIGURATION, GENERAL_PARSE, GENERAL_PROCESSING, HL7_MSH_ACKNOWLEDGEMENT_TYPE,
-    HL7_MSH_ENCODING_CHARACTER, HL7_MSH_MESSAGE_CONTROL_ID, HL7_MSH_MESSAGE_DATE, HL7_MSH_MESSAGE_TRIGGER,
-    HL7_MSH_MESSAGE_TYPE, HL7_MSH_PROCESSING_ID, HL7_MSH_PROFILE_ID, HL7_MSH_RECEIVING_APPLICATION,
-    HL7_MSH_RECEIVING_FACILITY, HL7_MSH_SEGMENT, HL7_MSH_SENDING_APPLICATION, HL7_MSH_SENDING_FACILITY,
-    HL7_MSH_VERSION, HL7_NK1_SEGMENT, HL7_OBX_SEGMENT, HL7_ORC_SEGMENT, HL7_PD1_SEGMENT, HL7_PID_SEGMENT,
-    HL7_PV1_SEGMENT, HL7_RXA_SEGMENT, HL7_RXR_SEGMENT, NEXT_OF_KIN_ADDRESS, NEXT_OF_KIN_ADDRESS_CITY,
-    NEXT_OF_KIN_ADDRESS_COUNTRY, NEXT_OF_KIN_ADDRESS_COUNTY, NEXT_OF_KIN_ADDRESS_STATE, NEXT_OF_KIN_ADDRESS_STREET,
-    NEXT_OF_KIN_ADDRESS_STREET2, NEXT_OF_KIN_NAME, NEXT_OF_KIN_NAME_FIRST, NEXT_OF_KIN_NAME_LAST,
-    NEXT_OF_KIN_PHONE_NUMBER, NEXT_OF_KIN_RELATIONSHIP, NEXT_OF_KIN_SSN, PATIENT_ADDRESS, PATIENT_ADDRESS_CITY,
-    PATIENT_ADDRESS_COUNTRY, PATIENT_ADDRESS_COUNTY, PATIENT_ADDRESS_STATE, PATIENT_ADDRESS_STREET,
-    PATIENT_ADDRESS_STREET2, PATIENT_ADDRESS_ZIP, PATIENT_ALIAS, PATIENT_BIRTH_INDICATOR, PATIENT_BIRTH_ORDER,
-    PATIENT_BIRTH_PLACE, PATIENT_BIRTH_REGISTRY_ID, PATIENT_DATE_OF_BIRTH, PATIENT_DEATH_DATE, PATIENT_ETHNICITY,
-    PATIENT_FIRST_NAME, PATIENT_GENDER, PATIENT_IMMUNIZATION_REGISTRY_STATUS, PATIENT_LAST_NAME,
-    PATIENT_MEDICAID_NUMBER, PATIENT_MIDDLE_NAME, PATIENT_MOTHERS_MAIDEN_NAME, PATIENT_NAME, PATIENT_PHONE,
-    PATIENT_PRIMARY_FACILITY_ID, PATIENT_PRIMARY_FACILITY_NAME, PATIENT_PRIMARY_LANAGUAGE,
-    PATIENT_PRIMARY_PHYSICIAN_ID, PATIENT_PRIMARY_PHYSICIAN_NAME, PATIENT_PROTECTION_INDICATOR, PATIENT_PUBLICITY_CODE,
-    PATIENT_RACE, PATIENT_REGISTRY_ID, PATIENT_SSN, PATIENT_SUBMITTER_ID, PATIENT_VFC_EFFECTIVE_DATE,
-    PATIENT_VFC_STATUS, PATIENT_WIC_ID, VACCINATION_ACTION_CODE, VACCINATION_ADMIN_CODE, VACCINATION_ADMIN_DATE,
-    VACCINATION_ADMIN_DATE_END, VACCINATION_ADMINISTERED_AMOUNT, VACCINATION_ADMINISTERED_UNIT, VACCINATION_BODY_ROUTE,
-    VACCINATION_BODY_SITE, VACCINATION_COMPLETION_STATUS, VACCINATION_CONFIDENTIALITY_CODE, VACCINATION_CPT_CODE,
-    VACCINATION_CVX_CODE, VACCINATION_CVX_CODE_AND_CPT_CODE, VACCINATION_DEATH_INDICATOR, VACCINATION_FACILITY_ID,
-    VACCINATION_FACILITY_NAME, VACCINATION_GIVEN_BY, VACCINATION_ID, VACCINATION_ID_OF_RECEIVER,
-    VACCINATION_ID_OF_SENDER, VACCINATION_INFORMATION_SOURCE, VACCINATION_LOT_EXPIRATION_DATE, VACCINATION_LOT_NUMBER,
-    VACCINATION_MANUFACTURER_CODE, VACCINATION_ORDERED_BY, VACCINATION_PRODUCT, VACCINATION_RECORDED_BY,
-    VACCINATION_REFUSAL_REASON, VACCINATION_SYSTEM_ENTRY_TIME
+    GENERAL_AUTHORIZATION,
+    GENERAL_CONFIGURATION,
+    GENERAL_PARSE,
+    GENERAL_PROCESSING,
+    HL7_MSH_ACKNOWLEDGEMENT_TYPE,
+
+
+
+
+    HL7_MSH_ENCODING_CHARACTER,
+
+
+    HL7_MSH_MESSAGE_CONTROL_ID,
+    HL7_MSH_MESSAGE_DATE,
+
+
+    HL7_MSH_MESSAGE_TRIGGER,
+
+    HL7_MSH_MESSAGE_TYPE,
+
+
+    HL7_MSH_PROCESSING_ID,
+
+
+
+    HL7_MSH_PROFILE_ID,
+
+    HL7_MSH_RECEIVING_APPLICATION,
+
+    HL7_MSH_RECEIVING_FACILITY,
+
+    HL7_MSH_SEGMENT,
+    HL7_MSH_SENDING_APPLICATION,
+
+    HL7_MSH_SENDING_FACILITY,
+
+    HL7_MSH_VERSION,
+
+
+
+
+    HL7_NK1_SEGMENT,
+
+    HL7_OBX_SEGMENT,
+    HL7_ORC_SEGMENT,
+
+    HL7_PD1_SEGMENT,
+    HL7_PID_SEGMENT,
+
+    HL7_PV1_SEGMENT,
+    HL7_RXA_SEGMENT,
+
+    HL7_RXR_SEGMENT,
+
+    NEXT_OF_KIN_ADDRESS,
+
+    NEXT_OF_KIN_ADDRESS_CITY,
+
+    NEXT_OF_KIN_ADDRESS_COUNTRY,
+
+
+
+
+    NEXT_OF_KIN_ADDRESS_COUNTY,
+
+
+
+
+    NEXT_OF_KIN_ADDRESS_STATE,
+
+
+
+
+    NEXT_OF_KIN_ADDRESS_STREET,
+    NEXT_OF_KIN_ADDRESS_STREET2,
+    NEXT_OF_KIN_NAME,
+
+    NEXT_OF_KIN_NAME_FIRST,
+    NEXT_OF_KIN_NAME_LAST,
+    NEXT_OF_KIN_PHONE_NUMBER,
+
+
+    NEXT_OF_KIN_RELATIONSHIP,
+
+
+
+
+
+    NEXT_OF_KIN_SSN,
+    PATIENT_ADDRESS,
+    PATIENT_ADDRESS_CITY,
+
+    PATIENT_ADDRESS_COUNTRY,
+
+
+
+
+    PATIENT_ADDRESS_COUNTY,
+
+
+
+
+    PATIENT_ADDRESS_STATE,
+
+
+
+
+    PATIENT_ADDRESS_STREET,
+    PATIENT_ADDRESS_STREET2,
+    PATIENT_ADDRESS_ZIP,
+
+    PATIENT_ALIAS,
+    PATIENT_BIRTH_INDICATOR,
+
+    PATIENT_BIRTH_ORDER,
+
+
+    PATIENT_BIRTH_PLACE,
+    PATIENT_BIRTH_REGISTRY_ID,
+
+    PATIENT_DATE_OF_BIRTH,
+
+
+
+
+    PATIENT_DEATH_DATE,
+
+
+
+    PATIENT_DEATH_INDICATOR,
+
+    PATIENT_ETHNICITY,
+
+
+
+
+    PATIENT_FIRST_NAME,
+
+
+    PATIENT_GENDER,
+
+
+
+
+    PATIENT_IMMUNIZATION_REGISTRY_STATUS,
+
+
+
+
+    PATIENT_LAST_NAME,
+
+    PATIENT_MEDICAID_NUMBER,
+
+    PATIENT_MIDDLE_NAME,
+
+    PATIENT_MOTHERS_MAIDEN_NAME,
+    PATIENT_NAME,
+
+    PATIENT_PHONE,
+
+
+    PATIENT_PRIMARY_FACILITY_ID,
+
+
+
+
+    PATIENT_PRIMARY_FACILITY_NAME,
+    PATIENT_PRIMARY_LANAGUAGE,
+
+
+
+
+    PATIENT_PRIMARY_PHYSICIAN_ID,
+
+
+
+
+    PATIENT_PRIMARY_PHYSICIAN_NAME,
+    PATIENT_PROTECTION_INDICATOR,
+
+
+
+
+
+
+    PATIENT_PUBLICITY_CODE,
+
+
+
+
+    PATIENT_RACE,
+
+
+
+
+    PATIENT_REGISTRY_ID,
+
+    PATIENT_SSN,
+
+    PATIENT_SUBMITTER_ID,
+    PATIENT_VFC_EFFECTIVE_DATE,
+
+
+
+    PATIENT_VFC_STATUS,
+
+
+
+
+    PATIENT_WIC_ID,
+
+    VACCINATION_ACTION_CODE,
+
+
+
+
+
+
+
+
+    VACCINATION_ADMIN_CODE,
+
+
+
+
+
+
+
+
+
+    VACCINATION_ADMIN_DATE,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    VACCINATION_ADMIN_DATE_END,
+
+    VACCINATION_ADMINISTERED_AMOUNT,
+
+
+
+    VACCINATION_ADMINISTERED_UNIT,
+    VACCINATION_BODY_ROUTE,
+
+
+
+
+
+    VACCINATION_BODY_SITE,
+
+
+
+
+
+    VACCINATION_COMPLETION_STATUS,
+
+
+
+
+
+
+
+
+    VACCINATION_CONFIDENTIALITY_CODE,
+
+
+
+
+
+    VACCINATION_CPT_CODE,
+
+
+
+
+    VACCINATION_CVX_CODE,
+
+
+
+
+    VACCINATION_CVX_CODE_AND_CPT_CODE,
+    VACCINATION_FACILITY_ID,
+
+
+
+
+    VACCINATION_FACILITY_NAME,
+    VACCINATION_GIVEN_BY,
+
+
+
+
+    VACCINATION_ID,
+    VACCINATION_ID_OF_RECEIVER,
+
+    VACCINATION_ID_OF_SENDER,
+
+    VACCINATION_INFORMATION_SOURCE,
+
+
+
+
+
+
+
+
+    VACCINATION_LOT_EXPIRATION_DATE,
+
+    VACCINATION_LOT_NUMBER,
+
+    VACCINATION_MANUFACTURER_CODE,
+
+
+
+
+    VACCINATION_ORDERED_BY,
+
+
+
+
+    VACCINATION_PRODUCT,
+
+
+
+    VACCINATION_RECORDED_BY,
+
+
+
+
+    VACCINATION_REFUSAL_REASON,
+
+
+
+
+    VACCINATION_SYSTEM_ENTRY_TIME
+
+
+
   }
 
   private HashMap<Field, HashMap<String, PotentialIssue>> fieldIssueMaps = new HashMap<PotentialIssues.Field, HashMap<String, PotentialIssue>>();
@@ -560,6 +882,8 @@ public class PotentialIssues
     PatientDeathDateIsInFuture = getPotentialIssue(session, "Patient", "death date", "is in future", "");
     PatientDeathDateIsInvalid = getPotentialIssue(session, "Patient", "death date", "is invalid", "");
     PatientDeathDateIsMissing = getPotentialIssue(session, "Patient", "death date", "is missing", "");
+    PatientDeathIndicatorIsInconsistent = getPotentialIssue(session, "Patient", "death indicator", "is inconsistent", "");
+    PatientDeathIndicatorIsMissing = getPotentialIssue(session, "Patient", "death indicator", "is missing", "");
     PatientEthnicityIsDeprecated = getPotentialIssue(session, "Patient", "ethnicity", "is deprecated", "");
     PatientEthnicityIsIgnored = getPotentialIssue(session, "Patient", "ethnicity", "is ignored", "");
     PatientEthnicityIsInvalid = getPotentialIssue(session, "Patient", "ethnicity", "is invalid", "");
@@ -664,7 +988,6 @@ public class PotentialIssues
     VaccinationAdminDateIsAfterPatientDeathDate = getPotentialIssue(session, "Vaccination", "admin date", "is after patient death date", "");
     VaccinationAdminDateIsAfterSystemEntryDate = getPotentialIssue(session, "Vaccination", "admin date", "is after system entry date", "");
     VaccinationAdminDateIsBeforeBirth = getPotentialIssue(session, "Vaccination", "admin date", "is before birth", "");
-    VaccinationAdminDateIsReportedLate = getPotentialIssue(session, "Vaccination", "admin date", "is reported late", "");
     VaccinationAdminDateIsBeforeOrAfterExpectedVaccineUsageRange = getPotentialIssue(session, "Vaccination", "admin date", "is before or after expected vaccine usage range", "");
     VaccinationAdminDateIsBeforeOrAfterLicensedVaccineRange = getPotentialIssue(session, "Vaccination", "admin date", "is before or after licensed vaccine range", "");
     VaccinationAdminDateIsBeforeOrAfterWhenExpectedForPatientAge = getPotentialIssue(session, "Vaccination", "admin date", "is before or after when expected for patient age", "");
@@ -674,6 +997,7 @@ public class PotentialIssues
     VaccinationAdminDateIsOn15ThDayOfMonth = getPotentialIssue(session, "Vaccination", "admin date", "is on 15th day of month", "");
     VaccinationAdminDateIsOnFirstDayOfMonth = getPotentialIssue(session, "Vaccination", "admin date", "is on first day of month", "");
     VaccinationAdminDateIsOnLastDayOfMonth = getPotentialIssue(session, "Vaccination", "admin date", "is on last day of month", "");
+    VaccinationAdminDateIsReportedLate = getPotentialIssue(session, "Vaccination", "admin date", "is reported late", "");
     VaccinationAdminDateEndIsDifferentFromStartDate = getPotentialIssue(session, "Vaccination", "admin date end", "is different from start date", "");
     VaccinationAdminDateEndIsMissing = getPotentialIssue(session, "Vaccination", "admin date end", "is missing", "");
     VaccinationAdministeredAmountIsInvalid = getPotentialIssue(session, "Vaccination", "administered amount", "is invalid", "");
@@ -719,8 +1043,6 @@ public class PotentialIssues
     VaccinationCvxCodeIsMissing = getPotentialIssue(session, "Vaccination", "CVX code", "is missing", "");
     VaccinationCvxCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "CVX code", "is unrecognized", "");
     VaccinationCvxCodeAndCptCodeAreInconsistent = getPotentialIssue(session, "Vaccination", "CVX code and CPT code", "are inconsistent", "");
-    VaccinationDeathIndicatorIsInconsistent = getPotentialIssue(session, "Vaccination", "death indicator", "is inconsistent", "");
-    VaccinationDeathIndicatorIsMissing = getPotentialIssue(session, "Vaccination", "death indicator", "is missing", "");
     VaccinationFacilityIdIsDeprecated = getPotentialIssue(session, "Vaccination", "facility id", "is deprecated", "");
     VaccinationFacilityIdIsIgnored = getPotentialIssue(session, "Vaccination", "facility id", "is ignored", "");
     VaccinationFacilityIdIsInvalid = getPotentialIssue(session, "Vaccination", "facility id", "is invalid", "");
@@ -907,6 +1229,8 @@ public class PotentialIssues
     addToFieldIssueMap(Field.PATIENT_DEATH_DATE, PatientDeathDateIsInFuture);
     addToFieldIssueMap(Field.PATIENT_DEATH_DATE, PatientDeathDateIsInvalid);
     addToFieldIssueMap(Field.PATIENT_DEATH_DATE, PatientDeathDateIsMissing);
+    addToFieldIssueMap(Field.PATIENT_DEATH_INDICATOR, PatientDeathIndicatorIsInconsistent);
+    addToFieldIssueMap(Field.PATIENT_DEATH_INDICATOR, PatientDeathIndicatorIsMissing);
     addToFieldIssueMap(Field.PATIENT_ETHNICITY, PatientEthnicityIsDeprecated);
     addToFieldIssueMap(Field.PATIENT_ETHNICITY, PatientEthnicityIsIgnored);
     addToFieldIssueMap(Field.PATIENT_ETHNICITY, PatientEthnicityIsInvalid);
@@ -1011,7 +1335,6 @@ public class PotentialIssues
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsAfterPatientDeathDate);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsAfterSystemEntryDate);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsBeforeBirth);
-    addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsReportedLate);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsBeforeOrAfterExpectedVaccineUsageRange);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsBeforeOrAfterLicensedVaccineRange);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsBeforeOrAfterWhenExpectedForPatientAge);
@@ -1021,6 +1344,7 @@ public class PotentialIssues
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsOn15ThDayOfMonth);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsOnFirstDayOfMonth);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsOnLastDayOfMonth);
+    addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsReportedLate);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE_END, VaccinationAdminDateEndIsDifferentFromStartDate);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE_END, VaccinationAdminDateEndIsMissing);
     addToFieldIssueMap(Field.VACCINATION_ADMINISTERED_AMOUNT, VaccinationAdministeredAmountIsInvalid);
@@ -1066,8 +1390,6 @@ public class PotentialIssues
     addToFieldIssueMap(Field.VACCINATION_CVX_CODE, VaccinationCvxCodeIsMissing);
     addToFieldIssueMap(Field.VACCINATION_CVX_CODE, VaccinationCvxCodeIsUnrecognized);
     addToFieldIssueMap(Field.VACCINATION_CVX_CODE_AND_CPT_CODE, VaccinationCvxCodeAndCptCodeAreInconsistent);
-    addToFieldIssueMap(Field.VACCINATION_DEATH_INDICATOR, VaccinationDeathIndicatorIsInconsistent);
-    addToFieldIssueMap(Field.VACCINATION_DEATH_INDICATOR, VaccinationDeathIndicatorIsMissing);
     addToFieldIssueMap(Field.VACCINATION_FACILITY_ID, VaccinationFacilityIdIsDeprecated);
     addToFieldIssueMap(Field.VACCINATION_FACILITY_ID, VaccinationFacilityIdIsIgnored);
     addToFieldIssueMap(Field.VACCINATION_FACILITY_ID, VaccinationFacilityIdIsInvalid);

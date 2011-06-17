@@ -6,6 +6,12 @@
 
 	<display-name>dqa-wicket</display-name>
 	
+	<context-param>
+         <param-name>configuration</param-name>
+         <!-- <param-value>development</param-value> -->
+         <param-value>deployment</param-value>
+    </context-param>
+    
 	<servlet>
 		<servlet-name>InServlet</servlet-name>
 		<display-name>DQA Incoming Interface</display-name>
@@ -14,7 +20,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>InServlet</servlet-name>
-		<url-pattern>in</url-pattern>
+		<url-pattern>/in</url-pattern>
 	</servlet-mapping>
 	
 	
