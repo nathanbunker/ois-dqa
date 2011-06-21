@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
@@ -41,16 +40,14 @@ public class Validator extends ValidateMessage
     this.patient = message.getPatient();
     this.issuesFound = message.getIssuesFound();
     validatePatient();
-    positionId = 1;
     for (NextOfKin nextOfKin : message.getNextOfKins())
     {
-      positionId++;
+      positionId = nextOfKin.getPositionId();
       validateNextOfKin(nextOfKin);
     }
-    positionId = 1;
     for (Vaccination vaccination : message.getVaccinations())
     {
-      positionId++;
+      positionId = vaccination.getPositionId();
       validateVaccination(vaccination);
     }
   }
@@ -99,7 +96,7 @@ public class Validator extends ValidateMessage
   {
     String actionCode = vaccination.getActionCode();
     actionCode = handleCodeReceived(actionCode, CodesReceived.getCodeTable(CodesReceived.ACTION_CODE),
-        PotentialIssues.Field.VACCINATION_ACTION_CODE);
+        PotentialIssues.Field.VACCINATION_ACTION_CODE).getCodeValue();
     vaccination.setActionCode(actionCode);
     if (actionCode != null)
     {
@@ -134,14 +131,18 @@ public class Validator extends ValidateMessage
     // TODO VaccinationInformationSourceIsHistoricalButAppearsToBeAdministered
 
     String cptCode = vaccination.getAdminCodeCpt();
-    cptCode = handleCodeReceived(cptCode, CodesReceived.getCodeTable(CodesReceived.CPT),
+    CodeReceived cptCr = handleCodeReceived(cptCode, CodesReceived.getCodeTable(CodesReceived.CPT),
         PotentialIssues.Field.VACCINATION_CPT_CODE);
+    cptCode = cptCr.getCodeValue();
     vaccination.setAdminCodeCpt(cptCode);
 
     String cvxCode = vaccination.getAdminCodeCvx();
-    cvxCode = handleCodeReceived(cvxCode, CodesReceived.getCodeTable(CodesReceived.CVX),
+    CodeReceived cvxCr = handleCodeReceived(cvxCode, CodesReceived.getCodeTable(CodesReceived.CVX),
         PotentialIssues.Field.VACCINATION_CVX_CODE);
+    cvxCode = cvxCr.getCodeValue();
     vaccination.setAdminCodeCvx(cvxCode);
+    
+    CodeReceived vaccineCr = cvxCr;
 
     // TODO Need to figure out status for CPT can CVX
     // CVX \ CPT | Deprecated | Ignored | Invalid | Missing | Not Specific |
@@ -182,6 +183,7 @@ public class Validator extends ValidateMessage
     if (vaccineCvx == null && vaccineCpt != null)
     {
       vaccineCvx = vaccineCpt.getCvx();
+      vaccineCr = cptCr;
     }
 
     if (notEmpty(vaccination.getAdminDate(), pi.VaccinationAdminDateIsMissing))
@@ -206,40 +208,42 @@ public class Validator extends ValidateMessage
       {
         if (administered)
         {
-          registerIssue(pi.VaccinationAdminCodeIsNotSpecific);
+          registerIssue(pi.VaccinationAdminCodeIsNotSpecific, vaccineCr);
         }
       } else if (vaccineCvx.getCvxCode().equals(VaccineCvx.NO_VACCINE_ADMINISTERED))
       {
-        registerIssue(pi.VaccinationAdminCodeIsValuedAsNotAdministered);
+        registerIssue(pi.VaccinationAdminCodeIsValuedAsNotAdministered, vaccineCr);
       } else if (vaccineCvx.getCvxCode().equals(VaccineCvx.CONCEPT_TYPE_NON_VACCINE))
       {
-        registerIssue(pi.VaccinationAdminCodeIsNotVaccine);
+        registerIssue(pi.VaccinationAdminCodeIsNotVaccine, vaccineCr);
       }
       if (vaccination.getAdminDate() != null)
       {
         if (vaccineCvx.getValidStartDate().after(vaccination.getAdminDate())
             || vaccination.getAdminDate().after(vaccineCvx.getValidEndDate()))
         {
-          registerIssue(pi.VaccinationProductIsInvalid);
+          registerIssue(pi.VaccinationAdminCodeIsInvalid, vaccineCr);
         } else if (vaccineCvx.getUseStartDate().after(vaccination.getAdminDate())
             || vaccination.getAdminDate().after(vaccineCvx.getUseEndDate()))
         {
-          registerIssue(pi.VaccinationProductIsDeprecated);
+          registerIssue(pi.VaccinationAdminCodeIsDeprecated, vaccineCr);
         }
         int monthsBetween = monthsBetween(patient.getBirthDate(), vaccination.getAdminDate());
         if (monthsBetween < vaccineCvx.getUseMonthStart() || monthsBetween > vaccineCvx.getUseMonthEnd())
         {
-          registerIssue(pi.VaccinationAdminDateIsBeforeOrAfterWhenExpectedForPatientAge);
+          registerIssue(pi.VaccinationAdminDateIsBeforeOrAfterWhenExpectedForPatientAge, vaccineCr);
         }
       }
     }
+    CodeReceived codeReceivedMvx = null;
     if (administered)
     {
-      handleCodeReceived(vaccination.getManufacturerCode(), CodesReceived.getCodeTable(CodesReceived.MVX),
-          PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE);
+      codeReceivedMvx = handleCodeReceived(vaccination.getManufacturer(),
+          CodesReceived.getCodeTable(CodesReceived.MVX), PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE);
     } else
     {
-
+      codeReceivedMvx = handleCodeReceived(vaccination.getManufacturer(),
+          CodesReceived.getCodeTable(CodesReceived.MVX), PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE, false);
     }
     VaccineMvx vaccineMvx = null;
     if (vaccination.getManufacturerCode() != null && !vaccination.getManufacturerCode().equals(""))
@@ -249,7 +253,8 @@ public class Validator extends ValidateMessage
     if (administered)
     {
       if (vaccineMvx != null && !vaccineMvx.getMvxCode().equals("") && vaccineCvx != null
-          && !vaccineCvx.getCvxCode().equals(""))
+          && !vaccineCvx.getCvxCode().equals("")
+          && (codeReceivedMvx.getCodeStatus().isValid() || codeReceivedMvx.getCodeStatus().isDeprecated()))
       {
         VaccineProduct vaccineProduct = VaccineProductManager.getVaccineProductManager().getVaccineProduct(vaccineCvx,
             vaccineMvx);
@@ -270,7 +275,6 @@ public class Validator extends ValidateMessage
         registerIssue(pi.VaccinationProductIsMissing);
       }
     }
-    // TODO Pull table from CDC that lists valid manufacturers for CVX and CPT
 
     // TODO VaccinationAdminCodeMayBeVariationOfPreviouslyReportedCodes
 
@@ -297,9 +301,19 @@ public class Validator extends ValidateMessage
           registerIssue(pi.VaccinationAdminDateIsAfterSystemEntryDate);
         }
       }
+      if (patient.getBirthDate() != null)
+      {
+        if (vaccination.getAdminDate().before(patient.getBirthDate()))
+        {
+          registerIssue(pi.VaccinationAdminDateIsBeforeBirth);
+        }
+      }
       if (vaccination.getSystemEntryDate() != null)
       {
-        registerIssue(pi.VaccinationAdminDateIsBeforeBirth);
+        if (vaccination.getAdminDate().after(vaccination.getSystemEntryDate()))
+        {
+          registerIssue(pi.VaccinationAdminDateIsAfterSystemEntryDate);
+        }
       }
       if (notEmpty(vaccination.getAdminDateEnd(), pi.VaccinationAdminDateEndIsMissing))
       {
@@ -361,7 +375,7 @@ public class Validator extends ValidateMessage
     // TODO VaccinationBodySiteIsInvalidForVaccineIndicated
     String completionStatusCode = vaccination.getCompletionStatusCode();
     completionStatusCode = handleCodeReceived(completionStatusCode, CodesReceived.getCodeTable(CodesReceived.COMPLETE),
-        PotentialIssues.Field.VACCINATION_COMPLETION_STATUS);
+        PotentialIssues.Field.VACCINATION_COMPLETION_STATUS).getCodeValue();
     vaccination.setCompletionStatusCode(completionStatusCode);
     if (completionStatusCode != null && !completionStatusCode.equals(""))
     {
@@ -381,33 +395,23 @@ public class Validator extends ValidateMessage
     }
     handleCodeReceived(vaccination.getConfidentiality(), CodesReceived.getCodeTable(CodesReceived.CONFIDENDIALITY),
         PotentialIssues.Field.VACCINATION_CONFIDENTIALITY_CODE);
-    
+
     if (vaccineCpt != null && vaccineCvx != null)
     {
-      // TODO VaccinationCvxCodeAndCptCodeAreInconsistent      
+      // TODO VaccinationCvxCodeAndCptCodeAreInconsistent
     }
-    
+
     String facilityId = vaccination.getFacilityId();
     facilityId = handleCodeReceived(facilityId, CodesReceived.getCodeTable(CodesReceived.FACILITY),
-        PotentialIssues.Field.VACCINATION_FACILITY_ID);
+        PotentialIssues.Field.VACCINATION_FACILITY_ID).getCodeValue();
     vaccination.setFacilityId(facilityId);
     notEmpty(vaccination.getFacilityName(), pi.VaccinationFacilityNameIsMissing);
-    
+
     // VaccinationGivenByIsDeprecated
     // VaccinationGivenByIsIgnored
     // VaccinationGivenByIsInvalid
     // VaccinationGivenByIsMissing
     // VaccinationGivenByIsUnrecognized
-    // VaccinationIdIsMissing
-    // VaccinationIdOfReceiverIsMissing
-    // VaccinationIdOfReceiverIsUnrecognized
-    // VaccinationIdOfSenderIsMissing
-    // VaccinationIdOfSenderIsUnrecognized
-
-    // VaccinationLotExpirationDateIsInvalid
-    // VaccinationLotExpirationDateIsMissing
-    // VaccinationLotNumberIsInvalid
-    // VaccinationLotNumberIsMissing
     // VaccinationOrderedByIsDeprecated
     // VaccinationOrderedByIsIgnored
     // VaccinationOrderedByIsInvalid
@@ -418,6 +422,23 @@ public class Validator extends ValidateMessage
     // VaccinationRecordedByIsInvalid
     // VaccinationRecordedByIsMissing
     // VaccinationRecordedByIsUnrecognized
+
+    // VaccinationIdIsMissing
+    // VaccinationIdOfReceiverIsMissing
+    // VaccinationIdOfReceiverIsUnrecognized
+    // VaccinationIdOfSenderIsMissing
+    // VaccinationIdOfSenderIsUnrecognized
+
+    // VaccinationLotExpirationDateIsInvalid
+    // VaccinationLotExpirationDateIsMissing
+    if (administered)
+    {
+      if (notEmpty(vaccination.getLotNumber(), pi.VaccinationLotNumberIsMissing))
+      {
+        // TODO VaccinationLotNumberIsInvalid
+      }
+    }
+    
     // VaccinationRefusalReasonIsDeprecated
     // VaccinationRefusalReasonIsIgnored
     // VaccinationRefusalReasonIsInvalid
@@ -443,17 +464,17 @@ public class Validator extends ValidateMessage
 
     String country = address.getCountry();
     country = handleCodeReceived(country, CodesReceived.getCodeTable(CodesReceived.COUNTRY),
-        PotentialIssues.Field.PATIENT_ADDRESS_COUNTRY);
-    address.setCountyParish(country);
+        PotentialIssues.Field.PATIENT_ADDRESS_COUNTRY).getCodeValue();
+    address.setCountry(country);
 
     String countyParish = address.getCountyParish();
     countyParish = handleCodeReceived(countyParish, CodesReceived.getCodeTable(CodesReceived.COUNTY_PARISH),
-        PotentialIssues.Field.PATIENT_ADDRESS_COUNTY);
+        PotentialIssues.Field.PATIENT_ADDRESS_COUNTY).getCodeValue();
     address.setCountyParish(countyParish);
 
     String state = address.getState();
-    state = handleCodeReceived(countyParish, CodesReceived.getCodeTable(CodesReceived.STATE),
-        PotentialIssues.Field.PATIENT_ADDRESS_STATE);
+    state = handleCodeReceived(state, CodesReceived.getCodeTable(CodesReceived.STATE),
+        PotentialIssues.Field.PATIENT_ADDRESS_STATE).getCodeValue();
     address.setState(state);
 
     String street = address.getStreet();
@@ -620,12 +641,13 @@ public class Validator extends ValidateMessage
     }
     return !empty;
   }
+
   protected CodeReceived handleCodeReceived(CodedEntity codedEntity, CodeTable codeTable, PotentialIssues.Field field)
   {
-    
+
     return handleCodeReceived(codedEntity, codeTable, field, true);
   }
-  
+
   protected CodeReceived handleCodeReceived(CodedEntity codedEntity, CodeTable codeTable, PotentialIssues.Field field,
       boolean notSilent)
   {
@@ -637,8 +659,7 @@ public class Validator extends ValidateMessage
       session.save(cr);
       if (cr.getCodeStatus().isValid())
       {
-        // registerIssue(pi.getIssue(field,
-        // PotentialIssue.ISSUE_TYPE_IS_INVALID), cr);
+        return cr;
       } else if (cr.getCodeStatus().isInvalid())
       {
         if (notSilent)
@@ -669,34 +690,56 @@ public class Validator extends ValidateMessage
     return cr;
   }
 
-  protected String handleCodeReceived(String receivedValue, CodeTable codeTable, PotentialIssues.Field field)
+  protected CodeReceived handleCodeReceived(String receivedValue, CodeTable codeTable, PotentialIssues.Field field)
   {
-    String value = "";
-    if (notEmpty(receivedValue, field))
+    return handleCodeReceived(receivedValue, codeTable, field, true);
+  }
+
+  protected CodeReceived handleCodeReceived(String value, CodeTable codeTable, PotentialIssues.Field field,
+      boolean notSilent)
+  {
+    CodeReceived cr = null;
+    if (notEmpty(value, field))
     {
-      CodeReceived cr = getCodeReceived(receivedValue, codeTable);
+      cr = getCodeReceived(value, codeTable);
       cr.incReceivedCount();
       session.save(cr);
       if (cr.getCodeStatus().isValid())
       {
+        // Do nothing
         // registerIssue(pi.getIssue(field,
         // PotentialIssue.ISSUE_TYPE_IS_INVALID), cr);
       } else if (cr.getCodeStatus().isInvalid())
       {
-        registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_INVALID), cr);
+        if (notSilent)
+        {
+          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_INVALID), cr);
+        }
       } else if (cr.getCodeStatus().isUnrecognized())
       {
-        registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_UNRECOGNIZED), cr);
+        if (notSilent)
+        {
+          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_UNRECOGNIZED), cr);
+        }
       } else if (cr.getCodeStatus().isDeprecated())
       {
-        registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_DEPRECATE), cr);
+        if (notSilent)
+        {
+          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_DEPRECATE), cr);
+        }
       } else if (cr.getCodeStatus().isIgnored())
       {
-        registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_IGNORED), cr);
+        if (notSilent)
+        {
+          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_IGNORED), cr);
+        }
       }
-      value = cr.getCodeValue();
     }
-    return value;
+    if (cr == null)
+    {
+      cr = new CodeReceived();
+    }
+    return cr;
   }
 
   protected CodeReceived getCodeReceived(String receivedValue, CodeTable codeTable)

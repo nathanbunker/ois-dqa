@@ -87,6 +87,7 @@ public class SubmitPage extends WebPage
           session.save(submitterProfile);
           organization.setPrimaryProfile(submitterProfile);
         }
+        tx.commit();
         StringWriter stringWriter = new StringWriter();
         PrintWriter out = new PrintWriter(stringWriter);
         try 
@@ -99,7 +100,6 @@ public class SubmitPage extends WebPage
         }
         out.close();
         results = stringWriter.toString();
-        tx.commit();
       }
     });
     add(new Label("results"));

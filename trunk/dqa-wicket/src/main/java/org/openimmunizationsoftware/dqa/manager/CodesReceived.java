@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.openimmunizationsoftware.dqa.db.model.CodeMaster;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeStatus;
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
@@ -68,19 +68,15 @@ public class CodesReceived
 
   public CodeReceived getCodeReceived(String receivedValue, CodeTable codeTable)
   {
+    CodeReceived cr = null;
     Map<String, CodeReceived> codesReceived = codeTableMaps.get(codeTable);
-    if (codesReceived == null)
+    if (codesReceived != null)
     {
-      if (parent == null)
-      {
-        return null;
-      }
-      return parent.getCodeReceived(receivedValue, codeTable);
+      cr = codesReceived.get(receivedValue);
     }
-    CodeReceived cr = codesReceived.get(receivedValue);
     if (cr == null && parent != null)
     {
-      return parent.getCodeReceived(receivedValue, codeTable);
+      cr = parent.getCodeReceived(receivedValue, codeTable);
     }
     return cr;
   }
@@ -131,11 +127,10 @@ public class CodesReceived
           addToCodeTableMapsMvx(codeTable, query.list(), (SubmitterProfile) session.get(SubmitterProfile.class, 1));
         } else
         {
-          String sql = "from CodeReceived where profile = ? and table = ?";
+          String sql = "from CodeMaster where table = ?";
           query = session.createQuery(sql);
-          query.setParameter(0, session.get(SubmitterProfile.class, 1));
-          query.setParameter(1, codeTable);
-          addToCodeTableMaps(codeTable, query.list());
+          query.setParameter(0, codeTable);
+          addMastersToCodeTableMaps(codeTable, query.list(), (SubmitterProfile) session.get(SubmitterProfile.class, 1));
         }
       }
       session.close();
@@ -147,6 +142,22 @@ public class CodesReceived
     Map<String, CodeReceived> codeReceivedMap = new HashMap<String, CodeReceived>();
     for (CodeReceived codeReceived : codesReceived)
     {
+      codeReceivedMap.put(codeReceived.getReceivedValue(), codeReceived);
+    }
+    codeTableMaps.put(codeTable, codeReceivedMap);
+  }
+
+  protected void addMastersToCodeTableMaps(CodeTable codeTable, List<CodeMaster> codeMasters, SubmitterProfile profile)
+  {
+    Map<String, CodeReceived> codeReceivedMap = new HashMap<String, CodeReceived>();
+    for (CodeMaster codeMaster : codeMasters)
+    {
+      CodeReceived codeReceived = new CodeReceived();
+      codeReceived.setReceivedValue(codeMaster.getCodeValue());
+      codeReceived.setCodeStatus(codeMaster.getCodeStatus());
+      codeReceived.setCodeValue(codeMaster.getUseValue());
+      codeReceived.setProfile(profile);
+      codeReceived.setTable(codeTable);
       codeReceivedMap.put(codeReceived.getReceivedValue(), codeReceived);
     }
     codeTableMaps.put(codeTable, codeReceivedMap);

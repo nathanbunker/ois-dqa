@@ -86,5 +86,25 @@ public class IssueFound
   {
     return this.issueAction != null && this.issueAction.equals(IssueAction.SKIP);
   }
+  
+  public String getDisplayText()
+  {
+    StringBuilder sb = new StringBuilder(issue.getDisplayText());
+    
+    if (codeReceived != null)
+    {
+      sb.append(", " + codeReceived.getTable().getTableLabel() + " = '" + codeReceived.getReceivedValue() +  "'");
+      if (codeReceived.getCodeStatus().isDeprecated() && !codeReceived.getCodeValue().equals(codeReceived.getReceivedValue()))
+      {
+        sb.append(", use '" + codeReceived.getCodeValue() +  "' instead");        
+      }
+    }
+    if (positionId > 1)
+    {
+      sb.append(", in repeat #" + positionId + "");
+    }
+
+    return sb.toString();
+  }
 
 }

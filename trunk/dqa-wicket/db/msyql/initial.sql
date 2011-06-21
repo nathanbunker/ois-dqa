@@ -1,5 +1,8 @@
 -- root/goldenroot on Nathan's dev laptop for MySQL
 
+-- mysql -udqa_web -pSharkBaitHooHaHa
+-- mysql -uroot -pgoldenroot
+
 CREATE DATABASE dqa;
 
 USE dqa;
@@ -144,6 +147,7 @@ INSERT INTO dqa_code_status (code_status, code_label) VALUES ('V', 'Valid');
 INSERT INTO dqa_code_status (code_status, code_label) VALUES ('I', 'Invalid');
 INSERT INTO dqa_code_status (code_status, code_label) VALUES ('U', 'Unrecognized');
 INSERT INTO dqa_code_status (code_status, code_label) VALUES ('D', 'Deprecated');
+INSERT INTO dqa_code_status (code_status, code_label) VALUES ('G', 'Ignored');
 
 CREATE TABLE dqa_code_table
 (
@@ -171,6 +175,7 @@ INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (1
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (17, 'State', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (18, 'Completion', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (19, 'Confidentiality', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (20, 'Vaccine Product', '');
 
 CREATE TABLE dqa_batch_type
 (
@@ -329,7 +334,7 @@ CREATE TABLE dqa_vaccine_product
 (
   product_id          INTEGER NOT NULL PRIMARY KEY,
   product_name        VARCHAR(250) NOT NULL,
-  product_label           VARCHAR(250) NOT NULL,
+  product_label       VARCHAR(250) NOT NULL,
   cvx_code            VARCHAR(10) NOT NULL,
   mvx_code            VARCHAR(10) NOT NULL,
   valid_start_date    DATE NOT NULL,
@@ -373,4 +378,39 @@ CREATE TABLE dqa_vaccine_cpt
   valid_end_date      DATE NOT NULL,
   cvx_code            VARCHAR(10) NOT NULL
 );
+
+CREATE TABLE dqa_code_master
+(
+  code_master_id      INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  table_id            INTEGER NOT NULL,
+  code_value          VARCHAR(50) NOT NULL,
+  code_label          VARCHAR(250) NOT NULL,
+  use_value           VARCHAR(50) NOT NULL,
+  code_status         VARCHAR(1) NOT NULL
+);
+
+CREATE TABLE dqa_application
+(
+  application_id      INTEGER NOT NULL PRIMARY KEY,
+  application_label   VARCHAR(30) NOT NULL,
+  application_type    VARCHAR(30) NOT NULL, -- Dev, Test, Prod
+  run_this            VARCHAR(1) NOT NULL DEFAULT 'N'
+);
+
+INSERT INTO dqa_application (application_id, application_label, application_type, run_this) VALUES (1, 'OIS DQA', 'Dev', 'Y');
+INSERT INTO dqa_application (application_id, application_label, application_type, run_this) VALUES (2, 'ImmTrac', 'Test', 'N');
+INSERT INTO dqa_application (application_id, application_label, application_type, run_this) VALUES (3, 'ImmTrac', 'Prod', 'N');
+
+CREATE TABLE dqa_keyed_setting
+(
+  keyed_id            INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  keyed_code          VARCHAR(50) NOT NULL,
+  object_code         VARCHAR(50) NOT NULL,
+  object_id           INTEGER NOT NULL,
+  keyed_value         VARCHAR(250) NOT NULL
+);
+
+INSERT INTO dqa_keyed_setting (keyed_code, object_code, object_id, keyed_value) VALUES ('in.file.enabled', 'Application', 1, 'Y');
+INSERT INTO dqa_keyed_setting (keyed_code, object_code, object_id, keyed_value) VALUES ('in.file.dir', 'Application', 1, 'C:\\data\\in');
+INSERT INTO dqa_keyed_setting (keyed_code, object_code, object_id, keyed_value) VALUES ('in.file.wait', 'Application', 1, '15');
 
