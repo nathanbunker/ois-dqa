@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.db.model">
+  <class name="BatchIssues" table="dqa_batch_issues">
+    <id name="batchIssuesId" column="batch_issues_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="messageBatch" column="batch_id" class="MessageBatch"/>
+    <many-to-one name="issue" column="issue_id" class="PotentialIssue"/>
+    <property name="issueCountPos" column="issue_count_pos" type="integer"/>
+    <property name="issueCountNeg" column="issue_count_neg" type="integer"/>
+  </class>
+</hibernate-mapping>
