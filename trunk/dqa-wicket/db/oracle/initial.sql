@@ -141,6 +141,7 @@ INSERT INTO dqa_code_status (code_status, code_label) VALUES ('V', 'Valid');
 INSERT INTO dqa_code_status (code_status, code_label) VALUES ('I', 'Invalid');
 INSERT INTO dqa_code_status (code_status, code_label) VALUES ('U', 'Unrecognized');
 INSERT INTO dqa_code_status (code_status, code_label) VALUES ('D', 'Deprecated');
+INSERT INTO dqa_code_status (code_status, code_label) VALUES ('G', 'Ignored');
 
 CREATE TABLE dqa_code_table
 (
@@ -372,6 +373,16 @@ CREATE TABLE dqa_vaccine_cpt
   cvx_code            VARCHAR2(10) NOT NULL
 );
 
+CREATE TABLE dqa_code_master
+(
+  code_master_id      INTEGER NOT NULL PRIMARY KEY,
+  table_id            INTEGER NOT NULL,
+  code_value          VARCHAR2(50) NOT NULL,
+  code_label          VARCHAR2(250) NOT NULL,
+  use_value           VARCHAR2(50) NOT NULL,
+  code_status         VARCHAR2(1) NOT NULL
+);
+
 CREATE TABLE dqa_application
 (
   application_id      INTEGER NOT NULL PRIMARY KEY,
@@ -393,6 +404,10 @@ CREATE TABLE dqa_keyed_setting
   keyed_value         VARCHAR2(250) NOT NULL
 );
 
+INSERT INTO dqa_keyed_setting (keyed_id, keyed_code, object_code, object_id, keyed_value) VALUES (dqa_keyed_id_sequence.NEXTVAL, 'in.file.enabled', 'Application', 1, 'Y');
+INSERT INTO dqa_keyed_setting (keyed_id, keyed_code, object_code, object_id, keyed_value) VALUES (dqa_keyed_id_sequence.NEXTVAL, 'in.file.dir', 'Application', 1, 'C:\data\in');
+INSERT INTO dqa_keyed_setting (keyed_id, keyed_code, object_code, object_id, keyed_value) VALUES (dqa_keyed_id_sequence.NEXTVAL, 'in.file.wait', 'Application', 1, '15');
+
 CREATE SEQUENCE dqa_organization_id_sequence INCREMENT BY 1 START WITH 100;
 CREATE SEQUENCE dqa_profile_id_sequence INCREMENT BY 1 START WITH 100;
 CREATE SEQUENCE dqa_message_received_sequence INCREMENT BY 1 START WITH 1;
@@ -401,5 +416,6 @@ CREATE SEQUENCE dqa_patient_id_sequence INCREMENT BY 1 START WITH 1;
 CREATE SEQUENCE dqa_next_of_kin_id_sequence INCREMENT BY 1 START WITH 1;
 CREATE SEQUENCE dqa_vaccination_id_sequence INCREMENT BY 1 START WITH 1;
 CREATE SEQUENCE dqa_keyed_id_sequence INCREMENT BY 1 START WITH 1;
+CREATE SEQUENCE dqa_code_master_id_sequence INCREMENT BY 1 START WITH 1;
 
 
