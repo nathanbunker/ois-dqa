@@ -141,7 +141,7 @@ public class Validator extends ValidateMessage
         PotentialIssues.Field.VACCINATION_CVX_CODE);
     cvxCode = cvxCr.getCodeValue();
     vaccination.setAdminCodeCvx(cvxCode);
-    
+
     CodeReceived vaccineCr = cvxCr;
 
     // TODO Need to figure out status for CPT can CVX
@@ -438,7 +438,7 @@ public class Validator extends ValidateMessage
         // TODO VaccinationLotNumberIsInvalid
       }
     }
-    
+
     // VaccinationRefusalReasonIsDeprecated
     // VaccinationRefusalReasonIsIgnored
     // VaccinationRefusalReasonIsInvalid
@@ -493,7 +493,8 @@ public class Validator extends ValidateMessage
       }
     }
 
-    if (street.equals("") || zip.equals("") || city.equals("") || state.equals(""))
+    if (street == null || street.equals("") || zip == null || zip.equals("") || city == null || city.equals("")
+        || state == null || state.equals(""))
     {
       registerIssue(pi.PatientAddressIsMissing);
     }
