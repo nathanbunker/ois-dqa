@@ -11,7 +11,7 @@ INSERT INTO dqa_user_account (username, password, account_type, org_id, email) V
 
 CREATE TABLE dqa_organization
 (
-  org_id             INTEGER NOT NULL PRIMARY KEY,
+  org_id             INTEGER NOT NULL IDENTITY,
   org_label          VARCHAR(60) NOT NULL,
   org_parent_id      INTEGER,
   primary_profile_id INTEGER
@@ -19,11 +19,9 @@ CREATE TABLE dqa_organization
 
 INSERT INTO dqa_organization (org_id, org_label, org_parent_id, primary_profile_id) VALUES (1, 'IIS', 0, 1);
 
-CREATE SEQUENCE dqa_organization_id_sequence INCREMENT BY 1 START WITH 100;
-
 CREATE TABLE dqa_submitter_profile
 (
-  profile_id         INTEGER NOT NULL PRIMARY KEY,
+  profile_id         INTEGER NOT NULL IDENTITY,
   profile_label      VARCHAR(30) NOT NULL,
   profile_status     VARCHAR(5) DEFAULT 'Setup' NOT NULL, -- Setup, Test, Production, Hold
   org_id             INTEGER NOT NULL,
@@ -32,13 +30,11 @@ CREATE TABLE dqa_submitter_profile
   access_key         VARCHAR(50)
 );
 
-CREATE SEQUENCE dqa_profile_id_sequence INCREMENT BY 1 START WITH 100;
-
 INSERT INTO dqa_submitter_profile(profile_id, profile_label, profile_status, org_id, data_format, transfer_priority, access_key) VALUES (1, 'HL7', 'Test', 1, 'HL7v2', 'Normal', 'hl7');
 
 CREATE TABLE dqa_potential_issue_status
 (
-  potential_issue_status_id INTEGER NOT NULL PRIMARY KEY,
+  potential_issue_status_id INTEGER NOT NULL IDENTITY,
   issue_id           INTEGER NOT NULL,
   profile_id         INTEGER NOT NULL,
   action_code        VARCHAR(1) NOT NULL,
@@ -61,7 +57,7 @@ INSERT INTO dqa_issue_action (action_code, action_label) VALUES ('S', 'Skip');
 
 CREATE TABLE dqa_potential_issue
 (
-  issue_id            INTEGER NOT NULL PRIMARY KEY,
+  issue_id            INTEGER NOT NULL IDENTITY,
   target_object       VARCHAR(30) NOT NULL,
   target_field        VARCHAR(50) NOT NULL,
   issue_type          VARCHAR(50) NOT NULL,
@@ -72,17 +68,17 @@ CREATE TABLE dqa_potential_issue
 
 CREATE TABLE dqa_message_batch
 (
-  batch_id            INTEGER NOT NULL PRIMARY KEY,
+  batch_id            INTEGER NOT NULL IDENTITY,
   batch_title         VARCHAR(60),
   type_code           VARCHAR(1),
-  start_date          DATE,
-  end_date            DATE,
+  start_date          DATESTAMP,
+  end_date            DATESTAMP,
   submit_code         VARCHAR(1)
 );
 
 CREATE TABLE dqa_receive_queue
 (
-  receive_queue_id    INTEGER NOT NULL PRIMARY KEY,
+  receive_queue_id    INTEGER NOT NULL IDENTITY,
   batch_id            INTEGER,
   received_id         INTEGER,
   submit_code         VARCHAR(1)
@@ -92,21 +88,19 @@ CREATE INDEX dqa_receive_queue_key ON dqa_receive_queue (batch_id, received_id);
 
 CREATE TABLE dqa_message_received
 (
-  received_id         INTEGER NOT NULL PRIMARY KEY,
+  received_id         INTEGER NOT NULL IDENTITY,
   profile_id          INTEGER NOT NULL,
-  received_date       DATE NOT NULL,
-  request_text        CLOB,
-  response_text       CLOB,
+  received_date       TIMESTAMP NOT NULL,
+  request_text        VARCHAR,
+  response_text       VARCHAR,
   action_code         VARCHAR(1),
   submit_code         VARCHAR(1),
   patient_id          INTEGER
 );
 
-CREATE SEQUENCE dqa_message_received_sequence INCREMENT BY 1 START WITH 1;
-
 CREATE TABLE dqa_issue_found 
 (
-  issue_found_id      INTEGER NOT NULL PRIMARY KEY,
+  issue_found_id      INTEGER NOT NULL IDENTITY,
   received_id         INTEGER NOT NULL,
   issue_id            INTEGER NOT NULL,
   position_id         INTEGER NOT NULL,
@@ -119,7 +113,7 @@ CREATE INDEX dqa_issue_found_key ON dqa_issue_found (received_id, issue_id);
 
 CREATE TABLE dqa_code_received
 (
-  code_id             INTEGER NOT NULL PRIMARY KEY,
+  code_id             INTEGER NOT NULL IDENTITY,
   profile_id          INTEGER NOT NULL,
   table_id            INTEGER NOT NULL,
   received_value      VARCHAR(50) NOT NULL,
@@ -129,8 +123,6 @@ CREATE TABLE dqa_code_received
 );
 
 CREATE INDEX dqa_code_received_key ON dqa_code_received (profile_id, table_id, received_value);
-
-CREATE SEQUENCE dqa_code_id_sequence INCREMENT BY 1 START WITH 1;
 
 CREATE TABLE dqa_code_status
 (
@@ -183,7 +175,7 @@ INSERT INTO dqa_batch_type (type_code, type_label) VALUES ('O', 'Other');
 
 CREATE TABLE dqa_batch_issues
 (
-  batch_issues_id     INTEGER NOT NULL PRIMARY KEY,
+  batch_issues_id     INTEGER NOT NULL IDENTITY,
   batch_id            INTEGER NOT NULL,
   issue_id            INTEGER NOT NULL,
   issue_count_pos     INTEGER,
@@ -194,7 +186,7 @@ CREATE INDEX dqa_batch_issues_key ON dqa_batch_issues (batch_id, issue_id);
 
 CREATE TABLE dqa_batch_actions
 (
-  batch_actions_id    INTEGER NOT NULL PRIMARY KEY,
+  batch_actions_id    INTEGER NOT NULL IDENTITY,
   batch_id            INTEGER NOT NULL,
   action_code         VARCHAR(1) NOT NULL,
   action_count        INTEGER
@@ -216,7 +208,7 @@ INSERT INTO dqa_submit_status (submit_code, submit_label) VALUES ('S', 'Submitte
 
 CREATE TABLE dqa_patient 
 (
-  patient_id               INTEGER NOT NULL PRIMARY KEY,
+  patient_id               INTEGER NOT NULL IDENTITY,
   received_id              INTEGER NOT NULL,
   address_city             VARCHAR(250),
   address_country          VARCHAR(250),
@@ -268,7 +260,7 @@ CREATE TABLE dqa_patient
 
 CREATE TABLE dqa_next_of_kin
 (
-  next_of_kin_id           INTEGER NOT NULL PRIMARY KEY,
+  next_of_kin_id           INTEGER NOT NULL IDENTITY,
   received_id              INTEGER NOT NULL,
   position_id              INTEGER NOT NULL,
   address_city             VARCHAR(250),
@@ -289,15 +281,9 @@ CREATE TABLE dqa_next_of_kin
   relationship_code        VARCHAR(250)
 );
 
-CREATE SEQUENCE dqa_patient_id_sequence INCREMENT BY 1 START WITH 1;
-
-CREATE SEQUENCE dqa_next_of_kin_id_sequence INCREMENT BY 1 START WITH 1;
-
-CREATE SEQUENCE dqa_vaccination_id_sequence INCREMENT BY 1 START WITH 1;
-
 CREATE TABLE dqa_vaccination 
 (
-  vaccination_id             INTEGER NOT NULL PRIMARY KEY,
+  vaccination_id             INTEGER NOT NULL IDENTITY,
   received_id                INTEGER NOT NULL,
   position_id                INTEGER NOT NULL,
   admin_code_cpt             VARCHAR(250),
@@ -378,3 +364,12 @@ CREATE TABLE dqa_vaccine_cpt
   cvx_code            VARCHAR(10) NOT NULL
 );
 
+CREATE TABLE dqa_code_master
+(
+  code_master_id      INTEGER NOT NULL IDENTITY PRIMARY KEY,
+  table_id            INTEGER NOT NULL,
+  code_value          VARCHAR(50) NOT NULL,
+  code_label          VARCHAR(250) NOT NULL,
+  use_value           VARCHAR(50) NOT NULL,
+  code_status         VARCHAR(1) NOT NULL
+);

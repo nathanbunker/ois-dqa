@@ -7,6 +7,7 @@ import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
@@ -25,14 +26,23 @@ import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
+import org.openimmunizationsoftware.dqa.manager.FileImportManager;
 import org.openimmunizationsoftware.dqa.manager.MessageReceivedManager;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
 import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
 import org.openimmunizationsoftware.dqa.validate.Validator;
 
-
 public class IncomingServlet extends HttpServlet
 {
+  
+  private FileImportManager fileImportManager = null;
+  
+  @Override
+  public void init() throws ServletException
+  {
+    fileImportManager = FileImportManager.getFileImportManager();
+  }
+  
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
@@ -69,6 +79,23 @@ public class IncomingServlet extends HttpServlet
     out.println("      <input type=\"checkbox\" name=\"DEBUG\" value=\"T\">Debug");
     out.println("      <input name=\"submit\" value=\"Submit\" type=\"submit\">");
     out.println("    </form>");
+    out.println("    ");
+    
+    if (fileImportManager.isKeepRunning())
+    {
+      out.println("      <p>File import manager is running.<p>");
+    }
+    if (fileImportManager.getLastException() != null)
+    {
+      out.println("      <p>Last Exception</p>");
+      out.println("<pre>");
+      fileImportManager.getLastException().printStackTrace(out);
+      out.println("</pre>");
+    }
+    out.println("      <p>Internal Log</p>");
+    out.println("<pre>");
+    out.print(fileImportManager.getInternalLog());
+    out.println("</pre>");
     out.println("  </body>");
     out.println("</html>");
     out.close();
@@ -96,8 +123,8 @@ public class IncomingServlet extends HttpServlet
     session.close();
   }
 
-  public static void process(boolean debug, PrintWriter out, Session session, SubmitterProfile profile, String messageData)
-      throws IOException
+  public static void process(boolean debug, PrintWriter out, Session session, SubmitterProfile profile,
+      String messageData) throws IOException
   {
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     StringReader stringReader = new StringReader(messageData);
@@ -130,8 +157,8 @@ public class IncomingServlet extends HttpServlet
     }
   }
 
-  private static void processMessage(PrintWriter out, VaccinationUpdateParserHL7 parser, StringBuilder sb, boolean debug, int messageCount,
-      SubmitterProfile profile, Session session)
+  private static void processMessage(PrintWriter out, VaccinationUpdateParserHL7 parser, StringBuilder sb,
+      boolean debug, int messageCount, SubmitterProfile profile, Session session)
   {
     try
     {
@@ -145,7 +172,7 @@ public class IncomingServlet extends HttpServlet
         Validator validator = new Validator(profile, session);
         validator.validateVaccinationUpdateMessage(messageReceived);
       }
-      
+
       String ackMessage = parser.makeAckMessage(messageReceived);
       messageReceived.setResponseText(ackMessage);
       messageReceived.setIssueAction(IssueAction.ACCEPT);
@@ -158,63 +185,46 @@ public class IncomingServlet extends HttpServlet
           out.print("-- DEBUG START -------------------------------------------------------\r");
           out.print("Processed message: " + messageCount + "\r");
           List<IssueFound> issuesFound = messageReceived.getIssuesFound();
-          out.print("Errors:\r");
+          boolean first = true;
           for (IssueFound issueFound : issuesFound)
           {
             if (!issueFound.getIssueNegate() && issueFound.isError())
             {
-              out.print("  + ");
-              out.print(issueFound.getIssue().getDisplayText());
-              if (issueFound.positionId > 1)
+              if (first)
               {
-                out.print(" (position #" + issueFound.positionId + ")");
+                out.print("Errors:\r");
+                first = false;
               }
-              out.print("\r");
+              printIssueFound(out, issueFound);
             }
           }
-          out.print("Warnings:\r");
+          first = true;
           for (IssueFound issueFound : issuesFound)
           {
             if (!issueFound.getIssueNegate() && issueFound.isWarn())
             {
-              out.print("  + ");
-              out.print(issueFound.getIssue().getDisplayText());
-              if (issueFound.positionId > 1)
+              if (first)
               {
-                out.print(" (position #" + issueFound.positionId + ")");
+                out.print("Warnings:\r");
+                first = false;
               }
-              out.print("\r");
+              printIssueFound(out, issueFound);
             }
           }
-          out.print("Information:\r");
-          for (IssueFound issueFound : issuesFound)
-          {
-            if (!issueFound.getIssueNegate() && issueFound.isAccept())
-            {
-              out.print("  + ");
-              out.print(issueFound.getIssue().getDisplayText());
-              if (issueFound.positionId > 1)
-              {
-                out.print(" (position #" + issueFound.positionId + ")");
-              }
-              out.print("\r");
-            }
-          }
-          out.print("Skip:\r");
+          first = true;
           for (IssueFound issueFound : issuesFound)
           {
             if (!issueFound.getIssueNegate() && issueFound.isSkip())
             {
-              out.print("  + ");
-              out.print(issueFound.getIssue().getDisplayText());
-              if (issueFound.positionId > 1)
+              if (first)
               {
-                out.print(" (position #" + issueFound.positionId + ")");
+                out.print("Skip:\r");
+                first = false;
               }
-              out.print("\r");
+              printIssueFound(out, issueFound);
             }
           }
-          out.print("Bean Printout: \r");
+          out.print("Message Data: \r");
           printBean(out, messageReceived, "  ");
           out.print("-- DEBUG END ---------------------------------------------------------\r");
         } catch (Exception e)
@@ -236,9 +246,18 @@ public class IncomingServlet extends HttpServlet
     }
   }
 
-  private static void printBean(PrintWriter out, Object object, String indent) throws IllegalAccessException,
+  private static void printIssueFound(PrintWriter out, IssueFound issueFound)
+  {
+    out.print("  + ");
+    out.print(issueFound.getDisplayText());
+    out.print("\r");
+  }
+
+  private static List<String> printBean(PrintWriter out, Object object, String indent) throws IllegalAccessException,
       InvocationTargetException
   {
+    List<String> thisPrinted = new ArrayList<String>();
+    List<String> subPrinted = new ArrayList<String>();
     Method[] methods = object.getClass().getMethods();
     Arrays.sort(methods, new Comparator<Method>() {
       public int compare(Method o1, Method o2)
@@ -249,43 +268,44 @@ public class IncomingServlet extends HttpServlet
     for (Method method : methods)
     {
       if (method.getName().startsWith("get") && !method.getName().equals("getClass")
-          && !method.getName().equals("getMessageReceived") 
-          && !method.getName().equals("getProfile")
-          && !method.getName().equals("getIssuesFound")
-          && !method.getReturnType().equals(Void.TYPE) && method.getParameterTypes().length == 0)
+          && !method.getName().equals("getMessageReceived") && !method.getName().equals("getProfile")
+          && !method.getName().equals("getRequestText") && !method.getName().equals("getResponseText")
+          && !method.getName().equals("getIssuesFound") && !method.getReturnType().equals(Void.TYPE)
+          && method.getParameterTypes().length == 0)
       {
         Object returnValue = method.invoke(object);
         String fieldName = method.getName().substring(3);
-        out.print(indent);
-        out.print(fieldName);
-        if (returnValue == null)
+        if (returnValue == null || subPrinted.contains(fieldName))
         {
-          out.print("\r");
+          // do nothing
         } else if (method.getReturnType() == String.class)
         {
           if (!((String) returnValue).equals(""))
           {
+            out.print(indent);
+            out.print(fieldName);
             out.print(" = '");
             out.print(returnValue);
             out.print("'");
+            out.print("\r");
+            thisPrinted.add(fieldName);
           }
-          out.print("\r");
         } else if (method.getReturnType() == Date.class)
         {
+          out.print(indent);
+          out.print(fieldName);
           SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
           out.print(" = ");
           out.print(sdf.format((Date) returnValue));
           out.print("\r");
+          thisPrinted.add(fieldName);
         } else if (method.getReturnType() == List.class)
         {
           List list = (List) returnValue;
           for (int i = 0; i < list.size(); i++)
           {
-            if (i > 0)
-            {
-              out.print(indent);
-              out.print(fieldName);
-            }
+            out.print(indent);
+            out.print(fieldName);
             out.print(" #");
             out.print(i + 1);
             out.print("\r");
@@ -293,10 +313,18 @@ public class IncomingServlet extends HttpServlet
           }
         } else
         {
+          out.print(indent);
+          out.print(fieldName);
           out.print("\r");
-          printBean(out, returnValue, indent + "  ");
+          List<String> returnPrints = printBean(out, returnValue, indent + "  ");
+          for (String returnPrint : returnPrints)
+          {
+            subPrinted.add(fieldName + returnPrint);
+          }
         }
       }
     }
+    return thisPrinted;
   }
+
 }

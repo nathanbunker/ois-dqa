@@ -26,7 +26,8 @@ public class TestVaccinationUpdateParserHL7 extends TestCase
     + "NK1|1|CHEIN^LASSIE^THE|MTH^Mother^HL70063|\r"
     + "NK1|2|CHEIN^JACQUES^LE|FTH^Father^HL70063|\r"
     + "PV1||R|\r"
-    + "RXA|0|999|20080606|20080606|45^Hep B, NOS^CVX^90731^Hep B - unspecified^C4|999|||01^Historical information - source unspecified^NIP001|\r"
+    + "RXA|0|999|20080606|20080606|90707^MMR^CPT^03^MMR^CVX|999|||01^Historical information - source unspecified^NIP001|\r"
+    + "RXR|ROUTE|SITE|\r"
     + "RXA|0|999|20080815|20080815|116^^CVX^90680^Rotavirus^C4|999|||01^Historical information - source unspecified^NIP001|\r"
     + "RXA|0|999|20080815|20080815|110^DTaP-Hep B-IPV^CVX^90723^DTaP/Hep B/IPV^C4|999|||01^Historical information - source unspecified^NIP001|\r"
     + "RXA|0|999|20081007|20081007|110^DTaP-Hep B-IPV^CVX^90723^DTaP/Hep B/IPV^C4|999|||00^New immunization record^NIP001||^^^West Houston^^^^^12606 West Houston Center Blvd.^^Houston^TX^77082^US||||D80993X||SKB^GlaxoSmithKline^MVX|\r"
@@ -65,11 +66,11 @@ public class TestVaccinationUpdateParserHL7 extends TestCase
     assertEquals("", patient.getFacilityId());
     assertEquals("", patient.getFacilityName());
     assertEquals("", patient.getFinancialEligibility());
-    assertEquals("", patient.getIdMedicaid());
-    assertEquals("", patient.getIdSsn());
+    assertEquals("7833822", patient.getIdMedicaid());
+    assertEquals("453533099", patient.getIdSsn());
     assertEquals("", patient.getIdSubmitterAssigningAuthority());
-    assertEquals("", patient.getIdSubmitterNumber());
-    assertEquals("", patient.getIdSubmitterTypeCode());
+    assertEquals("200005643", patient.getIdSubmitterNumber());
+    assertEquals("PI", patient.getIdSubmitterTypeCode());
     assertEquals("", patient.getMotherMaidenName());
     assertEquals("CHEIN", vum.getPatient().getNameLast());
     assertEquals("LE", vum.getPatient().getNameFirst());
@@ -110,13 +111,15 @@ public class TestVaccinationUpdateParserHL7 extends TestCase
     assertEquals(5, vaccinations.size());
     Vaccination vaccination = vaccinations.get(0);
     assertEquals("", vaccination.getActionCode());
-    assertEquals("90731", vaccination.getAdminCodeCpt());
-    assertEquals("45", vaccination.getAdminCodeCvx());
+    assertEquals("90707", vaccination.getAdminCodeCpt());
+    assertEquals("03", vaccination.getAdminCodeCvx());
     assertEquals("20080606", sdf.format(vaccination.getAdminDate()));
     assertEquals("999", vaccination.getAmount());
     assertEquals("", vaccination.getAmountUnitCode());
     assertEquals("", vaccination.getCompletionStatusCode());
     assertEquals("", vaccination.getConfidentialityCode());
+    assertEquals("ROUTE", vaccination.getBodyRouteCode());
+    assertEquals("SITE", vaccination.getBodySiteCode());
     assertEquals("", vaccination.getEnteredByNameFirst());
     assertEquals("", vaccination.getEnteredByNameLast());
     assertEquals("", vaccination.getEnteredByNumber());

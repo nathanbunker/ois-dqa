@@ -26,8 +26,6 @@ CREATE TABLE dqa_organization
 
 INSERT INTO dqa_organization (org_id, org_label, org_parent_id, primary_profile_id) VALUES (1, 'IIS', 0, 1);
 
-CREATE SEQUENCE dqa_organization_id_sequence INCREMENT BY 1 START WITH 100;
-
 CREATE TABLE dqa_submitter_profile
 (
   profile_id         INTEGER NOT NULL PRIMARY KEY,
@@ -38,8 +36,6 @@ CREATE TABLE dqa_submitter_profile
   transfer_priority  VARCHAR2(7) DEFAULT 'Normal' NOT NULL, -- Normal, High, Highest, Low, Lowest
   access_key         VARCHAR2(50)
 );
-
-CREATE SEQUENCE dqa_profile_id_sequence INCREMENT BY 1 START WITH 100;
 
 INSERT INTO dqa_submitter_profile(profile_id, profile_label, profile_status, org_id, data_format, transfer_priority, access_key) VALUES (1, 'HL7', 'Test', 1, 'HL7v2', 'Normal', 'hl7');
 
@@ -109,8 +105,6 @@ CREATE TABLE dqa_message_received
   patient_id          INTEGER
 );
 
-CREATE SEQUENCE dqa_message_received_sequence INCREMENT BY 1 START WITH 1;
-
 CREATE TABLE dqa_issue_found 
 (
   issue_found_id      INTEGER NOT NULL PRIMARY KEY,
@@ -136,8 +130,6 @@ CREATE TABLE dqa_code_received
 );
 
 CREATE INDEX dqa_code_received_key ON dqa_code_received (profile_id, table_id, received_value);
-
-CREATE SEQUENCE dqa_code_id_sequence INCREMENT BY 1 START WITH 1;
 
 CREATE TABLE dqa_code_status
 (
@@ -176,6 +168,7 @@ INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (1
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (17, 'State', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (18, 'Completion', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (19, 'Confidentiality', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES (20, 'Vaccine Product', '');
 
 CREATE TABLE dqa_batch_type
 (
@@ -296,12 +289,6 @@ CREATE TABLE dqa_next_of_kin
   relationship_code        VARCHAR2(250)
 );
 
-CREATE SEQUENCE dqa_patient_id_sequence INCREMENT BY 1 START WITH 1;
-
-CREATE SEQUENCE dqa_next_of_kin_id_sequence INCREMENT BY 1 START WITH 1;
-
-CREATE SEQUENCE dqa_vaccination_id_sequence INCREMENT BY 1 START WITH 1;
-
 CREATE TABLE dqa_vaccination 
 (
   vaccination_id             INTEGER NOT NULL PRIMARY KEY,
@@ -384,4 +371,35 @@ CREATE TABLE dqa_vaccine_cpt
   valid_end_date      DATE NOT NULL,
   cvx_code            VARCHAR2(10) NOT NULL
 );
+
+CREATE TABLE dqa_application
+(
+  application_id      INTEGER NOT NULL PRIMARY KEY,
+  application_label   VARCHAR2(30) NOT NULL,
+  application_type    VARCHAR2(30) NOT NULL, -- Dev, Test, Prod
+  run_this            VARCHAR2(1) DEFAULT 'N'
+);
+
+INSERT INTO dqa_application (application_id, application_label, application_type, run_this) VALUES (1, 'DQA Dev', 'Dev', 'Y');
+INSERT INTO dqa_application (application_id, application_label, application_type, run_this) VALUES (2, 'ImmTrac', 'Test', 'N');
+INSERT INTO dqa_application (application_id, application_label, application_type, run_this) VALUES (3, 'ImmTrac', 'Prod', 'N');
+
+CREATE TABLE dqa_keyed_setting
+(
+  keyed_id            INTEGER NOT NULL PRIMARY KEY,
+  keyed_code          VARCHAR2(50) NOT NULL,
+  object_code         VARCHAR2(50) NOT NULL,
+  object_id           INTEGER NOT NULL,
+  keyed_value         VARCHAR2(250) NOT NULL
+);
+
+CREATE SEQUENCE dqa_organization_id_sequence INCREMENT BY 1 START WITH 100;
+CREATE SEQUENCE dqa_profile_id_sequence INCREMENT BY 1 START WITH 100;
+CREATE SEQUENCE dqa_message_received_sequence INCREMENT BY 1 START WITH 1;
+CREATE SEQUENCE dqa_code_id_sequence INCREMENT BY 1 START WITH 1000;
+CREATE SEQUENCE dqa_patient_id_sequence INCREMENT BY 1 START WITH 1;
+CREATE SEQUENCE dqa_next_of_kin_id_sequence INCREMENT BY 1 START WITH 1;
+CREATE SEQUENCE dqa_vaccination_id_sequence INCREMENT BY 1 START WITH 1;
+CREATE SEQUENCE dqa_keyed_id_sequence INCREMENT BY 1 START WITH 1;
+
 

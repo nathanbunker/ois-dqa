@@ -9,6 +9,7 @@ import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
+import org.openimmunizationsoftware.dqa.db.model.received.Patient;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Address;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
@@ -92,6 +93,11 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         orcSegment = currentSegment;
       } else if (segmentName.equals("RXA"))
       {
+        if (vaccination == null)
+        {
+          positionId = 0;
+        }
+        positionId ++;
         vaccinationCount++;
         vaccination = new Vaccination();
         vaccination.setPositionId(vaccinationCount);
@@ -103,7 +109,16 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
           populateORC(message);
           orcSegment = null;
         }
+      } else if (segmentName.equals("RXR"))
+      {
+        if (vaccination == null)
+        {
+          registerIssue(pi.Hl7RxaSegmentIsMissing);
+          continue;
+        }
+        populateRXR(message);
       }
+      
     }
   }
 
@@ -135,11 +150,9 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     patient.setDeathDate(getValueDate(29));
     patient.setDeathIndicator(getValue(30));
     patient.setEthnicityCode(getValue(22));
-    // private OrganizationName facility = new OrganizationName();
-    // private String financialEligibility = "";
-    // private String idMedicaid = "";
-    // private String idSsn = "";
-    // private Id idSubmitter = new Id();
+    // TODO private OrganizationName facility = new OrganizationName();
+    // TODO private String financialEligibility = "";
+    readPatientId(patient);
     patient.setMotherMaidenName(getValue(21));
     readName(5, patient.getName());
     readPhoneNumber(13, patient.getPhone());
@@ -150,12 +163,12 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   private void populatePD1(MessageReceived message)
   {
-    // private OrganizationName facility = new OrganizationName();
-    // private Id idSubmitter = new Id();
-    // private Id physician = new Id();
-    // private CodedEntity protection = new CodedEntity();
-    // private CodedEntity publicity = new CodedEntity();
-    // private String registryStatus = "";
+    // TODO private OrganizationName facility = new OrganizationName();
+    // TODO private Id idSubmitter = new Id();
+    // TODO private Id physician = new Id();
+    // TODO private CodedEntity protection = new CodedEntity();
+    // TODO private CodedEntity publicity = new CodedEntity();
+    // TODO private String registryStatus = "";
   }
 
   private void populateNK1(MessageReceived message)
@@ -175,8 +188,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     vaccination.setAmount(getValue(6));
     vaccination.setAmountUnitCode(getValue(7));
     readCodeEntity(9, vaccination.getInformationSource());
-    // 10 XCN private Id givenBy = new Id();
-    // 11 LA2 private OrganizationName facility = new OrganizationName();
+    // TODO 10 XCN private Id givenBy = new Id();
+    // TODO 11 LA2 private OrganizationName facility = new OrganizationName();
     vaccination.setLotNumber(getValue(15));
     vaccination.setExpirationDate(getValueDate(16));
     readCodeEntity(17, vaccination.getManufacturer());
@@ -184,6 +197,12 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     vaccination.setCompletionStatusCode(getValue(20));
     vaccination.setActionCode(getValue(21));
     vaccination.setSystemEntryDate(getValueDate(22));
+  }
+  
+  private void populateRXR(MessageReceived message)
+  {
+    readCodeEntity(1, vaccination.getBodyRoute());
+    readCodeEntity(2, vaccination.getBodySite());
   }
 
   private void readCptCvxCodes(CodedEntity admin)
@@ -193,7 +212,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       vaccination.setAdminCodeCvx(admin.getCode());
     } else if (admin.getAltTable().equals("CVX"))
     {
-      vaccination.setAdminCodeCvx(admin.getCode());
+      vaccination.setAdminCodeCvx(admin.getAltCode());
     }
     if (admin.getTable().equals("CPT") || admin.getTable().equals("C4"))
     {
@@ -206,17 +225,15 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   private void populateORC(MessageReceived message)
   {
-
-    // private CodedEntity confidentiality = new CodedEntity();
-    // private Id enteredBy = new Id();
-    // private String idSubmitter = "";
-    // private Id orderedBy = new Id();
-
+    // TODO private CodedEntity confidentiality = new CodedEntity();
+    // TODO private Id enteredBy = new Id();
+    // TODO private String idSubmitter = "";
+    // TODO private Id orderedBy = new Id();
   }
 
   private void populatePV1(MessageReceived message)
   {
-    // private String financialEligibility = "";
+    // TODO private String financialEligibility = "";
   }
 
   private void readPhoneNumber(int fieldNumber, PhoneNumber phoneNumber)
@@ -247,6 +264,34 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     address.setCountry(field.length >= 6 ? field[5] : "");
     address.setType(field.length >= 7 ? field[6] : "");
     address.setCountyParish(field.length >= 8 ? field[7] : "");
+  }
+  
+  private void readPatientId(Patient patient)
+  {
+    List<String[]> values = getRepeatValues(3);
+    if (values.size() > 0)
+    {
+      String[] fields = values.get(0);
+      patient.setIdSubmitterNumber(fields.length >= 1 ? fields[0] : "");
+      patient.setIdSubmitterAssigningAuthority(fields.length >= 4 ? fields[3] : "");
+      patient.setIdSubmitterTypeCode(fields.length >= 5 ? fields[4] : "");
+    }
+    for (int i = 1; i < values.size(); i++)
+    {
+      String[] fields = values.get(i);
+      if (fields.length >= 5)
+      {
+        String typeCode = fields[4];
+        if ("SS".equals(typeCode))
+        {
+          patient.setIdSsn(fields[0]);
+        }
+        else if ("MA".equals(typeCode))
+        {
+          patient.setIdMedicaid(fields[0]);
+        }
+      }
+    }
   }
 
   private void readCodeEntity(int fieldNumber, CodedEntity ce)
@@ -380,6 +425,37 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     }
     return value.split("\\" + separators[CAR]);
   }
+  
+  private List<String[]> getRepeatValues(int fieldNumber)
+  {
+    List<String[]> values = new ArrayList<String[]>();
+    String value = null;
+    if (currentSegment.size() > fieldNumber)
+    {
+      value = currentSegment.get(fieldNumber);
+    }
+    if (value == null)
+    {
+      values.add(new String[] { "" });
+      return values;
+    }
+    int valueLength = value.length();
+    int startPos = 0;
+    for (int i = 0; i < valueLength; i++)
+    {
+      char c = value.charAt(i);
+      if (c == separators[TIL])
+      {
+        values.add(value.substring(startPos, i).split("\\" + separators[CAR]));
+        startPos = i + 1;
+      }
+    }
+    if (startPos < valueLength)
+    {
+      values.add(value.substring(startPos).split("\\" + separators[CAR]));
+    }
+    return values;
+  }
 
   private void readSeparators(String messageText)
   {
@@ -422,7 +498,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       {
         if (issueFound.isError())
           return "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r" + "MSA|AE|TODO|"
-              + issueFound.getIssue().getDisplayText() + "|\r";
+              + issueFound.getDisplayText() + "|\r";
       }
     }
     return "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r" + "MSA|AA|TODO|Message received for "
