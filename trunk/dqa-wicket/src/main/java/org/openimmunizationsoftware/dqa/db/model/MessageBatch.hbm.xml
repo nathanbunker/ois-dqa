@@ -3,7 +3,9 @@
 <hibernate-mapping package="org.openimmunizationsoftware.dqa.db.model">
   <class name="MessageBatch" table="dqa_message_batch">
     <id name="batchId" column="batch_id">
-      <generator class="native"/>
+      <generator class="native">
+        <param name="sequence">dqa_batch_id_sequence</param>
+      </generator>
     </id>
     <property name="batchTitle" column="batch_title" type="string"/>
     <many-to-one name="batchType" column="type_code" class="BatchType"/>

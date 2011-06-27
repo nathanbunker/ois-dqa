@@ -8,6 +8,17 @@ public class BatchIssues
   private int issueCountPos = 0;
   private int issueCountNeg = 0;
   
+  public BatchIssues()
+  {
+    // default
+  }
+  
+  public BatchIssues(PotentialIssue issue, MessageBatch messageBatch)
+  {
+    this.issue = issue;
+    this.messageBatch = messageBatch;
+  }
+  
   public int getBatchIssuesId()
   {
     return batchIssuesId;
@@ -35,6 +46,10 @@ public class BatchIssues
   public int getIssueCountPos()
   {
     return issueCountPos;
+  }
+  public void incIssueCountPos()
+  {
+    issueCountPos++;
   }
   public void setIssueCountPos(int issueCountPos)
   {

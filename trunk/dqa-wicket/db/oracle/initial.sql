@@ -121,6 +121,7 @@ CREATE INDEX dqa_issue_found_key ON dqa_issue_found (received_id, issue_id);
 CREATE TABLE dqa_code_received
 (
   code_id             INTEGER NOT NULL PRIMARY KEY,
+  code_label          VARCHAR2(30),
   profile_id          INTEGER NOT NULL,
   table_id            INTEGER NOT NULL,
   received_value      VARCHAR2(50) NOT NULL,

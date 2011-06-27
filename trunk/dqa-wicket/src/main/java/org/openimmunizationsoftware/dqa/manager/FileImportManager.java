@@ -22,13 +22,17 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.Version;
+import org.openimmunizationsoftware.dqa.db.model.BatchType;
 import org.openimmunizationsoftware.dqa.db.model.IssueAction;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
+import org.openimmunizationsoftware.dqa.db.model.ReceiveQueue;
+import org.openimmunizationsoftware.dqa.db.model.SubmitStatus;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
+import org.openimmunizationsoftware.dqa.quality.QualityReport;
 import org.openimmunizationsoftware.dqa.validate.Validator;
 
 public class FileImportManager extends Thread
@@ -55,7 +59,7 @@ public class FileImportManager extends Thread
   private SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
   private File processingFile = null;
   private PrintWriter processingOut = null;
-  private File processedDir = null;
+  private File acceptedDir = null;
   private File receiveDir = null;
   private File submitDir = null;
   private SubmitterProfile profile = null;
@@ -65,10 +69,11 @@ public class FileImportManager extends Thread
   private PrintWriter logOut;
   private PrintWriter reportOut;
   private PrintWriter errorsOut;
-  private PrintWriter processedOut;
+  private PrintWriter acceptedOut;
   private Exception lastException = null;
   private StringBuilder internalLog = new StringBuilder();
   private String accessKey = null;
+  private MessageBatchManager messageBatchManager = null;
 
   public StringBuilder getInternalLog()
   {
@@ -180,6 +185,7 @@ public class FileImportManager extends Thread
       long timeSinceLastChange = System.currentTimeMillis() - inFile.lastModified();
       if (timeSinceLastChange > 60 * 1000)
       {
+        procLog("Processing file " + filename);
         processFile(session, filename, inFile);
       } else
       {
@@ -193,6 +199,7 @@ public class FileImportManager extends Thread
 
   private void processFile(Session session, String filename, File inFile) throws FileNotFoundException, IOException
   {
+    createMessageBatch(session);
     BufferedReader in = new BufferedReader(new FileReader(inFile));
     String line = readRealFirstLine(in);
     if (line != null && (line.startsWith("MSH") || line.startsWith("FHS") || line.startsWith("BHS")))
@@ -203,8 +210,8 @@ public class FileImportManager extends Thread
       do
       {
         line = line.trim();
-        processedOut.print(line);
-        processedOut.print("\r");
+        acceptedOut.print(line);
+        acceptedOut.print("\r");
         if (line.startsWith("MSH"))
         {
           if (message.length() > 0)
@@ -226,36 +233,30 @@ public class FileImportManager extends Thread
         processMessage(message, profile, session);
       }
       printReport(inFile);
-      closeOutputs(processedOut);
+      closeOutputs(acceptedOut);
     }
     in.close();
+    messageBatchManager.close();
+    Transaction tx = session.beginTransaction();
+    session.save(messageBatchManager.getMessageBatch());
+    tx.commit();
     inFile.delete();
+  }
+
+  private void createMessageBatch(Session session)
+  {
+    Transaction tx = session.beginTransaction();
+    messageBatchManager = new MessageBatchManager("File Import", BatchType.SUBMISSION, profile);
+    session.save(messageBatchManager.getMessageBatch());
+    tx.commit();
   }
 
   private void printReport(File inFile)
   {
-    reportOut.println("<html>");
-    reportOut.println("  <head>");
-    reportOut.println("    <title>DQA Report</title>");
-    reportOut.println("  </head>");
-    reportOut.println("  <body>");
-    reportOut.println("    <h1>DQA Report</h1>");
-    reportOut.println("    <table border=\"1\" cellspacing=\"0\" width=\"200\">");
-    reportOut.println("      <tr>");
-    reportOut.println("        <td>Submitter Code</td>");
-    reportOut.println("        <td>" + accessKey + "</td>");
-    reportOut.println("      </tr>");
-    reportOut.println("      <tr>");
-    reportOut.println("        <td>File Name</td>");
-    reportOut.println("        <td>" + inFile.getName() + "</td>");
-    reportOut.println("      </tr>");
-    reportOut.println("      <tr>");
-    reportOut.println("        <td>Messages Processed</td>");
-    reportOut.println("        <td>" + messageCount + "</td>");
-    reportOut.println("      </tr>");
-    reportOut.println("    </table>");
-    reportOut.println("  </body>");
-    reportOut.println("<html>");
+    messageBatchManager.score();
+    QualityReport qualityReport = new QualityReport(messageBatchManager, profile, reportOut);
+    qualityReport.setFilename(inFile.getName());
+    qualityReport.printReport();
   }
 
   /**
@@ -283,21 +284,21 @@ public class FileImportManager extends Thread
 
   private void openOutputs(String filename) throws IOException
   {
-    File outFile = new File(processedDir, filename);
-    processedOut = new PrintWriter(new FileWriter(outFile, true));
-    ackOut = new PrintWriter(new FileWriter(new File(processedDir, filename + ".ack.hl7")));
-    logOut = new PrintWriter(new FileWriter(new File(processedDir, filename + ".log.txt")));
-    reportOut = new PrintWriter(new FileWriter(new File(processedDir, filename + ".report.html")));
-    errorsOut = new PrintWriter(new FileWriter(new File(processedDir, filename + ".errors.txt")));
+    File outFile = new File(acceptedDir, filename);
+    acceptedOut = new PrintWriter(new FileWriter(outFile, true));
+    ackOut = new PrintWriter(new FileWriter(new File(receiveDir, filename + ".ack.hl7")));
+    logOut = new PrintWriter(new FileWriter(new File(receiveDir, filename + ".log.txt")));
+    reportOut = new PrintWriter(new FileWriter(new File(receiveDir, filename + ".report.html")));
+    errorsOut = new PrintWriter(new FileWriter(new File(receiveDir, filename + ".errors.txt")));
   }
 
-  private void closeOutputs(PrintWriter processedOut)
+  private void closeOutputs(PrintWriter acceptedOut)
   {
     logOut.println("Processing Complete");
     logOut.println("Software Label:   " + KeyedSettingManager.getApplication().getApplicationLabel());
     logOut.println("Software Type:    " + KeyedSettingManager.getApplication().getApplicationType());
     logOut.println("Software Version: " + Version.SOFTWARE_VERSION);
-    processedOut.close();
+    acceptedOut.close();
     ackOut.close();
     logOut.close();
     reportOut.close();
@@ -318,16 +319,19 @@ public class FileImportManager extends Thread
         Validator validator = new Validator(profile, session);
         validator.validateVaccinationUpdateMessage(messageReceived);
       }
+      IssueAction issueAction = determineIssueAction(messageReceived);
+      messageReceived.setIssueAction(issueAction);
+      messageBatchManager.registerProcessedMessage(messageReceived);
 
       String ackMessage = parser.makeAckMessage(messageReceived);
       messageReceived.setResponseText(ackMessage);
-      messageReceived.setIssueAction(IssueAction.ACCEPT);
       MessageReceivedManager.saveMessageReceived(profile, messageReceived, session);
+      saveInQueue(session, messageReceived);
       ackOut.print(ackMessage);
-      printLogDetails(message, messageReceived, logOut);
-      if (messageReceived.hasErrors())
+      printLogDetails(message, messageReceived, logOut, false);
+      if (issueAction.isError())
       {
-        printLogDetails(message, messageReceived, errorsOut);
+        printLogDetails(message, messageReceived, errorsOut, true);
       }
       tx.commit();
     } catch (Exception exception)
@@ -342,7 +346,36 @@ public class FileImportManager extends Thread
     }
   }
 
-  private void printLogDetails(StringBuilder message, MessageReceived messageReceived, PrintWriter out)
+  private IssueAction determineIssueAction(MessageReceived messageReceived)
+  {
+    IssueAction issueAction;
+    if (messageReceived.getPatient().isSkipped())
+    {
+      issueAction = IssueAction.SKIP;
+    } else if (messageReceived.hasErrors())
+    {
+      issueAction = IssueAction.ERROR;
+    } else if (messageReceived.hasWarns())
+    {
+      issueAction = IssueAction.WARN;
+    } else
+    {
+      issueAction = IssueAction.ACCEPT;
+    }
+    return issueAction;
+  }
+
+  private void saveInQueue(Session session, MessageReceived messageReceived)
+  {
+    ReceiveQueue receiveQueue = new ReceiveQueue();
+    receiveQueue.setMessageBatch(messageBatchManager.getMessageBatch());
+    receiveQueue.setMessageReceived(messageReceived);
+    receiveQueue.setSubmitStatus(messageReceived.hasErrors() ? SubmitStatus.EXCLUDED : SubmitStatus.QUEUED);
+    session.save(receiveQueue);
+  }
+
+  private void printLogDetails(StringBuilder message, MessageReceived messageReceived, PrintWriter out,
+      boolean printDetails)
   {
     try
     {
@@ -388,8 +421,11 @@ public class FileImportManager extends Thread
           out.println(" + " + issueFound.getDisplayText());
         }
       }
-      out.println("Message Data: ");
-      printBean(out, messageReceived, "  ");
+      if (printDetails)
+      {
+        out.println("Message Data: ");
+        printBean(out, messageReceived, "  ");
+      }
       out.println();
       out.println();
     } catch (Exception e)
@@ -412,7 +448,7 @@ public class FileImportManager extends Thread
       organization.setOrgLabel(accessKey);
       organization.setParentOrganization((Organization) session.get(Organization.class, 1));
       profile = new SubmitterProfile();
-      profile.setProfileLabel("Batch File");
+      profile.setProfileLabel("HL7 File");
       profile.setProfileStatus(SubmitterProfile.PROFILE_STATUS_TEST);
       profile.setOrganization(organization);
       profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
@@ -432,11 +468,11 @@ public class FileImportManager extends Thread
 
   private void createProcessingDirs(KeyedSettingManager ksm, File dir)
   {
-    processedDir = new File(dir, ksm.getKeyedValue(KeyedSetting.IN_FILE_PROCESSED_DIR_NAME, "processed"));
-    if (!processedDir.exists())
+    acceptedDir = new File(dir, ksm.getKeyedValue(KeyedSetting.IN_FILE_ACCEPTED_DIR_NAME, "accepted"));
+    if (!acceptedDir.exists())
     {
       procLog("Processed directory does not exist, creating");
-      processedDir.mkdir();
+      acceptedDir.mkdir();
     }
     receiveDir = new File(dir, ksm.getKeyedValue(KeyedSetting.IN_FILE_RECEIVE_DIR_NAME, "receive"));
     if (!receiveDir.exists())
@@ -493,6 +529,7 @@ public class FileImportManager extends Thread
   private void procLog(String message)
   {
     processingOut.println(sdf.format(new Date()) + " " + message);
+    processingOut.flush();
   }
 
   private static List<String> printBean(PrintWriter out, Object object, String indent) throws IllegalAccessException,
@@ -511,6 +548,7 @@ public class FileImportManager extends Thread
     {
       if (method.getName().startsWith("get") && !method.getName().equals("getClass")
           && !method.getName().equals("getMessageReceived") && !method.getName().equals("getProfile")
+          && !method.getName().equals("getTableType") && !method.getName().equals("getCodeReceived")
           && !method.getName().equals("getRequestText") && !method.getName().equals("getResponseText")
           && !method.getName().equals("getIssuesFound") && !method.getReturnType().equals(Void.TYPE)
           && method.getParameterTypes().length == 0)

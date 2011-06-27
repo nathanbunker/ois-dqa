@@ -7,6 +7,7 @@ public class CodeReceived
   private CodeTable table = null;
   private String receivedValue = "";
   private String codeValue = "";
+  private String codeLabel = "";
   private CodeStatus codeStatus = null;
   private int receivedCount = 0;  
   
@@ -15,7 +16,7 @@ public class CodeReceived
     // default
   }
   
-  public CodeReceived(CodeReceived parent, SubmitterProfile profile)
+  public CodeReceived(CodeReceived parent, SubmitterProfile profile, String codeLabel)
   {
     this.profile = profile;
     this.table = parent.table;
@@ -23,6 +24,7 @@ public class CodeReceived
     this.codeValue = parent.codeValue;
     this.codeStatus = parent.codeStatus;
     this.receivedCount = 0;
+    this.codeLabel = codeLabel;
   }
   
   public long getCodeId()
@@ -37,6 +39,16 @@ public class CodeReceived
   {
     return profile;
   }
+  public String getCodeLabel()
+  {
+    return codeLabel;
+  }
+
+  public void setCodeLabel(String codeLabel)
+  {
+    this.codeLabel = codeLabel;
+  }
+
   public void setProfile(SubmitterProfile profile)
   {
     this.profile = profile;

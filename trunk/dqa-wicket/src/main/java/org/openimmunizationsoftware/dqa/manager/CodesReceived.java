@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.manager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,26 +19,6 @@ import org.openimmunizationsoftware.dqa.db.model.VaccineMvx;
 
 public class CodesReceived
 {
-  public static final int ACTION_CODE = 1;
-  public static final int ADDRESS_TYPE = 2;
-  public static final int BIRTH_ORDER = 3;
-  public static final int BODY_ROUTE = 4;
-  public static final int BODY_SITE = 5;
-  public static final int COUNTY_PARISH = 6;
-  public static final int COUNTRY = 7;
-  public static final int CPT = 8;
-  public static final int CVX = 9;
-  public static final int FACILITY = 10;
-  public static final int INFO_SOURCE = 11;
-  public static final int LANGUAGE = 12;
-  public static final int MVX = 13;
-  public static final int NAME_TYPE = 14;
-  public static final int SEX = 15;
-  public static final int VFC_STATUS = 16;
-  public static final int STATE = 17;
-  public static final int COMPLETE = 18;
-  public static final int CONFIDENDIALITY = 19;
-
   private static CodesReceived singleton = null;
 
   public static CodesReceived getCodesReceived()
@@ -65,7 +46,8 @@ public class CodesReceived
     }
     return codesReceived;
   }
-
+  
+  
   public CodeReceived getCodeReceived(String receivedValue, CodeTable codeTable)
   {
     CodeReceived cr = null;
@@ -80,14 +62,25 @@ public class CodesReceived
     }
     return cr;
   }
+  
+  public List<CodeReceived> getCodesReceived(CodeTable codeTable)
+  {
+    List<CodeReceived> codesReceived = new ArrayList<CodeReceived>();
+    if (codeTableMaps.containsKey(codeTable))
+    {
+      codesReceived.addAll(codeTableMaps.get(codeTable).values());
+    }
+    // TODO sort list?
+    return codesReceived;
+  }
 
-  public static CodeTable getCodeTable(int tableId)
+  public static CodeTable getCodeTable(CodeTable.Type table)
   {
     getCodesReceived();
-    CodeTable ct = codeTables.get(tableId);
+    CodeTable ct = codeTables.get(table.getTableId());
     if (ct == null)
     {
-      throw new NullPointerException("Code table " + tableId + " unrecognized");
+      throw new NullPointerException("Code table " + table.getTableId() + " unrecognized");
     }
     return ct;
   }
@@ -95,6 +88,13 @@ public class CodesReceived
   public Map<Integer, CodeTable> getCodeTables()
   {
     return codeTables;
+  }
+  
+  public List<CodeTable> getCodeTableList()
+  {
+    List<CodeTable> list = new ArrayList<CodeTable>(codeTables.values());
+    // TODO sort array?
+    return list;
   }
 
   private static Map<Integer, CodeTable> codeTables = new HashMap<Integer, CodeTable>();
@@ -113,15 +113,15 @@ public class CodesReceived
       for (CodeTable codeTable : codeTableList)
       {
         codeTables.put(codeTable.getTableId(), codeTable);
-        if (codeTable.getTableId() == CPT)
+        if (codeTable.getTableId() == CodeTable.Type.VACCINATION_CPT_CODE.getTableId())
         {
           query = session.createQuery("from VaccineCpt");
           addToCodeTableMapsCpt(codeTable, query.list(), (SubmitterProfile) session.get(SubmitterProfile.class, 1));
-        } else if (codeTable.getTableId() == CVX)
+        } else if (codeTable.getTableId() == CodeTable.Type.VACCINATION_CVX_CODE.getTableId())
         {
           query = session.createQuery("from VaccineCvx");
           addToCodeTableMapsCvx(codeTable, query.list(), (SubmitterProfile) session.get(SubmitterProfile.class, 1));
-        } else if (codeTable.getTableId() == MVX)
+        } else if (codeTable.getTableId() == CodeTable.Type.VACCINATION_MANUFACTURER_CODE.getTableId())
         {
           query = session.createQuery("from VaccineMvx");
           addToCodeTableMapsMvx(codeTable, query.list(), (SubmitterProfile) session.get(SubmitterProfile.class, 1));
@@ -158,6 +158,7 @@ public class CodesReceived
       codeReceived.setCodeValue(codeMaster.getUseValue());
       codeReceived.setProfile(profile);
       codeReceived.setTable(codeTable);
+      codeReceived.setCodeLabel(codeMaster.getCodeLabel());
       codeReceivedMap.put(codeReceived.getReceivedValue(), codeReceived);
     }
     codeTableMaps.put(codeTable, codeReceivedMap);

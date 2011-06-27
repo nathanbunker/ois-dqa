@@ -10,6 +10,7 @@ import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
 import org.openimmunizationsoftware.dqa.db.model.received.Patient;
+import org.openimmunizationsoftware.dqa.db.model.received.Skippable;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 
@@ -22,6 +23,7 @@ public abstract class ValidateMessage
   protected Patient patient = null;
   protected Vaccination vaccination = null;
   protected NextOfKin nextOfKin = null;
+  protected Skippable skippableItem = null;
   protected PotentialIssues pi = PotentialIssues.getPotentialIssues();
   protected int positionId = 0;
   protected List<IssueFound> issuesFound = null;
@@ -66,6 +68,10 @@ public abstract class ValidateMessage
       issueFound.setIssueAction(issueAction);
       issueFound.setCodeReceived(codeReceived);
       issuesFound.add(issueFound);
+      if (issueAction.isSkip() && skippableItem != null)
+      {
+        skippableItem.setSkipped(true);
+      }
     }
   }
   

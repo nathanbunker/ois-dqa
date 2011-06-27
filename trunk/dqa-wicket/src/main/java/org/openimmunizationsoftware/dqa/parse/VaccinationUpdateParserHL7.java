@@ -7,16 +7,17 @@ import java.util.List;
 
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
+import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
 import org.openimmunizationsoftware.dqa.db.model.received.Patient;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Address;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
+import org.openimmunizationsoftware.dqa.db.model.received.types.Id;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Name;
 import org.openimmunizationsoftware.dqa.db.model.received.types.PhoneNumber;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
-
 
 public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 {
@@ -38,7 +39,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
   private List<String> currentSegment;
   private int vaccinationCount = 0;
   private int nextOfKinCount = 0;
-  
+
   private void setup()
   {
     startField = 0;
@@ -60,7 +61,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
   @Override
   public void createVaccinationUpdateMessage(MessageReceived messageReceived)
   {
-    String messageText = messageReceived.getRequestText(); 
+    String messageText = messageReceived.getRequestText();
     message = messageReceived;
     issuesFound = message.getIssuesFound();
     setup();
@@ -97,7 +98,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         {
           positionId = 0;
         }
-        positionId ++;
+        positionId++;
         vaccinationCount++;
         vaccination = new Vaccination();
         vaccination.setPositionId(vaccinationCount);
@@ -118,7 +119,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         }
         populateRXR(message);
       }
-      
+
     }
   }
 
@@ -143,21 +144,20 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
     readAddress(11, patient.getAddress());
     // private Name alias = new Name();
-    patient.setBirthDate(getValueDate(7));
-    patient.setBirthMuliple(getValue(24));
-    patient.setBirthOrder(getValue(25));
+    patient.setBirthDate(getValueDate(7, pi.PatientBirthDateIsInvalid));
+    patient.setBirthMultiple(getValue(24));
+    patient.setBirthOrderCode(getValue(25));
     patient.setBirthPlace(getValue(23));
-    patient.setDeathDate(getValueDate(29));
+    patient.setDeathDate(getValueDate(29, pi.PatientDeathDateIsInvalid));
     patient.setDeathIndicator(getValue(30));
-    patient.setEthnicityCode(getValue(22));
+    readCodeEntity(22, patient.getEthnicity());
     // TODO private OrganizationName facility = new OrganizationName();
-    // TODO private String financialEligibility = "";
     readPatientId(patient);
     patient.setMotherMaidenName(getValue(21));
     readName(5, patient.getName());
     readPhoneNumber(13, patient.getPhone());
-    patient.setPrimaryLanguageCode(getValue(15));
-    patient.setRaceCode(getValue(10));
+    readCodeEntity(15, patient.getPrimaryLanguage());
+    readCodeEntity(10, patient.getRace());
     patient.setSexCode(getValue(8));
   }
 
@@ -181,7 +181,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   private void populateRXA(MessageReceived message)
   {
-    vaccination.setAdminDate(getValueDate(3));
+    vaccination.setAdminDate(getValueDate(3, pi.VaccinationAdminDateIsInvalid));
     readCodeEntity(5, vaccination.getAdmin());
     CodedEntity admin = vaccination.getAdmin();
     readCptCvxCodes(admin);
@@ -191,14 +191,14 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     // TODO 10 XCN private Id givenBy = new Id();
     // TODO 11 LA2 private OrganizationName facility = new OrganizationName();
     vaccination.setLotNumber(getValue(15));
-    vaccination.setExpirationDate(getValueDate(16));
+    vaccination.setExpirationDate(getValueDate(16, pi.VaccinationLotExpirationDateIsInvalid));
     readCodeEntity(17, vaccination.getManufacturer());
     readCodeEntity(18, vaccination.getRefusal());
-    vaccination.setCompletionStatusCode(getValue(20));
+    vaccination.setCompletionCode(getValue(20));
     vaccination.setActionCode(getValue(21));
-    vaccination.setSystemEntryDate(getValueDate(22));
+    vaccination.setSystemEntryDate(getValueDate(22, pi.VaccinationSystemEntryTimeIsInvalid));
   }
-  
+
   private void populateRXR(MessageReceived message)
   {
     readCodeEntity(1, vaccination.getBodyRoute());
@@ -209,17 +209,49 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
   {
     if (admin.getTable().equals("CVX"))
     {
-      vaccination.setAdminCodeCvx(admin.getCode());
+      vaccination.getAdminCvx().setCode(admin.getCode());
+      vaccination.getAdminCvx().setText(admin.getText());
+      vaccination.getAdminCvx().setTable(admin.getTable());
     } else if (admin.getAltTable().equals("CVX"))
     {
-      vaccination.setAdminCodeCvx(admin.getAltCode());
+      vaccination.getAdminCvx().setCode(admin.getAltCode());
+      vaccination.getAdminCvx().setText(admin.getAltText());
+      vaccination.getAdminCvx().setTable(admin.getAltTable());
+    } else if (admin.getTable().equals(""))
+    {
+      String possible = admin.getCode();
+      if (possible != null)
+      {
+        try
+        {
+          Integer.parseInt(possible);
+          if (possible.length() >= 2 && possible.length() <= 3)
+          {
+            vaccination.getAdminCvx().setCode(admin.getCode());
+            vaccination.getAdminCvx().setText(admin.getText());
+            vaccination.getAdminCvx().setTable(admin.getTable());
+          } else if (possible.length() == 5 && possible.startsWith("90"))
+          {
+            vaccination.getAdminCpt().setCode(admin.getCode());
+            vaccination.getAdminCpt().setText(admin.getText());
+            vaccination.getAdminCpt().setTable(admin.getTable());
+          }
+        } catch (NumberFormatException nfe)
+        {
+          // not CVX
+        }
+      }
     }
     if (admin.getTable().equals("CPT") || admin.getTable().equals("C4"))
     {
-      vaccination.setAdminCodeCpt(admin.getCode());
+      vaccination.getAdminCpt().setCode(admin.getCode());
+      vaccination.getAdminCpt().setText(admin.getText());
+      vaccination.getAdminCpt().setTable(admin.getTable());
     } else if (admin.getAltTable().equals("CPT") || admin.getAltTable().equals("C4"))
     {
-      vaccination.setAdminCodeCpt(admin.getAltCode());
+      vaccination.getAdminCpt().setCode(admin.getAltCode());
+      vaccination.getAdminCpt().setText(admin.getAltText());
+      vaccination.getAdminCpt().setTable(admin.getAltTable());
     }
   }
 
@@ -259,22 +291,20 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     address.setStreet(field.length >= 1 ? field[0] : "");
     address.setStreet2(field.length >= 2 ? field[1] : "");
     address.setCity(field.length >= 3 ? field[2] : "");
-    address.setState(field.length >= 4 ? field[3] : "");
+    address.setStateCode(field.length >= 4 ? field[3] : "");
     address.setZip(field.length >= 5 ? field[4] : "");
-    address.setCountry(field.length >= 6 ? field[5] : "");
-    address.setType(field.length >= 7 ? field[6] : "");
-    address.setCountyParish(field.length >= 8 ? field[7] : "");
+    address.setCountryCode(field.length >= 6 ? field[5] : "");
+    address.setTypeCode(field.length >= 7 ? field[6] : "");
+    address.setCountyParishCode(field.length >= 8 ? field[7] : "");
   }
-  
+
   private void readPatientId(Patient patient)
   {
     List<String[]> values = getRepeatValues(3);
     if (values.size() > 0)
     {
       String[] fields = values.get(0);
-      patient.setIdSubmitterNumber(fields.length >= 1 ? fields[0] : "");
-      patient.setIdSubmitterAssigningAuthority(fields.length >= 4 ? fields[3] : "");
-      patient.setIdSubmitterTypeCode(fields.length >= 5 ? fields[4] : "");
+      readId(fields, patient.getIdSubmitter());
     }
     for (int i = 1; i < values.size(); i++)
     {
@@ -284,14 +314,20 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         String typeCode = fields[4];
         if ("SS".equals(typeCode))
         {
-          patient.setIdSsn(fields[0]);
-        }
-        else if ("MA".equals(typeCode))
+          readId(fields, patient.getIdSsn());
+        } else if ("MA".equals(typeCode))
         {
-          patient.setIdMedicaid(fields[0]);
+          readId(fields, patient.getIdMedicaid());
         }
       }
     }
+  }
+
+  private void readId(String[] fields, Id id)
+  {
+    id.setNumber(fields.length >= 1 ? fields[0] : "");
+    id.setAssigningAuthorityCode(fields.length >= 4 ? fields[3] : "");
+    id.setTypeCode(fields.length >= 5 ? fields[4] : "");
   }
 
   private void readCodeEntity(int fieldNumber, CodedEntity ce)
@@ -345,7 +381,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     }
   }
 
-  private Date getValueDate(int fieldNumber)
+  private Date getValueDate(int fieldNumber, PotentialIssue pi)
   {
     String fieldValue = getValue(fieldNumber);
     if (fieldValue.equals("") || fieldValue.length() < 8)
@@ -360,10 +396,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         return sdf.parse(fieldValue.substring(0, 8));
       } catch (java.text.ParseException e)
       {
+        registerIssue(pi);
         return null;
-        // TODO
-        // throw new ParseException("Invalid Date", currentSegment.get(0) + "-"
-        // + fieldNumber);
       }
     }
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -372,10 +406,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       return sdf.parse(fieldValue.substring(0, 14));
     } catch (java.text.ParseException e)
     {
+      registerIssue(pi);
       return null;
-      // TODO
-      // throw new ParseException("Invalid DateTime", currentSegment.get(0) +
-      // "-" + fieldNumber);
     }
   }
 
@@ -425,7 +457,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     }
     return value.split("\\" + separators[CAR]);
   }
-  
+
   private List<String[]> getRepeatValues(int fieldNumber)
   {
     List<String[]> values = new ArrayList<String[]>();
@@ -476,12 +508,10 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       if (!messageText.startsWith("MSH"))
       {
         registerError(pi.Hl7MshSegmentIsMissing);
-      }
-      else if (messageText.length() < 10)
+      } else if (messageText.length() < 10)
       {
         registerError(pi.Hl7MshEncodingCharacterIsMissing);
-      }
-      else
+      } else
       {
         registerError(pi.GeneralParseException);
       }

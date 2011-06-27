@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,11 +23,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.ietf.jgss.MessageProp;
+import org.openimmunizationsoftware.dqa.db.model.BatchType;
+import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
+import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.IssueAction;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
+import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
+import org.openimmunizationsoftware.dqa.manager.MessageBatchManager;
+import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 import org.openimmunizationsoftware.dqa.manager.FileImportManager;
 import org.openimmunizationsoftware.dqa.manager.MessageReceivedManager;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
@@ -34,19 +43,21 @@ import org.openimmunizationsoftware.dqa.validate.Validator;
 
 public class IncomingServlet extends HttpServlet
 {
-  
+
   private FileImportManager fileImportManager = null;
-  
+  private PrintWriter out = null;
+  private MessageBatchManager messageBatchManager = null;
+
   @Override
   public void init() throws ServletException
   {
     fileImportManager = FileImportManager.getFileImportManager();
   }
-  
+
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
-    PrintWriter out = new PrintWriter(resp.getOutputStream());
+    out = new PrintWriter(resp.getOutputStream());
     out.println("<html>");
     out.println("  <head>");
     out.println("    <title>DQA Incoming Interface</title>");
@@ -80,7 +91,7 @@ public class IncomingServlet extends HttpServlet
     out.println("      <input name=\"submit\" value=\"Submit\" type=\"submit\">");
     out.println("    </form>");
     out.println("    ");
-    
+
     if (fileImportManager.isKeepRunning())
     {
       out.println("      <p>File import manager is running.<p>");
@@ -99,6 +110,7 @@ public class IncomingServlet extends HttpServlet
     out.println("  </body>");
     out.println("</html>");
     out.close();
+    out = null;
   }
 
   @Override
@@ -109,29 +121,114 @@ public class IncomingServlet extends HttpServlet
     String facilityid = req.getParameter("FACILITYID");
     boolean debug = req.getParameter("DEBUG") != null;
     resp.setContentType("text/plain");
-    PrintWriter out = new PrintWriter(resp.getOutputStream());
+    out = new PrintWriter(resp.getOutputStream());
 
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    if (facilityid == null || facilityid.equals(""))
+    {
+      facilityid = "1";
+    }
     Organization organization = (Organization) session.get(Organization.class, Integer.parseInt(facilityid));
     SubmitterProfile profile = organization.getPrimaryProfile();
 
     String messageData = req.getParameter("MESSAGEDATA");
-    process(debug, out, session, profile, messageData);
+    processStream(debug, session, profile, messageData);
+    if (debug)
+    {
+      printMessageBatch();
+      out.print("\r");
+      out.print("\r");
+      CodesReceived cr = CodesReceived.getCodesReceived(profile, session);
+      CodesReceived masterCr = CodesReceived.getCodesReceived();
+      for (CodeTable codeTable : cr.getCodeTableList())
+      {
+        List<CodeReceived> codesReceived = cr.getCodesReceived(codeTable);
+        if (codesReceived.size() > 0)
+        {
+          out.print("-- " + padSlash(codeTable.getTableLabel() + " ", 92) + "\r");
+          out.print("\r");
+          out.print("VALUES RECEIVED\r");
+          out.print(pad("value", 20));
+          out.print(pad("label", 30));
+          out.print(pad("use instead", 20));
+          out.print(pad("status", 15));
+          out.print(pad("count", 7));
+          out.print("\r");
+          for (CodeReceived codeReceived : codesReceived)
+          {
+            out.print(pad(codeReceived.getReceivedValue(), 20));
+            out.print(pad(codeReceived.getCodeLabel(), 30));
+            if (codeReceived.getCodeValue() == null
+                || (codeReceived.getCodeValue().equals(codeReceived.getReceivedValue())))
+            {
+              out.print(pad("", 20));
+            } else
+            {
+              out.print(pad(codeReceived.getCodeValue(), 20));
+            }
+            out.print(pad(codeReceived.getCodeStatus().getCodeLabel(), 15));
+            out.print(pad(String.valueOf(codeReceived.getReceivedCount()), 7));
+            out.print("\r");
+          }
+          codesReceived = masterCr.getCodesReceived(codeTable);
+          out.print("\r");
+          out.print("MASTER VALUE LIST\r");
+          out.print(pad("value", 20));
+          out.print(pad("label", 30));
+          out.print(pad("use instead", 20));
+          out.print(pad("status", 15));
+          out.print("\r");
+
+          for (CodeReceived codeReceived : codesReceived)
+          {
+            out.print(pad(codeReceived.getReceivedValue(), 20));
+            out.print(pad(codeReceived.getCodeLabel(), 30));
+            if (codeReceived.getCodeValue() == null
+                || (codeReceived.getCodeValue().equals(codeReceived.getReceivedValue())))
+            {
+              out.print(pad("", 20));
+            } else
+            {
+              out.print(pad(codeReceived.getCodeValue(), 20));
+            }
+            out.print(pad(codeReceived.getCodeStatus().getCodeLabel(), 15));
+            out.print("\r");
+          }
+          out.print("\r");
+        }
+      }
+    }
     out.close();
+    out = null;
     session.flush();
     session.close();
   }
 
-  public static void process(boolean debug, PrintWriter out, Session session, SubmitterProfile profile,
-      String messageData) throws IOException
+  private void printMessageBatch()
+  {
+    MessageBatch mb = messageBatchManager.getMessageBatch();
+    out.print("\r");
+    out.print("\r");
+    out.print("Message Batch Summary: \r");
+    out.print("Message Count:       " + mb.getMessageCount() + "\r");
+    out.print("Patient Count:       " + mb.getMessageCount() + "\r");
+    out.print("Vaccination      \r");
+    out.print(" + Administered:     " + mb.getVaccinationAdministeredCount() + "\r");
+    out.print(" + Historical:       " + mb.getVaccinationHistoricalCount() + "\r");
+    out.print(" + Not Administered: " + mb.getVaccinationNotAdministeredCount() + "\r");
+    out.print(" + Deleted:          " + mb.getVaccinationDeleteCount() + "\r");
+  }
+
+  public void processStream(boolean debug, Session session, SubmitterProfile profile, String messageData)
+      throws IOException
   {
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     StringReader stringReader = new StringReader(messageData);
     BufferedReader in = new BufferedReader(stringReader);
     String line = null;
     StringBuilder sb = new StringBuilder();
-    int messageCount = 0;
+    messageBatchManager = new MessageBatchManager("Realtime HTTPS", BatchType.SUBMISSION, profile);
 
     while ((line = in.readLine()) != null)
     {
@@ -139,8 +236,7 @@ public class IncomingServlet extends HttpServlet
       {
         if (sb.length() > 0)
         {
-          messageCount++;
-          processMessage(out, parser, sb, debug, messageCount, profile, session);
+          processMessage(parser, sb, debug, profile, session);
         }
         sb.setLength(0);
       } else if (line.startsWith("FHS") || line.startsWith("BHS") || line.startsWith("BTS") || line.startsWith("FTS"))
@@ -152,17 +248,21 @@ public class IncomingServlet extends HttpServlet
     }
     if (sb.length() > 0)
     {
-      messageCount++;
-      processMessage(out, parser, sb, debug, messageCount, profile, session);
+      processMessage(parser, sb, debug, profile, session);
     }
+    Transaction tx = session.beginTransaction();
+    messageBatchManager.close();
+    session.save(messageBatchManager.getMessageBatch());
+    tx.commit();
   }
 
-  private static void processMessage(PrintWriter out, VaccinationUpdateParserHL7 parser, StringBuilder sb,
-      boolean debug, int messageCount, SubmitterProfile profile, Session session)
+  private void processMessage(VaccinationUpdateParserHL7 parser, StringBuilder sb, boolean debug,
+      SubmitterProfile profile, Session session)
   {
     try
     {
       Transaction tx = session.beginTransaction();
+
       MessageReceived messageReceived = new MessageReceived();
       messageReceived.setProfile(profile);
       messageReceived.setRequestText(sb.toString());
@@ -172,6 +272,7 @@ public class IncomingServlet extends HttpServlet
         Validator validator = new Validator(profile, session);
         validator.validateVaccinationUpdateMessage(messageReceived);
       }
+      messageBatchManager.registerProcessedMessage(messageReceived);
 
       String ackMessage = parser.makeAckMessage(messageReceived);
       messageReceived.setResponseText(ackMessage);
@@ -183,7 +284,7 @@ public class IncomingServlet extends HttpServlet
         try
         {
           out.print("-- DEBUG START -------------------------------------------------------\r");
-          out.print("Processed message: " + messageCount + "\r");
+          out.print("Processed message: " + messageBatchManager.getMessageBatch().getMessageCount() + "\r");
           List<IssueFound> issuesFound = messageReceived.getIssuesFound();
           boolean first = true;
           for (IssueFound issueFound : issuesFound)
@@ -195,7 +296,7 @@ public class IncomingServlet extends HttpServlet
                 out.print("Errors:\r");
                 first = false;
               }
-              printIssueFound(out, issueFound);
+              printIssueFound(issueFound);
             }
           }
           first = true;
@@ -208,7 +309,7 @@ public class IncomingServlet extends HttpServlet
                 out.print("Warnings:\r");
                 first = false;
               }
-              printIssueFound(out, issueFound);
+              printIssueFound(issueFound);
             }
           }
           first = true;
@@ -221,11 +322,11 @@ public class IncomingServlet extends HttpServlet
                 out.print("Skip:\r");
                 first = false;
               }
-              printIssueFound(out, issueFound);
+              printIssueFound(issueFound);
             }
           }
           out.print("Message Data: \r");
-          printBean(out, messageReceived, "  ");
+          printBean(messageReceived, "  ");
           out.print("-- DEBUG END ---------------------------------------------------------\r");
         } catch (Exception e)
         {
@@ -246,15 +347,14 @@ public class IncomingServlet extends HttpServlet
     }
   }
 
-  private static void printIssueFound(PrintWriter out, IssueFound issueFound)
+  private void printIssueFound(IssueFound issueFound)
   {
     out.print("  + ");
     out.print(issueFound.getDisplayText());
     out.print("\r");
   }
 
-  private static List<String> printBean(PrintWriter out, Object object, String indent) throws IllegalAccessException,
-      InvocationTargetException
+  private List<String> printBean(Object object, String indent) throws IllegalAccessException, InvocationTargetException
   {
     List<String> thisPrinted = new ArrayList<String>();
     List<String> subPrinted = new ArrayList<String>();
@@ -309,14 +409,17 @@ public class IncomingServlet extends HttpServlet
             out.print(" #");
             out.print(i + 1);
             out.print("\r");
-            printBean(out, list.get(i), indent + "  ");
+            printBean(list.get(i), indent + "  ");
           }
+        } else if (method.getReturnType() == CodeTable.Type.class)
+        {
+          // don't process
         } else
         {
           out.print(indent);
           out.print(fieldName);
           out.print("\r");
-          List<String> returnPrints = printBean(out, returnValue, indent + "  ");
+          List<String> returnPrints = printBean(returnValue, indent + "  ");
           for (String returnPrint : returnPrints)
           {
             subPrinted.add(fieldName + returnPrint);
@@ -327,4 +430,19 @@ public class IncomingServlet extends HttpServlet
     return thisPrinted;
   }
 
+  private static final String PAD = "                                                                                                          ";
+
+  private static String pad(String s, int size)
+  {
+    s += PAD;
+    return s.substring(0, size - 1) + " ";
+  }
+
+  private static final String PAD_SLASH = "-----------------------------------------------------------------------------------------------------";
+
+  private static String padSlash(String s, int size)
+  {
+    s += PAD_SLASH;
+    return s.substring(0, size - 1) + "-";
+  }
 }

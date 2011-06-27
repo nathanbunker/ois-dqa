@@ -1,9 +1,11 @@
 package org.openimmunizationsoftware.dqa.db.model.received.types;
 
+import org.openimmunizationsoftware.dqa.db.model.CodeTable;
+
 public class OrganizationName
 {
   private String name = "";
-  private String id = "";
+  private Id id = new Id(CodeTable.Type.ORGANIZATION);
   public String getName()
   {
     return name;
@@ -12,12 +14,16 @@ public class OrganizationName
   {
     this.name = name;
   }
-  public String getId()
+  public String getIdNumber()
+  {
+    return id.getNumber();
+  }
+  public Id getId()
   {
     return id;
   }
-  public void setId(String id)
+  public void setIdNumber(String idNumber)
   {
-    this.id = id;
+    this.id.setNumber(idNumber);
   }
 }
