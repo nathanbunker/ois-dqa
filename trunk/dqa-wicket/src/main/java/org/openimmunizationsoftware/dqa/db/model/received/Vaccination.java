@@ -2,55 +2,73 @@ package org.openimmunizationsoftware.dqa.db.model.received;
 
 import java.util.Date;
 
+import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Id;
 import org.openimmunizationsoftware.dqa.db.model.received.types.OrganizationName;
 
-
-public class Vaccination
+public class Vaccination implements Skippable
 {
   public static final String ACTION_CODE_ADD = "A";
   public static final String ACTION_CODE_DELETE = "D";
   public static final String ACTION_CODE_UPDATE = "U";
 
+  public static final String COMPLETION_COMPLETED = "CP";
+  public static final String COMPLETION_NOT_ADMINISTERED = "NA";
+  
+  public static final String COMPLETION_PARTIALLY_ADMINISTERED = "PA";
+  public static final String COMPLETION_REFUSED = "RE";
   public static final String INFO_SOURCE_ADMIN = "00";
   public static final String INFO_SOURCE_HIST = "01";
-
-  private String actionCode = "";
-  private CodedEntity admin = new CodedEntity();
-  private String adminCodeCpt = "";
-  private String adminCodeCvx = "";
+  
+  private CodedEntity action = new CodedEntity(CodeTable.Type.VACCINATION_ACTION_CODE);
+  private CodedEntity admin = new CodedEntity(CodeTable.Type.VACCINATION_CVX_CODE);
+  private CodedEntity adminCpt = new CodedEntity(CodeTable.Type.VACCINATION_CPT_CODE);
+  private CodedEntity adminCvx = new CodedEntity(CodeTable.Type.VACCINATION_CVX_CODE);
   private Date adminDate = null;
   private Date adminDateEnd = null;
   private String amount = "";
-  private CodedEntity amountUnit = new CodedEntity();
-  private CodedEntity bodyRoute = new CodedEntity();
-  private CodedEntity bodySite = new CodedEntity();
-  private String completionStatusCode = "";
-  private CodedEntity confidentiality = new CodedEntity();
-  private Id enteredBy = new Id();
+  private CodedEntity amountUnit = new CodedEntity(CodeTable.Type.ADMINISTRATION_UNIT);
+  private CodedEntity bodyRoute = new CodedEntity(CodeTable.Type.BODY_ROUTE);
+  private CodedEntity bodySite = new CodedEntity(CodeTable.Type.BODY_SITE);
+  private CodedEntity completion = new CodedEntity(CodeTable.Type.VACCINATION_COMPLETION);
+  private CodedEntity confidentiality = new CodedEntity(CodeTable.Type.VACCINATION_CONFIDENTIALITY);
+  private Id enteredBy = new Id(CodeTable.Type.PHYSICIAN_NUMBER);
   private Date expirationDate = null;
   private OrganizationName facility = new OrganizationName();
-  private String financialEligibilityCode = "";
-  private Id givenBy = new Id();
+  private CodedEntity financialEligibility = new CodedEntity(CodeTable.Type.FINANICAL_STATUS_CODE);
+  private Id givenBy = new Id(CodeTable.Type.PHYSICIAN_NUMBER);
   private String idSubmitter = "";
-  private CodedEntity informationSource = new CodedEntity();
+  private CodedEntity informationSource = new CodedEntity(CodeTable.Type.VACCINATION_INFORMATION_SOURCE);
   private String lotNumber = "";
-  private CodedEntity manufacturer = new CodedEntity();
+  private CodedEntity manufacturer = new CodedEntity(CodeTable.Type.VACCINATION_MANUFACTURER_CODE);
   private MessageReceived messageReceived = null;
-  private Id orderedBy = new Id();
+  private Id orderedBy = new Id(CodeTable.Type.PHYSICIAN_NUMBER);
   private int positionId = 0;
-  private CodedEntity refusal = new CodedEntity();
+  private CodedEntity product = new CodedEntity(CodeTable.Type.VACCINE_PRODUCT);
+  private CodedEntity refusal = new CodedEntity(CodeTable.Type.VACCINATION_REFUSAL);
+  private boolean skipped = false;
   private Date systemEntryDate = null;
   private long vaccinationId = 0l;
 
   private Date visPublicationDate = null;
 
+  public CodedEntity getAction()
+  {
+    return action;
+  }
   public String getActionCode()
   {
-    return actionCode;
+    return action.getCode();
   }
+
+  // public static final String ACTION_CODE_ADD = "A";
+  // public static final String ACTION_CODE_DELETE = "D";
+  // public static final String ACTION_CODE_UPDATE = "U";
+  //
+  // public static final String INFO_SOURCE_ADMIN = "00";
+  // public static final String INFO_SOURCE_HIST = "01";
 
   public CodedEntity getAdmin()
   {
@@ -62,14 +80,24 @@ public class Vaccination
     return admin.getCode();
   }
 
-  public String getAdminCodeCpt()
+  public CodedEntity getAdminCpt()
   {
-    return adminCodeCpt;
+    return adminCpt;
   }
 
-  public String getAdminCodeCvx()
+  public String getAdminCptCode()
   {
-    return adminCodeCvx;
+    return adminCpt.getCode();
+  }
+
+  public CodedEntity getAdminCvx()
+  {
+    return adminCvx;
+  }
+
+  public String getAdminCvxCode()
+  {
+    return adminCvx.getCode();
   }
 
   public Date getAdminDate()
@@ -97,9 +125,34 @@ public class Vaccination
     return amountUnit.getCode();
   }
 
-  public String getCompletionStatusCode()
+  public CodedEntity getBodyRoute()
   {
-    return completionStatusCode;
+    return this.bodyRoute;
+  }
+
+  public String getBodyRouteCode()
+  {
+    return this.bodyRoute.getCode();
+  }
+
+  public CodedEntity getBodySite()
+  {
+    return this.bodySite;
+  }
+
+  public String getBodySiteCode()
+  {
+    return this.bodySite.getCode();
+  }
+
+  public CodedEntity getCompletion()
+  {
+    return completion;
+  }
+
+  public String getCompletionCode()
+  {
+    return completion.getCode();
   }
 
   public CodedEntity getConfidentiality()
@@ -142,9 +195,9 @@ public class Vaccination
     return facility;
   }
 
-  public String getFacilityId()
+  public String getFacilityIdNumber()
   {
-    return facility.getId();
+    return facility.getIdNumber();
   }
 
   public String getFacilityName()
@@ -152,9 +205,14 @@ public class Vaccination
     return facility.getName();
   }
 
+  public CodedEntity getFinancialEligibility()
+  {
+    return financialEligibility;
+  }
+
   public String getFinancialEligibilityCode()
   {
-    return financialEligibilityCode;
+    return financialEligibility.getCode();
   }
 
   public Id getGivenBy()
@@ -237,6 +295,11 @@ public class Vaccination
     return positionId;
   }
 
+  public CodedEntity getProduct()
+  {
+    return this.product;
+  }
+
   public CodedEntity getRefusal()
   {
     return refusal;
@@ -262,9 +325,59 @@ public class Vaccination
     return visPublicationDate;
   }
 
+  public boolean isActionAdd()
+  {
+    return action.getCode() != null && action.getCode().equals(ACTION_CODE_ADD);
+  }
+
+  public boolean isActionDelete()
+  {
+    return action.getCode() != null && action.getCode().equals(ACTION_CODE_DELETE);
+  }
+
+  public boolean isActionUpdate()
+  {
+    return action.getCode() != null && action.getCode().equals(ACTION_CODE_UPDATE);
+  }
+
+  public boolean isCompletionCompleted()
+  {
+    return completion.getCode() != null && completion.getCode().equals(COMPLETION_COMPLETED);
+  }
+
+  public boolean isCompletionNotAdministered()
+  {
+    return completion.getCode() != null && completion.getCode().equals(COMPLETION_NOT_ADMINISTERED);
+  }
+
+  public boolean isCompletionPartiallyAdministered()
+  {
+    return completion.getCode() != null && completion.getCode().equals(COMPLETION_PARTIALLY_ADMINISTERED);
+  }
+
+  public boolean isCompletionRefused()
+  {
+    return completion.getCode() != null && completion.getCode().equals(COMPLETION_REFUSED);
+  }
+
+  public boolean isInformationSourceAdmin()
+  {
+    return informationSource.getCode() != null && informationSource.getCode().equals(INFO_SOURCE_ADMIN);
+  }
+
+  public boolean isInformationSourceHist()
+  {
+    return informationSource.getCode() != null && informationSource.getCode().equals(INFO_SOURCE_HIST);
+  }
+
+  public boolean isSkipped()
+  {
+    return skipped;
+  }
+
   public void setActionCode(String actionCode)
   {
-    this.actionCode = actionCode;
+    this.action.setCode(actionCode);
   }
 
   public void setAdminCode(String adminCode)
@@ -272,14 +385,14 @@ public class Vaccination
     admin.setCode(adminCode);
   }
 
-  public void setAdminCodeCpt(String adminCodeCpt)
+  public void setAdminCptCode(String adminCptCode)
   {
-    this.adminCodeCpt = adminCodeCpt;
+    this.adminCpt.setCode(adminCptCode);
   }
 
-  public void setAdminCodeCvx(String adminCodeCvx)
+  public void setAdminCvxCode(String adminCvxCode)
   {
-    this.adminCodeCvx = adminCodeCvx;
+    this.adminCvx.setCode(adminCvxCode);
   }
 
   public void setAdminDate(Date adminDate)
@@ -302,9 +415,19 @@ public class Vaccination
     amountUnit.setCode(amountUnitCode);
   }
 
-  public void setCompletionStatusCode(String completionStatusCode)
+  public void setBodyRouteCode(String bodyRouteCode)
   {
-    this.completionStatusCode = completionStatusCode;
+    this.bodyRoute.setCode(bodyRouteCode);
+  }
+
+  public void setBodySiteCode(String bodySiteCode)
+  {
+    this.bodySite.setCode(bodySiteCode);
+  }
+
+  public void setCompletionCode(String completionCode)
+  {
+    this.completion.setCode(completionCode);
   }
 
   public void setConfidentialityCode(String confidentialityCode)
@@ -332,9 +455,9 @@ public class Vaccination
     this.expirationDate = expirationDate;
   }
 
-  public void setFacilityId(String facilityId)
+  public void setFacilityIdNumber(String facilityIdNumber)
   {
-    facility.setId(facilityId);
+    facility.setIdNumber(facilityIdNumber);
   }
 
   public void setFacilityName(String facilityName)
@@ -344,7 +467,7 @@ public class Vaccination
 
   public void setFinancialEligibilityCode(String financialEligibilityCode)
   {
-    this.financialEligibilityCode = financialEligibilityCode;
+    this.financialEligibility.setCode(financialEligibilityCode);
   }
 
   public void setGivenByNameFirst(String givenByNameFirst)
@@ -411,50 +534,25 @@ public class Vaccination
   {
     refusal.setCode(refusalCode);
   }
-
+  
+  public void setSkipped(boolean skipped)
+  {
+    this.skipped = skipped;
+  }
+  
   public void setSystemEntryDate(Date systemEntryDate)
   {
     this.systemEntryDate = systemEntryDate;
   }
-
+  
   public void setVaccinationId(long vaccinationId)
   {
     this.vaccinationId = vaccinationId;
   }
-
+  
   public void setVisPublicationDate(Date visPublicationDate)
   {
     this.visPublicationDate = visPublicationDate;
   }
-
-  public CodedEntity getBodyRoute()
-  {
-    return this.bodyRoute;
-  }
-
-  public CodedEntity getBodySite()
-  {
-    return this.bodySite;
-  }
-
-  public String getBodyRouteCode()
-  {
-    return this.bodyRoute.getCode();
-  }
-
-  public String getBodySiteCode()
-  {
-    return this.bodySite.getCode();
-  }
-
-  public void setBodyRouteCode(String bodyRouteCode)
-  {
-    this.bodyRoute.setCode(bodyRouteCode);
-  }
-
-  public void setBodySiteCode(String bodySiteCode)
-  {
-    this.bodySite.setCode(bodySiteCode);
-  }
-
+  
 }

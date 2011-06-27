@@ -40,6 +40,18 @@ public class MessageReceived
     return false;
   }
   
+  public boolean hasWarns()
+  {
+    for (IssueFound issueFound : issuesFound)
+    {
+      if (issueFound.getIssueAction().equals(IssueAction.WARN))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+  
   public List<NextOfKin> getNextOfKins()
   {
     return nextOfKins;

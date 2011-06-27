@@ -1,15 +1,17 @@
 package org.openimmunizationsoftware.dqa.db.model.received.types;
 
+import org.openimmunizationsoftware.dqa.db.model.CodeTable;
+
 public class Address
 {
   private String street = "";
   private String street2 = "";
   private String city = "";
-  private String state = "";
+  private CodedEntity state = new CodedEntity(CodeTable.Type.ADDRESS_STATE);
   private String zip = "";
-  private String country = "";
-  private String countyParish = "";
-  private String type = "";
+  private CodedEntity country = new CodedEntity(CodeTable.Type.ADDRESS_COUNTRY);
+  private CodedEntity countyParish = new CodedEntity(CodeTable.Type.ADDRESS_COUNTY);
+  private CodedEntity type = new CodedEntity(CodeTable.Type.ADDRESS_TYPE);
   
   public String getStreet()
   {
@@ -35,13 +37,17 @@ public class Address
   {
     this.city = city;
   }
-  public String getState()
+  public CodedEntity getState()
   {
     return state;
   }
-  public void setState(String state)
+  public String getStateCode()
   {
-    this.state = state;
+    return state.getCode();
+  }
+  public void setStateCode(String stateCode)
+  {
+    this.state.setCode(stateCode);
   }
   public String getZip()
   {
@@ -51,28 +57,40 @@ public class Address
   {
     this.zip = zip;
   }
-  public String getCountry()
+  public CodedEntity getCountry()
   {
     return country;
   }
-  public void setCountry(String country)
+  public String getCountryCode()
   {
-    this.country = country;
+    return country.getCode();
   }
-  public String getCountyParish()
+  public void setCountryCode(String countryCode)
+  {
+    this.country.setCode(countryCode);
+  }
+  public CodedEntity getCountyParish()
   {
     return countyParish;
   }
-  public void setCountyParish(String countyParish)
+  public void setCountyParishCode(String countyParishCode)
   {
-    this.countyParish = countyParish;
+    this.countyParish.setCode(countyParishCode);
   }
-  public String getType()
+  public String getCountyParishCode()
+  {
+    return countyParish.getCode();
+  }
+  public CodedEntity getType()
   {
     return type;
   }
-  public void setType(String type)
+  public String getTypeCode()
   {
-    this.type = type;
+    return type.getCode();
+  }
+  public void setTypeCode(String typeCode)
+  {
+    this.type.setCode(typeCode);
   }
 }

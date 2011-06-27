@@ -9,20 +9,20 @@
     </id>
     <many-to-one name="messageReceived" column="received_id" class="org.openimmunizationsoftware.dqa.db.model.MessageReceived"/>
     <property name="positionId" column="position_id" type="int"/>
-    <property name="adminCodeCpt" column="admin_code_cpt" type="string"/>
-    <property name="adminCodeCvx" column="admin_code_cvx" type="string"/>
+    <property name="adminCptCode" column="admin_code_cpt" type="string"/>
+    <property name="adminCvxCode" column="admin_code_cvx" type="string"/>
     <property name="adminDate" column="admin_date" type="date"/>
     <property name="amount" column="amount" type="string"/>
     <property name="amountUnitCode" column="amount_unit_code" type="string"/>
     <property name="bodyRouteCode" column="body_site_code" type="string"/>
     <property name="bodySiteCode" column="body_route_code" type="string"/>
-    <property name="completionStatusCode" column="completion_status_code" type="string"/>
+    <property name="completionCode" column="completion_status_code" type="string"/>
     <property name="confidentialityCode" column="confidentiality_code" type="string"/>
     <property name="enteredByNumber" column="entered_by_number" type="string"/>
     <property name="enteredByNameFirst" column="entered_by_name_first" type="string"/>
     <property name="enteredByNameLast" column="entered_by_name_last" type="string"/>
     <property name="expirationDate" column="expiration_date" type="date"/>
-    <property name="facilityId" column="facility_id" type="string"/>
+    <property name="facilityIdNumber" column="facility_id" type="string"/>
     <property name="facilityName" column="facility_name" type="string"/>
     <property name="financialEligibilityCode" column="financial_eligibility_code" type="string"/>
     <property name="givenByNumber" column="given_by_number" type="string"/>

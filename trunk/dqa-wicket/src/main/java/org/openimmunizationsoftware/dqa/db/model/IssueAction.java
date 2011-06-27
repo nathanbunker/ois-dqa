@@ -7,6 +7,26 @@ public class IssueAction
   public static final IssueAction ACCEPT = new IssueAction("A", "Accept");
   public static final IssueAction SKIP = new IssueAction("S", "Skip");
   
+  public boolean isError()
+  {
+    return this.actionCode.equals(ERROR.actionCode);
+  }
+  
+  public boolean isWarn()
+  {
+    return this.actionCode.equals(WARN.actionCode);
+  }
+  
+  public boolean isAccept()
+  {
+    return this.actionCode.equals(ACCEPT.actionCode);
+  }
+  
+  public boolean isSkip()
+  {
+    return this.actionCode.equals(SKIP.actionCode);
+  }
+  
   public IssueAction()
   {
     // default

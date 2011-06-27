@@ -4,7 +4,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
-
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -13,7 +12,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -92,7 +90,7 @@ public class SubmitPage extends WebPage
         PrintWriter out = new PrintWriter(stringWriter);
         try 
         {
-          IncomingServlet.process(false, out, session, submitterProfile, messageString);
+          // TODO IncomingServlet.processStream(false, out, session, submitterProfile, messageString);
         }
         catch (Exception e)
         {

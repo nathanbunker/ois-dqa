@@ -2,8 +2,8 @@ package org.openimmunizationsoftware.dqa.manager;
 
 import java.util.Date;
 
-
 import org.hibernate.Session;
+import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.SubmitStatus;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
@@ -13,24 +13,38 @@ import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 
 public class MessageReceivedManager
 {
-  public static void saveMessageReceived(SubmitterProfile profile, MessageReceived messageReceived, Session session)  
+  public static void saveMessageReceived(SubmitterProfile profile, MessageReceived messageReceived, Session session)
   {
     messageReceived.setProfile(profile);
     messageReceived.setReceivedDate(new Date());
     messageReceived.setSubmitStatus(SubmitStatus.HOLD);
-    session.save(messageReceived);
+    session.saveOrUpdate(messageReceived);
     Patient patient = messageReceived.getPatient();
-    patient.setMessageReceived(messageReceived);
-    session.save(patient);
-    for (Vaccination vaccination : messageReceived.getVaccinations())
+    if (!patient.isSkipped())
     {
-      vaccination.setMessageReceived(messageReceived);
-      session.save(vaccination);
+      patient.setMessageReceived(messageReceived);
+      session.save(patient);
+      for (Vaccination vaccination : messageReceived.getVaccinations())
+      {
+        if (!vaccination.isSkipped())
+        {
+          vaccination.setMessageReceived(messageReceived);
+          session.saveOrUpdate(vaccination);
+        }
+      }
+      for (NextOfKin nextOfKin : messageReceived.getNextOfKins())
+      {
+        if (!nextOfKin.isSkipped())
+        {
+          nextOfKin.setMessageReceived(messageReceived);
+          session.saveOrUpdate(nextOfKin);
+        }
+      }
     }
-    for (NextOfKin nextOfKin : messageReceived.getNextOfKins())
+    for (IssueFound issueFound : messageReceived.getIssuesFound())
     {
-      nextOfKin.setMessageReceived(messageReceived);
-      session.save(nextOfKin);
+      issueFound.setMessageReceived(messageReceived);
+      session.saveOrUpdate(issueFound);
     }
   }
 }

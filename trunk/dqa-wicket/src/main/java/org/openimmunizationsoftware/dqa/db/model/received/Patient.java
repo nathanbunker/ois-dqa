@@ -2,6 +2,7 @@ package org.openimmunizationsoftware.dqa.db.model.received;
 
 import java.util.Date;
 
+import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Address;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
@@ -11,34 +12,36 @@ import org.openimmunizationsoftware.dqa.db.model.received.types.OrganizationName
 import org.openimmunizationsoftware.dqa.db.model.received.types.PhoneNumber;
 
 
-public class Patient
+public class Patient implements Skippable
 {
   private Address address = new Address();
   private Name alias = new Name();
   private Date birthDate = null;
-  private String birthMuliple = "";
-  private String birthOrder = "";
+  private String birthMultiple = "";
+  private CodedEntity birthOrder = new CodedEntity(CodeTable.Type.BIRTH_ORDER);
   private String birthPlace = "";
   private Date deathDate = null;
   private String deathIndicator = "";
-  private CodedEntity ethnicity = new CodedEntity();
+  private CodedEntity ethnicity = new CodedEntity(CodeTable.Type.PATIENT_ETHNICITY);
   private OrganizationName facility = new OrganizationName();
-  private String financialEligibility = "";
-  private String idMedicaid = "";
-  private String idSsn = "";
-  private Id idSubmitter = new Id();
+  private CodedEntity financialEligibility = new CodedEntity(CodeTable.Type.FINANICAL_STATUS_CODE);
+  private Id idMedicaid = new Id(CodeTable.Type.PATIENT_ID);
+  private Id idRegistry = new Id(CodeTable.Type.PATIENT_ID);
+  private Id idSsn = new Id(CodeTable.Type.PATIENT_ID);
+  private Id idSubmitter = new Id(CodeTable.Type.PATIENT_ID);
   private MessageReceived messageReceived = null;
   private String motherMaidenName = "";
   private Name name = new Name();
   private long patientId = 0;
   private PhoneNumber phone = new PhoneNumber();
-  private Id physician = new Id();
-  private CodedEntity primaryLanguage = new CodedEntity();
-  private CodedEntity protection = new CodedEntity();
-  private CodedEntity publicity = new CodedEntity();
-  private CodedEntity race = new CodedEntity();
-  private String registryStatus = "";
-  private String sexCode = "";
+  private Id physician = new Id(CodeTable.Type.PHYSICIAN_NUMBER);
+  private CodedEntity primaryLanguage = new CodedEntity(CodeTable.Type.PERSON_LANGUAGE);
+  private CodedEntity protection = new CodedEntity(CodeTable.Type.PATIENT_PROTECTION);
+  private CodedEntity publicity = new CodedEntity(CodeTable.Type.PATIENT_PUBLICITY);
+  private CodedEntity race = new CodedEntity(CodeTable.Type.PATIENT_RACE);
+  private CodedEntity registryStatus = new CodedEntity(CodeTable.Type.REGISTRY_STATUS);
+  private CodedEntity sex = new CodedEntity(CodeTable.Type.PATIENT_SEX);
+  private boolean skipped = false;
 
   public Address getAddress()
   {
@@ -50,19 +53,19 @@ public class Patient
     return address.getCity();
   }
 
-  public String getAddressCountry()
+  public String getAddressCountryCode()
   {
-    return address.getCountry();
+    return address.getCountry().getCode();
   }
 
-  public String getAddressCountyParish()
+  public String getAddressCountyParishCode()
   {
-    return address.getCountyParish();
+    return address.getCountyParishCode();
   }
 
-  public String getAddressState()
+  public String getAddressStateCode()
   {
-    return address.getState();
+    return address.getStateCode();
   }
 
   public String getAddressStreet()
@@ -75,9 +78,9 @@ public class Patient
     return address.getStreet2();
   }
 
-  public String getAddressType()
+  public String getAddressTypeCode()
   {
-    return address.getType();
+    return address.getTypeCode();
   }
 
   public String getAddressZip()
@@ -125,26 +128,31 @@ public class Patient
     return birthDate;
   }
 
-  public String getBirthMuliple()
+  public String getBirthMultiple()
   {
-    return birthMuliple;
+    return birthMultiple;
   }
 
-  public String getBirthOrder()
+  public CodedEntity getBirthOrder()
   {
     return birthOrder;
+  }
+
+  public String getBirthOrderCode()
+  {
+    return birthOrder.getCode();
   }
 
   public String getBirthPlace()
   {
     return birthPlace;
   }
-
+  
   public Date getDeathDate()
   {
     return deathDate;
   }
-
+  
   public String getDeathIndicator()
   {
     return deathIndicator;
@@ -165,9 +173,9 @@ public class Patient
     return facility;
   }
 
-  public String getFacilityId()
+  public String getFacilityIdNumber()
   {
-    return facility.getId();
+    return facility.getIdNumber();
   }
 
   public String getFacilityName()
@@ -175,19 +183,44 @@ public class Patient
     return facility.getName();
   }
 
-  public String getFinancialEligibility()
+  public CodedEntity getFinancialEligibility()
   {
     return financialEligibility;
   }
 
-  public String getIdMedicaid()
+  public String getFinancialEligibilityCode()
+  {
+    return financialEligibility.getCode();
+  }
+
+  public Id getIdMedicaid()
   {
     return idMedicaid;
   }
 
-  public String getIdSsn()
+  public String getIdMedicaidNumber()
+  {
+    return idMedicaid.getNumber();
+  }
+
+  public Id getIdRegistry()
+  {
+    return idRegistry;
+  }
+
+  public String getIdRegistryNumber()
+  {
+    return idRegistry.getNumber();
+  }
+
+  public Id getIdSsn()
   {
     return idSsn;
+  }
+
+  public String getIdSsnNumber()
+  {
+    return idSsn.getNumber();
   }
 
   public Id getIdSubmitter()
@@ -195,9 +228,9 @@ public class Patient
     return idSubmitter;
   }
 
-  public String getIdSubmitterAssigningAuthority()
+  public String getIdSubmitterAssigningAuthorityCode()
   {
-    return idSubmitter.getAssigningAuthority();
+    return idSubmitter.getAssigningAuthority().getCode();
   }
 
   public String getIdSubmitterNumber()
@@ -330,14 +363,29 @@ public class Patient
     return race.getCode();
   }
 
-  public String getRegistryStatus()
+  public CodedEntity getRegistryStatus()
   {
     return registryStatus;
   }
 
+  public String getRegistryStatusCode()
+  {
+    return registryStatus.getCode();
+  }
+
+  public CodedEntity getSex()
+  {
+    return sex;
+  }
+
   public String getSexCode()
   {
-    return sexCode;
+    return sex.getCode();
+  }
+
+  public boolean isSkipped()
+  {
+    return skipped;
   }
 
   public void setAddressCity(String addressCity)
@@ -345,19 +393,19 @@ public class Patient
     address.setCity(addressCity);
   }
 
-  public void setAddressCountry(String addressCountry)
+  public void setAddressCountryCode(String addressCountryCode)
   {
-    address.setCountry(addressCountry);
+    address.getCountry().setCode(addressCountryCode);
   }
 
-  public void setAddressCountyParish(String addressCountyParish)
+  public void setAddressCountyParishCode(String addressCountyParishCode)
   {
-    address.setCountyParish(addressCountyParish);
+    address.getCountyParish().setCode(addressCountyParishCode);
   }
 
-  public void setAddressState(String addressState)
+  public void setAddressStateCode(String addressStateCode)
   {
-    address.setState(addressState);
+    address.getState().setCode(addressStateCode);
   }
 
   public void setAddressStreet(String addressStreet)
@@ -370,9 +418,9 @@ public class Patient
     address.setStreet2(addressStreet2);
   }
 
-  public void setAddressType(String addressType)
+  public void setAddressTypeCode(String addressTypeCode)
   {
-    address.setType(addressType);
+    address.getType().setCode(addressTypeCode);
   }
 
   public void setAddressZip(String addressZip)
@@ -415,14 +463,14 @@ public class Patient
     this.birthDate = birthDate;
   }
 
-  public void setBirthMuliple(String birthMuliple)
+  public void setBirthMultiple(String birthMultiple)
   {
-    this.birthMuliple = birthMuliple;
+    this.birthMultiple = birthMultiple;
   }
 
-  public void setBirthOrder(String birthOrder)
+  public void setBirthOrderCode(String birthOrderCode)
   {
-    this.birthOrder = birthOrder;
+    this.birthOrder.setCode(birthOrderCode);
   }
 
   public void setBirthPlace(String birthPlace)
@@ -445,9 +493,9 @@ public class Patient
     ethnicity.setCode(ethnicityCode);
   }
 
-  public void setFacilityId(String facilityId)
+  public void setFacilityIdNumber(String facilityIdNumber)
   {
-    facility.setId(facilityId);
+    facility.setIdNumber(facilityIdNumber);
   }
 
   public void setFacilityName(String facilityName)
@@ -455,24 +503,29 @@ public class Patient
     facility.setName(facilityName);
   }
 
-  public void setFinancialEligibility(String financialEligibility)
+  public void setFinancialEligibilityCode(String financialEligibilityCode)
   {
-    this.financialEligibility = financialEligibility;
+    this.financialEligibility.setCode(financialEligibilityCode);
   }
 
-  public void setIdMedicaid(String idMedicaid)
+  public void setIdMedicaidNumber(String idMedicaidNumber)
   {
-    this.idMedicaid = idMedicaid;
+    this.idMedicaid.setNumber(idMedicaidNumber);
   }
 
-  public void setIdSsn(String idSsn)
+  public void setIdRegistryNumber(String idRegistryNumber)
   {
-    this.idSsn = idSsn;
+    this.idRegistry.setNumber(idRegistryNumber);
   }
 
-  public void setIdSubmitterAssigningAuthority(String assigningAuthority)
+  public void setIdSsnNumber(String idSsnNumber)
   {
-    idSubmitter.setAssigningAuthority(assigningAuthority);
+    this.idSsn.setNumber(idSsnNumber);
+  }
+
+  public void setIdSubmitterAssigningAuthorityCode(String assigningAuthorityCode)
+  {
+    idSubmitter.setAssigningAuthorityCode(assigningAuthorityCode);
   }
 
   public void setIdSubmitterNumber(String number)
@@ -570,13 +623,18 @@ public class Patient
     race.setCode(raceCode);
   }
 
-  public void setRegistryStatus(String registryStatus)
+  public void setRegistryStatusCode(String registryStatusCode)
   {
-    this.registryStatus = registryStatus;
+    this.registryStatus.setCode(registryStatusCode);
   }
 
   public void setSexCode(String sexCode)
   {
-    this.sexCode = sexCode;
+    this.sex.setCode(sexCode);
+  }
+
+  public void setSkipped(boolean skipped)
+  {
+    this.skipped = skipped;
   }
 }

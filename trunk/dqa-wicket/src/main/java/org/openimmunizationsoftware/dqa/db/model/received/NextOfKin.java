@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.db.model.received;
 
+import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Address;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
@@ -7,16 +8,33 @@ import org.openimmunizationsoftware.dqa.db.model.received.types.Name;
 import org.openimmunizationsoftware.dqa.db.model.received.types.PhoneNumber;
 
 
-public class NextOfKin
+public class NextOfKin implements Skippable
 {
+  
+  public static final String RELATIONSHIP_BROTHER = "BRO";
+  public static final String RELATIONSHIP_CARE_GIVER = "CGV";
+  public static final String RELATIONSHIP_FATHER = "FTH";
+  public static final String RELATIONSHIP_FOSTER_CHILD = "FCH";
+  public static final String RELATIONSHIP_GARNDPARENT = "GRP";
+  public static final String RELATIONSHIP_GUARDIAN = "GRD";
+  public static final String RELATIONSHIP_MOTHER = "MTH";
+  public static final String RELATIONSHIP_OTHER = "OTH";
+  public static final String RELATIONSHIP_PARENT = "PAR";
+  public static final String RELATIONSHIP_SELF = "SEL";
+  public static final String RELATIONSHIP_SIBLING = "SIB";
+  public static final String RELATIONSHIP_SISTER = "SIS";
+  public static final String RELATIONSHIP_SPOUSE = "SPO";
+  public static final String RELATIONSHIP_STEPCHILD = "SCH";
+  
   private Address address = new Address();
   private MessageReceived messageReceived = null;
   private Name name = new Name();
+  private long nextOfKinId;
   private PhoneNumber phone = new PhoneNumber();
   private int positionId = 0;
   private long receivedId = 0l;
-  private long nextOfKinId;
-  private CodedEntity relationship = new CodedEntity();
+  private CodedEntity relationship = new CodedEntity(CodeTable.Type.PERSON_RELATIONSHIP);
+  private boolean skipped = false;
 
   public Address getAddress()
   {
@@ -27,25 +45,24 @@ public class NextOfKin
   {
     return address.getCity();
   }
-
-  public String getAddressCountry()
+  public String getAddressCountryCode()
   {
-    return address.getCountry();
+    return address.getCountry().getCode();
   }
 
-  public String getAddressCountyParish()
+  public String getAddressCountyParishCode()
   {
-    return address.getCountyParish();
-  }
-
-  public String getAddressState()
-  {
-    return address.getState();
+    return address.getCountyParish().getCode();
   }
 
   public void getAddressState(String addressStreet)
   {
     address.setStreet(addressStreet);
+  }
+
+  public String getAddressStateCode()
+  {
+    return address.getState().getCode();
   }
 
   public String getAddressStreet()
@@ -58,9 +75,9 @@ public class NextOfKin
     return address.getStreet2();
   }
 
-  public String getAddressType()
+  public String getAddressTypeCode()
   {
-    return address.getType();
+    return address.getType().getCode();
   }
 
   public String getAddressZip()
@@ -108,6 +125,11 @@ public class NextOfKin
     return name.getTypeCode();
   }
 
+  public long getNextOfKinId()
+  {
+    return nextOfKinId;
+  }
+
   public PhoneNumber getPhone()
   {
     return phone;
@@ -128,11 +150,6 @@ public class NextOfKin
     return receivedId;
   }
 
-  public long getNextOfKinId()
-  {
-    return nextOfKinId;
-  }
-
   public CodedEntity getRelationship()
   {
     return relationship;
@@ -143,9 +160,9 @@ public class NextOfKin
     return relationship.getCode();
   }
 
-  public void setRelationshipCode(String relationshipCode)
+  public boolean isSkipped()
   {
-    relationship.setCode(relationshipCode);
+    return skipped;
   }
 
   public void setAddressCity(String addressCity)
@@ -153,19 +170,19 @@ public class NextOfKin
     address.setCity(addressCity);
   }
 
-  public void setAddressCountry(String addressCountry)
+  public void setAddressCountryCode(String addressCountryCode)
   {
-    address.setCountry(addressCountry);
+    address.getCountry().setCode(addressCountryCode);
   }
 
-  public void setAddressCountyParish(String addressCountyParish)
+  public void setAddressCountyParishCode(String addressCountyParishCode)
   {
-    address.setCountyParish(addressCountyParish);
+    address.getCountyParish().setCode(addressCountyParishCode);
   }
 
-  public void setAddressState(String addressState)
+  public void setAddressStateCode(String addressStateCode)
   {
-    address.setState(addressState);
+    address.getState().setCode(addressStateCode);
   }
 
   public void setAddressStreet(String addressStreet)
@@ -178,9 +195,9 @@ public class NextOfKin
     address.setStreet2(addressStreet2);
   }
 
-  public void setAddressType(String addressType)
+  public void setAddressTypeCode(String addressTypeCode)
   {
-    address.setType(addressType);
+    address.getType().setCode(addressTypeCode);
   }
 
   public void setAddressZip(String addressZip)
@@ -223,6 +240,11 @@ public class NextOfKin
     name.setTypeCode(nameTypeCode);
   }
 
+  public void setNextOfKinId(long nextOfKinId)
+  {
+    this.nextOfKinId = nextOfKinId;
+  }
+
   public void setPhoneNumber(String phoneNumber)
   {
     phone.setNumber(phoneNumber);
@@ -238,9 +260,14 @@ public class NextOfKin
     this.receivedId = receivedId;
   }
 
-  public void setNextOfKinId(long nextOfKinId)
+  public void setRelationshipCode(String relationshipCode)
   {
-    this.nextOfKinId = nextOfKinId;
+    relationship.setCode(relationshipCode);
+  }
+
+  public void setSkipped(boolean skipped)
+  {
+    this.skipped = skipped;
   }
 
 }

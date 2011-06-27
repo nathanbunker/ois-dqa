@@ -20,13 +20,27 @@ import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Address;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
+import org.openimmunizationsoftware.dqa.db.model.received.types.Id;
+import org.openimmunizationsoftware.dqa.db.model.received.types.Name;
+import org.openimmunizationsoftware.dqa.db.model.received.types.PhoneNumber;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 import org.openimmunizationsoftware.dqa.manager.VaccineProductManager;
 
 public class Validator extends ValidateMessage
 {
+  private static final long AVERAGE_AGE_18_IN_MS = (long) (1000.0 * 60.0 * 60.0 * 24.0 * 365.25);
+
   private Session session = null;
+  private Date now = new Date();
+  private PotentialIssues.Field piAddress;
+  private PotentialIssues.Field piAddressCity;
+  private PotentialIssues.Field piAddressStreet;
+  private PotentialIssues.Field piAddressCountry;
+  private PotentialIssues.Field piAddressCounty;
+  private PotentialIssues.Field piAddressState;
+  private PotentialIssues.Field piAddressStreet2;
+  private PotentialIssues.Field piAddressZip;
 
   public Validator(SubmitterProfile profile, Session session) {
     super(profile);
@@ -35,89 +49,111 @@ public class Validator extends ValidateMessage
 
   public void validateVaccinationUpdateMessage(MessageReceived message)
   {
-    positionId = 1;
     this.message = message;
     this.patient = message.getPatient();
+    positionId = 1;
+    skippableItem = patient;
     this.issuesFound = message.getIssuesFound();
     validatePatient();
     for (NextOfKin nextOfKin : message.getNextOfKins())
     {
       positionId = nextOfKin.getPositionId();
+      skippableItem = nextOfKin;
       validateNextOfKin(nextOfKin);
     }
     for (Vaccination vaccination : message.getVaccinations())
     {
       positionId = vaccination.getPositionId();
+      skippableItem = vaccination;
       validateVaccination(vaccination);
     }
   }
 
   private void validateNextOfKin(NextOfKin nextOfKin)
   {
-    // NextOfKinAddressIsDifferentFromPatientAddress
-    // NextOfKinAddressIsMissing
-    // NextOfKinAddressCityIsInvalid
-    // NextOfKinAddressCityIsMissing
-    // NextOfKinAddressCountryIsDeprecated
-    // NextOfKinAddressCountryIsIgnored
-    // NextOfKinAddressCountryIsInvalid
-    // NextOfKinAddressCountryIsMissing
-    // NextOfKinAddressCountryIsUnrecognized
-    // NextOfKinAddressCountyIsDeprecated
-    // NextOfKinAddressCountyIsIgnored
-    // NextOfKinAddressCountyIsInvalid
-    // NextOfKinAddressCountyIsMissing
-    // NextOfKinAddressCountyIsUnrecognized
-    // NextOfKinAddressStateIsDeprecated
-    // NextOfKinAddressStateIsIgnored
-    // NextOfKinAddressStateIsInvalid
-    // NextOfKinAddressStateIsMissing
-    // NextOfKinAddressStateIsUnrecognized
-    // NextOfKinAddressStreetIsMissing
-    // NextOfKinAddressStreet2IsMissing
-    // NextOfKinNameIsMissing
-    // NextOfKinNameIsSameAsUnderagePatient
-    // NextOfKinNameFirstIsMissing
-    // NextOfKinNameLastIsMissing
-    // NextOfKinPhoneNumberIsIncomplete
-    // NextOfKinPhoneNumberIsInvalid
-    // NextOfKinPhoneNumberIsMissing
-    // NextOfKinRelationshipIsDeprecated
-    // NextOfKinRelationshipIsIgnored
-    // NextOfKinRelationshipIsInvalid
-    // NextOfKinRelationshipIsMissing
-    // NextOfKinRelationshipIsNotResponsibleParty
-    // NextOfKinRelationshipIsUnrecognized
-    // NextOfKinSsnIsMissing
+    piAddress = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS;
+    piAddressCity = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_CITY;
+    piAddressStreet = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_STREET;
+    piAddressCountry = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_COUNTRY;
+    piAddressCounty = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_COUNTY;
+    piAddressState = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_STATE;
+    piAddressStreet2 = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_STREET2;
+    piAddressZip = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_ZIP;
+    if (validateAddress(nextOfKin.getAddress()))
+    {
+      Address p = patient.getAddress();
+      Address n = nextOfKin.getAddress();
+      if (!p.getCity().equals(n.getCity()) || !p.getState().equals(n.getState())
+          || !p.getStreet().equals(n.getStreet()) || !p.getStreet2().equals(p.getStreet2()))
+      {
+        registerIssue(pi.NextOfKinAddressIsDifferentFromPatientAddress);
+      }
+    }
+    boolean patientUnderAge = false;
+    if (patient.getBirthDate() != null)
+    {
+      long age = now.getTime() - patient.getBirthDate().getTime();
+      patientUnderAge = age < AVERAGE_AGE_18_IN_MS;
+    }
+    boolean isResponsibleParty = false;
+    handleCodeReceived(nextOfKin.getRelationship(), PotentialIssues.Field.NEXT_OF_KIN_RELATIONSHIP);
+    if (patientUnderAge && !nextOfKin.getRelationship().isEmpty())
+    {
 
+      String relationshipCode = nextOfKin.getRelationshipCode();
+      String[] responsibleParties = { NextOfKin.RELATIONSHIP_CARE_GIVER, NextOfKin.RELATIONSHIP_FATHER,
+          NextOfKin.RELATIONSHIP_GARNDPARENT, NextOfKin.RELATIONSHIP_MOTHER, NextOfKin.RELATIONSHIP_PARENT };
+      for (String compare : responsibleParties)
+      {
+        if (compare.equals(relationshipCode))
+        {
+          isResponsibleParty = true;
+          break;
+        }
+      }
+      if (!isResponsibleParty)
+      {
+        registerIssue(pi.NextOfKinRelationshipIsNotResponsibleParty);
+      }
+    }
+
+    boolean notEmptyFirst = notEmpty(nextOfKin.getNameLast(), pi.NextOfKinNameLastIsMissing);
+    boolean notEmptyLast = notEmpty(nextOfKin.getNameLast(), pi.NextOfKinNameFirstIsMissing);
+    if (notEmptyFirst && notEmptyLast && patientUnderAge && isResponsibleParty)
+    {
+      if (areEqual(nextOfKin.getNameLast(), patient.getNameLast())
+          && areEqual(nextOfKin.getNameFirst(), patient.getNameFirst())
+          && areEqual(nextOfKin.getNameMiddle(), patient.getNameMiddle())
+          && areEqual(nextOfKin.getNameSuffix(), patient.getNameMiddle())
+          && areEqual(nextOfKin.getNameSuffix(), patient.getNameSuffix()))
+      {
+        registerIssue(pi.PatientGuardianNameIsSameAsUnderagePatient);
+      }
+    }
+    validatePhone(nextOfKin.getPhone(), PotentialIssues.Field.NEXT_OF_KIN_PHONE_NUMBER);
+    // TODO NextOfKinSsnIsMissing
   }
 
   private void validateVaccination(Vaccination vaccination)
   {
-    String actionCode = vaccination.getActionCode();
-    actionCode = handleCodeReceived(actionCode, CodesReceived.getCodeTable(CodesReceived.ACTION_CODE),
-        PotentialIssues.Field.VACCINATION_ACTION_CODE).getCodeValue();
-    vaccination.setActionCode(actionCode);
-    if (actionCode != null)
+    handleCodeReceived(vaccination.getAction(), PotentialIssues.Field.VACCINATION_ACTION_CODE);
+    if (vaccination.isActionAdd())
     {
-      if (actionCode.equals(Vaccination.ACTION_CODE_ADD))
-      {
-        registerIssue(pi.VaccinationActionCodeIsValuedAsAdd);
-        registerIssue(pi.VaccinationActionCodeIsValuedAsAddOrUpdate);
-      } else if (actionCode.equals(Vaccination.ACTION_CODE_ADD))
-      {
-        registerIssue(pi.VaccinationActionCodeIsValuedAsUpdate);
-      } else if (actionCode.equals(Vaccination.ACTION_CODE_ADD))
-      {
-        registerIssue(pi.VaccinationActionCodeIsValuedAsDelete);
-      }
+      registerIssue(pi.VaccinationActionCodeIsValuedAsAdd);
+      registerIssue(pi.VaccinationActionCodeIsValuedAsAddOrUpdate);
+    } else if (vaccination.isActionUpdate())
+    {
+      registerIssue(pi.VaccinationActionCodeIsValuedAsUpdate);
+      registerIssue(pi.VaccinationActionCodeIsValuedAsAddOrUpdate);
+    } else if (vaccination.isActionDelete())
+    {
+      registerIssue(pi.VaccinationActionCodeIsValuedAsDelete);
     }
 
     boolean administered = false;
     if (notEmpty(vaccination.getInformationSourceCode(), pi.VaccinationInformationSourceIsMissing))
     {
-      handleCodeReceived(vaccination.getInformationSourceCode(), CodesReceived.getCodeTable(CodesReceived.INFO_SOURCE),
-          PotentialIssues.Field.VACCINATION_INFORMATION_SOURCE);
+      handleCodeReceived(vaccination.getInformationSource(), PotentialIssues.Field.VACCINATION_INFORMATION_SOURCE);
       administered = Vaccination.INFO_SOURCE_ADMIN.equals(vaccination.getInformationSourceCode());
       if (administered)
       {
@@ -130,19 +166,14 @@ public class Validator extends ValidateMessage
     // TODO VaccinationInformationSourceIsAdministeredButAppearsToHistorical
     // TODO VaccinationInformationSourceIsHistoricalButAppearsToBeAdministered
 
-    String cptCode = vaccination.getAdminCodeCpt();
-    CodeReceived cptCr = handleCodeReceived(cptCode, CodesReceived.getCodeTable(CodesReceived.CPT),
-        PotentialIssues.Field.VACCINATION_CPT_CODE);
-    cptCode = cptCr.getCodeValue();
-    vaccination.setAdminCodeCpt(cptCode);
+    handleCodeReceived(vaccination.getAdminCpt(), PotentialIssues.Field.VACCINATION_CPT_CODE);
+    String cptCode = vaccination.getAdminCptCode();
+    vaccination.setAdminCptCode(cptCode);
 
-    String cvxCode = vaccination.getAdminCodeCvx();
-    CodeReceived cvxCr = handleCodeReceived(cvxCode, CodesReceived.getCodeTable(CodesReceived.CVX),
-        PotentialIssues.Field.VACCINATION_CVX_CODE);
-    cvxCode = cvxCr.getCodeValue();
-    vaccination.setAdminCodeCvx(cvxCode);
+    handleCodeReceived(vaccination.getAdminCvx(), PotentialIssues.Field.VACCINATION_CVX_CODE);
+    String cvxCode = vaccination.getAdminCvxCode();
 
-    CodeReceived vaccineCr = cvxCr;
+    CodeReceived vaccineCr = vaccination.getAdminCvx().getCodeReceived();
 
     // TODO Need to figure out status for CPT can CVX
     // CVX \ CPT | Deprecated | Ignored | Invalid | Missing | Not Specific |
@@ -183,7 +214,7 @@ public class Validator extends ValidateMessage
     if (vaccineCvx == null && vaccineCpt != null)
     {
       vaccineCvx = vaccineCpt.getCvx();
-      vaccineCr = cptCr;
+      vaccineCr = vaccination.getAdminCpt().getCodeReceived();
     }
 
     if (notEmpty(vaccination.getAdminDate(), pi.VaccinationAdminDateIsMissing))
@@ -235,16 +266,7 @@ public class Validator extends ValidateMessage
         }
       }
     }
-    CodeReceived codeReceivedMvx = null;
-    if (administered)
-    {
-      codeReceivedMvx = handleCodeReceived(vaccination.getManufacturer(),
-          CodesReceived.getCodeTable(CodesReceived.MVX), PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE);
-    } else
-    {
-      codeReceivedMvx = handleCodeReceived(vaccination.getManufacturer(),
-          CodesReceived.getCodeTable(CodesReceived.MVX), PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE, false);
-    }
+    handleCodeReceived(vaccination.getManufacturer(), PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE, administered);
     VaccineMvx vaccineMvx = null;
     if (vaccination.getManufacturerCode() != null && !vaccination.getManufacturerCode().equals(""))
     {
@@ -254,7 +276,7 @@ public class Validator extends ValidateMessage
     {
       if (vaccineMvx != null && !vaccineMvx.getMvxCode().equals("") && vaccineCvx != null
           && !vaccineCvx.getCvxCode().equals("")
-          && (codeReceivedMvx.getCodeStatus().isValid() || codeReceivedMvx.getCodeStatus().isDeprecated()))
+          && (vaccination.getManufacturer().isValid() || vaccination.getManufacturer().isDeprecated()))
       {
         VaccineProduct vaccineProduct = VaccineProductManager.getVaccineProductManager().getVaccineProduct(vaccineCvx,
             vaccineMvx);
@@ -298,7 +320,7 @@ public class Validator extends ValidateMessage
       {
         if (vaccination.getAdminDate().after(patient.getDeathDate()))
         {
-          registerIssue(pi.VaccinationAdminDateIsAfterSystemEntryDate);
+          registerIssue(pi.VaccinationAdminDateIsAfterPatientDeathDate);
         }
       }
       if (patient.getBirthDate() != null)
@@ -327,177 +349,106 @@ public class Validator extends ValidateMessage
     // TODO
     // registerIssue(pi.VaccinationAdminDateIsBeforeExpectedReportingWindow);
 
-    if (notEmpty(vaccination.getAmount(), pi.VaccinationAdministeredAmountIsMissing))
-    {
-      if (vaccination.getAmount().equals("999"))
-      {
-        if (administered)
-        {
-          registerIssue(pi.VaccinationAdministeredAmountIsValuedAsUnknown);
-        }
-      } else
-      {
-        try
-        {
-          int amount = Integer.parseInt(vaccination.getAmount());
-          if (amount == 0)
-          {
-            if (administered)
-            {
-              registerIssue(pi.VaccinationAdministeredAmountIsValuedAsZero);
-            }
-          }
-        } catch (NumberFormatException nfe)
-        {
-          if (administered)
-          {
-            registerIssue(pi.VaccinationAdministeredAmountIsInvalid);
-          }
-          vaccination.setAmount("");
-        }
-      }
-    }
-
-    if (vaccination.getAmount() != null && !vaccination.getAmount().equals(""))
+    if (vaccination.getAmount() == null || vaccination.getAmount().equals("") || vaccination.getAmount().equals("999"))
     {
       if (administered)
       {
-        registerIssue(pi.VaccinationAdministeredUnitIsMissing);
+        registerIssue(pi.VaccinationAdministeredAmountIsMissing);
+        registerIssue(pi.VaccinationAdministeredAmountIsValuedAsUnknown);
+      }
+      vaccination.setAmount("");
+    } else
+    {
+      try
+      {
+        float amount = Float.parseFloat(vaccination.getAmount());
+        if (amount == 0)
+        {
+          if (administered)
+          {
+            registerIssue(pi.VaccinationAdministeredAmountIsValuedAsZero);
+          }
+        }
+      } catch (NumberFormatException nfe)
+      {
+        if (administered)
+        {
+          registerIssue(pi.VaccinationAdministeredAmountIsInvalid);
+        }
+        vaccination.setAmount("");
       }
     }
-
-    handleCodeReceived(vaccination.getBodyRoute(), CodesReceived.getCodeTable(CodesReceived.BODY_ROUTE),
-        PotentialIssues.Field.VACCINATION_BODY_ROUTE, administered);
-    handleCodeReceived(vaccination.getBodySite(), CodesReceived.getCodeTable(CodesReceived.BODY_SITE),
-        PotentialIssues.Field.VACCINATION_BODY_SITE, administered);
+    handleCodeReceived(vaccination.getAmountUnit(), PotentialIssues.Field.VACCINATION_ADMINISTERED_UNIT, administered);
+    handleCodeReceived(vaccination.getBodyRoute(), PotentialIssues.Field.VACCINATION_BODY_ROUTE, administered);
+    handleCodeReceived(vaccination.getBodySite(), PotentialIssues.Field.VACCINATION_BODY_SITE, administered);
 
     // TODO VaccinationBodyRouteIsInvalidForVaccineIndicated
     // TODO VaccinationBodySiteIsInvalidForVaccineIndicated
-    String completionStatusCode = vaccination.getCompletionStatusCode();
-    completionStatusCode = handleCodeReceived(completionStatusCode, CodesReceived.getCodeTable(CodesReceived.COMPLETE),
-        PotentialIssues.Field.VACCINATION_COMPLETION_STATUS).getCodeValue();
-    vaccination.setCompletionStatusCode(completionStatusCode);
-    if (completionStatusCode != null && !completionStatusCode.equals(""))
+    handleCodeReceived(vaccination.getCompletion(), PotentialIssues.Field.VACCINATION_COMPLETION_STATUS);
+    if (vaccination.isCompletionCompleted())
     {
-      if (completionStatusCode.equals("CP"))
-      {
-        registerIssue(pi.VaccinationCompletionStatusIsValuedAsCompleted);
-      } else if (completionStatusCode.equals("RE"))
-      {
-        registerIssue(pi.VaccinationCompletionStatusIsValuedAsRefused);
-      } else if (completionStatusCode.equals("NA"))
-      {
-        registerIssue(pi.VaccinationCompletionStatusIsValuedAsNotAdministered);
-      } else if (completionStatusCode.equals("PA"))
-      {
-        registerIssue(pi.VaccinationCompletionStatusIsValuedAsPartiallyAdministered);
-      }
+      registerIssue(pi.VaccinationCompletionStatusIsValuedAsCompleted);
+    } else if (vaccination.isCompletionRefused())
+    {
+      registerIssue(pi.VaccinationCompletionStatusIsValuedAsRefused);
+    } else if (vaccination.isCompletionNotAdministered())
+    {
+      registerIssue(pi.VaccinationCompletionStatusIsValuedAsNotAdministered);
+    } else if (vaccination.isCompletionPartiallyAdministered())
+    {
+      registerIssue(pi.VaccinationCompletionStatusIsValuedAsPartiallyAdministered);
     }
-    handleCodeReceived(vaccination.getConfidentiality(), CodesReceived.getCodeTable(CodesReceived.CONFIDENDIALITY),
-        PotentialIssues.Field.VACCINATION_CONFIDENTIALITY_CODE);
+    handleCodeReceived(vaccination.getConfidentiality(), PotentialIssues.Field.VACCINATION_CONFIDENTIALITY_CODE);
 
     if (vaccineCpt != null && vaccineCvx != null)
     {
       // TODO VaccinationCvxCodeAndCptCodeAreInconsistent
     }
 
-    String facilityId = vaccination.getFacilityId();
-    facilityId = handleCodeReceived(facilityId, CodesReceived.getCodeTable(CodesReceived.FACILITY),
-        PotentialIssues.Field.VACCINATION_FACILITY_ID).getCodeValue();
-    vaccination.setFacilityId(facilityId);
-    notEmpty(vaccination.getFacilityName(), pi.VaccinationFacilityNameIsMissing);
+    handleCodeReceived(vaccination.getFacility().getId(), PotentialIssues.Field.VACCINATION_FACILITY_ID, administered);
+    handleCodeReceived(vaccination.getGivenBy(), PotentialIssues.Field.VACCINATION_GIVEN_BY, administered);
+    handleCodeReceived(vaccination.getOrderedBy(), PotentialIssues.Field.VACCINATION_ORDERED_BY, administered);
+    handleCodeReceived(vaccination.getEnteredBy(), PotentialIssues.Field.VACCINATION_RECORDED_BY);
+    notEmpty(vaccination.getIdSubmitter(), pi.VaccinationIdIsMissing);
+    // TODO VaccinationIdOfReceiverIsMissing
+    // TODO VaccinationIdOfReceiverIsUnrecognized
+    // TODO VaccinationIdOfSenderIsMissing
+    // TODO VaccinationIdOfSenderIsUnrecognized
 
-    // VaccinationGivenByIsDeprecated
-    // VaccinationGivenByIsIgnored
-    // VaccinationGivenByIsInvalid
-    // VaccinationGivenByIsMissing
-    // VaccinationGivenByIsUnrecognized
-    // VaccinationOrderedByIsDeprecated
-    // VaccinationOrderedByIsIgnored
-    // VaccinationOrderedByIsInvalid
-    // VaccinationOrderedByIsMissing
-    // VaccinationOrderedByIsUnrecognized
-    // VaccinationRecordedByIsDeprecated
-    // VaccinationRecordedByIsIgnored
-    // VaccinationRecordedByIsInvalid
-    // VaccinationRecordedByIsMissing
-    // VaccinationRecordedByIsUnrecognized
-
-    // VaccinationIdIsMissing
-    // VaccinationIdOfReceiverIsMissing
-    // VaccinationIdOfReceiverIsUnrecognized
-    // VaccinationIdOfSenderIsMissing
-    // VaccinationIdOfSenderIsUnrecognized
-
-    // VaccinationLotExpirationDateIsInvalid
-    // VaccinationLotExpirationDateIsMissing
     if (administered)
     {
+      notEmpty(vaccination.getFacilityName(), pi.VaccinationFacilityNameIsMissing);
+      notEmpty(vaccination.getExpirationDate(), pi.VaccinationLotExpirationDateIsMissing);
       if (notEmpty(vaccination.getLotNumber(), pi.VaccinationLotNumberIsMissing))
       {
         // TODO VaccinationLotNumberIsInvalid
       }
     }
+    handleCodeReceived(vaccination.getRefusal(), PotentialIssues.Field.VACCINATION_REFUSAL_REASON);
+    // TODO add logic to indicate if refusal reason is given but completion is
+    // RE
 
-    // VaccinationRefusalReasonIsDeprecated
-    // VaccinationRefusalReasonIsIgnored
-    // VaccinationRefusalReasonIsInvalid
-    // VaccinationRefusalReasonIsMissing
-    // VaccinationRefusalReasonIsUnrecognized
-    // VaccinationSystemEntryTimeIsInFuture
-    // VaccinationSystemEntryTimeIsInvalid
-    // VaccinationSystemEntryTimeIsMissing
+    if (notEmpty(vaccination.getSystemEntryDate(), pi.VaccinationSystemEntryTimeIsMissing))
+    {
+      if (now.before(vaccination.getSystemEntryDate()))
+      {
+        registerIssue(pi.VaccinationSystemEntryTimeIsInFuture);
+      }
+    }
 
   }
 
   private void validatePatient()
   {
-    Address address = patient.getAddress();
-    String city = address.getCity();
-    if (notEmpty(city, PotentialIssues.Field.PATIENT_ADDRESS_CITY))
-    {
-      if (city.equalsIgnoreCase("ANYTOWN") || city.length() <= 1)
-      {
-        registerIssue(pi.getIssue(PotentialIssues.Field.PATIENT_ADDRESS_CITY, PotentialIssue.ISSUE_TYPE_IS_INVALID));
-      }
-    }
-
-    String country = address.getCountry();
-    country = handleCodeReceived(country, CodesReceived.getCodeTable(CodesReceived.COUNTRY),
-        PotentialIssues.Field.PATIENT_ADDRESS_COUNTRY).getCodeValue();
-    address.setCountry(country);
-
-    String countyParish = address.getCountyParish();
-    countyParish = handleCodeReceived(countyParish, CodesReceived.getCodeTable(CodesReceived.COUNTY_PARISH),
-        PotentialIssues.Field.PATIENT_ADDRESS_COUNTY).getCodeValue();
-    address.setCountyParish(countyParish);
-
-    String state = address.getState();
-    state = handleCodeReceived(state, CodesReceived.getCodeTable(CodesReceived.STATE),
-        PotentialIssues.Field.PATIENT_ADDRESS_STATE).getCodeValue();
-    address.setState(state);
-
-    String street = address.getStreet();
-    notEmpty(street, PotentialIssues.Field.PATIENT_ADDRESS_STREET);
-
-    String street2 = address.getStreet2();
-    notEmpty(street2, PotentialIssues.Field.PATIENT_ADDRESS_STREET2);
-
-    String zip = address.getZip();
-    if (notEmpty(zip, PotentialIssues.Field.PATIENT_ADDRESS_ZIP))
-    {
-      // TODO Zip valid?
-      if (false)
-      {
-        registerIssue(pi.getIssue(PotentialIssues.Field.PATIENT_ADDRESS_ZIP, PotentialIssue.ISSUE_TYPE_IS_INVALID));
-      }
-    }
-
-    if (street == null || street.equals("") || zip == null || zip.equals("") || city == null || city.equals("")
-        || state == null || state.equals(""))
-    {
-      registerIssue(pi.PatientAddressIsMissing);
-    }
+    piAddress = PotentialIssues.Field.PATIENT_ADDRESS;
+    piAddressCity = PotentialIssues.Field.PATIENT_ADDRESS_CITY;
+    piAddressStreet = PotentialIssues.Field.PATIENT_ADDRESS_STREET;
+    piAddressCountry = PotentialIssues.Field.PATIENT_ADDRESS_COUNTRY;
+    piAddressCounty = PotentialIssues.Field.PATIENT_ADDRESS_COUNTY;
+    piAddressState = PotentialIssues.Field.PATIENT_ADDRESS_STATE;
+    piAddressStreet2 = PotentialIssues.Field.PATIENT_ADDRESS_STREET2;
+    piAddressZip = PotentialIssues.Field.PATIENT_ADDRESS_ZIP;
+    validateAddress(patient.getAddress());
 
     String aliasFirst = patient.getAliasFirst();
     String aliasLast = patient.getAliasLast();
@@ -508,114 +459,180 @@ public class Validator extends ValidateMessage
 
     if (patient.getBirthDate() == null)
     {
-      registerIssue(pi.PatientDateOfBirthIsMissing);
+      registerIssue(pi.PatientBirthDateIsMissing);
     } else
     {
-      Date now = new Date();
-      if (now.before(patient.getBirthDate()))
+      if (message.getReceivedDate().before(patient.getBirthDate()))
       {
-        registerIssue(pi.PatientDateOfBirthIsInFuture);
+        registerIssue(pi.PatientBirthDateIsInFuture);
       }
     }
-    // public PotentialIssue PatientBirthIndicatorIsInvalid = null;
-    // public PotentialIssue PatientBirthIndicatorIsMissing = null;
-    // public PotentialIssue PatientBirthOrderIsInvalid = null;
-    // public PotentialIssue PatientBirthOrderIsMissing = null;
-    // public PotentialIssue PatientBirthOrderIsMissingAndMultipleBirthIndicated
-    // = null;
-    // public PotentialIssue PatientBirthPlaceIsMissing = null;
-    // public PotentialIssue PatientDeathDateIsBeforeBirth = null;
-    // public PotentialIssue PatientDeathDateIsInFuture = null;
-    // public PotentialIssue PatientDeathDateIsInvalid = null;
-    // public PotentialIssue PatientDeathDateIsMissing = null;
-    // PatientEthnicityIsDeprecated
-    // PatientEthnicityIsIgnored
-    // PatientEthnicityIsInvalid
-    // PatientEthnicityIsMissing
-    // PatientEthnicityIsUnrecognized
-    // PatientFirstNameIsInvalid
-    // PatientFirstNameIsMissing
-    // PatientFirstNameMayIncludeMiddleInitial
-    // PatientGenderIsDeprecated
-    // PatientGenderIsIgnored
-    // PatientGenderIsInvalid
-    // PatientGenderIsMissing
-    // PatientGenderIsUnrecognized
-    // PatientImmunizationRegistryStatusIsDeprecated
-    // PatientImmunizationRegistryStatusIsIgnored
-    // PatientImmunizationRegistryStatusIsInvalid
-    // PatientImmunizationRegistryStatusIsMissing
-    // PatientImmunizationRegistryStatusIsUnrecognized
-    // PatientLastNameIsInvalid
-    // PatientLastNameIsMissing
-    // PatientMedicaidNumberIsInvalid
-    // PatientMedicaidNumberIsMissing
-    // PatientMiddleNameIsMissing
-    // PatientMiddleNameMayBeInitial
-    // PatientMotherSMaidenNameIsMissing
-    // PatientNameMayBeTemporaryNewbornName
-    // PatientNameMayBeTestName
-    // PatientPhoneIsIncomplete
-    // PatientPhoneIsInvalid
-    // PatientPhoneIsMissing
-    // PatientPrimaryFacilityIdIsDeprecated
-    // PatientPrimaryFacilityIdIsIgnored
-    // PatientPrimaryFacilityIdIsInvalid
-    // PatientPrimaryFacilityIdIsMissing
-    // PatientPrimaryFacilityIdIsUnrecognized
-    // PatientPrimaryFacilityNameIsMissing
-    // PatientPrimaryLanaguageIsDeprecated
-    // PatientPrimaryLanaguageIsIgnored
-    // PatientPrimaryLanaguageIsInvalid
-    // PatientPrimaryLanaguageIsMissing
-    // PatientPrimaryLanaguageIsUnrecognized
-    // PatientPrimaryPhysicianIdIsDeprecated
-    // PatientPrimaryPhysicianIdIsIgnored
-    // PatientPrimaryPhysicianIdIsInvalid
-    // PatientPrimaryPhysicianIdIsMissing
-    // PatientPrimaryPhysicianIdIsUnrecognized
-    // PatientPrimaryPhysicianNameIsMissing
-    // PatientProtectionIndicatorIsDeprecated
-    // PatientProtectionIndicatorIsIgnored
-    // PatientProtectionIndicatorIsInvalid
-    // PatientProtectionIndicatorIsMissing
-    // PatientProtectionIndicatorIsUnrecognized
-    // PatientProtectionIndicatorIsValuedAsNo
-    // PatientProtectionIndicatorIsValuedAsYes
-    // PatientPublicityCodeIsDeprecated
-    // PatientPublicityCodeIsIgnored
-    // PatientPublicityCodeIsInvalid
-    // PatientPublicityCodeIsMissing
-    // PatientPublicityCodeIsUnrecognized
-    // PatientRaceIsDeprecated
-    // PatientRaceIsIgnored
-    // PatientRaceIsInvalid
-    // PatientRaceIsMissing
-    // PatientRaceIsUnrecognized
-    // PatientRegistryIdIsMissing
-    // PatientRegistryIdIsUnrecognized
-    // PatientSsnIsInvalid
-    // PatientSsnIsMissing
-    // PatientSubmitterIdIsMissing
-    // PatientVfcEffectiveDateIsBeforeBirth
-    // PatientVfcEffectiveDateIsInFuture
-    // PatientVfcEffectiveDateIsInvalid
-    // PatientVfcEffectiveDateIsMissing
-    // PatientVfcStatusIsDeprecated
-    // PatientVfcStatusIsIgnored
-    // PatientVfcStatusIsInvalid
-    // PatientVfcStatusIsMissing
-    // PatientVfcStatusIsUnrecognized
-    // PatientWicIdIsInvalid
-    // PatientWicIdIsMissing
-    // VaccinationDeathIndicatorIsInconsistent
-    // VaccinationDeathIndicatorIsMissing
 
+    if (notEmpty(patient.getBirthMultiple(), pi.PatientBirthIndicatorIsMissing))
+    {
+      if (patient.getBirthMultiple().equals("Y"))
+      {
+        handleCodeReceived(patient.getBirthOrder(), PotentialIssues.Field.PATIENT_BIRTH_ORDER);
+        if (patient.getBirthOrder().isEmpty())
+        {
+          registerIssue(pi.PatientBirthOrderIsMissingAndMultipleBirthIndicated);
+        }
+      } else if (patient.getBirthMultiple().equals("N"))
+      {
+        if (!patient.getBirthOrder().isEmpty())
+        {
+          registerIssue(pi.PatientBirthOrderIsInvalid);
+        }
+      } else
+      {
+        registerIssue(pi.PatientBirthIndicatorIsInvalid);
+      }
+    } else
+    {
+      if (!patient.getBirthOrder().isEmpty())
+      {
+        registerIssue(pi.PatientBirthOrderIsInvalid);
+      }
+    }
+    notEmpty(patient.getBirthPlace(), pi.PatientBirthPlaceIsMissing);
+    if (notEmpty(patient.getDeathDate(), pi.PatientDeathDateIsMissing))
+    {
+      if (patient.getBirthDate() != null && patient.getDeathDate().before(patient.getBirthDate()))
+      {
+        registerIssue(pi.PatientDeathDateIsBeforeBirth);
+      }
+      if (message.getReceivedDate().before(patient.getDeathDate()))
+      {
+        registerIssue(pi.PatientDeathDateIsInFuture);
+      }
+    }
+    handleCodeReceived(patient.getEthnicity(), PotentialIssues.Field.PATIENT_ETHNICITY);
+    if (notEmpty(patient.getNameFirst(), pi.PatientFirstNameIsMissing))
+    {
+      // TODO PatientFirstNameIsInvalid
+      // TODO PatientFirstNameMayIncludeMiddleInitial
+    }
+    handleCodeReceived(patient.getSex(), PotentialIssues.Field.PATIENT_GENDER);
+    // TODO
+    // String registryStatus = patient.getRegistryStatus();
+    // handleCodeReceived(registryStatus,
+    // CodesReceived.getCodeTable(CodesReceived.REGISTRY_STATUS),
+    // PotentialIssues.Field.PATIENT_REGISTRY_ID);
+    handleCodeReceived(patient.getRegistryStatus(), PotentialIssues.Field.PATIENT_REGISTRY_STATUS);
+
+    if (notEmpty(patient.getNameLast(), pi.PatientLastNameIsMissing))
+    {
+      // TODO PatientLastNameIsInvalid
+    }
+    if (notEmpty(patient.getIdMedicaid(), pi.PatientMedicaidNumberIsMissing))
+    {
+      // TODO PatientMedicaidNumberIsInvalid
+    }
+
+    String middleName = patient.getNameMiddle();
+    if (patient.getNameMiddle().endsWith("."))
+    {
+      middleName = patient.getNameMiddle();
+      middleName = middleName.substring(0, middleName.length() - 1);
+      patient.setNameMiddle(middleName);
+    }
+    if (notEmpty(middleName, pi.PatientMiddleNameIsMissing))
+    {
+      // PatientMiddleNameMayBeInitial
+      middleName = patient.getNameMiddle();
+      if (middleName.length() == 1)
+      {
+        registerIssue(pi.PatientMiddleNameMayBeInitial);
+      }
+    }
+    notEmpty(patient.getMotherMaidenName(), pi.PatientMotherSMaidenNameIsMissing);
+
+    // TODO PatientNameMayBeTemporaryNewbornName
+    // TODO PatientNameMayBeTestName
+
+    validatePhone(patient.getPhone(), PotentialIssues.Field.PATIENT_PHONE);
+
+    notEmpty(patient.getFacilityName(), pi.PatientPrimaryFacilityNameIsMissing);
+    handleCodeReceived(patient.getFacility().getId(), PotentialIssues.Field.PATIENT_PRIMARY_FACILITY_ID);
+    handleCodeReceived(patient.getPrimaryLanguage(), PotentialIssues.Field.PATIENT_PRIMARY_LANAGUAGE);
+    handleCodeReceived(patient.getPhysician(), PotentialIssues.Field.PATIENT_PRIMARY_PHYSICIAN_ID);
+    notEmpty(patient.getPhysician().getName(), pi.PatientPrimaryPhysicianNameIsMissing);
+    handleCodeReceived(patient.getProtection(), PotentialIssues.Field.PATIENT_PROTECTION_INDICATOR);
+    handleCodeReceived(patient.getPublicity(), PotentialIssues.Field.PATIENT_PUBLICITY_CODE);
+    handleCodeReceived(patient.getRace(), PotentialIssues.Field.PATIENT_RACE);
+    notEmpty(patient.getIdRegistry(), pi.PatientRegistryIdIsMissing);
+
+    if (notEmpty(patient.getIdRegistryNumber(), PotentialIssues.Field.PATIENT_REGISTRY_ID))
+    {
+      // TODO PatientRegistryIdIsUnrecognized
+    }
+    if (notEmpty(patient.getIdSsnNumber(), PotentialIssues.Field.PATIENT_SSN))
+    {
+      // TODO PatientSsnIsInvalid
+    }
+    notEmpty(patient.getIdSubmitterNumber(), PotentialIssues.Field.PATIENT_SUBMITTER_ID);
+
+    // TODO PatientVfcEffectiveDateIsBeforeBirth
+    // TODO PatientVfcEffectiveDateIsInFuture
+    // TODO PatientVfcEffectiveDateIsInvalid
+    // TODO PatientVfcEffectiveDateIsMissing
+    handleCodeReceived(patient.getFinancialEligibility(), PotentialIssues.Field.PATIENT_VFC_STATUS);
+    if (notEmpty(patient.getDeathIndicator(), pi.PatientDeathIndicatorIsMissing))
+    {
+      if (patient.getDeathIndicator().equals("Y") && patient.getDeathDate() == null)
+      {
+        registerIssue(pi.PatientDeathIndicatorIsInconsistent);
+      } else if (patient.getDeathDate() == null)
+      {
+        registerIssue(pi.PatientDeathIndicatorIsInconsistent);
+      }
+    }
   }
 
-  private boolean notEmpty(CodedEntity codedEntity, PotentialIssue potentialIssue)
+  private void validatePhone(PhoneNumber phone, PotentialIssues.Field piPhone)
   {
-    return notEmpty(codedEntity.getCode(), potentialIssue);
+    if (notEmpty(phone.getNumber(), piPhone))
+    {
+      if (phone.getAreaCode().equals("") || phone.getLocalNumber().equals(""))
+      {
+        // TODO PatientPhoneIsIncomplete
+      }
+      // TODO PatientPhoneIsInvalid
+    }
+  }
+
+  private boolean validateAddress(Address address)
+  {
+    String city = address.getCity();
+    if (notEmpty(city, piAddressCity))
+    {
+      if (city.equalsIgnoreCase("ANYTOWN") || city.length() <= 1)
+      {
+        registerIssue(pi.getIssue(piAddressCity, PotentialIssue.ISSUE_TYPE_IS_INVALID));
+      }
+    }
+
+    handleCodeReceived(address.getCountry(), piAddressCountry);
+    handleCodeReceived(address.getCountyParish(), piAddressCounty);
+    handleCodeReceived(address.getState(), piAddressState);
+    notEmpty(address.getStreet(), piAddressStreet);
+    notEmpty(address.getStreet2(), piAddressStreet2);
+    if (notEmpty(address.getZip(), piAddressZip))
+    {
+      // TODO Zip valid?
+    }
+
+    if (isEmpty(address.getStreet()) || isEmpty(city) || isEmpty(address.getZip()) || isEmpty(address.getState()))
+    {
+      registerIssue(pi.getIssue(piAddress, PotentialIssue.ISSUE_TYPE_IS_MISSING));
+      return false;
+    }
+    return true;
+  }
+
+  private boolean notEmpty(Id id, PotentialIssue potentialIssue)
+  {
+    return notEmpty(id.getNumber(), potentialIssue);
   }
 
   private boolean notEmpty(Date date, PotentialIssue potentialIssue)
@@ -643,24 +660,92 @@ public class Validator extends ValidateMessage
     return !empty;
   }
 
-  protected CodeReceived handleCodeReceived(CodedEntity codedEntity, CodeTable codeTable, PotentialIssues.Field field)
+  private boolean notEmpty(Name name, PotentialIssue potentialIssue)
   {
-
-    return handleCodeReceived(codedEntity, codeTable, field, true);
+    boolean empty = true;
+    if (name != null)
+    {
+      if (name.getFirst() != null && !name.getFirst().equals(""))
+      {
+        empty = false;
+      } else if (name.getLast() != null && !name.getLast().equals(""))
+      {
+        empty = false;
+      }
+    }
+    if (empty)
+    {
+      registerIssue(potentialIssue);
+    }
+    return !empty;
   }
 
-  protected CodeReceived handleCodeReceived(CodedEntity codedEntity, CodeTable codeTable, PotentialIssues.Field field,
-      boolean notSilent)
+  protected void handleCodeReceived(Id id, PotentialIssues.Field field)
+  {
+
+    handleCodeReceived(id, field, true);
+  }
+
+  protected void handleCodeReceived(Id id, PotentialIssues.Field field, boolean notSilent)
   {
     CodeReceived cr = null;
-    if (notEmpty(codedEntity.getCode(), field))
+    if (notEmpty(id.getNumber(), field))
     {
-      cr = getCodeReceived(codedEntity.getCode(), codeTable);
+      CodeTable codeTable = CodesReceived.getCodeTable(id.getTableType());
+      cr = getCodeReceived(id.getNumber(), id.getName().getFullName(), codeTable);
       cr.incReceivedCount();
       session.save(cr);
       if (cr.getCodeStatus().isValid())
       {
-        return cr;
+        id.setCodeReceived(cr);
+      } else if (cr.getCodeStatus().isInvalid())
+      {
+        if (notSilent)
+        {
+          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_INVALID), cr);
+        }
+      } else if (cr.getCodeStatus().isUnrecognized())
+      {
+        if (notSilent)
+        {
+          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_UNRECOGNIZED), cr);
+        }
+      } else if (cr.getCodeStatus().isDeprecated())
+      {
+        if (notSilent)
+        {
+          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_DEPRECATE), cr);
+        }
+      } else if (cr.getCodeStatus().isIgnored())
+      {
+        if (notSilent)
+        {
+          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_IGNORED), cr);
+        }
+      }
+      id.setNumber(cr.getCodeValue());
+    }
+    id.setCodeReceived(cr);
+  }
+
+  protected void handleCodeReceived(CodedEntity codedEntity, PotentialIssues.Field field)
+  {
+    handleCodeReceived(codedEntity, field, true);
+  }
+
+  protected void handleCodeReceived(CodedEntity codedEntity, PotentialIssues.Field field, boolean notSilent)
+  {
+    CodeReceived cr = null;
+    if (notEmpty(codedEntity.getCode(), field))
+    {
+      CodeTable codeTable = CodesReceived.getCodeTable(codedEntity.getTableType());
+      cr = getCodeReceived(codedEntity.getCode(), codedEntity.getText(), codeTable);
+      cr.incReceivedCount();
+      session.save(cr);
+      if (cr.getCodeStatus().isValid())
+      {
+        codedEntity.setCodeReceived(cr);
+        return;
       } else if (cr.getCodeStatus().isInvalid())
       {
         if (notSilent)
@@ -688,65 +773,78 @@ public class Validator extends ValidateMessage
       }
       codedEntity.setCode(cr.getCodeValue());
     }
-    return cr;
+    codedEntity.setCodeReceived(cr);
   }
 
-  protected CodeReceived handleCodeReceived(String receivedValue, CodeTable codeTable, PotentialIssues.Field field)
-  {
-    return handleCodeReceived(receivedValue, codeTable, field, true);
-  }
+  // protected CodeReceived handleCodeReceived(String receivedValue, CodeTable
+  // codeTable, PotentialIssues.Field field)
+  // {
+  // return handleCodeReceived(receivedValue, codeTable, field, true);
+  // }
+  //
+  // protected CodeReceived handleCodeReceived(String value, CodeTable
+  // codeTable, PotentialIssues.Field field,
+  // boolean notSilent)
+  // {
+  // CodeReceived cr = null;
+  // if (notEmpty(value, field))
+  // {
+  // cr = getCodeReceived(value, codeTable);
+  // cr.incReceivedCount();
+  // session.save(cr);
+  // if (cr.getCodeStatus().isValid())
+  // {
+  // // Do nothing
+  // // registerIssue(pi.getIssue(field,
+  // // PotentialIssue.ISSUE_TYPE_IS_INVALID), cr);
+  // } else if (cr.getCodeStatus().isInvalid())
+  // {
+  // if (notSilent)
+  // {
+  // registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_INVALID),
+  // cr);
+  // }
+  // } else if (cr.getCodeStatus().isUnrecognized())
+  // {
+  // if (notSilent)
+  // {
+  // registerIssue(pi.getIssue(field,
+  // PotentialIssue.ISSUE_TYPE_IS_UNRECOGNIZED), cr);
+  // }
+  // } else if (cr.getCodeStatus().isDeprecated())
+  // {
+  // if (notSilent)
+  // {
+  // registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_DEPRECATE),
+  // cr);
+  // }
+  // } else if (cr.getCodeStatus().isIgnored())
+  // {
+  // if (notSilent)
+  // {
+  // registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_IGNORED),
+  // cr);
+  // }
+  // }
+  // }
+  // if (cr == null)
+  // {
+  // cr = new CodeReceived();
+  // }
+  // return cr;
+  // }
 
-  protected CodeReceived handleCodeReceived(String value, CodeTable codeTable, PotentialIssues.Field field,
-      boolean notSilent)
-  {
-    CodeReceived cr = null;
-    if (notEmpty(value, field))
-    {
-      cr = getCodeReceived(value, codeTable);
-      cr.incReceivedCount();
-      session.save(cr);
-      if (cr.getCodeStatus().isValid())
-      {
-        // Do nothing
-        // registerIssue(pi.getIssue(field,
-        // PotentialIssue.ISSUE_TYPE_IS_INVALID), cr);
-      } else if (cr.getCodeStatus().isInvalid())
-      {
-        if (notSilent)
-        {
-          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_INVALID), cr);
-        }
-      } else if (cr.getCodeStatus().isUnrecognized())
-      {
-        if (notSilent)
-        {
-          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_UNRECOGNIZED), cr);
-        }
-      } else if (cr.getCodeStatus().isDeprecated())
-      {
-        if (notSilent)
-        {
-          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_DEPRECATE), cr);
-        }
-      } else if (cr.getCodeStatus().isIgnored())
-      {
-        if (notSilent)
-        {
-          registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_IGNORED), cr);
-        }
-      }
-    }
-    if (cr == null)
-    {
-      cr = new CodeReceived();
-    }
-    return cr;
-  }
-
-  protected CodeReceived getCodeReceived(String receivedValue, CodeTable codeTable)
+  protected CodeReceived getCodeReceived(String receivedValue, String receivedLabel, CodeTable codeTable)
   {
     CodesReceived crs = profile.getCodesReceived(session);
     CodeReceived cr = crs.getCodeReceived(receivedValue, codeTable);
+    if (receivedLabel != null)
+    {
+      if (receivedLabel.length() > 30)
+      {
+        receivedLabel = receivedLabel.substring(0, 30);
+      }
+    }
     if (cr == null)
     {
       cr = new CodeReceived();
@@ -755,11 +853,15 @@ public class Validator extends ValidateMessage
       cr.setReceivedValue(receivedValue);
       cr.setCodeValue(codeTable.getDefaultCodeValue());
       cr.setCodeStatus(CodeStatus.UNRECOGNIZED);
+      cr.setCodeLabel(receivedLabel);
+      session.save(cr);
     } else if (!cr.getProfile().equals(profile))
     {
-      cr = new CodeReceived(cr, profile);
+      cr = new CodeReceived(cr, profile, receivedLabel);
+      session.save(cr);
       // first time code was received
     }
+
     return cr;
   }
 
@@ -773,5 +875,20 @@ public class Validator extends ValidateMessage
     int startMonth = cal.get(Calendar.MONTH);
     int startYear = cal.get(Calendar.YEAR);
     return ((endYear - startYear) * cal.getMaximum(Calendar.MONTH)) + (endMonth - startMonth);
+  }
+
+  private static boolean isEmpty(String s)
+  {
+    return s == null || s.equals("");
+  }
+
+  private static boolean isEmpty(CodedEntity ce)
+  {
+    return ce == null || ce.isEmpty();
+  }
+
+  private static boolean areEqual(String field1, String field2)
+  {
+    return field1 != null && field1.equals(field2);
   }
 }

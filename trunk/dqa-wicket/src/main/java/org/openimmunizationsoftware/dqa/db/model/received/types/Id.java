@@ -1,37 +1,41 @@
 package org.openimmunizationsoftware.dqa.db.model.received.types;
 
+import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
+import org.openimmunizationsoftware.dqa.db.model.CodeTable;
+
 public class Id
 {
-  private String number = "";
-  private String assigningAuthority = "";
-  private String typeCode = "";
+  private CodedEntity assigningAuthority = new CodedEntity(CodeTable.Type.ID_ASSIGNING_AUTHORITY);
+  private CodeReceived codeReceived = null;
+  private CodeTable.Type tableType = null;
   private Name name = null;
-  
-  public String getNumber()
-  {
-    return number;
+  private String number = "";
+  private CodedEntity type = new CodedEntity(CodeTable.Type.ID_TYPE_CODE);
+
+  public Id(CodeTable.Type tableType) {
+    this.tableType = tableType;
   }
-  public void setNumber(String number)
-  {
-    this.number = number;
-  }
-  public String getAssigningAuthority()
+
+  public CodedEntity getAssigningAuthority()
   {
     return assigningAuthority;
   }
-  public void setAssigningAuthority(String assigningAuthority)
+
+  public String getAssigningAuthorityCode()
   {
-    this.assigningAuthority = assigningAuthority;
+    return assigningAuthority.getCode();
   }
-  public String getTypeCode()
+
+  public CodeReceived getCodeReceived()
   {
-    return typeCode;
+    return codeReceived;
   }
-  public void setTypeCode(String typeCode)
+
+
+  public CodeTable.Type getTableType()
   {
-    this.typeCode = typeCode;
+    return tableType;
   }
-  
   public Name getName()
   {
     if (name == null)
@@ -39,5 +43,34 @@ public class Id
       name = new Name();
     }
     return name;
+  }
+  public String getNumber()
+  {
+    return number;
+  }
+  public CodedEntity getType()
+  {
+    return type;
+  }
+  public String getTypeCode()
+  {
+    return type.getCode();
+  }
+  public void setAssigningAuthorityCode(String assigningAuthorityCode)
+  {
+    this.assigningAuthority.setCode(assigningAuthorityCode);
+  }
+  public void setCodeReceived(CodeReceived codeReceived)
+  {
+    this.codeReceived = codeReceived;
+  }
+  public void setNumber(String number)
+  {
+    this.number = number;
+  }
+  
+  public void setTypeCode(String typeCode)
+  {
+    this.type.setCode(typeCode);
   }
 }

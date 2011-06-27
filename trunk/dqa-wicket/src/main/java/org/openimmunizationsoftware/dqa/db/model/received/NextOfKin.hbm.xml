@@ -10,12 +10,12 @@
     <many-to-one name="messageReceived" column="received_id" class="org.openimmunizationsoftware.dqa.db.model.MessageReceived"/>
     <property name="positionId" column="position_id" type="int"/>
     <property name="addressCity" column="address_city" type="string"/>
-    <property name="addressCountry" column="address_country" type="string"/>
-    <property name="addressCountyParish" column="address_county_parish" type="string"/>
-    <property name="addressState" column="address_state" type="string"/>
+    <property name="addressCountryCode" column="address_country" type="string"/>
+    <property name="addressCountyParishCode" column="address_county_parish" type="string"/>
+    <property name="addressStateCode" column="address_state" type="string"/>
     <property name="addressStreet" column="address_street" type="string"/>
     <property name="addressStreet2" column="address_street2" type="string"/>
-    <property name="addressType" column="address_type" type="string"/>
+    <property name="addressTypeCode" column="address_type" type="string"/>
     <property name="addressZip" column="address_zip" type="string"/>
     <property name="nameFirst" column="name_first" type="string"/>
     <property name="nameLast" column="name_last" type="string"/>
