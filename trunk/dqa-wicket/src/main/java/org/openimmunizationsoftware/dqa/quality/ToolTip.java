@@ -3,9 +3,22 @@ package org.openimmunizationsoftware.dqa.quality;
 public class ToolTip
 {
 
+  private static final String DEFAULT_INDENT = "&nbsp;-&nbsp;";
   private String indent = "";
   private String label = "";
   private String tip = "";
+  private boolean emphasize = false;
+
+  public boolean isEmphasize()
+  {
+    return emphasize;
+  }
+
+  public ToolTip setEmphasize(boolean emphasize)
+  {
+    this.emphasize = emphasize;
+    return this;
+  }
 
   public ToolTip(String label, String tip) {
     this.label = label;
@@ -15,7 +28,7 @@ public class ToolTip
   public ToolTip(String label, String tip, boolean indent) {
     this.label = label;
     this.tip = tip;
-    this.indent = indent ? "&nbsp;-&nbsp;" : "";
+    this.indent = indent ? DEFAULT_INDENT : "";
   }
 
   public String getHtml()
@@ -46,6 +59,11 @@ public class ToolTip
   public void setIndent(String indent)
   {
     this.indent = indent;
+  }
+
+  public void setIndent(boolean i)
+  {
+    this.indent = i ? DEFAULT_INDENT : "";
   }
 
   public void setLabel(String label)

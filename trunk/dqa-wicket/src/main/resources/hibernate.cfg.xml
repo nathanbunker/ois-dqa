@@ -34,6 +34,8 @@
     <mapping resource="org/openimmunizationsoftware/dqa/db/model/VaccineProduct.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/db/model/VaccineMvx.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/db/model/VaccineCvx.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/db/model/VaccineCvxGroup.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/db/model/VaccineCpt.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/db/model/VaccineGroup.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

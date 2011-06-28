@@ -14,6 +14,7 @@ public class MessageBatch
   private int completenessPatientScore = 0;
   private int completenessScore = 0;
   private int completenessVaccinationScore = 0;
+  private int completenessVaccineGroupScore = 0;
   private Date endDate = null;
   private int messageCount = 0;
   private int messageWithAdminCount = 0;
@@ -22,6 +23,8 @@ public class MessageBatch
   private int patientCount = 0;
   private int patientUnderageCount = 0;
   private int qualityScore = 0;
+  private int qualityErrorScore = 0;
+  private int qualityWarnScore = 0;
   private Date startDate = null;
   private SubmitStatus submitStatus = null;
   private double timelinessAverage = 0.0;
@@ -31,6 +34,9 @@ public class MessageBatch
   private Date timelinessDateFirst = null;
   private Date timelinessDateLast = null;
   private int timelinessScore = 0;
+  private int timelinessScore2Days = 0;
+  private int timelinessScore30Days = 0;
+  private int timelinessScore7Days = 0;
   private int vaccinationAdministeredCount = 0;
   private int vaccinationDeleteCount = 0;
   private int vaccinationHistoricalCount = 0;
@@ -96,6 +102,11 @@ public class MessageBatch
   public int getCompletenessVaccinationScore()
   {
     return completenessVaccinationScore;
+  }
+
+  public int getCompletenessVaccineGroupScore()
+  {
+    return completenessVaccineGroupScore;
   }
 
   public Date getEndDate()
@@ -181,6 +192,21 @@ public class MessageBatch
   public int getTimelinessScore()
   {
     return timelinessScore;
+  }
+
+  public int getTimelinessScore2Days()
+  {
+    return timelinessScore2Days;
+  }
+
+  public int getTimelinessScore30Days()
+  {
+    return timelinessScore30Days;
+  }
+
+  public int getTimelinessScore7Days()
+  {
+    return timelinessScore7Days;
   }
 
   public int getVaccinationAdministeredCount()
@@ -320,6 +346,11 @@ public class MessageBatch
     this.completenessVaccinationScore = completenessVaccinationScore;
   }
 
+  public void setCompletenessVaccineGroupScore(int completenessVaccineGroupScore)
+  {
+    this.completenessVaccineGroupScore = completenessVaccineGroupScore;
+  }
+
   public void setEndDate(Date endDate)
   {
     this.endDate = endDate;
@@ -405,6 +436,21 @@ public class MessageBatch
     this.timelinessScore = timelinessScore;
   }
 
+  public void setTimelinessScore2Days(int timelinessScore2Days)
+  {
+    this.timelinessScore2Days = timelinessScore2Days;
+  }
+
+  public void setTimelinessScore30Days(int timelinessScore30Days)
+  {
+    this.timelinessScore30Days = timelinessScore30Days;
+  }
+
+  public void setTimelinessScore7Days(int timelinessScore7Days)
+  {
+    this.timelinessScore7Days = timelinessScore7Days;
+  }
+
   public void setVaccinationAdministeredCount(int vaccinationAdministeredCount)
   {
     this.vaccinationAdministeredCount = vaccinationAdministeredCount;
@@ -423,6 +469,26 @@ public class MessageBatch
   public void setVaccinationNotAdministeredCount(int vaccinationNotAdministeredCount)
   {
     this.vaccinationNotAdministeredCount = vaccinationNotAdministeredCount;
+  }
+
+  public int getQualityErrorScore()
+  {
+    return qualityErrorScore;
+  }
+
+  public void setQualityErrorScore(int qualityErrorScore)
+  {
+    this.qualityErrorScore = qualityErrorScore;
+  }
+
+  public int getQualityWarnScore()
+  {
+    return qualityWarnScore;
+  }
+
+  public void setQualityWarnScore(int qualityWarnScore)
+  {
+    this.qualityWarnScore = qualityWarnScore;
   }
 
 }

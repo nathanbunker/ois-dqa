@@ -3,6 +3,7 @@ package org.openimmunizationsoftware.dqa.manager;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssueStatus;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
+import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
+import org.openimmunizationsoftware.dqa.db.model.VaccineGroup;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.quality.CompletenessRow;
 import org.openimmunizationsoftware.dqa.quality.CompletenessScoring;
@@ -38,6 +41,22 @@ public class MessageBatchManager
   private Date vaccinationAdminDateLatest = null;
   private int numeratorVaccinationAdminDateAge = 0;
   private CompletenessScoring scoring = null;
+  private Map<VaccineCvx, Integer> vaccineCvxCounts = new HashMap<VaccineCvx, Integer>();
+
+  public int getVaccineCvxCount(VaccineCvx cvx)
+  {
+    Integer count = vaccineCvxCounts.get(cvx);
+    if (count == null)
+    {
+      return 0;
+    }
+    return count;
+  }
+
+  public Set<VaccineCvx> getVaccineCvxReceived()
+  {
+    return vaccineCvxCounts.keySet();
+  }
 
   public CompletenessScoring getCompletenessScoring()
   {
@@ -154,6 +173,15 @@ public class MessageBatchManager
             latestAdmin = vaccination.getAdminDate();
           }
         }
+        if (vaccination.getVaccineCvx() != null)
+        {
+          Integer count = vaccineCvxCounts.get(vaccination.getVaccineCvx());
+          if (count == null)
+          {
+            count = 0;
+          }
+          vaccineCvxCounts.put(vaccination.getVaccineCvx(), ++count);
+        }
       } else
       {
         messageBatch.incVaccinationHistoricalCount();
@@ -162,12 +190,13 @@ public class MessageBatchManager
     if (timelinessGap < DAYS_2)
     {
       messageBatch.incTimelinessCount2Days();
-    }
-    if (timelinessGap < DAYS_7)
+      messageBatch.incTimelinessCount7Days();
+      messageBatch.incTimelinessCount30Days();
+    } else if (timelinessGap < DAYS_7)
     {
       messageBatch.incTimelinessCount7Days();
-    }
-    if (timelinessGap < DAYS_30)
+      messageBatch.incTimelinessCount30Days();
+    } else if (timelinessGap < DAYS_30)
     {
       messageBatch.incTimelinessCount30Days();
     }
@@ -228,14 +257,62 @@ public class MessageBatchManager
     score(batchIssuesMap, patientOptional);
     score(batchIssuesMap, patientRecommended);
     score(batchIssuesMap, patientRequired);
+    score(batchIssuesMap, vaccinationExpected);
+    score(batchIssuesMap, vaccinationOptional);
+    score(batchIssuesMap, vaccinationRecommended);
+    score(batchIssuesMap, vaccinationRequired);
     double patientScore = patientExpected.getWeightedScore() + patientOptional.getWeightedScore()
         + patientRecommended.getWeightedScore() + patientRequired.getWeightedScore();
     double vaccinationScore = vaccinationExpected.getWeightedScore() + vaccinationOptional.getWeightedScore()
         + vaccinationRecommended.getWeightedScore() + vaccinationRequired.getWeightedScore();
-    int completenessScore = (int) (patientScore * 50 + vaccinationScore * 50 + 0.5);
+
+    double vaccineGroupScore = scoreVaccineGroupScore();
+
+    int completenessScore = (int) (patientScore * 40 + vaccinationScore * 40 + vaccineGroupScore * 20 + 0.5);
     messageBatch.setCompletenessPatientScore((int) (patientScore * 100 + 0.5));
     messageBatch.setCompletenessVaccinationScore((int) (vaccinationScore * 100 + 0.5));
+    messageBatch.setCompletenessVaccineGroupScore((int) (vaccineGroupScore * 100 + 0.5));
     messageBatch.setCompletenessScore(completenessScore);
+  }
+
+  private double scoreVaccineGroupScore()
+  {
+    VaccineGroupManager vaccineGroupManager = VaccineGroupManager.getVaccineGroupManager();
+    List<VaccineGroup> vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_EXPECTED);
+    int groupsCovered = 0;
+    for (VaccineGroup vaccineGroup : vaccineGroupList)
+    {
+      for (VaccineCvx vaccineCvx : vaccineGroup.getVaccineCvxList())
+      {
+        if (getVaccineCvxCount(vaccineCvx) > 0)
+        {
+          groupsCovered++;
+          break;
+        }
+      }
+    }
+    int denominator = vaccineGroupList.size();
+    vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_NOT_EXPECTED);
+    int groupsNotExpected = 0;
+    for (VaccineGroup vaccineGroup : vaccineGroupList)
+    {
+      for (VaccineCvx vaccineCvx : vaccineGroup.getVaccineCvxList())
+      {
+        if (getVaccineCvxCount(vaccineCvx) > 0)
+        {
+          groupsNotExpected += 2;
+          break;
+        }
+      }
+    }
+
+    double vaccinationGroupScore = denominator > 0 ? (groupsCovered - groupsNotExpected) / (float) denominator : 1.0;
+    if (vaccinationGroupScore < 0)
+    {
+      vaccinationGroupScore = 0;
+    }
+    // return vaccinationGroupScore;
+    return vaccinationGroupScore;
   }
 
   private void score(Map<PotentialIssue, BatchIssues> batchIssuesMap, ScoringSet scoringSet)
@@ -352,24 +429,52 @@ public class MessageBatchManager
     }
     int denominator = messageBatch.getMessageCount() + messageBatch.getVaccinationCount();
     // If there are more than 10% errors then the score is 0.
-    double qualityErrorScore = 100.0 - 100.0 * errorIssues.size() / (0.03 * denominator);
+    double denominatorScaled = 0.03 * denominator;
+    double qualityErrorScore;
+    if (errorIssues.size() > denominatorScaled)
+    {
+      qualityErrorScore = 0;
+    } else
+    {
+      qualityErrorScore = 100.0 - 100.0 * errorIssues.size() / denominatorScaled;
+    }
     if (qualityErrorScore < 0)
     {
       qualityErrorScore = 0;
     }
-    double qualityWarnScore = 100.0 - 100.0 * errorIssues.size() / (0.3 * denominator) + 0.5;
+    denominatorScaled = 0.3 * denominator;
+    double qualityWarnScore;
+    if (warnIssues.size() > denominatorScaled)
+    {
+      qualityWarnScore = 0;
+    } else
+    {
+      qualityWarnScore = 100.0 - 100.0 * errorIssues.size() / denominatorScaled + 0.5;
+    }
     if (qualityWarnScore < 0)
     {
       qualityWarnScore = 0;
     }
+    messageBatch.setQualityWarnScore((int) (qualityWarnScore + 0.5));
+    messageBatch.setQualityErrorScore((int) (qualityErrorScore + 0.5));
     messageBatch.setQualityScore((int) (qualityErrorScore * 0.5 + qualityWarnScore * 0.5 + 0.5));
   }
 
   private void scoreTimeliness()
   {
-    int timeliness = (int) ((60.0 * messageBatch.getTimelinessCount30Days() + 30.0
-        * messageBatch.getTimelinessCount7Days() + 10.0 * messageBatch.getTimelinessCount2Days())
-        / messageBatch.getMessageWithAdminCount() + 0.5);
+    double score2days = 0;
+    double score7days = 0;
+    double score30days = 0;
+    double timelinessAverage = 0;
+    if (messageBatch.getMessageWithAdminCount() > 0)
+    {
+      score2days = messageBatch.getTimelinessCount2Days() / messageBatch.getMessageWithAdminCount();
+      score7days = messageBatch.getTimelinessCount7Days() / messageBatch.getMessageWithAdminCount();
+      score30days = messageBatch.getTimelinessCount30Days() / messageBatch.getMessageWithAdminCount();
+      timelinessAverage = numeratorVaccinationAdminDateAge / (double) messageBatch.getMessageWithAdminCount();
+    }
+
+    int timeliness = (int) (60.0 * score30days + 30.0 * score7days + 10.0 * score2days + 0.5);
     if (timeliness > 100)
     {
       timeliness = 100;
@@ -379,8 +484,10 @@ public class MessageBatchManager
       timeliness = 0;
     }
     messageBatch.setTimelinessScore(timeliness);
-    messageBatch.setTimelinessAverage(numeratorVaccinationAdminDateAge
-        / (double) messageBatch.getMessageWithAdminCount());
+    messageBatch.setTimelinessScore2Days((int) (100 * score2days + 0.5));
+    messageBatch.setTimelinessScore7Days((int) (100 * score7days + 0.5));
+    messageBatch.setTimelinessScore30Days((int) (100 * score30days + 0.5));
+    messageBatch.setTimelinessAverage(timelinessAverage);
     messageBatch.setTimelinessDateFirst(vaccinationAdminDateEarliest);
     messageBatch.setTimelinessDateLast(vaccinationAdminDateLatest);
   }

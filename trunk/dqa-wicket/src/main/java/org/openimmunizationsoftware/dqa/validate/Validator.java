@@ -61,6 +61,10 @@ public class Validator extends ValidateMessage
       skippableItem = nextOfKin;
       validateNextOfKin(nextOfKin);
     }
+    if (patient.getResponsibleParty() == null)
+    {
+      registerIssue(pi.PatientGuardianPartyIsMissing);
+    }
     for (Vaccination vaccination : message.getVaccinations())
     {
       positionId = vaccination.getPositionId();
@@ -131,6 +135,37 @@ public class Validator extends ValidateMessage
       }
     }
     validatePhone(nextOfKin.getPhone(), PotentialIssues.Field.NEXT_OF_KIN_PHONE_NUMBER);
+    if ((isResponsibleParty && patientUnderAge && (notEmptyFirst || notEmptyLast)) || !patientUnderAge)
+    {
+      if (patient.getResponsibleParty() == null)
+      {
+        patient.setResponsibleParty(nextOfKin);
+        notEmpty(patient.getAddressCity(), piAddressCity = PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
+        notEmpty(patient.getAddressStateCode(), piAddressCity = PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_STATE);
+        notEmpty(patient.getAddressCity(), piAddressCity = PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
+        notEmpty(patient.getAddressZip(), piAddressCity = PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_ZIP);
+
+        boolean firstEmpty = notEmpty(nextOfKin.getNameFirst(), pi.PatientGuardianFirstNameIsMissing);
+        boolean lastEmpty = notEmpty(nextOfKin.getNameLast(), pi.PatientGuardianLastNameIsMissing);
+        if (firstEmpty && lastEmpty)
+        {
+          registerIssue(pi.PatientGuardianNameIsMissing);
+        }
+        String pFirst = patient.getNameFirst();
+        String pLast = patient.getNameLast();
+        String nFirst = nextOfKin.getNameFirst();
+        String nLast = nextOfKin.getNameLast();
+        if (pFirst != null && !pFirst.equals("") && pLast != null && !pLast.equals(""))
+        {
+          if (pFirst.equals(nFirst) && pLast.equals(nLast))
+          {
+            registerIssue(pi.PatientGuardianNameIsSameAsUnderagePatient);
+          }
+        }
+        notEmpty(nextOfKin.getPhoneNumber(), pi.PatientGuardianPhoneIsMissing);
+        notEmpty(nextOfKin.getRelationshipCode(), pi.PatientGuardianRelationshipIsMissing);
+      }
+    }
     // TODO NextOfKinSsnIsMissing
   }
 
@@ -216,6 +251,7 @@ public class Validator extends ValidateMessage
       vaccineCvx = vaccineCpt.getCvx();
       vaccineCr = vaccination.getAdminCpt().getCodeReceived();
     }
+    vaccination.setVaccineCvx(vaccineCvx);
 
     if (notEmpty(vaccination.getAdminDate(), pi.VaccinationAdminDateIsMissing))
     {

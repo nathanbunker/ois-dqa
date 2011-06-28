@@ -63,16 +63,21 @@ public class CompletenessScoring
     patReq.add("Possible Test Name", pi.PatientNameMayBeTestName, patient, -10).setInvert(false);
     patReq.add("Possible Baby Name", pi.PatientNameMayBeTemporaryNewbornName, patient, -10).setInvert(false);
     patReq.add("Birth Date", pi.PatientBirthDateIsMissing, patient, 10);
-    patReq.add("Sex", pi.PatientGenderIsMissing, patient, 5);
+    patReq.add("Sex", PotentialIssues.Field.PATIENT_GENDER, patient, 5);
     patReq.add("Address", pi.PatientAddressIsMissing, patient, 2);
     patReq.add("Street", pi.PatientAddressStreetIsMissing, patient, 5).setIndent(true);
     patReq.add("City", pi.PatientAddressCityIsMissing, patient, 1).setIndent(true);
     patReq.add("State", pi.PatientAddressStateIsMissing, patient, 1).setIndent(true);
     patReq.add("Zip", pi.PatientAddressZipIsMissing, patient, 1).setIndent(true);
 
-    patExp.add("Middle Name", pi.PatientAliasIsMissing, patient, 10);
+    patExp.add("Middle Name", pi.PatientMiddleNameIsMissing, patient, 10);
     patExp.add("Phone", pi.PatientPhoneIsMissing, patient, 10);
     patExp.add("Mother's Maiden", pi.PatientMotherSMaidenNameIsMissing, patient, 10);
+    patExp.add("Responsible Party", pi.PatientGuardianPartyIsMissing, patient, 1);
+    patExp.add("First Name", pi.PatientGuardianFirstNameIsMissing, patient, 4).setIndent(true);
+    patExp.add("Last Name", pi.PatientGuardianLastNameIsMissing, patient, 4).setIndent(true);
+    patExp.add("Same as Patient", pi.PatientGuardianNameIsSameAsUnderagePatient, patient, -4).setIndent(true);
+    patExp.add("Relationship", pi.PatientGuardianRelationshipIsMissing, patient, 1).setIndent(true);
 
     patRec.add("Alias", pi.PatientAliasIsMissing, patient, 10);
     patRec.add("Birth Indicator", pi.PatientBirthIndicatorIsMissing, patient, 10);
@@ -81,6 +86,23 @@ public class CompletenessScoring
     patRec.add("SSN", pi.PatientSsnIsMissing, patient, 10);
     patRec.add("Medicaid Id", pi.PatientMedicaidNumberIsMissing, patient, 5);
     patRec.add("Primary Language", pi.PatientPrimaryLanaguageIsMissing, patient, 5);
+
+    patOpt.add("Resp Party Address", pi.PatientGuardianAddressIsMissing, patient, 0);
+    patOpt.add("Street", pi.PatientGuardianAddressStreetIsMissing, patient, 0).setIndent(true);
+    patOpt.add("City", pi.PatientGuardianAddressCityIsMissing, patient, 0).setIndent(true);
+    patOpt.add("State", pi.PatientGuardianAddressStateIsMissing, patient, 0).setIndent(true);
+    patOpt.add("Zip", pi.PatientGuardianAddressZipIsMissing, patient, 0).setIndent(true);
+    patOpt.add("Resp Party Phone", pi.PatientGuardianPhoneIsMissing, patient, 0);
+    patOpt.add("Address County", pi.PatientAddressCountyIsMissing, patient, 0);
+    patOpt.add("Financial Class", PotentialIssues.Field.PATIENT_VFC_STATUS, patient, 0);
+    patOpt.add("Registry Status", PotentialIssues.Field.PATIENT_REGISTRY_STATUS, patient, 0);
+    patOpt.add("Primary Physician", PotentialIssues.Field.PATIENT_PRIMARY_PHYSICIAN_ID, patient, 0);
+    patOpt.add("Name", pi.PatientPrimaryPhysicianNameIsMissing, patient, 0).setIndent(true);
+    patOpt.add("Primary Facility", PotentialIssues.Field.PATIENT_PRIMARY_FACILITY_ID, patient, 0);
+    patOpt.add("Name", pi.PatientPrimaryFacilityNameIsMissing, patient, 0).setIndent(true);
+    patOpt.add("Patient Registry Id", PotentialIssues.Field.PATIENT_REGISTRY_ID, patient, 0);
+    patOpt.add("Protection Indicator", PotentialIssues.Field.PATIENT_PROTECTION_INDICATOR, patient, 0);
+    patOpt.add("Publicity Indicator", PotentialIssues.Field.PATIENT_PUBLICITY_CODE, patient, 0);
 
     vacReq.add("Vaccination Date", pi.VaccinationAdminDateIsMissing, vaccination, 40);
     vacReq.add("Vaccination Code", PotentialIssues.Field.VACCINATION_ADMIN_CODE, vaccination, 40);
@@ -93,24 +115,30 @@ public class CompletenessScoring
     vacReq.add("May be Administered", pi.VaccinationInformationSourceIsHistoricalButAppearsToBeAdministered,
         vaccination, -10).setDemerit();
 
-    vacReq.add("CVX Code", PotentialIssues.Field.VACCINATION_CVX_CODE, vaccination, 20);
-    vacReq.add("Lot Number", PotentialIssues.Field.VACCINATION_LOT_NUMBER, vaccinationAdmin, 20);
-    vacReq.add("Manufacturer", PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE, vaccinationAdmin, 20);
-    vacReq.add("Admin Amount", pi.VaccinationAdministeredAmountIsMissing, vaccinationAdmin, 10);
-    vacReq.add("Invalid", pi.VaccinationAdministeredAmountIsInvalid, vaccinationAdmin, -10).setDemerit();
-    vacReq.add("Missing Units", pi.VaccinationAdministeredUnitIsMissing, vaccinationAdmin, -2).setDemerit();
-    vacReq.add("Facility Id", PotentialIssues.Field.VACCINATION_FACILITY_ID, vaccinationAdmin, 20);
-    vacReq.add("Body Site", PotentialIssues.Field.VACCINATION_BODY_SITE, vaccinationAdmin, 10);
-    vacReq.add("Body Route", PotentialIssues.Field.VACCINATION_BODY_ROUTE, vaccinationAdmin, 10);
-    
+    vacExp.add("CVX Code", PotentialIssues.Field.VACCINATION_CVX_CODE, vaccination, 20);
+    vacExp.add("Lot Number", PotentialIssues.Field.VACCINATION_LOT_NUMBER, vaccinationAdmin, 20);
+    vacExp.add("Manufacturer", PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE, vaccinationAdmin, 20);
+    vacExp.add("Admin Amount", pi.VaccinationAdministeredAmountIsMissing, vaccinationAdmin, 10);
+    vacExp.add("Invalid", pi.VaccinationAdministeredAmountIsInvalid, vaccinationAdmin, -10).setDemerit();
+    vacExp.add("Missing Units", pi.VaccinationAdministeredUnitIsMissing, vaccinationAdmin, -2).setDemerit();
+    vacExp.add("Facility Id", PotentialIssues.Field.VACCINATION_FACILITY_ID, vaccinationAdmin, 20);
+    vacExp.add("Body Site", PotentialIssues.Field.VACCINATION_BODY_SITE, vaccinationAdmin, 10);
+    vacExp.add("Body Route", PotentialIssues.Field.VACCINATION_BODY_ROUTE, vaccinationAdmin, 10);
+
     vacRec.add("Action Code", PotentialIssues.Field.VACCINATION_ACTION_CODE, vaccination, 10);
     vacRec.add("Given by Id", PotentialIssues.Field.VACCINATION_GIVEN_BY, vaccinationAdmin, 10);
     vacRec.add("Vaccination Id", PotentialIssues.Field.VACCINATION_ID, vaccinationAdmin, 10);
-    vacRec.add("Completion Status", PotentialIssues.Field.VACCINATION_COMPLETION_STATUS, vaccinationAdmin, 5);    
+    vacRec.add("Completion Status", PotentialIssues.Field.VACCINATION_COMPLETION_STATUS, vaccinationAdmin, 5);
     vacRec.add("System Entry Date", pi.VaccinationSystemEntryTimeIsMissing, vaccination, 5);
     vacReq.add("Invalid", pi.VaccinationSystemEntryTimeIsInvalid, vaccination, -5).setDemerit();
     vacReq.add("In Future", pi.VaccinationSystemEntryTimeIsInFuture, vaccination, -5).setDemerit();
-    
+
+    vacOpt.add("Ordered By", PotentialIssues.Field.VACCINATION_ORDERED_BY, vaccinationAdmin, 0);
+    vacOpt.add("Entered By", PotentialIssues.Field.VACCINATION_RECORDED_BY, vaccinationAdmin, 0);
+    vacOpt.add("Refusal Reason", PotentialIssues.Field.VACCINATION_REFUSAL_REASON, vaccination, 0);
+    vacOpt.add("Lot Expiration Date", pi.VaccinationLotExpirationDateIsMissing, vaccinationAdmin, 0);
+    vacOpt.add("Invalid", pi.VaccinationLotExpirationDateIsInvalid, vaccinationAdmin, 0).setDemerit();
+    vacOpt.add("CPT Code", PotentialIssues.Field.VACCINATION_CPT_CODE, vaccination, 0);
   }
 
 }

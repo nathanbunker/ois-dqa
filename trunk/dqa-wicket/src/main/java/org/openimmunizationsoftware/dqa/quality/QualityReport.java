@@ -16,16 +16,19 @@ import org.openimmunizationsoftware.dqa.db.model.IssueAction;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
+import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
+import org.openimmunizationsoftware.dqa.db.model.VaccineGroup;
 import org.openimmunizationsoftware.dqa.manager.MessageBatchManager;
+import org.openimmunizationsoftware.dqa.manager.VaccineGroupManager;
 
 public class QualityReport
 {
   private static final ToolTip RECEIVED_PATIENTS = new ToolTip("Patients",
-      "The number of patients sent, one per message");
+      "The number of patients sent, one per message").setEmphasize(true);
   private static final ToolTip RECEIVED_NEXT_OF_KINS = new ToolTip("Next-of-Kins",
-      "The number of responsible and associate parties sent");
-
-  private static final ToolTip RECEIVED_VACCINATIONS = new ToolTip("Vaccinations", "The number of vaccinations sent");
+      "The number of responsible and associate parties sent").setEmphasize(true);
+  private static final ToolTip RECEIVED_VACCINATIONS = new ToolTip("Vaccinations", "The number of vaccinations sent")
+      .setEmphasize(true);
   private static final ToolTip RECEIVED_VACCINATIONS_ADMININISTERED = new ToolTip("Administered",
       "Number of vaccinations indicated as administered", true);
   private static final ToolTip RECEIVED_VACCINATIONS_HISTORICAL = new ToolTip("Historical",
@@ -44,13 +47,47 @@ public class QualityReport
       "Number of messages that are accepted without errors but will not be processed");
 
   private static final ToolTip SCORE_COMPLETENESS = new ToolTip("Completeness",
-      "Indicates how consistently required, expected, and recommended fields are valued");
+      "Indicates how consistently required, expected, and recommended fields are valued").setEmphasize(true);
+  private static final ToolTip SCORE_COMPLETENESS_SCORE_PATIENT = new ToolTip("Patient",
+      "Indicates the completeness of patient related fields", true);
+  private static final ToolTip SCORE_COMPLETENESS_SCORE_VACCINATION = new ToolTip("Vaccination",
+      "Indicates the completeness of vaccination related fields", true);
+  private static final ToolTip SCORE_COMPLETENESS_SCORE_VACCINE_GROUP = new ToolTip("Vaccine Group",
+      "Indicates the completess of the type of vaccines reported", true);
   private static final ToolTip SCORE_QUALITY = new ToolTip("Quality",
-      "Indicates the level of errors and warnings generated");
+      "Indicates the level of errors and warnings generated").setEmphasize(true);
+  private static final ToolTip SCORE_QUALITY_SCORE_ERRORS = new ToolTip("Errors",
+      "Indicates the level of errors found, message are expected to generate less than one percent error rate", true);
+  private static final ToolTip SCORE_QUALITY_SCORE_WARNINGS = new ToolTip("Warnings",
+      "Indicates the level of warnings found, message are expected to generate less than ten percent warning rate",
+      true);
   private static final ToolTip SCORE_TIMELINESS = new ToolTip("Timeliness",
-      "Indicates the amount of time between administration of vaccinations and reporting them");
-  private static final ToolTip SCORE_OVERALL = new ToolTip("Overall",
-      "Indicates the overall quality for this file based on completeness, quality and timeliness");
+      "Indicates the amount of time between administration of vaccinations and reporting them").setEmphasize(true);
+  private static final ToolTip SCORE_TIMELINESS_SCORE_2_DAYS = new ToolTip("2 Days",
+      "Indicates the number of messages received within 48 hours of administration", true);
+  private static final ToolTip SCORE_TIMELINESS_SCORE_7_DAYS = new ToolTip("7 Days",
+      "Indicates the number of messages received within a week of administration", true);
+  private static final ToolTip SCORE_TIMELINESS_SCORE_30_DAYS = new ToolTip("30 Days",
+      "Indicates the number of messages received within 4 weeks of administration", true);
+
+  private static final ToolTip COMPLETENESS_SCORE_PATIENT = new ToolTip("Patient",
+      "Indicates the completeness of patient related fields");
+  private static final ToolTip COMPLETENESS_SCORE_VACCINATION = new ToolTip("Vaccination",
+      "Indicates the completeness of vaccination related fields");
+  private static final ToolTip COMPLETENESS_SCORE_VACCINE_GROUP = new ToolTip("Vaccine Group",
+      "Indicates the completess of the type of vaccines reported");
+
+  private static final ToolTip QUALITY_SCORE_ERRORS = new ToolTip("Errors",
+      "Indicates the level of errors found, message are expected to generate less than one percent error rate");
+  private static final ToolTip QUALITY_SCORE_WARNINGS = new ToolTip("Warnings",
+      "Indicates the level of warnings found, message are expected to generate less than ten percent warning rate");
+
+  private static final ToolTip TIMELINESS_SCORE_2_DAYS = new ToolTip("2 Days",
+      "Indicates the number of messages received within 48 hours of administration");
+  private static final ToolTip TIMELINESS_SCORE_7_DAYS = new ToolTip("7 Days",
+      "Indicates the number of messages received within a week of administration");
+  private static final ToolTip TIMELINESS_SCORE_30_DAYS = new ToolTip("30 Days",
+      "Indicates the number of messages received within 4 weeks of administration");
 
   private static final ToolTip TIMELINESS_WITHIN_2_DAYS = new ToolTip(
       "2 Days",
@@ -61,6 +98,9 @@ public class QualityReport
   private static final ToolTip TIMELINESS_WITHIN_30_DAYS = new ToolTip(
       "30 Days",
       "Latest vaccination reported within 30 days (reports of previous administered vaccinations in same message and historical vaccinations not counted)");
+
+  private static final ToolTip VACCINATION_GROUP_OTHER = new ToolTip("Undefined",
+      "Vaccination is not classified as part of a particular vaccine group");
 
   private MessageBatchManager messageBatchManager = null;
   private SubmitterProfile profile = null;
@@ -113,15 +153,21 @@ public class QualityReport
     out.println("<html>");
     out.println("  <head>");
     out.println("    <title>Data Quality Report</title>");
-    printCss();
+    printCss2();
     out.println("  </head>");
     out.println("  <body>");
-    printTitleBar(messageBatch);
-    printSummary(messageBatch);
-    printCompleteness(messageBatch);
-    printQuality();
-    printTimeliness(messageBatch);
-    printFooter();
+    try
+    {
+      printTitleBar(messageBatch);
+      printSummary(messageBatch);
+      printCompleteness(messageBatch);
+      printQuality(messageBatch);
+      printTimeliness(messageBatch);
+      printFooter();
+    } catch (Exception e)
+    {
+      e.printStackTrace(out);
+    }
     out.println("  </body>");
     out.println("<html>");
   }
@@ -148,8 +194,24 @@ public class QualityReport
     out.println("      recommended fields have been received and also indicates");
     out.println("      if expected vaccinations have been reported. ");
     out.println("    </p>");
+    out.println("    <h3>Score</h3>");
+    printScoringSummary("Completeness", messageBatch.getCompletenessScore());
+    out.println("    <table width=\"350\">");
+    out.println("      <tr>");
+    out.println("        <th align=\"left\">Measurement</th>");
+    out.println("        <th align=\"center\">Score</th>");
+    out.println("        <th align=\"center\">Description</th>");
+    out.println("        <th align=\"center\">Weight</th>");
+    out.println("      </tr>");
+    printScore(COMPLETENESS_SCORE_PATIENT, messageBatch.getCompletenessPatientScore(), "20%");
+    printScore(COMPLETENESS_SCORE_VACCINATION, messageBatch.getCompletenessPatientScore(), "20%");
+    printScore(COMPLETENESS_SCORE_VACCINE_GROUP, messageBatch.getCompletenessVaccineGroupScore(), "10%");
+    out.println("    </table>");
 
-    out.println("    <h3>Patient Fields Received</h3>");
+    out.println("    <h3>Patient</h3>");
+    printCompletenessScoring("Patient", patientRequired, patientExpected, patientRecommended,
+        messageBatch.getCompletenessPatientScore());
+    out.println("    <br>");
     printCompleteness(patientRequired, "Required");
     out.println("    <br>");
     printCompleteness(patientExpected, "Expected");
@@ -158,9 +220,11 @@ public class QualityReport
     out.println("    <br>");
     printCompleteness(patientOptional, "Optional");
     out.println("    <br>");
-    printCompletenessScoring(patientRequired, patientExpected, patientRecommended, messageBatch.getCompletenessPatientScore());
 
-    out.println("    <h3>Vaccination Fields Received</h3>");
+    out.println("    <h3>Vaccination</h3>");
+    printCompletenessScoring("Vaccination", vaccinationRequired, vaccinationExpected, vaccinationRecommended,
+        messageBatch.getCompletenessVaccinationScore());
+    out.println("    <br>");
     printCompleteness(vaccinationRequired, "Required");
     out.println("    <br>");
     printCompleteness(vaccinationExpected, "Expected");
@@ -168,15 +232,131 @@ public class QualityReport
     printCompleteness(vaccinationRecommended, "Recommended");
     out.println("    <br>");
     printCompleteness(vaccinationOptional, "Optional");
+
+    out.println("    <h3>Vaccine Group</h3>");
+    Set<VaccineCvx> vaccinesNotYetPrinted = messageBatchManager.getVaccineCvxReceived();
+    VaccineGroupManager vaccineGroupManager = VaccineGroupManager.getVaccineGroupManager();
+    List<VaccineGroup> vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_EXPECTED);
+    printVaccines("Expected", messageBatch, vaccinesNotYetPrinted, vaccineGroupList, false);
     out.println("    <br>");
-    printCompletenessScoring(vaccinationRequired, vaccinationExpected, vaccinationRecommended, messageBatch.getCompletenessVaccinationScore());
+    vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_OPTIONAL);
+    printVaccines("Optional", messageBatch, vaccinesNotYetPrinted, vaccineGroupList, true);
+    out.println("    <br>");
+    vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_NOT_EXPECTED);
+    printVaccines("Unexpected", messageBatch, vaccinesNotYetPrinted, vaccineGroupList, true);
+    if (vaccinesNotYetPrinted.size() > 0)
+    {
+      out.println("    <br>");
+      printVaccinesLeftover(messageBatch, vaccinesNotYetPrinted);
+    }
   }
 
-  private void printCompletenessScoring(ScoringSet required, ScoringSet expected, ScoringSet recommended, int score)
+  private void printVaccines(String label, MessageBatch messageBatch, Set<VaccineCvx> vaccinesNotPrinted,
+      List<VaccineGroup> vaccineGroupList, boolean skipZeroSize)
+  {
+    out.println("    <table width=\"650\">");
+    out.println("      <tr>");
+    out.println("        <th align=\"left\">" + label + "</th>");
+    out.println("        <th align=\"left\">CVX</th>");
+    out.println("        <th align=\"left\">Label</th>");
+    out.println("        <th align=\"center\">Count</th>");
+    out.println("        <th align=\"center\">Percent</th>");
+    out.println("      </tr>");
+    for (VaccineGroup vaccineGroup : vaccineGroupList)
+    {
+      List<VaccineCvx> vaccinesToPrint = new ArrayList<VaccineCvx>();
+      for (VaccineCvx vaccineCvx : vaccineGroup.getVaccineCvxList())
+      {
+        int count = messageBatchManager.getVaccineCvxCount(vaccineCvx);
+        if (count > 0)
+        {
+          vaccinesToPrint.add(vaccineCvx);
+        }
+      }
+      int size = vaccinesToPrint.size();
+      if (size == 0)
+      {
+        if (skipZeroSize)
+        {
+          continue;
+        }
+      }
+      ToolTip toolTip = vaccineGroup.getToolTip();
+      printVaccinesRow(messageBatch, vaccinesNotPrinted, vaccinesToPrint, size, toolTip, size == 0);
+    }
+    out.println("    </table>");
+  }
+
+  private void printVaccinesLeftover(MessageBatch messageBatch, Set<VaccineCvx> vaccinesNotPrinted)
+  {
+    out.println("    <table width=\"650\">");
+    out.println("      <tr>");
+    out.println("        <th align=\"left\">Other</th>");
+    out.println("        <th align=\"center\">CVX</th>");
+    out.println("        <th align=\"left\">Label</th>");
+    out.println("        <th align=\"center\">Count</th>");
+    out.println("        <th align=\"center\">Percent</th>");
+    out.println("      </tr>");
+    List<VaccineCvx> vaccinesToPrint = new ArrayList<VaccineCvx>(vaccinesNotPrinted);
+    ToolTip toolTip = VACCINATION_GROUP_OTHER;
+    printVaccinesRow(messageBatch, vaccinesNotPrinted, vaccinesToPrint, vaccinesToPrint.size(), toolTip, true);
+    out.println("    </table>");
+  }
+
+  private void printVaccinesRow(MessageBatch messageBatch, Set<VaccineCvx> vaccinesNotPrinted,
+      List<VaccineCvx> vaccinesToPrint, int size, ToolTip toolTip, boolean outOfRange)
+  {
+    {
+      out.println("      <tr>");
+      out.println("        <td align=\"left\"" + (outOfRange ? " class=\"alert\"" : "") + " rowspan=\"" + size + "\">"
+          + toolTip.getHtml());
+      out.println("        </td>");
+      boolean nextRow = false;
+      for (VaccineCvx vaccineCvx : vaccinesToPrint)
+      {
+        int count = messageBatchManager.getVaccineCvxCount(vaccineCvx);
+        int denominator = messageBatch.getVaccinationAdministeredCount();
+        String percent = "&nbsp;";
+        if (denominator != 0)
+        {
+          if (count == 0)
+          {
+            percent = "-";
+          } else
+          {
+            int per = (int) ((100.0 * count) / denominator + 0.5);
+            percent = String.valueOf(per) + "%";
+          }
+        }
+        if (nextRow)
+        {
+          out.println("      </tr>");
+          out.println("      <tr>");
+        }
+        String[] fields = { vaccineCvx.getCvxCode(), vaccineCvx.getCvxLabel(), String.valueOf(count), percent };
+        for (int i = 0; i < fields.length; i++)
+        {
+          String align = i == 1 ? "left" : "center";
+          out.println("        <td align=\"" + align + "\"" + (outOfRange ? " class=\"alert\"" : "") + ">" + fields[i]
+              + "</td>");
+        }
+        vaccinesNotPrinted.remove(vaccineCvx);
+        nextRow = true;
+      }
+      if (!nextRow)
+      {
+        out.println("       <td colspan=\"4\"><span class=\"problem\">Problem: no vaccines received for this group</span></td>");
+      }
+      out.println("      </tr>");
+    }
+  }
+
+  private void printCompletenessScoring(String label, ScoringSet required, ScoringSet expected, ScoringSet recommended,
+      int score)
   {
     out.println("    <table>");
     out.println("      <tr>");
-    out.println("        <th align=\"left\">Fields</th>");
+    out.println("        <th align=\"left\">" + label + " Fields</th>");
     out.println("        <th>Score</th>");
     out.println("        <th>Description</th>");
     out.println("        <th>Weight</th>");
@@ -199,17 +379,18 @@ public class QualityReport
     int score = (int) (100 * ss.getScore() + 0.5);
     boolean showRed = score < 70;
     out.println("      <tr>");
-    out.println("        <td" + (showRed ? " class=\"alert\"" : "") + ">" + label + "</th>");
-    out.println("        <td" + (showRed ? " class=\"alert\"" : "") + ">" + score + "</th>");
-    out.println("        <td" + (showRed ? " class=\"alert\"" : "") + ">" + getScoreDescription(score) + "</th>");
-    out.println("        <td" + (showRed ? " class=\"alert\"" : "") + ">" + (int) (100 * ss.getWeight() + 0.5) + "</th>");
+    out.println("        <td" + (showRed ? " class=\"problem\"" : "") + ">" + label + "</th>");
+    out.println("        <td" + (showRed ? " class=\"problem\"" : "") + ">" + score + "</th>");
+    out.println("        <td" + (showRed ? " class=\"problem\"" : "") + ">" + getScoreDescription(score) + "</th>");
+    out.println("        <td" + (showRed ? " class=\"problem\"" : "") + ">" + (int) (100 * ss.getWeight() + 0.5)
+        + "</th>");
     out.println("      </tr>");
   }
 
   private void printCompleteness(ScoringSet scoringSet, String label)
   {
     List<CompletenessRow> completenessRowList = scoringSet.getCompletenessRow();
-    out.println("    <table width=\"370\">");
+    out.println("    <table width=\"400\">");
     out.println("      <tr>");
     out.println("        <th width=\"40%\" align=\"left\">" + label + "</th>");
     out.println("        <th width=\"20%\" align=\"center\">Count</th>");
@@ -254,29 +435,53 @@ public class QualityReport
 
     }
     out.println("    </table>");
-    out.println("    <p>");
-    out.println("      Immunization data quality is measured in three main areas: ");    
-    out.println("      Timeliness, Quality and Completeness.  ");    
-    out.println("      Timeliness measures how quickly administered vaccinations are ");    
-    out.println("      reported. ");    
-    out.println("      Quality measures how accurate patient and vaccination data is ");    
-    out.println("      recorded and whether it reflects expected practice.");
-    out.println("      Completeness measures if fields necessary for registry functions ");    
-    out.println("      been valued. ");    
-    out.println("    </p>");
-    out.println("    <br>");
-    out.println("    <table width=\"350\">");
+    // out.println("    <p>");
+    // out.println("      Immunization data quality is measured in three main areas: ");
+    // out.println("      Timeliness, Quality and Completeness.  ");
+    // out.println("      Timeliness measures how quickly administered vaccinations are ");
+    // out.println("      reported. ");
+    // out.println("      Quality measures how accurate patient and vaccination data is ");
+    // out.println("      recorded and whether it reflects expected practice.");
+    // out.println("      Completeness measures if fields necessary for registry functions ");
+    // out.println("      been valued. ");
+    // out.println("    </p>");
+    out.println("    <h3>Scoring Summary</h3>");
+    printScoringSummary("DQA", messageBatch.getOverallScore());
+    out.println("    <table width=\"400\">");
     out.println("      <tr>");
     out.println("        <th align=\"left\">Measurement</th>");
     out.println("        <th align=\"center\">Score</th>");
     out.println("        <th align=\"center\">Description</th>");
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
-    printScore(SCORE_COMPLETENESS, messageBatch.getCompletenessScore(), "50%");
-    printScore(SCORE_QUALITY, messageBatch.getQualityScore(), "40%");
-    printScore(SCORE_TIMELINESS, messageBatch.getTimelinessScore(), "10%");
-    printScore(SCORE_OVERALL, messageBatch.getOverallScore(), "&nbsp;");
+    printScoreOverall(SCORE_COMPLETENESS, messageBatch.getCompletenessScore(), "50%");
+    printScoreOverall(SCORE_COMPLETENESS_SCORE_PATIENT, messageBatch.getCompletenessPatientScore(), "20%");
+    printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINATION, messageBatch.getCompletenessPatientScore(), "20%");
+    printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINE_GROUP, messageBatch.getCompletenessVaccineGroupScore(), "10%");
+    printScoreOverall(SCORE_QUALITY, messageBatch.getQualityScore(), "40%");
+    printScoreOverall(SCORE_QUALITY_SCORE_ERRORS, messageBatch.getQualityErrorScore(), "20%");
+    printScoreOverall(SCORE_QUALITY_SCORE_WARNINGS, messageBatch.getQualityWarnScore(), "20%");
+    printScoreOverall(SCORE_TIMELINESS, messageBatch.getTimelinessScore(), "10%");
+    printScoreOverall(SCORE_TIMELINESS_SCORE_30_DAYS, messageBatch.getTimelinessScore30Days(), "6%");
+    printScoreOverall(SCORE_TIMELINESS_SCORE_7_DAYS, messageBatch.getTimelinessScore7Days(), "3%");
+    printScoreOverall(SCORE_TIMELINESS_SCORE_2_DAYS, messageBatch.getTimelinessScore2Days(), "1%");
     out.println("    </table>");
+  }
+
+  private void printScoringSummary(String label, int score)
+  {
+    out.println("    <table>");
+    out.println("      <tr>");
+    out.println("        <th align=\"center\">" + label + " Score</th>");
+    out.println("        <th align=\"center\">Description</th>");
+    out.println("      </tr>");
+    out.println("      <tr>");
+    out.println("        <td align=\"center\"><span class=\"score\">" + score + "</span></th>");
+    out.println("        <td align=\"center\"><span class=\"score\">" + getScoreDescription(score) + "</span></th>");
+    out.println("      </tr>");
+    out.println("    </table>");
+    out.println("    <br/>");
+
   }
 
   private void printSummary(MessageBatch messageBatch)
@@ -315,7 +520,7 @@ public class QualityReport
     out.println("    </table>");
   }
 
-  private void printQuality()
+  private void printQuality(MessageBatch messageBatch)
   {
     out.println("    <h2>Quality</h2>");
     out.println("    <p>");
@@ -326,6 +531,18 @@ public class QualityReport
     out.println("      Total warnings registered are expected to account for ");
     out.println("      less than ten percent of the total patients and vaccinations. ");
     out.println("    </p>");
+    out.println("    <h3>Quality Score</h3>");
+    printScoringSummary("Quality", messageBatch.getQualityScore());
+    out.println("    <table width=\"400\">");
+    out.println("      <tr>");
+    out.println("        <th align=\"left\">Measurement</th>");
+    out.println("        <th align=\"center\">Score</th>");
+    out.println("        <th align=\"center\">Description</th>");
+    out.println("        <th align=\"center\">Weight</th>");
+    out.println("      </tr>");
+    printScore(QUALITY_SCORE_ERRORS, messageBatch.getQualityErrorScore(), "20%");
+    printScore(QUALITY_SCORE_WARNINGS, messageBatch.getQualityWarnScore(), "20%");
+    out.println("    </table>");
     if (messageBatchManager.getErrorIssues().size() > 0)
     {
       out.println("    <h3>Errors</h3>");
@@ -368,30 +585,44 @@ public class QualityReport
     out.println("      Submitters should send administered vaccinations as soon as possible after");
     out.println("      administration, normally once a week. ");
     out.println("    </p>");
+    out.println("    <h3>Timeliness Score</h3>");
+    printScoringSummary("Timeliness", messageBatch.getTimelinessScore());
+    out.println("    <table width=\"400\">");
+    out.println("      <tr>");
+    out.println("        <th align=\"left\">Measurement</th>");
+    out.println("        <th align=\"center\">Score</th>");
+    out.println("        <th align=\"center\">Description</th>");
+    out.println("        <th align=\"center\">Weight</th>");
+    out.println("      </tr>");
+    printScore(TIMELINESS_SCORE_30_DAYS, messageBatch.getTimelinessScore30Days(), "6%");
+    printScore(TIMELINESS_SCORE_7_DAYS, messageBatch.getTimelinessScore7Days(), "3%");
+    printScore(TIMELINESS_SCORE_2_DAYS, messageBatch.getTimelinessScore2Days(), "1%");
+    out.println("    </table>");
+    out.println("    <br>");
     out.println("    <table width=\"350\">");
     out.println("      <tr>");
     out.println("        <th align=\"left\">Vaccination Received</th>");
     out.println("        <th align=\"center\">Count</th>");
     out.println("        <th align=\"center\">Percent</th>");
     out.println("      </tr>");
-    printPer(TIMELINESS_WITHIN_2_DAYS, messageBatch.getTimelinessCount2Days(), messageBatch.getMessageWithAdminCount());
-    printPer(TIMELINESS_WITHIN_7_DAYS, messageBatch.getTimelinessCount7Days(), messageBatch.getMessageWithAdminCount());
     printPer(TIMELINESS_WITHIN_30_DAYS, messageBatch.getTimelinessCount30Days(),
         messageBatch.getMessageWithAdminCount());
+    printPer(TIMELINESS_WITHIN_7_DAYS, messageBatch.getTimelinessCount7Days(), messageBatch.getMessageWithAdminCount());
+    printPer(TIMELINESS_WITHIN_2_DAYS, messageBatch.getTimelinessCount2Days(), messageBatch.getMessageWithAdminCount());
     out.println("    </table>");
     out.println("    <br>");
     out.println("    <table>");
     if (messageBatch.getTimelinessDateFirst() != null)
     {
       out.println("      <tr>");
-      out.println("        <th align=\"left\">Earliest Date</th>");
+      out.println("        <th align=\"left\">Earliest Vaccination Admin Date</th>");
       out.println("        <td>" + dateOnly.format(messageBatch.getTimelinessDateFirst()) + "</th>");
       out.println("      </tr>");
     }
     if (messageBatch.getTimelinessDateLast() != null)
     {
       out.println("      <tr>");
-      out.println("        <th align=\"left\">Latest Date</th>");
+      out.println("        <th align=\"left\">Latest Vaccination Admin Date</th>");
       out.println("        <td>" + dateOnly.format(messageBatch.getTimelinessDateLast()) + "</th>");
       out.println("      </tr>");
     }
@@ -401,12 +632,17 @@ public class QualityReport
     out.println("        <td>" + df.format(messageBatch.getTimelinessAverage()) + "</th>");
     out.println("      </tr>");
     out.println("    </table>");
-    out.println("    <h3>Scoring</h3>");
+
   }
 
   private void printScore(ToolTip tip, int score, String weight)
   {
     printRow(tip, score < 70, String.valueOf(score), getScoreDescription(score), weight);
+  }
+
+  private void printScoreOverall(ToolTip tip, int score, String weight)
+  {
+    printRow(tip, false, String.valueOf(score), getScoreDescription(score), weight);
   }
 
   private void printCodeReceived(Set<CodeReceived> codeReceivedSet)
@@ -502,6 +738,28 @@ public class QualityReport
     printRow(toolTip, outOfRange, String.valueOf(value), percent);
   }
 
+  private void printVaccineGroup(ToolTip toolTip, int value, int denominator, int okayLow, int okayHigh)
+  {
+    String percent = "&nbsp;";
+    boolean outOfRange = false;
+    if (denominator != 0)
+    {
+      if (value == 0)
+      {
+        percent = "-";
+      } else
+      {
+        int per = (int) ((100.0 * value) / denominator + 0.5);
+        if (per < okayLow || per > okayHigh)
+        {
+          outOfRange = true;
+        }
+        percent = String.valueOf(per) + "%";
+      }
+    }
+    printRow(toolTip, outOfRange, String.valueOf(value), percent);
+  }
+
   private void print(CompletenessRow row)
   {
     ToolTip toolTip = row.getToolTip();
@@ -530,7 +788,11 @@ public class QualityReport
       printRow(toolTip, outOfRange, String.valueOf(value), percent);
     } else
     {
-      printRow(toolTip, outOfRange, String.valueOf(value), percent, df.format(row.getScore()));
+      if (row.getScoreWeight() < 0)
+      {
+        outOfRange = true;
+      }
+      printRow(toolTip, outOfRange, String.valueOf(value), percent, df.format(row.getScoreWeight()));
     }
   }
 
@@ -548,26 +810,37 @@ public class QualityReport
 
   private void printRow(ToolTip tip, boolean showRed, String... fields)
   {
+    String cssClass = showRed ? " class=\"alert\"" : "";
+    if (tip.isEmphasize())
+    {
+      cssClass = " class=\"highlight\"";
+    }
     out.println("      <tr>");
-    out.println("        <td align=\"left\"" + (showRed ? " class=\"alert\"" : "") + ">" + tip.getHtml());
+    out.println("        <td align=\"left\"" + cssClass + ">" + tip.getHtml());
     out.println("        </td>");
     for (int i = 0; i < fields.length; i++)
     {
-      out.println("        <td align=\"center\"" + (showRed ? " class=\"alert\"" : "") + ">" + fields[i] + "</td>");
+      out.println("        <td align=\"center\"" + cssClass + ">" + fields[i] + "</td>");
     }
     out.println("      </tr>");
   }
 
-  private void printCss()
+  private void printCss1()
   {
     out.println("    <style><!--");
     out.println("      body {font-family: Tahoma, Geneva, Sans-serif}");
     out.println("      p {width:700px; color:#2B3E42; background:#F7F3E8; padding:6px; border-style:dashed; border-width:1px; border-color:#2B3E42}");
-    out.println("      h1 {color:#2B3E42}");
-    out.println("      table {background:#D5E1DD; border-style:solid; border-width:1; border-color:#2B3E42; border-collapse:collapse}");
-    out.println("      th {background:#77BED2; font-size:0.8em; color:#2B3E42: border-style:none; padding-left:5px; padding-right:5px;}");
+    out.println("      h1 {color:#2B3E42; font-size:2.0em;}");
+    out.println("      h2 {color:#2B3E42; font-size:2.0em;}");
+    out.println("      h3 {color:#2B3E42; font-size:1.2em;}");
+    out.println("      table {background:#D5E1DD; border-style:solid; border-width:2; border-color:#2B3E42; border-collapse:collapse}");
+    out.println("      th {background:#2B3E42; font-size:0.8em; color:#D5E1DD; border-style:none; padding-left:5px; padding-right:5px;}");
     out.println("      td {border-style:solid; border-width:1; border-color:#747E80;margin:0px; padding-left:5px; padding-right:5px;}");
-    out.println("      .alert {background: #F2583E}");
+    out.println("      .score {font-size:1.5em;}");
+    out.println("      .alert {}");
+    out.println("      .highlight {background: #77BED2;}");
+    out.println("      .poor {color:#F2583E; font-style:bold;}");
+    out.println("      .problem {color:#F2583E; font-style:bold;}");
     out.println("      a:link {text-decoration:none; color:#350608}");
     out.println("      a:visited {text-decoration:none; color:#350608}");
     out.println("      a:hover {text-decoration:none; color:#350608} ");
@@ -576,24 +849,94 @@ public class QualityReport
     out.println("      a.tooltip:hover span{display:inline; position:absolute; background:#F7F3E8; border:1px solid #CCCCCC; color:#6C6C6C}");
     out.println("    --></style>");
   }
+  
+  
+  // Yellow & grey
+//  private static final String VERY_LIGHT = "#FFFFFF";
+//  private static final String LIGHT = "#EEEEEE";
+//  private static final String MEDIUM_LIGHT = "#F3E7A9;";
+//  private static final String MEDIUM = "#F2C968";
+//  private static final String DARK = "#A5A162";
+//  private static final String BLACK = "#515230";
+//  private static final String RED = "#FE4902";
 
+  // too brown
+//  private static final String VERY_LIGHT = "#FFFFFF";
+//  private static final String LIGHT = "#FCF5EB";
+//  private static final String MEDIUM_LIGHT = "#F4E6CC;";
+//  private static final String MEDIUM = "#A25F08";
+//  private static final String DARK = "#111111";
+//  private static final String BLACK = "#000000";
+//  private static final String RED = "#FE4902";
+  
+  // Very Green
+//  private static final String VERY_LIGHT = "#FFFFFF";
+//  private static final String LIGHT = "#C7EB6E";
+//  private static final String MEDIUM_LIGHT = "#9DCE5C;";
+//  private static final String MEDIUM = "#79B837";
+//  private static final String DARK = "#111111";
+//  private static final String BLACK = "#000000";
+//  private static final String RED = "#CE3100";
+  
+  // Green & Grey
+//  private static final String VERY_LIGHT = "#FFFFFF";
+//  private static final String LIGHT = "#E5E5E5";
+//  private static final String MEDIUM_LIGHT = " #C7EB6E;";
+//  private static final String MEDIUM = "#9DCE5C";
+//  private static final String DARK = "#79B837";
+//  private static final String BLACK = "#000000";
+//  private static final String RED = "#CE3100";
+
+  // Steel
+  private static final String VERY_LIGHT = "#FFFFFF";
+  private static final String LIGHT = "#CCDDDD";
+  private static final String MEDIUM_LIGHT = " #AAC4C4;";
+  private static final String MEDIUM = "#93AAAB";
+  private static final String DARK = "#749749";
+  private static final String BLACK = "#000000";
+  private static final String RED = "#CE3100";
+  
+  private void printCss2()
+  {
+    out.println("    <style><!--");
+    out.println("      body {font-family: Tahoma, Geneva, Sans-serif}");
+    out.println("      p {width:700px; color:" + DARK + "; background:" + VERY_LIGHT + "; padding:6px; border-style:dashed; border-width:1px; border-color:" + LIGHT + "}");
+    out.println("      h1 {color:" + BLACK + "; font-size:2.0em;}");
+    out.println("      h2 {color:" + BLACK + "; font-size:2.0em;}");
+    out.println("      h3 {color:" + BLACK + "; font-size:1.2em;}");
+    out.println("      table {background:" + LIGHT + "; border-style:solid; border-width:1; border-color:" + MEDIUM + "; border-collapse:collapse}");
+    out.println("      th {background:" + MEDIUM + "; font-size:0.8em; color:" + BLACK + "; border-style:none; padding-left:5px; padding-right:5px;}");
+    out.println("      td {border-style:solid; border-width:1; border-color:" + MEDIUM + ";margin:0px; padding-left:5px; padding-right:5px;}");
+    out.println("      .score {font-size:1.5em;}");
+    out.println("      .alert {}");
+    out.println("      .highlight {background: " + MEDIUM_LIGHT + ";}");
+    out.println("      .poor {color:" + RED + "; font-style:bold;}");
+    out.println("      .problem {color:" + RED + "; font-style:bold;}");
+    out.println("      a:link {text-decoration:none; color:" + BLACK + "}");
+    out.println("      a:visited {text-decoration:none; color:" + BLACK + "}");
+    out.println("      a:hover {text-decoration:none; color:" + BLACK + "} ");
+    out.println("      a:active {text-decoration:none; color:" + BLACK + "} ");
+    out.println("      a.tooltip span {display:none; padding:2px 3px; margin-left:8px; width:130px;}");
+    out.println("      a.tooltip:hover span{display:inline; position:absolute; background:" + LIGHT + "; border:1px solid " + DARK + "; color:" + DARK + "}");
+    out.println("    --></style>");
+  }
   private String getScoreDescription(int score)
   {
     if (score >= 90)
     {
-      return "Excellent";
+      return "<span class=\"excellent\">Excellent</span>";
     } else if (score >= 80)
     {
-      return "Good";
+      return "<span class=\"good\">Good</span>";
     } else if (score >= 70)
     {
-      return "Okay";
+      return "<span class=\"okay\">Okay</span>";
     } else if (score >= 60)
     {
-      return "Poor";
+      return "<span class=\"poor\">Poor</span></span>";
     } else
     {
-      return "Problem";
+      return "<span class=\"problem\">Problem</span>";
     }
   }
 

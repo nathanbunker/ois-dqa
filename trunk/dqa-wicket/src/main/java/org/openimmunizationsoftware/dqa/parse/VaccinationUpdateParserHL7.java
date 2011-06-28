@@ -153,7 +153,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     readCodeEntity(22, patient.getEthnicity());
     // TODO private OrganizationName facility = new OrganizationName();
     readPatientId(patient);
-    patient.setMotherMaidenName(getValue(21));
+    patient.setMotherMaidenName(getValue(6));
     readName(5, patient.getName());
     readPhoneNumber(13, patient.getPhone());
     readCodeEntity(15, patient.getPrimaryLanguage());
