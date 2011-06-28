@@ -650,3 +650,177 @@ INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, us
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, 'O', 'Other Race', '2131-1', 'D');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, 'U', 'Unknown', '2131-1', 'D');
 
+CREATE TABLE dqa_vaccine_group
+(
+  group_id            INTEGER NOT NULL PRIMARY KEY,   
+  group_code          VARCHAR2(30) NOT NULL,
+  group_label         VARCHAR2(250) NOT NULL,
+  group_status        VARCHAR2(30) NOT NULL 
+);
+
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (2, 'ADENO', 'Adnovirus', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (3, 'ANTHRAX', 'Anthrax', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (4, 'BCG', 'BCG', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (5, 'cholera', 'Cholera', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (6, 'DTAP', 'DTaP', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (7, 'FLU', 'Influenza', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (8, 'H1N1 flu', 'H1N1-09', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (9, 'H5N1 flu', 'Influenza, H5N1-1203', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (10, 'HBIG', 'HBIG', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (11, 'Hep E', 'Hep E', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (12, 'HepA', 'Hep A', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (13, 'HepB', 'Hep B', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (14, 'HepC', 'Hep C', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (15, 'HIB', 'Hib', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (16, 'HPV', 'HPV', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (17, 'IG', 'IG', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (18, 'Japanese encephalitis', 'Japanese Encephalitis', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (19, 'Lyme disease', 'Lyme Disease', 'Not Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (20, 'MEASLES', 'Measles', 'Optional');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (21, 'MENING', 'Meningococcal', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (22, 'MMR', 'MMR', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (23, 'MUMPS', 'Mumps', 'Optional');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (24, 'PneumoPCV', 'Pneumococcal', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (25, 'PneumoPPV', 'Pneumococcal', 'Optional');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (26, 'POLIO', 'Polio', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (27, 'RABIES', 'Rabies', 'Optional');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (28, 'ROTAVIRUS', 'Rotavirus', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (29, 'RUBELLA', 'Rubella', 'Optional');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (30, 'Td', 'Tdap', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (31, 'TYPHOID', 'Typhoid', 'Optional');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (32, 'VACCINIA', 'Vaccinia (smallpox)', 'Optional');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (33, 'VARICELLA', 'Varicella', 'Expected');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (34, 'VEE', 'VEE', 'Optional');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (35, 'YELLOWFEVER', 'Yellow Fever', 'Optional');
+INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (36, 'ZOSTER', 'Zoster', 'Optional');
+
+CREATE TABLE dqa_vaccine_cvx_group
+(
+  cvx_group_id        INTEGER NOT NULL PRIMARY KEY,
+  group_id            INTEGER NOT NULL,
+  cvx_code            VARCHAR2(10) NOT NULL
+);
+
+CREATE SEQUENCE dqa_cvx_group_id_sequence INCREMENT BY 1 START WITH 1;
+
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 2, '54');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 3, '55');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 4, '82');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 5, '24');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 6, '19');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 7, '26');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 8, '29');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 9, '28');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 10, '20');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 11, '106');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 12, '107');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 13, '110');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 14, '110');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 15, '110');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 16, '50');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 17, '50');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 18, '120');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 19, '120');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 20, '120');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 21, '130');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 22, '130');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 23, '132');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 24, '132');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 25, '132');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 26, '132');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 27, '01');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 28, '22');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 29, '22');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 30, '102');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 31, '102');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 32, '102');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 33, '30');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 34, '52');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 35, '83');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 36, '84');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 37, '31');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 38, '85');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 39, '104');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 40, '104');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 41, '08');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 42, '42');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 43, '43');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 44, '44');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 45, '45');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 46, '58');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 47, '59');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 48, '47');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 49, '46');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 50, '49');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 51, '48');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 52, '17');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 53, '51');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 54, '51');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 55, '118');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 56, '62');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 57, '137');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 58, '86');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 59, '14');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 60, '87');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 61, '123');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 62, '135');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 63, '111');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 64, '141');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 65, '140');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 66, '15');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 67, '88');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 68, '16');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 69, '10');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 70, '134');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 71, '39');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 72, '66');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 73, '04');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 74, '04');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 75, '05');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 76, '103');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 77, '136');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 78, '114');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 79, '32');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 80, '108');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 81, '03');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 82, '94');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 83, '94');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 84, '07');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 85, '127');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 86, '128');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 87, '125');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 88, '126');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 89, '02');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 90, '133');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 91, '100');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 92, '33');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 93, '89');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 94, '40');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 95, '18');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 96, '90');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 97, '34');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 98, '119');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 99, '116');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 100, '74');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 101, '122');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 102, '71');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 103, '06');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 104, '38');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 105, '38');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 106, '138');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 107, '113');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 108, '09');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 109, '115');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 110, '25');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 111, '41');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 112, '53');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 113, '91');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 114, '101');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 115, '75');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 116, '105');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 117, '21');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 118, '81');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 119, '80');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 120, '92');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 121, '37');
+INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 122, '121');

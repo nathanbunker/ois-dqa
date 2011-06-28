@@ -6,7 +6,6 @@ public class CompletenessRow
 {
   private int count = 0;
   private int denominator = 0;
-  private boolean indent = false;
   private boolean invert = true;
   private int okayHigh = 100;
   private int okayLow = 0;
@@ -25,6 +24,7 @@ public class CompletenessRow
     this.reportDenominator = template.reportDenominator;
     this.scoreWeight = template.scoreWeight;
     this.score = score;
+    this.toolTip = new ToolTip(toolTip.getLabel(), "");
   }
 
   public CompletenessRow(String label, PotentialIssue potentialIssue, String reportDenominator, int scoreWeight) {
@@ -80,11 +80,6 @@ public class CompletenessRow
     return toolTip;
   }
 
-  public boolean isIndent()
-  {
-    return indent;
-  }
-
   public boolean isInvert()
   {
     return invert;
@@ -102,14 +97,14 @@ public class CompletenessRow
 
   public CompletenessRow setIndent(boolean indent)
   {
-    this.indent = indent;
+    this.toolTip.setIndent(indent);
     return this;
   }
   
   public CompletenessRow setDemerit()
   {
-    this.indent = true;
     this.invert = false;
+    this.toolTip.setIndent(true);
     return this;
   }
 

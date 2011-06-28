@@ -329,7 +329,7 @@ CREATE TABLE dqa_vaccine_product
 (
   product_id          INTEGER NOT NULL PRIMARY KEY,
   product_name        VARCHAR2(250) NOT NULL,
-  product_label           VARCHAR2(250) NOT NULL,
+  product_label       VARCHAR2(250) NOT NULL,
   cvx_code            VARCHAR2(10) NOT NULL,
   mvx_code            VARCHAR2(10) NOT NULL,
   valid_start_date    DATE NOT NULL,

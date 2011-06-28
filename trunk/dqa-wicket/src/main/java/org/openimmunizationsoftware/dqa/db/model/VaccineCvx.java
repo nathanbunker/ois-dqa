@@ -94,4 +94,21 @@ public class VaccineCvx
   {
     this.conceptType = conceptType;
   }
+  
+  @Override
+  public boolean equals(Object arg0)
+  {
+   if (arg0 instanceof VaccineCvx)
+   {
+     return ((VaccineCvx) arg0).getCvxCode().equals(cvxCode);
+   }
+    return super.equals(arg0);
+  }
+  
+  @Override
+  public int hashCode()
+  {
+    return cvxCode.hashCode();
+  }
+  
 }

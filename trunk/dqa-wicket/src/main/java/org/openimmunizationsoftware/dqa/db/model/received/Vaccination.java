@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
+import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Id;
 import org.openimmunizationsoftware.dqa.db.model.received.types.OrganizationName;
@@ -16,12 +17,12 @@ public class Vaccination implements Skippable
 
   public static final String COMPLETION_COMPLETED = "CP";
   public static final String COMPLETION_NOT_ADMINISTERED = "NA";
-  
+
   public static final String COMPLETION_PARTIALLY_ADMINISTERED = "PA";
   public static final String COMPLETION_REFUSED = "RE";
   public static final String INFO_SOURCE_ADMIN = "00";
   public static final String INFO_SOURCE_HIST = "01";
-  
+
   private CodedEntity action = new CodedEntity(CodeTable.Type.VACCINATION_ACTION_CODE);
   private CodedEntity admin = new CodedEntity(CodeTable.Type.VACCINATION_CVX_CODE);
   private CodedEntity adminCpt = new CodedEntity(CodeTable.Type.VACCINATION_CPT_CODE);
@@ -51,24 +52,18 @@ public class Vaccination implements Skippable
   private boolean skipped = false;
   private Date systemEntryDate = null;
   private long vaccinationId = 0l;
-
+  private VaccineCvx vaccineCvx = null;
   private Date visPublicationDate = null;
 
   public CodedEntity getAction()
   {
     return action;
   }
+
   public String getActionCode()
   {
     return action.getCode();
   }
-
-  // public static final String ACTION_CODE_ADD = "A";
-  // public static final String ACTION_CODE_DELETE = "D";
-  // public static final String ACTION_CODE_UPDATE = "U";
-  //
-  // public static final String INFO_SOURCE_ADMIN = "00";
-  // public static final String INFO_SOURCE_HIST = "01";
 
   public CodedEntity getAdmin()
   {
@@ -79,6 +74,13 @@ public class Vaccination implements Skippable
   {
     return admin.getCode();
   }
+
+  // public static final String ACTION_CODE_ADD = "A";
+  // public static final String ACTION_CODE_DELETE = "D";
+  // public static final String ACTION_CODE_UPDATE = "U";
+  //
+  // public static final String INFO_SOURCE_ADMIN = "00";
+  // public static final String INFO_SOURCE_HIST = "01";
 
   public CodedEntity getAdminCpt()
   {
@@ -320,6 +322,11 @@ public class Vaccination implements Skippable
     return vaccinationId;
   }
 
+  public VaccineCvx getVaccineCvx()
+  {
+    return vaccineCvx;
+  }
+
   public Date getVisPublicationDate()
   {
     return visPublicationDate;
@@ -534,25 +541,30 @@ public class Vaccination implements Skippable
   {
     refusal.setCode(refusalCode);
   }
-  
+
   public void setSkipped(boolean skipped)
   {
     this.skipped = skipped;
   }
-  
+
   public void setSystemEntryDate(Date systemEntryDate)
   {
     this.systemEntryDate = systemEntryDate;
   }
-  
+
   public void setVaccinationId(long vaccinationId)
   {
     this.vaccinationId = vaccinationId;
   }
-  
+
+  public void setVaccineCvx(VaccineCvx vaccineCvx)
+  {
+    this.vaccineCvx = vaccineCvx;
+  }
+
   public void setVisPublicationDate(Date visPublicationDate)
   {
     this.visPublicationDate = visPublicationDate;
   }
-  
+
 }

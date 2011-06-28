@@ -11,7 +11,6 @@ import org.openimmunizationsoftware.dqa.db.model.received.types.Name;
 import org.openimmunizationsoftware.dqa.db.model.received.types.OrganizationName;
 import org.openimmunizationsoftware.dqa.db.model.received.types.PhoneNumber;
 
-
 public class Patient implements Skippable
 {
   private Address address = new Address();
@@ -40,6 +39,7 @@ public class Patient implements Skippable
   private CodedEntity publicity = new CodedEntity(CodeTable.Type.PATIENT_PUBLICITY);
   private CodedEntity race = new CodedEntity(CodeTable.Type.PATIENT_RACE);
   private CodedEntity registryStatus = new CodedEntity(CodeTable.Type.REGISTRY_STATUS);
+  private NextOfKin responsibleParty = null;
   private CodedEntity sex = new CodedEntity(CodeTable.Type.PATIENT_SEX);
   private boolean skipped = false;
 
@@ -147,12 +147,12 @@ public class Patient implements Skippable
   {
     return birthPlace;
   }
-  
+
   public Date getDeathDate()
   {
     return deathDate;
   }
-  
+
   public String getDeathIndicator()
   {
     return deathIndicator;
@@ -371,6 +371,11 @@ public class Patient implements Skippable
   public String getRegistryStatusCode()
   {
     return registryStatus.getCode();
+  }
+
+  public NextOfKin getResponsibleParty()
+  {
+    return responsibleParty;
   }
 
   public CodedEntity getSex()
@@ -626,6 +631,11 @@ public class Patient implements Skippable
   public void setRegistryStatusCode(String registryStatusCode)
   {
     this.registryStatus.setCode(registryStatusCode);
+  }
+
+  public void setResponsibleParty(NextOfKin responsibleParty)
+  {
+    this.responsibleParty = responsibleParty;
   }
 
   public void setSexCode(String sexCode)
