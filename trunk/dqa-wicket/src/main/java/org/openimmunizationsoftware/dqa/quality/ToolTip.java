@@ -8,6 +8,13 @@ public class ToolTip
   private String label = "";
   private String tip = "";
   private boolean emphasize = false;
+  private String link = "#";
+  
+  public ToolTip setLink(String link)
+  {
+    this.link = link;
+    return this;
+  }
 
   public boolean isEmphasize()
   {
@@ -35,7 +42,7 @@ public class ToolTip
   {
     if (tip != null && !tip.equals(""))
     {
-      return "<a class=\"tooltip\" href=\"#\">" + indent + label + "<span>" + tip + "</span></a>";
+      return "<a class=\"tooltip\" href=\"" + link + "\">" + indent + label + "<span>" + tip + "</span></a>";
     } else
     {
       return indent + label;
