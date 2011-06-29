@@ -13,6 +13,17 @@ public class ScoringSet
   private double score = 0;
   private double weightedScore = 0;
   private String label = "";
+  private int overallWeight = 0;
+
+  public int getOverallWeight()
+  {
+    return overallWeight;
+  }
+
+  public void setOverallWeight(int overallWeight)
+  {
+    this.overallWeight = overallWeight;
+  }
 
   public String getLabel()
   {

@@ -340,6 +340,7 @@ public class MessageBatchManager
         overallWeight += completenessRow.getScoreWeight();
       }
     }
+    scoringSet.setOverallWeight(overallWeight);
     double overallPercent = overallWeight > 0 ? overallScore / overallWeight : 0;
     if (overallPercent < 0)
     {
@@ -408,6 +409,8 @@ public class MessageBatchManager
 
   private void scoreQuality()
   {
+    int errorCount = 0;
+    int warningCount = 0;
     Map<PotentialIssue, BatchIssues> batchIssuesMap = messageBatch.getBatchIssuesMap();
     for (PotentialIssueStatus potentialIssueStatus : profile.getPotentialIssueStatusMap().values())
     {
@@ -418,25 +421,28 @@ public class MessageBatchManager
         if (potentialIssueStatus.getAction().isError())
         {
           errorIssues.add(batchIssues);
+          errorCount += batchIssues.getIssueCountPos();
         } else if (potentialIssueStatus.getAction().isWarn())
         {
           warnIssues.add(batchIssues);
+          warningCount += batchIssues.getIssueCountPos();
         } else if (potentialIssueStatus.getAction().isSkip())
         {
           skipIssues.add(batchIssues);
         }
       }
     }
+    
     int denominator = messageBatch.getMessageCount() + messageBatch.getVaccinationCount();
     // If there are more than 10% errors then the score is 0.
     double denominatorScaled = 0.03 * denominator;
     double qualityErrorScore;
-    if (errorIssues.size() > denominatorScaled)
+    if (errorCount > denominatorScaled)
     {
       qualityErrorScore = 0;
     } else
     {
-      qualityErrorScore = 100.0 - 100.0 * errorIssues.size() / denominatorScaled;
+      qualityErrorScore = 1.0 - (1.0 * errorCount / denominatorScaled);
     }
     if (qualityErrorScore < 0)
     {
@@ -444,20 +450,20 @@ public class MessageBatchManager
     }
     denominatorScaled = 0.3 * denominator;
     double qualityWarnScore;
-    if (warnIssues.size() > denominatorScaled)
+    if (warningCount > denominatorScaled)
     {
       qualityWarnScore = 0;
     } else
     {
-      qualityWarnScore = 100.0 - 100.0 * errorIssues.size() / denominatorScaled + 0.5;
+      qualityWarnScore = 1.0 - (1.0 * warningCount / denominatorScaled);
     }
     if (qualityWarnScore < 0)
     {
       qualityWarnScore = 0;
     }
-    messageBatch.setQualityWarnScore((int) (qualityWarnScore + 0.5));
-    messageBatch.setQualityErrorScore((int) (qualityErrorScore + 0.5));
-    messageBatch.setQualityScore((int) (qualityErrorScore * 0.5 + qualityWarnScore * 0.5 + 0.5));
+    messageBatch.setQualityWarnScore((int) (100.0 * qualityWarnScore + 0.5));
+    messageBatch.setQualityErrorScore((int) (100.0 * qualityErrorScore + 0.5));
+    messageBatch.setQualityScore((int) (qualityErrorScore * 50.0 + qualityWarnScore * 50.0 + 0.5));
   }
 
   private void scoreTimeliness()
