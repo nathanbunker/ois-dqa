@@ -545,6 +545,10 @@ public class Validator extends ValidateMessage
     handleCodeReceived(patient.getEthnicity(), PotentialIssues.Field.PATIENT_ETHNICITY);
     if (notEmpty(patient.getNameFirst(), pi.PatientFirstNameIsMissing))
     {
+      if (patient.getNameFirst().equalsIgnoreCase("unknown"))
+      {
+        registerIssue(pi.PatientFirstNameIsInvalid);
+      }
       // TODO PatientFirstNameIsInvalid
       // TODO PatientFirstNameMayIncludeMiddleInitial
     }

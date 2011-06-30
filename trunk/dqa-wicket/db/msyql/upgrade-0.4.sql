@@ -1,20 +1,16 @@
-CREATE SEQUENCE dqa_issue_found_id_sequence INCREMENT BY 1 START WITH 1;
-CREATE SEQUENCE dqa_batch_id_sequence INCREMENT BY 1 START WITH 1;
-CREATE SEQUENCE dqa_receive_queue_id_sequence INCREMENT BY 1 START WITH 1;
-
 INSERT INTO dqa_batch_type (type_code, type_label) VALUES ('S', 'Submission');
 
 DROP TABLE dqa_code_received;
 
 CREATE TABLE dqa_code_received
 (
-  code_id             INTEGER NOT NULL PRIMARY KEY,
-  code_label          VARCHAR2(30),
+  code_id             INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  code_label          VARCHAR(30),
   profile_id          INTEGER NOT NULL,
   table_id            INTEGER NOT NULL,
-  received_value      VARCHAR2(50) NOT NULL,
-  code_value          VARCHAR2(50),
-  code_status         VARCHAR2(1) NOT NULL,
+  received_value      VARCHAR(50) NOT NULL,
+  code_value          VARCHAR(50),
+  code_status         VARCHAR(1) NOT NULL,
   received_count      INTEGER
 );
 
@@ -29,8 +25,8 @@ DROP TABLE dqa_code_table;
 CREATE TABLE dqa_code_table
 (
   table_id             INTEGER NOT NULL PRIMARY KEY,
-  table_label          VARCHAR2(50) NOT NULL, 
-  default_code_value   VARCHAR2(50)
+  table_label          VARCHAR(50) NOT NULL, 
+  default_code_value   VARCHAR(50)
 );
 
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(2, 'Address Country', '');
@@ -41,7 +37,7 @@ INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(6,
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(7, 'Birth Order', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(8, 'Body Route', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(9, 'Body Site', '');
-INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(10, 'Finanical Status Code', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(10, 'Financial Status Code', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(11, 'Id Assigning Authority', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(12, 'Id Type Code', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(13, 'Organization', '');
@@ -70,14 +66,14 @@ DROP TABLE dqa_potential_issue;
 CREATE TABLE dqa_potential_issue
 (
   issue_id            INTEGER NOT NULL PRIMARY KEY,
-  target_object       VARCHAR2(30) NOT NULL,
-  target_field        VARCHAR2(50) NOT NULL,
-  issue_type          VARCHAR2(50) NOT NULL,
-  field_value         VARCHAR2(50),
-  default_action_code VARCHAR2(1) NOT NULL,
-  change_priority     VARCHAR2(7) NOT NULL, -- Must, Should, Can, May, Blocked
-  report_denominator  VARCHAR2(30) NOT NULL,
-  issue_description   VARCHAR2(4000)
+  target_object       VARCHAR(30) NOT NULL,
+  target_field        VARCHAR(50) NOT NULL,
+  issue_type          VARCHAR(50) NOT NULL,
+  field_value         VARCHAR(50),
+  default_action_code VARCHAR(1) NOT NULL,
+  change_priority     VARCHAR(7) NOT NULL, -- Must, Should, Can, May, Blocked
+  report_denominator  VARCHAR(30) NOT NULL,
+  issue_description   VARCHAR(4000)
 );
 
 
@@ -449,212 +445,212 @@ INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_typ
 INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (367, 'Vaccination', 'system entry time', 'is missing', '', 'A', 'May', 'Vaccination Count', '');
 
 DELETE FROM dqa_code_master;
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 25, 'A', 'Add', 'A', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 25, 'D', 'Delete', 'D', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 25, 'U', 'Update', 'U', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'C', 'Current or temporary', 'C', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'P', 'Permanent', 'P', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'M', 'Mailing', 'M', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'B', 'Firm/Business', 'B', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'O', 'Office', 'O', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'H', 'Home', 'H', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'N', 'Birth (nee)', 'N', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'F', 'Country of origin', 'F', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'L', 'Legal address', 'L', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'BDL', 'Birth delivery location', 'BDL', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'BR', 'Residence at birth', 'BR', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'RH', 'Registry home', 'RH', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 5, 'BA', 'Bad address', 'BA', 'I');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 7, '1', 'First', '1', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 7, '2', 'Second', '2', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 7, '3', 'Third', '3', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 7, '4', 'Fourth', '4', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 7, '5', 'Fifth', '5', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'ID', 'Intradermal', 'ID', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'IM', 'Intramuscular', 'IM', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'NS', 'Nasal', 'NS', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'IN', 'Intranasal', 'NS', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'IV', 'Intravenous', 'IV', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'PO', 'Oral', 'PO', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'OTH', 'Other/Miscellaneous', 'OTH', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'SC', 'Subcutaneous', 'SC', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'TD', 'Transdermal', 'TD', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'C38238', 'Intradermal', 'C38238', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'C28161', 'Intramuscular', 'C28161', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'C38284', 'Nasal', 'C38284', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'C38276', 'Intravenous', 'C38276', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'C38288', 'Oral', 'C38288', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'C38676', 'Percutaneous', 'C38676', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'C38299', 'Subcutaneous', 'C38299', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 8, 'C38305', 'Transdermal', 'C38305', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'LT', 'Left Thigh', 'LT', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'LA', 'Left Upper Arm', 'LA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'LD', 'Left Deltoid', 'LD', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'LG', 'Left Gluteous Medius', 'LG', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'LVL', 'Left Vastus Lateralis', 'LVL', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'LLFA', 'Left Lower Forearm', 'LLFA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'RA', 'Right Upper Arm', 'RA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'RT', 'Right Thigh', 'RT', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'RVL', 'Right Vastus Lateralis', 'RVL', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'RG', 'Right Gluteous Medius', 'RG', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'RD', 'Right Deltoid', 'RD', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 9, 'RLFA', 'Right Lower Forearm', 'RLFA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 2, 'USA', 'United States', 'USA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 2, 'US', 'United States', 'USA', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 2, 'MX', 'Mexico', 'MEX', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 2, 'CA', 'Canada', 'CAN', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 2, 'MEX', 'Mexico', 'MEX', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 2, 'CAN', 'Canada', 'CAN', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 30, '00', 'New immunization record', '00', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 30, '01', 'Historical information - source unspecified', '01', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 30, '02', 'Historical information - from other provider', '01', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 30, '03', 'Historical information - from parents written record', '01', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 30, '04', 'Historical information - from parents recall', '01', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 30, '05', 'Historical information - from other registry', '01', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 30, '06', 'Historical information - from birth certificate', '01', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 30, '07', 'Historical information - from school record', '01', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 30, '08', 'Historical information - from public agency', '01', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'ara', 'Arabic', 'ara', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'arm', 'Armenian', 'arm', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'cat', 'Catalan; Valencian', 'cat', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'chi', 'Chinese', 'chi', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'dan', 'Danish', 'dan', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'eng', 'English', 'eng', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'fre', 'French', 'fre', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'ger', 'German', 'ger', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'hat', 'Haitian; Haitian Creole', 'hat', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'heb', 'Hebrew', 'heb', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'hin', 'Hindi', 'hin', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'hmn', 'Hmong', 'hmn', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'jpn', 'Japanese', 'jpn', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'kor', 'Korean', 'kor', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'rus', 'Russian', 'rus', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'som', 'Somali', 'som', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'spa', 'Spanish; Castilian', 'spa', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 20, 'vie', 'Vietnamese', 'vie', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 21, 'A', 'Alias name', 'A', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 21, 'L', 'Legal name', 'L', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 21, 'D', 'Display name', 'D', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 21, 'M', 'Maiden name', 'M', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 21, 'C', 'Adopted name', 'C', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 21, 'B', 'Name at birth', 'B', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 21, 'P', 'Name of partner/spouse', 'P', 'I');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 21, 'U', 'Unspecified', 'U', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 19, 'F', 'Female', 'F', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 19, 'M', 'Male', 'M', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 19, 'U', 'Unknown/undifferentiated', 'U', 'I');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 10, 'V01', 'Not VFC eligible', 'V01', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 10, 'V02', 'VFC eligible-Medicaid/Medicaid managed care', 'V02', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 10, 'V03', 'VFC eligible-Uninsured', 'V03', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 10, 'V04', 'VFC eligible- American Indian/Alaskan Native', 'V04', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 10, 'V05', 'VFC eligible-Federally Qualified Health Center Patient (under-insured)', 'V05', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 10, 'V06', 'VFC eligible- State specific eligibility (e.g. S-CHIP plan)', 'V06', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 10, 'V07', 'VFC eligibility- Local-specific eligibility', 'V07', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 10, 'V08', 'Not VFC eligible-Under-insured', 'V08', 'I');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'AL', 'Alabama', 'AL', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'AK', 'Alaska', 'AK', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'AZ', 'Arizona', 'AZ', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'AR', 'Arkansas', 'AR', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'CA', 'California', 'CA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'CO', 'Colorado', 'CO', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'CT', 'Connecticut', 'CT', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'DE', 'Delaware', 'DE', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'DC', 'District of Columbia', 'DC', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'FL', 'Florida', 'FL', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'GA', 'Georgia', 'GA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'HI', 'Hawaii', 'HI', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'ID', 'Idaho', 'ID', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'IL', 'Illinois', 'IL', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'IN', 'Indiana', 'IN', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'IA', 'Iowa', 'IA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'KS', 'Kansas', 'KS', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'KY', 'Kentucky', 'KY', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'LA', 'Louisiana', 'LA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'ME', 'Maine', 'ME', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'MD', 'Maryland', 'MD', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'MA', 'Massachusetts', 'MA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'MI', 'Michigan', 'MI', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'MN', 'Minnesota', 'MN', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'MS', 'Mississippi', 'MS', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'MO', 'Missouri', 'MO', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'MT', 'Montana', 'MT', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'NE', 'Nebraska', 'NE', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'NV', 'Nevada', 'NV', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'NH', 'New Hampshire', 'NH', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'NJ', 'New Jersey', 'NJ', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'NM', 'New Mexico', 'NM', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'NY', 'New York', 'NY', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'NC', 'North Carolina', 'NC', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'ND', 'North Dakota', 'ND', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'OH', 'Ohio', 'OH', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'OK', 'Oklahoma', 'OK', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'OR', 'Oregon', 'OR', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'PA', 'Pennsylvania', 'PA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'RI', 'Rhode Island', 'RI', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'SC', 'South Carolina', 'SC', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'SD', 'South Dakota', 'SD', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'TN', 'Tennessee', 'TN', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'TX', 'Texas', 'TX', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'UT', 'Utah', 'UT', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'VT', 'Vermont', 'VT', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'VA', 'Virginia', 'VA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'WA', 'Washington', 'WA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'WV', 'West Virginia', 'WV', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'WI', 'Wisconsin', 'WI', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'WY', 'Wyoming', 'WY', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'AS', 'American Samoa', 'AS', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'GU', 'Guam', 'GU', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'MP', 'Northern Mariana Islands', 'MP', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'PR', 'Puerto Rico', 'PR', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'VI', 'Virgin Islands', 'VI', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'FM', 'Federated States of Micronesia', 'FM', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'MH', 'Marshall Islands', 'MH', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'PW', 'Palau', 'PW', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'AA', 'Armed Forces Americas (except Canada)', 'AA', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'AE', 'Armed Forces (Europe, Canada, Middle East, Africa)', 'AE', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'AP', 'Armed Forces Pacific', 'AP', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'CZ', 'Canal Zone', 'CZ', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'PI', 'Philippine Islands', 'PI', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'TT', 'Trust Territory of the Pacific Islands', 'TT', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 4, 'CM', 'Commonwealth of the Northern Mariana Islands', 'CM', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 26, 'CP', 'Complete', 'CP', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 26, 'RE', 'Refused', 'RE', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 26, 'NA', 'Not Administered', 'NA', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 26, 'PA', 'Partially Administered', 'PA', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'BRO', 'Brother', 'BRO', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'CGV', 'Care Giver', 'CGV', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'FTH', 'Father', 'FTH', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'FCH', 'Foster Child', 'FCH', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'GRP', 'Grand Parent', 'GRP', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'GRD', 'Guardian', 'GRD', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'MTH', 'Mother', 'MTH', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'OTH', 'Other', 'OTH', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'PAR', 'Parent', 'PAR', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'SEL', 'Self', 'SEL', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'SIB', 'Sibling', 'SIB', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'SIS', 'Sister', 'SIS', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'SPO', 'Spouse', 'SPO', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 22, 'SCH', 'Step Child', 'SCH', 'G');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, '1002-5', 'American Indian or Alaska Native', '1002-5', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, '2028-9', 'Asian', '2028-9', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, '2076-8', 'Native Hawaiian or Other Pacific Islander', '2076-8', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, '2054-5', 'Black or African-American', '2054-5', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, '2106-3', 'White', '2106-3', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, '2131-1', 'Other Race', '2131-1', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, 'I', 'American Indian or Alaska Native', '1002-5', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, 'A', 'Asian', '2028-9', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, 'A', 'Native Hawaiian or Other Pacific Islander', '2076-8', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, 'B', 'Black or African-American', '2054-5', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, 'W', 'White', '2106-3', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, 'O', 'Other Race', '2131-1', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 18, 'U', 'Unknown', '2131-1', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (25, 'A', 'Add', 'A', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (25, 'D', 'Delete', 'D', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (25, 'U', 'Update', 'U', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'C', 'Current or temporary', 'C', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'P', 'Permanent', 'P', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'M', 'Mailing', 'M', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'B', 'Firm/Business', 'B', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'O', 'Office', 'O', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'H', 'Home', 'H', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'N', 'Birth (nee)', 'N', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'F', 'Country of origin', 'F', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'L', 'Legal address', 'L', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'BDL', 'Birth delivery location', 'BDL', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'BR', 'Residence at birth', 'BR', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'RH', 'Registry home', 'RH', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (5, 'BA', 'Bad address', 'BA', 'I');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (7, '1', 'First', '1', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (7, '2', 'Second', '2', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (7, '3', 'Third', '3', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (7, '4', 'Fourth', '4', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (7, '5', 'Fifth', '5', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'ID', 'Intradermal', 'ID', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'IM', 'Intramuscular', 'IM', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'NS', 'Nasal', 'NS', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'IN', 'Intranasal', 'NS', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'IV', 'Intravenous', 'IV', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'PO', 'Oral', 'PO', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'OTH', 'Other/Miscellaneous', 'OTH', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'SC', 'Subcutaneous', 'SC', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'TD', 'Transdermal', 'TD', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'C38238', 'Intradermal', 'C38238', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'C28161', 'Intramuscular', 'C28161', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'C38284', 'Nasal', 'C38284', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'C38276', 'Intravenous', 'C38276', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'C38288', 'Oral', 'C38288', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'C38676', 'Percutaneous', 'C38676', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'C38299', 'Subcutaneous', 'C38299', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (8, 'C38305', 'Transdermal', 'C38305', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'LT', 'Left Thigh', 'LT', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'LA', 'Left Upper Arm', 'LA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'LD', 'Left Deltoid', 'LD', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'LG', 'Left Gluteous Medius', 'LG', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'LVL', 'Left Vastus Lateralis', 'LVL', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'LLFA', 'Left Lower Forearm', 'LLFA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'RA', 'Right Upper Arm', 'RA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'RT', 'Right Thigh', 'RT', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'RVL', 'Right Vastus Lateralis', 'RVL', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'RG', 'Right Gluteous Medius', 'RG', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'RD', 'Right Deltoid', 'RD', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (9, 'RLFA', 'Right Lower Forearm', 'RLFA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (2, 'USA', 'United States', 'USA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (2, 'US', 'United States', 'USA', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (2, 'MX', 'Mexico', 'MEX', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (2, 'CA', 'Canada', 'CAN', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (2, 'MEX', 'Mexico', 'MEX', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (2, 'CAN', 'Canada', 'CAN', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (30, '00', 'New immunization record', '00', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (30, '01', 'Historical information - source unspecified', '01', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (30, '02', 'Historical information - from other provider', '01', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (30, '03', 'Historical information - from parents written record', '01', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (30, '04', 'Historical information - from parents recall', '01', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (30, '05', 'Historical information - from other registry', '01', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (30, '06', 'Historical information - from birth certificate', '01', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (30, '07', 'Historical information - from school record', '01', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (30, '08', 'Historical information - from public agency', '01', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'ara', 'Arabic', 'ara', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'arm', 'Armenian', 'arm', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'cat', 'Catalan; Valencian', 'cat', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'chi', 'Chinese', 'chi', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'dan', 'Danish', 'dan', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'eng', 'English', 'eng', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'fre', 'French', 'fre', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'ger', 'German', 'ger', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'hat', 'Haitian; Haitian Creole', 'hat', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'heb', 'Hebrew', 'heb', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'hin', 'Hindi', 'hin', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'hmn', 'Hmong', 'hmn', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'jpn', 'Japanese', 'jpn', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'kor', 'Korean', 'kor', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'rus', 'Russian', 'rus', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'som', 'Somali', 'som', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'spa', 'Spanish; Castilian', 'spa', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (20, 'vie', 'Vietnamese', 'vie', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (21, 'A', 'Alias name', 'A', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (21, 'L', 'Legal name', 'L', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (21, 'D', 'Display name', 'D', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (21, 'M', 'Maiden name', 'M', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (21, 'C', 'Adopted name', 'C', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (21, 'B', 'Name at birth', 'B', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (21, 'P', 'Name of partner/spouse', 'P', 'I');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (21, 'U', 'Unspecified', 'U', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (19, 'F', 'Female', 'F', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (19, 'M', 'Male', 'M', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (19, 'U', 'Unknown/undifferentiated', 'U', 'I');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (10, 'V01', 'Not VFC eligible', 'V01', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (10, 'V02', 'VFC eligible-Medicaid/Medicaid managed care', 'V02', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (10, 'V03', 'VFC eligible-Uninsured', 'V03', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (10, 'V04', 'VFC eligible- American Indian/Alaskan Native', 'V04', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (10, 'V05', 'VFC eligible-Federally Qualified Health Center Patient (under-insured)', 'V05', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (10, 'V06', 'VFC eligible- State specific eligibility (e.g. S-CHIP plan)', 'V06', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (10, 'V07', 'VFC eligibility- Local-specific eligibility', 'V07', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (10, 'V08', 'Not VFC eligible-Under-insured', 'V08', 'I');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'AL', 'Alabama', 'AL', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'AK', 'Alaska', 'AK', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'AZ', 'Arizona', 'AZ', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'AR', 'Arkansas', 'AR', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'CA', 'California', 'CA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'CO', 'Colorado', 'CO', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'CT', 'Connecticut', 'CT', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'DE', 'Delaware', 'DE', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'DC', 'District of Columbia', 'DC', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'FL', 'Florida', 'FL', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'GA', 'Georgia', 'GA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'HI', 'Hawaii', 'HI', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'ID', 'Idaho', 'ID', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'IL', 'Illinois', 'IL', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'IN', 'Indiana', 'IN', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'IA', 'Iowa', 'IA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'KS', 'Kansas', 'KS', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'KY', 'Kentucky', 'KY', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'LA', 'Louisiana', 'LA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'ME', 'Maine', 'ME', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'MD', 'Maryland', 'MD', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'MA', 'Massachusetts', 'MA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'MI', 'Michigan', 'MI', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'MN', 'Minnesota', 'MN', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'MS', 'Mississippi', 'MS', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'MO', 'Missouri', 'MO', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'MT', 'Montana', 'MT', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'NE', 'Nebraska', 'NE', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'NV', 'Nevada', 'NV', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'NH', 'New Hampshire', 'NH', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'NJ', 'New Jersey', 'NJ', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'NM', 'New Mexico', 'NM', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'NY', 'New York', 'NY', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'NC', 'North Carolina', 'NC', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'ND', 'North Dakota', 'ND', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'OH', 'Ohio', 'OH', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'OK', 'Oklahoma', 'OK', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'OR', 'Oregon', 'OR', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'PA', 'Pennsylvania', 'PA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'RI', 'Rhode Island', 'RI', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'SC', 'South Carolina', 'SC', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'SD', 'South Dakota', 'SD', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'TN', 'Tennessee', 'TN', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'TX', 'Texas', 'TX', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'UT', 'Utah', 'UT', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'VT', 'Vermont', 'VT', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'VA', 'Virginia', 'VA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'WA', 'Washington', 'WA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'WV', 'West Virginia', 'WV', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'WI', 'Wisconsin', 'WI', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'WY', 'Wyoming', 'WY', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'AS', 'American Samoa', 'AS', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'GU', 'Guam', 'GU', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'MP', 'Northern Mariana Islands', 'MP', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'PR', 'Puerto Rico', 'PR', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'VI', 'Virgin Islands', 'VI', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'FM', 'Federated States of Micronesia', 'FM', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'MH', 'Marshall Islands', 'MH', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'PW', 'Palau', 'PW', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'AA', 'Armed Forces Americas (except Canada)', 'AA', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'AE', 'Armed Forces (Europe, Canada, Middle East, Africa)', 'AE', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'AP', 'Armed Forces Pacific', 'AP', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'CZ', 'Canal Zone', 'CZ', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'PI', 'Philippine Islands', 'PI', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'TT', 'Trust Territory of the Pacific Islands', 'TT', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (4, 'CM', 'Commonwealth of the Northern Mariana Islands', 'CM', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (26, 'CP', 'Complete', 'CP', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (26, 'RE', 'Refused', 'RE', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (26, 'NA', 'Not Administered', 'NA', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (26, 'PA', 'Partially Administered', 'PA', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'BRO', 'Brother', 'BRO', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'CGV', 'Care Giver', 'CGV', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'FTH', 'Father', 'FTH', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'FCH', 'Foster Child', 'FCH', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'GRP', 'Grand Parent', 'GRP', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'GRD', 'Guardian', 'GRD', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'MTH', 'Mother', 'MTH', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'OTH', 'Other', 'OTH', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'PAR', 'Parent', 'PAR', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'SEL', 'Self', 'SEL', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'SIB', 'Sibling', 'SIB', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'SIS', 'Sister', 'SIS', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'SPO', 'Spouse', 'SPO', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (22, 'SCH', 'Step Child', 'SCH', 'G');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, '1002-5', 'American Indian or Alaska Native', '1002-5', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, '2028-9', 'Asian', '2028-9', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, '2076-8', 'Native Hawaiian or Other Pacific Islander', '2076-8', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, '2054-5', 'Black or African-American', '2054-5', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, '2106-3', 'White', '2106-3', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, '2131-1', 'Other Race', '2131-1', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, 'I', 'American Indian or Alaska Native', '1002-5', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, 'A', 'Asian', '2028-9', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, 'A', 'Native Hawaiian or Other Pacific Islander', '2076-8', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, 'B', 'Black or African-American', '2054-5', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, 'W', 'White', '2106-3', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, 'O', 'Other Race', '2131-1', 'D');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (18, 'U', 'Unknown', '2131-1', 'D');
 
 CREATE TABLE dqa_vaccine_group
 (
   group_id            INTEGER NOT NULL PRIMARY KEY,   
-  group_code          VARCHAR2(30) NOT NULL,
-  group_label         VARCHAR2(250) NOT NULL,
-  group_status        VARCHAR2(30) NOT NULL 
+  group_code          VARCHAR(30) NOT NULL,
+  group_label         VARCHAR(250) NOT NULL,
+  group_status        VARCHAR(30) NOT NULL 
 );
 
 INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (2, 'ADENO', 'Adnovirus', 'Not Expected');
@@ -695,131 +691,129 @@ INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) V
 
 CREATE TABLE dqa_vaccine_cvx_group
 (
-  cvx_group_id        INTEGER NOT NULL PRIMARY KEY,
+  cvx_group_id        INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
   group_id            INTEGER NOT NULL,
-  cvx_code            VARCHAR2(10) NOT NULL
+  cvx_code            VARCHAR(10) NOT NULL
 );
 
-CREATE SEQUENCE dqa_cvx_group_id_sequence INCREMENT BY 1 START WITH 1;
-
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 2, '54');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 3, '55');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 4, '82');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 5, '24');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 6, '19');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 7, '26');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 8, '29');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 9, '28');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 10, '20');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 11, '106');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 12, '107');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 13, '110');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 14, '110');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 15, '110');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 16, '50');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 17, '50');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 18, '120');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 19, '120');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 20, '120');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 21, '130');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 22, '130');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 23, '132');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 24, '132');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 25, '132');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 26, '132');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 27, '01');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 28, '22');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 29, '22');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 30, '102');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 31, '102');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 32, '102');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 33, '30');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 34, '52');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 35, '83');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 36, '84');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 37, '31');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 38, '85');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 39, '104');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 40, '104');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 41, '08');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 42, '42');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 43, '43');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 44, '44');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 45, '45');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 46, '58');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 47, '59');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 48, '47');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 49, '46');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 50, '49');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 51, '48');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 52, '17');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 53, '51');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 54, '51');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 55, '118');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 56, '62');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 57, '137');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 58, '86');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 59, '14');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 60, '87');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 61, '123');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 62, '135');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 63, '111');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 64, '141');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 65, '140');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 66, '15');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 67, '88');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 68, '16');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 69, '10');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 70, '134');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 71, '39');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 72, '66');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 73, '04');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 74, '04');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 75, '05');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 76, '103');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 77, '136');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 78, '114');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 79, '32');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 80, '108');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 81, '03');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 82, '94');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 83, '94');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 84, '07');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 85, '127');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 86, '128');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 87, '125');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 88, '126');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 89, '02');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 90, '133');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 91, '100');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 92, '33');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 93, '89');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 94, '40');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 95, '18');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 96, '90');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 97, '34');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 98, '119');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 99, '116');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 100, '74');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 101, '122');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 102, '71');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 103, '06');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 104, '38');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 105, '38');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 106, '138');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 107, '113');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 108, '09');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 109, '115');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 110, '25');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 111, '41');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 112, '53');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 113, '91');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 114, '101');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 115, '75');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 116, '105');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 117, '21');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 118, '81');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 119, '80');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 120, '92');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 121, '37');
-INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_code) VALUES (dqa_cvx_group_id_sequence.NEXTVAL, 122, '121');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (2, '54');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (2, '55');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (2, '82');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (3, '24');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (4, '19');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (5, '26');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (17, '29');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '28');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '20');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '106');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '107');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '110');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '110');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (26, '110');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '50');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '50');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '120');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '120');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (26, '120');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '130');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (26, '130');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '132');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '132');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '132');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (26, '132');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '01');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '22');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '22');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (6, '102');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '102');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '102');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (10, '30');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (12, '52');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (12, '83');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (12, '84');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (12, '31');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (12, '85');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (12, '104');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '104');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '08');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '42');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '43');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '44');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '45');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (14, '58');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (11, '59');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '47');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '46');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '49');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '48');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '17');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (13, '51');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (15, '51');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (16, '118');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (16, '62');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (16, '137');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (17, '86');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (17, '14');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (17, '87');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (9, '123');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (7, '135');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (7, '111');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (7, '141');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (7, '140');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (7, '15');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (7, '88');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (7, '16');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (26, '10');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (18, '134');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (18, '39');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (19, '66');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (20, '04');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (29, '04');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (20, '05');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (21, '103');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (21, '136');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (21, '114');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (21, '32');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (21, '108');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (22, '03');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (22, '94');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (33, '94');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (23, '07');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (8, '127');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (8, '128');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (8, '125');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (8, '126');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (26, '02');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (24, '133');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (24, '100');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (25, '33');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (26, '89');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (27, '40');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (27, '18');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (27, '90');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (17, '34');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (28, '119');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (28, '116');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (28, '74');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (28, '122');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (17, '71');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (29, '06');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (23, '38');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (29, '38');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (30, '138');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (30, '113');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (30, '09');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (30, '115');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (31, '25');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (31, '41');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (31, '53');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (31, '91');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (31, '101');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (32, '75');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (32, '105');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (33, '21');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (34, '81');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (34, '80');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (34, '92');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (35, '37');
+INSERT INTO dqa_vaccine_cvx_group (group_id, cvx_code) VALUES (36, '121');

@@ -71,7 +71,7 @@ public class TestVaccinationUpdateParserHL7 extends TestCase
     assertEquals("", patient.getIdSubmitterAssigningAuthorityCode());
     assertEquals("200005643", patient.getIdSubmitterNumber());
     assertEquals("PI", patient.getIdSubmitterTypeCode());
-    assertEquals("", patient.getMotherMaidenName());
+    assertEquals("DOG", patient.getMotherMaidenName());
     assertEquals("CHEIN", vum.getPatient().getNameLast());
     assertEquals("LE", vum.getPatient().getNameFirst());
     assertEquals("A", patient.getNameMiddle());
