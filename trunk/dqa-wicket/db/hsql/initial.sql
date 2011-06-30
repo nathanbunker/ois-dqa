@@ -71,8 +71,8 @@ CREATE TABLE dqa_message_batch
   batch_id            INTEGER NOT NULL IDENTITY,
   batch_title         VARCHAR(60),
   type_code           VARCHAR(1),
-  start_date          DATESTAMP,
-  end_date            DATESTAMP,
+  start_date          TIMESTAMP,
+  end_date            TIMESTAMP,
   submit_code         VARCHAR(1)
 );
 
