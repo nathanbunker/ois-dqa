@@ -56,4 +56,20 @@ public class CodeTable
   {
     this.defaultCodeValue = defaultCodeValue;
   }
+  
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof CodeTable)
+    {
+      return ((CodeTable)obj).getTableId() == tableId;
+    }
+    return super.equals(obj);
+  }
+  
+  @Override
+  public int hashCode()
+  {
+    return tableId;
+  }
 }

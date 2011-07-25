@@ -12,5 +12,33 @@
     <property name="startDate" column="start_date" type="timestamp"/>
     <property name="endDate" column="end_date" type="timestamp"/>
     <many-to-one name="submitStatus" column="submit_code" class="SubmitStatus"/>
+    <many-to-one name="profile" column="profile_id" class="SubmitterProfile"/>
+    <property name="completenessPatientScore" column="comp_patient_score" type="integer"/>
+    <property name="completenessScore" column="comp_score" type="integer"/>
+    <property name="completenessVaccinationScore" column="comp_vaccination_score" type="integer"/>
+    <property name="completenessVaccineGroupScore" column="comp_vaccine_group_score" type="integer"/>
+    <property name="messageCount" column="message_count" type="integer"/>
+    <property name="messageWithAdminCount" column="message_with_admin_count" type="integer"/>
+    <property name="nextOfKinCount" column="next_of_kin_count" type="integer"/>
+    <property name="overallScore" column="overall_score" type="integer"/>
+    <property name="patientCount" column="patient_count" type="integer"/>
+    <property name="patientUnderageCount" column="patient_underage_count" type="integer"/>
+    <property name="qualityErrorScore" column="qual_error_score" type="integer"/>
+    <property name="qualityScore" column="qual_score" type="integer"/>
+    <property name="qualityWarnScore" column="qual_warn_score" type="integer"/>
+    <property name="timelinessCount2Days" column="time_count_2_days" type="integer"/>
+    <property name="timelinessCount30Days" column="time_count_30_days" type="integer"/>
+    <property name="timelinessCount7Days" column="time_count_7_days" type="integer"/>
+    <property name="timelinessScore" column="time_score" type="integer"/>
+    <property name="timelinessScore2Days" column="time_score_2_days" type="integer"/>
+    <property name="timelinessScore30Days" column="time_score_30_days" type="integer"/>
+    <property name="timelinessScore7Days" column="time_score_7_days" type="integer"/>
+    <property name="vaccinationAdministeredCount" column="vacc_admin_count" type="integer"/>
+    <property name="vaccinationDeleteCount" column="vacc_delete_count" type="integer"/>
+    <property name="vaccinationHistoricalCount" column="vacc_historical_count" type="integer"/>
+    <property name="vaccinationNotAdministeredCount" column="vacc_not_admin_count" type="integer"/>
+    <property name="timelinessAverage" column="time_average" type="double"/>
+    <property name="timelinessDateFirst" column="time_date_first" type="date"/>
+    <property name="timelinessDateLast" column="time_date_last" type="date"/>
   </class>
 </hibernate-mapping>

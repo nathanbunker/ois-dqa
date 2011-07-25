@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -266,7 +267,7 @@ public class QualityReport
     printCompleteness(vaccinationOptional, "completeness.vaccination.optional", "Optional", 0.0);
 
     out.println("    <h3><a name=\"completeness.vaccineGroup\">Vaccine Group</h3>");
-    Set<VaccineCvx> vaccinesNotYetPrinted = messageBatchManager.getVaccineCvxReceived();
+    Set<VaccineCvx> vaccinesNotYetPrinted = new HashSet<VaccineCvx>(messageBatch.getBatchVaccineCvxMap().keySet());
     VaccineGroupManager vaccineGroupManager = VaccineGroupManager.getVaccineGroupManager();
     List<VaccineGroup> vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_EXPECTED);
     printVaccines("Expected", messageBatch, vaccinesNotYetPrinted, vaccineGroupList, false);
@@ -459,13 +460,13 @@ public class QualityReport
     out.println("        <th>Batch Title</th>");
     out.println("        <th>Batch Type</th>");
     out.println("        <th>Profile</th>");
-    if (filename != null)
+    if (filename != null && !filename.equals(""))
     {
       out.println("        <th>File Name</th>");
     }
     out.println("        <th>Received</th>");
     out.println("      </tr>");
-    if (filename != null)
+    if (filename != null && !filename.equals(""))
     {
       printRow(messageBatch.getBatchTitle(), messageBatch.getBatchType().getTypeLabel(), profile.getProfileLabel(),
           filename, makeDateTimeRange(messageBatch.getStartDate(), messageBatch.getEndDate()));

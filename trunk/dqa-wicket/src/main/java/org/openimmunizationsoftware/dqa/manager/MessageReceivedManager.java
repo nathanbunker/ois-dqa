@@ -20,26 +20,17 @@ public class MessageReceivedManager
     messageReceived.setSubmitStatus(SubmitStatus.HOLD);
     session.saveOrUpdate(messageReceived);
     Patient patient = messageReceived.getPatient();
-    if (!patient.isSkipped())
+    patient.setMessageReceived(messageReceived);
+    session.save(patient);
+    for (Vaccination vaccination : messageReceived.getVaccinations())
     {
-      patient.setMessageReceived(messageReceived);
-      session.save(patient);
-      for (Vaccination vaccination : messageReceived.getVaccinations())
-      {
-        if (!vaccination.isSkipped())
-        {
-          vaccination.setMessageReceived(messageReceived);
-          session.saveOrUpdate(vaccination);
-        }
-      }
-      for (NextOfKin nextOfKin : messageReceived.getNextOfKins())
-      {
-        if (!nextOfKin.isSkipped())
-        {
-          nextOfKin.setMessageReceived(messageReceived);
-          session.saveOrUpdate(nextOfKin);
-        }
-      }
+      vaccination.setMessageReceived(messageReceived);
+      session.saveOrUpdate(vaccination);
+    }
+    for (NextOfKin nextOfKin : messageReceived.getNextOfKins())
+    {
+      nextOfKin.setMessageReceived(messageReceived);
+      session.saveOrUpdate(nextOfKin);
     }
     for (IssueFound issueFound : messageReceived.getIssuesFound())
     {

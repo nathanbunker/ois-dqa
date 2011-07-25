@@ -3,14 +3,15 @@ package org.openimmunizationsoftware.dqa.manager;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.openimmunizationsoftware.dqa.db.model.BatchCodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.BatchIssues;
 import org.openimmunizationsoftware.dqa.db.model.BatchType;
+import org.openimmunizationsoftware.dqa.db.model.BatchVaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
@@ -34,28 +35,19 @@ public class MessageBatchManager
   private List<BatchIssues> errorIssues = new ArrayList<BatchIssues>();
   private List<BatchIssues> warnIssues = new ArrayList<BatchIssues>();
   private List<BatchIssues> skipIssues = new ArrayList<BatchIssues>();
-  private Set<CodeReceived> invalidCodes = new HashSet<CodeReceived>();
-  private Set<CodeReceived> unrecognizedCodes = new HashSet<CodeReceived>();
-  private Set<CodeReceived> deprecatedCodes = new HashSet<CodeReceived>();
   private Date vaccinationAdminDateEarliest = null;
   private Date vaccinationAdminDateLatest = null;
   private int numeratorVaccinationAdminDateAge = 0;
   private CompletenessScoring scoring = null;
-  private Map<VaccineCvx, Integer> vaccineCvxCounts = new HashMap<VaccineCvx, Integer>();
 
-  public int getVaccineCvxCount(VaccineCvx cvx)
+  public int getVaccineCvxCount(VaccineCvx vaccineCvx)
   {
-    Integer count = vaccineCvxCounts.get(cvx);
-    if (count == null)
+    BatchVaccineCvx batchVaccineCvx = messageBatch.getBatchVaccineCvxMap().get(vaccineCvx);
+    if (batchVaccineCvx == null)
     {
       return 0;
     }
-    return count;
-  }
-
-  public Set<VaccineCvx> getVaccineCvxReceived()
-  {
-    return vaccineCvxCounts.keySet();
+    return batchVaccineCvx.getReceivedCount();
   }
 
   public CompletenessScoring getCompletenessScoring()
@@ -79,6 +71,7 @@ public class MessageBatchManager
     messageBatch.setStartDate(new Date());
     messageBatch.setEndDate(new Date());
     messageBatch.setBatchType(batchType);
+    messageBatch.setProfile(profile);
     this.profile = profile;
   }
 
@@ -110,19 +103,10 @@ public class MessageBatchManager
     for (IssueFound issueFound : messageReceived.getIssuesFound())
     {
       messageBatch.incBatchIssueCount(issueFound.getIssue());
-      if (issueFound.getCodeReceived() != null && (issueFound.isError() || issueFound.isWarn()))
+      if (issueFound.getCodeReceived() != null)
       {
         CodeReceived codeReceived = issueFound.getCodeReceived();
-        if (codeReceived.getCodeStatus().isDeprecated())
-        {
-          deprecatedCodes.add(codeReceived);
-        } else if (codeReceived.getCodeStatus().isInvalid())
-        {
-          invalidCodes.add(codeReceived);
-        } else if (codeReceived.getCodeStatus().isUnrecognized())
-        {
-          unrecognizedCodes.add(codeReceived);
-        }
+        messageBatch.getBatchCodeReceived(codeReceived).incReceivedCount();
       }
     }
     messageBatch.incNextOfKinCount(messageReceived.getNextOfKins().size());
@@ -175,12 +159,7 @@ public class MessageBatchManager
         }
         if (vaccination.getVaccineCvx() != null)
         {
-          Integer count = vaccineCvxCounts.get(vaccination.getVaccineCvx());
-          if (count == null)
-          {
-            count = 0;
-          }
-          vaccineCvxCounts.put(vaccination.getVaccineCvx(), ++count);
+          messageBatch.getBatchVaccineCvx(vaccination.getVaccineCvx()).incReceivedCount();
         }
       } else
       {
@@ -279,14 +258,14 @@ public class MessageBatchManager
   {
     VaccineGroupManager vaccineGroupManager = VaccineGroupManager.getVaccineGroupManager();
     List<VaccineGroup> vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_EXPECTED);
-    int groupsCovered = 0;
+    int groupsExpected = 0;
     for (VaccineGroup vaccineGroup : vaccineGroupList)
     {
       for (VaccineCvx vaccineCvx : vaccineGroup.getVaccineCvxList())
       {
         if (getVaccineCvxCount(vaccineCvx) > 0)
         {
-          groupsCovered++;
+          groupsExpected++;
           break;
         }
       }
@@ -306,7 +285,7 @@ public class MessageBatchManager
       }
     }
 
-    double vaccinationGroupScore = denominator > 0 ? (groupsCovered - groupsNotExpected) / (float) denominator : 1.0;
+    double vaccinationGroupScore = denominator > 0 ? (groupsExpected - groupsNotExpected) / (float) denominator : 1.0;
     if (vaccinationGroupScore < 0)
     {
       vaccinationGroupScore = 0;
@@ -432,7 +411,7 @@ public class MessageBatchManager
         }
       }
     }
-    
+
     int denominator = messageBatch.getMessageCount() + messageBatch.getVaccinationCount();
     // If there are more than 10% errors then the score is 0.
     double denominatorScaled = 0.03 * denominator;
@@ -493,9 +472,19 @@ public class MessageBatchManager
     messageBatch.setTimelinessScore2Days((int) (100 * score2days + 0.5));
     messageBatch.setTimelinessScore7Days((int) (100 * score7days + 0.5));
     messageBatch.setTimelinessScore30Days((int) (100 * score30days + 0.5));
-    messageBatch.setTimelinessAverage(timelinessAverage);
-    messageBatch.setTimelinessDateFirst(vaccinationAdminDateEarliest);
-    messageBatch.setTimelinessDateLast(vaccinationAdminDateLatest);
+    // Set values if they have not already been set
+    if (messageBatch.getTimelinessAverage() == 0.0)
+    {
+      messageBatch.setTimelinessAverage(timelinessAverage);
+    }
+    if (messageBatch.getTimelinessDateFirst() == null)
+    {
+      messageBatch.setTimelinessDateFirst(vaccinationAdminDateEarliest);
+    }
+    if (messageBatch.getTimelinessDateLast() == null)
+    {
+      messageBatch.setTimelinessDateLast(vaccinationAdminDateLatest);
+    }
   }
 
   public void close()
@@ -520,17 +509,41 @@ public class MessageBatchManager
 
   public Set<CodeReceived> getInvalidCodes()
   {
-    return invalidCodes;
+    Set<CodeReceived> codes = new HashSet<CodeReceived>();
+    for (BatchCodeReceived batchCode : messageBatch.getBatchCodeReceivedMap().values())
+    {
+      if (batchCode.getCodeReceived().getCodeStatus().isInvalid())
+      {
+        codes.add(batchCode.getCodeReceived());
+      }
+    }
+    return codes;
   }
 
   public Set<CodeReceived> getUnrecognizedCodes()
   {
-    return unrecognizedCodes;
+    Set<CodeReceived> codes = new HashSet<CodeReceived>();
+    for (BatchCodeReceived batchCode : messageBatch.getBatchCodeReceivedMap().values())
+    {
+      if (batchCode.getCodeReceived().getCodeStatus().isUnrecognized())
+      {
+        codes.add(batchCode.getCodeReceived());
+      }
+    }
+    return codes;
   }
 
   public Set<CodeReceived> getDeprecatedCodes()
   {
-    return deprecatedCodes;
+    Set<CodeReceived> codes = new HashSet<CodeReceived>();
+    for (BatchCodeReceived batchCode : messageBatch.getBatchCodeReceivedMap().values())
+    {
+      if (batchCode.getCodeReceived().getCodeStatus().isDeprecated())
+      {
+        codes.add(batchCode.getCodeReceived());
+      }
+    }
+    return codes;
   }
 
 }

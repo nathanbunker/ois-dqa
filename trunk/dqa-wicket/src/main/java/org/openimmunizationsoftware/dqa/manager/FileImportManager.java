@@ -22,10 +22,15 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.Version;
+import org.openimmunizationsoftware.dqa.db.model.BatchActions;
+import org.openimmunizationsoftware.dqa.db.model.BatchCodeReceived;
+import org.openimmunizationsoftware.dqa.db.model.BatchIssues;
 import org.openimmunizationsoftware.dqa.db.model.BatchType;
+import org.openimmunizationsoftware.dqa.db.model.BatchVaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.IssueAction;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
+import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
 import org.openimmunizationsoftware.dqa.db.model.ReceiveQueue;
@@ -35,7 +40,7 @@ import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
 import org.openimmunizationsoftware.dqa.quality.QualityReport;
 import org.openimmunizationsoftware.dqa.validate.Validator;
 
-public class FileImportManager extends Thread
+public class FileImportManager extends ManagerThread
 {
   private static FileImportManager singleton = null;
 
@@ -47,13 +52,6 @@ public class FileImportManager extends Thread
       singleton.start();
     }
     return singleton;
-  }
-
-  private boolean keepRunning = true;
-
-  public boolean isKeepRunning()
-  {
-    return keepRunning;
   }
 
   private SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
@@ -70,23 +68,11 @@ public class FileImportManager extends Thread
   private PrintWriter reportOut;
   private PrintWriter errorsOut;
   private PrintWriter acceptedOut;
-  private Exception lastException = null;
-  private StringBuilder internalLog = new StringBuilder();
-  private String accessKey = null;
+  private String profileCode = null;
   private MessageBatchManager messageBatchManager = null;
 
-  public StringBuilder getInternalLog()
-  {
-    return internalLog;
-  }
-
-  public Exception getLastException()
-  {
-    return lastException;
-  }
-
   private FileImportManager() {
-    // Default
+    super("File Import Manager");
   }
 
   @Override
@@ -106,18 +92,19 @@ public class FileImportManager extends Thread
           File rootDir = new File(rootDirString);
           if (rootDir.exists() && rootDir.isDirectory())
           {
-            internalLog.append("Rood dir exists, begin processing\r");
+            internalLog.append("Root dir exists, begin processing\r");
             processDataDir(ksm, rootDir);
           } else
           {
             internalLog.append("Can't find root directory: " + rootDirString + "\r");
           }
         }
-      } catch (Exception e)
+      } catch (Throwable e)
       {
         e.printStackTrace();
         lastException = e;
       }
+      internalLog.append("Processing complete\r");
       try
       {
         synchronized (sdf)
@@ -151,10 +138,10 @@ public class FileImportManager extends Thread
       {
         internalLog.append(" PROCESSING \r");
         createProcessingDirs(ksm, dir);
-        accessKey = dir.getName();
+        profileCode = dir.getName();
         SessionFactory factory = OrganizationManager.getSessionFactory();
         Session session = factory.openSession();
-        findProfile(accessKey, session);
+        findProfile(profileCode, session);
         String[] filesToProcess = submitDir.list(new FilenameFilter() {
           public boolean accept(java.io.File dir, String name)
           {
@@ -236,11 +223,34 @@ public class FileImportManager extends Thread
       closeOutputs(acceptedOut);
     }
     in.close();
+    saveAndCloseBatch(session);
+    inFile.delete();
+  }
+
+  private void saveAndCloseBatch(Session session)
+  {
     messageBatchManager.close();
     Transaction tx = session.beginTransaction();
+    messageBatchManager.getMessageBatch().setSubmitStatus(SubmitStatus.QUEUED);
     session.save(messageBatchManager.getMessageBatch());
+    MessageBatch messageBatch = messageBatchManager.getMessageBatch();
+    for (BatchIssues batchIssues : messageBatch.getBatchIssuesMap().values())
+    {
+      session.save(batchIssues);
+    }
+    for (BatchActions batchActions : messageBatch.getBatchActionsMap().values())
+    {
+      session.save(batchActions);
+    }
+    for (BatchCodeReceived batchCodeReceived : messageBatch.getBatchCodeReceivedMap().values())
+    {
+      session.save(batchCodeReceived);
+    }
+    for (BatchVaccineCvx batchVaccineCvx : messageBatch.getBatchVaccineCvxMap().values())
+    {
+      session.save(batchVaccineCvx);
+    }
     tx.commit();
-    inFile.delete();
   }
 
   private void createMessageBatch(Session session)
@@ -334,7 +344,7 @@ public class FileImportManager extends Thread
         printLogDetails(message, messageReceived, errorsOut, true);
       }
       tx.commit();
-    } catch (Exception exception)
+    } catch (Throwable exception)
     {
       String ackMessage = "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r"
           + "MSA|AE|TODO|Exception occurred: " + exception.getMessage() + "|\r";
@@ -371,6 +381,7 @@ public class FileImportManager extends Thread
     receiveQueue.setMessageBatch(messageBatchManager.getMessageBatch());
     receiveQueue.setMessageReceived(messageReceived);
     receiveQueue.setSubmitStatus(messageReceived.hasErrors() ? SubmitStatus.EXCLUDED : SubmitStatus.QUEUED);
+    messageReceived.setSubmitStatus(receiveQueue.getSubmitStatus());
     session.save(receiveQueue);
   }
 
@@ -434,18 +445,18 @@ public class FileImportManager extends Thread
     }
   }
 
-  private void findProfile(String accessKey, Session session)
+  private void findProfile(String profileCode, Session session)
   {
     procLog("Looking for submitter profile");
-    Query query = session.createQuery("from SubmitterProfile where accessKey = ?");
-    query.setParameter(0, accessKey);
+    Query query = session.createQuery("from SubmitterProfile where profileCode = ?");
+    query.setParameter(0, profileCode);
     List<SubmitterProfile> submitterProfiles = query.list();
     if (submitterProfiles.size() == 0)
     {
       procLog("Submitter profile not found, creating new one");
       Transaction tx = session.beginTransaction();
       Organization organization = new Organization();
-      organization.setOrgLabel(accessKey);
+      organization.setOrgLabel(profileCode);
       organization.setParentOrganization((Organization) session.get(Organization.class, 1));
       profile = new SubmitterProfile();
       profile.setProfileLabel("HL7 File");
@@ -453,7 +464,8 @@ public class FileImportManager extends Thread
       profile.setOrganization(organization);
       profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
       profile.setTransferPriority(SubmitterProfile.TRANSFER_PRIORITY_NORMAL);
-      profile.setAccessKey(accessKey);
+      profile.setProfileCode(profileCode);
+      profile.generateAccessKey();
       session.save(organization);
       session.save(profile);
       organization.setPrimaryProfile(profile);
@@ -513,7 +525,7 @@ public class FileImportManager extends Thread
         // application
         // this should not happen, but if it is then this process will give it
         // at least
-        // and hour to complete. When the processing is complete the file is
+        // an hour to complete. When the processing is complete the file is
         // renamed to
         // processed.txt
         okayToProcess = false;

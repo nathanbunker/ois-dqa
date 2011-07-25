@@ -10,5 +10,6 @@
     <property name="orgLabel" column="org_label" type="string"/>
     <many-to-one name="parentOrganization" column="org_parent_id" class="Organization"/>
     <many-to-one name="primaryProfile" column="primary_profile_id" class="SubmitterProfile"/>
+    <property name="orgLocalCode" column="org_local_code" type="string"/>
   </class>
 </hibernate-mapping>

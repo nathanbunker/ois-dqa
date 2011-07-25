@@ -54,5 +54,6 @@
     <property name="raceCode" column="race_code" type="string"/>
     <property name="registryStatusCode" column="registry_status" type="string"/>
     <property name="sexCode" column="sex_code" type="string"/>
+    <property name="skipped" column="skipped" type="yes_no"/>
   </class>
 </hibernate-mapping>

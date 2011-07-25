@@ -10,6 +10,11 @@ public class BatchActions
   public BatchActions() {
     // default
   }
+  
+  public void inc(BatchActions batchActions)
+  {
+    this.actionCount += batchActions.getActionCount();
+  }
 
   public BatchActions(IssueAction issueAction, MessageBatch messageBatch) {
     this.messageBatch = messageBatch;

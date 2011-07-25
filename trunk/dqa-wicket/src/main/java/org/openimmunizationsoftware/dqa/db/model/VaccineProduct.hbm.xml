@@ -7,7 +7,7 @@
     </id>
     <property name="productName" column="product_name" type="string"/>
     <property name="productLabel" column="product_label" type="string"/>
-    <many-to-one name="cvx" column="cvx_code" class="VaccineCvx" lazy="false"/>
+    <many-to-one name="cvx" column="cvx_id" class="VaccineCvx" lazy="false"/>
     <many-to-one name="mvx" column="mvx_code" class="VaccineMvx" lazy="false"/>
     <property name="validStartDate" column="valid_start_date" type="date"/>
     <property name="useStartDate" column="use_start_date" type="date"/>

@@ -2,13 +2,17 @@ package org.openimmunizationsoftware.dqa.db.model;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class MessageBatch
 {
   private Map<IssueAction, BatchActions> batchActionsMap = new HashMap<IssueAction, BatchActions>();
   private int batchId = 0;
   private Map<PotentialIssue, BatchIssues> batchIssuesMap = new HashMap<PotentialIssue, BatchIssues>();
+  private Map<CodeReceived, BatchCodeReceived> batchCodeReceivedMap = new HashMap<CodeReceived, BatchCodeReceived>();
+  private Map<VaccineCvx, BatchVaccineCvx> batchVaccineCvxMap = new HashMap<VaccineCvx, BatchVaccineCvx>();
   private String batchTitle = "";
   private BatchType batchType = null;
   private int completenessPatientScore = 0;
@@ -22,8 +26,9 @@ public class MessageBatch
   private int overallScore = 0;
   private int patientCount = 0;
   private int patientUnderageCount = 0;
-  private int qualityScore = 0;
+  private SubmitterProfile profile = null;
   private int qualityErrorScore = 0;
+  private int qualityScore = 0;
   private int qualityWarnScore = 0;
   private Date startDate = null;
   private SubmitStatus submitStatus = null;
@@ -41,6 +46,70 @@ public class MessageBatch
   private int vaccinationDeleteCount = 0;
   private int vaccinationHistoricalCount = 0;
   private int vaccinationNotAdministeredCount = 0;
+
+  public void addToCounts(MessageBatch messageBatch)
+  {
+    // private Map<IssueAction, BatchActions> batchActionsMap = new
+    // HashMap<IssueAction, BatchActions>();
+    // private Map<PotentialIssue, BatchIssues> batchIssuesMap = new
+    // HashMap<PotentialIssue, BatchIssues>();
+
+    messageCount += messageBatch.getMessageCount();
+    messageWithAdminCount += messageBatch.getMessageWithAdminCount();
+    nextOfKinCount += messageBatch.getNextOfKinCount();
+    patientCount += messageBatch.getPatientCount();
+    patientUnderageCount += messageBatch.getPatientUnderageCount();
+    double a1 = this.getMessageWithAdminCount();
+    double a2 = messageBatch.getMessageWithAdminCount();
+    double s1 = this.getTimelinessAverage();
+    double s2 = messageBatch.getTimelinessAverage();
+    if ((a1 + a2) == 0)
+    {
+      timelinessAverage = 0.0;
+    } else
+    {
+      timelinessAverage = (a1 * s1 + s2 * a2) / (a1 + a2);
+    }
+    timelinessCount2Days += messageBatch.getTimelinessCount2Days();
+    timelinessCount30Days += messageBatch.getTimelinessCount30Days();
+    timelinessCount7Days += messageBatch.getTimelinessCount7Days();
+    timelinessDateFirst = min(timelinessDateFirst, messageBatch.getTimelinessDateFirst());
+    timelinessDateLast = max(timelinessDateLast, messageBatch.getTimelinessDateLast());
+    vaccinationAdministeredCount += messageBatch.getVaccinationAdministeredCount();
+    vaccinationDeleteCount += messageBatch.getVaccinationDeleteCount();
+    vaccinationHistoricalCount += messageBatch.getVaccinationHistoricalCount();
+    vaccinationNotAdministeredCount += messageBatch.getVaccinationNotAdministeredCount();
+  }
+
+  private static Date min(Date d1, Date d2)
+  {
+    if (d1 == null)
+    {
+      return d2;
+    } else if (d2 == null)
+    {
+      return d1;
+    } else if (d1.before(d2))
+    {
+      return d1;
+    }
+    return d2;
+  }
+
+  private static Date max(Date d1, Date d2)
+  {
+    if (d1 == null)
+    {
+      return d2;
+    } else if (d2 == null)
+    {
+      return d1;
+    } else if (d1.after(d2))
+    {
+      return d1;
+    }
+    return d2;
+  }
 
   public BatchActions getBatchActions(IssueAction issueAction)
   {
@@ -78,7 +147,38 @@ public class MessageBatch
   {
     return batchIssuesMap;
   }
+  
+  public Map<CodeReceived, BatchCodeReceived> getBatchCodeReceivedMap()
+  {
+    return batchCodeReceivedMap;
+  }
+  
+  public Map<VaccineCvx, BatchVaccineCvx> getBatchVaccineCvxMap()
+  {
+    return batchVaccineCvxMap;
+  }
+  
+  public BatchCodeReceived getBatchCodeReceived(CodeReceived codeReceived)
+  {
+    BatchCodeReceived batchCodeReceived = batchCodeReceivedMap.get(codeReceived);
+    if (batchCodeReceived == null)
+    {
+      batchCodeReceived = new BatchCodeReceived(codeReceived, this);
+      batchCodeReceivedMap.put(codeReceived, batchCodeReceived);
+    }
+    return batchCodeReceived;
+  }
 
+  public BatchVaccineCvx getBatchVaccineCvx(VaccineCvx vaccineCvx)
+  {
+    BatchVaccineCvx batchVaccineCvx = batchVaccineCvxMap.get(vaccineCvx);
+    if (batchVaccineCvx == null)
+    {
+      batchVaccineCvx = new BatchVaccineCvx(vaccineCvx, this);
+      batchVaccineCvxMap.put(vaccineCvx, batchVaccineCvx);
+    }
+    return batchVaccineCvx;
+  }
   public String getBatchTitle()
   {
     return batchTitle;
@@ -144,9 +244,24 @@ public class MessageBatch
     return patientUnderageCount;
   }
 
+  public SubmitterProfile getProfile()
+  {
+    return profile;
+  }
+
+  public int getQualityErrorScore()
+  {
+    return qualityErrorScore;
+  }
+
   public int getQualityScore()
   {
     return qualityScore;
+  }
+
+  public int getQualityWarnScore()
+  {
+    return qualityWarnScore;
   }
 
   public Date getStartDate()
@@ -386,9 +501,24 @@ public class MessageBatch
     this.patientUnderageCount = patientUnderageCount;
   }
 
+  public void setProfile(SubmitterProfile profile)
+  {
+    this.profile = profile;
+  }
+
+  public void setQualityErrorScore(int qualityErrorScore)
+  {
+    this.qualityErrorScore = qualityErrorScore;
+  }
+
   public void setQualityScore(int qualityScore)
   {
     this.qualityScore = qualityScore;
+  }
+
+  public void setQualityWarnScore(int qualityWarnScore)
+  {
+    this.qualityWarnScore = qualityWarnScore;
   }
 
   public void setStartDate(Date startDate)
@@ -469,26 +599,6 @@ public class MessageBatch
   public void setVaccinationNotAdministeredCount(int vaccinationNotAdministeredCount)
   {
     this.vaccinationNotAdministeredCount = vaccinationNotAdministeredCount;
-  }
-
-  public int getQualityErrorScore()
-  {
-    return qualityErrorScore;
-  }
-
-  public void setQualityErrorScore(int qualityErrorScore)
-  {
-    this.qualityErrorScore = qualityErrorScore;
-  }
-
-  public int getQualityWarnScore()
-  {
-    return qualityWarnScore;
-  }
-
-  public void setQualityWarnScore(int qualityWarnScore)
-  {
-    this.qualityWarnScore = qualityWarnScore;
   }
 
 }

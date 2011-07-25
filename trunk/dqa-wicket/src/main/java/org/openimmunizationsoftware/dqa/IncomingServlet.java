@@ -11,20 +11,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.ietf.jgss.MessageProp;
+import org.openimmunizationsoftware.dqa.db.model.BatchActions;
+import org.openimmunizationsoftware.dqa.db.model.BatchCodeReceived;
+import org.openimmunizationsoftware.dqa.db.model.BatchIssues;
 import org.openimmunizationsoftware.dqa.db.model.BatchType;
+import org.openimmunizationsoftware.dqa.db.model.BatchVaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.IssueAction;
@@ -32,19 +34,26 @@ import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
+import org.openimmunizationsoftware.dqa.db.model.SubmitStatus;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
-import org.openimmunizationsoftware.dqa.manager.MessageBatchManager;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 import org.openimmunizationsoftware.dqa.manager.FileImportManager;
+import org.openimmunizationsoftware.dqa.manager.ManagerThread;
+import org.openimmunizationsoftware.dqa.manager.MessageBatchManager;
 import org.openimmunizationsoftware.dqa.manager.MessageReceivedManager;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
+import org.openimmunizationsoftware.dqa.manager.WeeklyBatchManager;
+import org.openimmunizationsoftware.dqa.manager.WeeklyExportManager;
 import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
 import org.openimmunizationsoftware.dqa.validate.Validator;
 
 public class IncomingServlet extends HttpServlet
 {
 
-  private FileImportManager fileImportManager = null;
+  private static FileImportManager fileImportManager = null;
+  private static WeeklyBatchManager weeklyBatchManager = null;
+  private static WeeklyExportManager weeklyExportManager = null;
+
   private PrintWriter out = null;
   private MessageBatchManager messageBatchManager = null;
 
@@ -52,8 +61,9 @@ public class IncomingServlet extends HttpServlet
   public void init() throws ServletException
   {
     fileImportManager = FileImportManager.getFileImportManager();
+    weeklyBatchManager = WeeklyBatchManager.getWeeklyBatchManager();
+    weeklyExportManager = WeeklyExportManager.getWeeklyExportManager();
   }
- 
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -93,48 +103,73 @@ public class IncomingServlet extends HttpServlet
     out.println("    </form>");
     out.println("    ");
 
-    if (fileImportManager.isKeepRunning())
-    {
-      out.println("      <p>File import manager is running.<p>");
-    }
-    if (fileImportManager.getLastException() != null)
-    {
-      out.println("      <p>Last Exception</p>");
-      out.println("<pre>");
-      fileImportManager.getLastException().printStackTrace(out);
-      out.println("</pre>");
-    }
-    out.println("      <p>Internal Log</p>");
-    out.println("<pre>");
-    out.print(fileImportManager.getInternalLog());
-    out.println("</pre>");
+    printManagerThread(fileImportManager);
+    printManagerThread(weeklyBatchManager);
+    printManagerThread(weeklyExportManager);
+    out.println("    <hr>");
+    out.println("    <p>Version 0.5</p>");
     out.println("  </body>");
     out.println("</html>");
     out.close();
     out = null;
   }
 
+  private void printManagerThread(ManagerThread mt)
+  {
+    if (mt.isKeepRunning())
+    {
+      out.println("      <p>" + mt.getLabel() + " is running.<p>");
+    }
+    if (mt.getLastException() != null)
+    {
+      out.println("      <p>Last Exception</p>");
+      out.println("<pre>");
+      mt.getLastException().printStackTrace(out);
+      out.println("</pre>");
+    }
+    out.println("      <p>Internal Log</p>");
+    out.println("<pre>");
+    out.print(mt.getInternalLog());
+    out.println("</pre>");
+  }
+
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
-    // String userid = req.getParameter("USERID");
-    // String password = req.getParameter("PASSWORD");
-    String facilityid = req.getParameter("FACILITYID");
+    String profileCode = req.getParameter("USERID");
+    String accessKey = req.getParameter("PASSWORD");
+    String profileId = req.getParameter("FACILITYID");
     boolean debug = req.getParameter("DEBUG") != null;
     resp.setContentType("text/plain");
     out = new PrintWriter(resp.getOutputStream());
 
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
-    if (facilityid == null || facilityid.equals(""))
+    if (profileId == null || profileId.equals(""))
     {
-      facilityid = "1";
+      profileId = "1";
     }
-    Organization organization = (Organization) session.get(Organization.class, Integer.parseInt(facilityid));
-    SubmitterProfile profile = organization.getPrimaryProfile();
-
-    String messageData = req.getParameter("MESSAGEDATA");
-    processStream(debug, session, profile, messageData);
+    SubmitterProfile profile = null;
+    String accessDenied = null;
+    Query query = session.createQuery("from SubmitterProfile where profileCode = ? and accessKey = ?");
+    query.setParameter(0, profileCode);
+    query.setParameter(1, accessKey);
+    List<SubmitterProfile> submitterProfiles = query.list();
+    if (submitterProfiles.size() == 0)
+    {
+      accessDenied = "Authorization failed, invalid USERID or PASSWORD";
+    } else
+    {
+      profile = submitterProfiles.get(0);
+    }
+    if (accessDenied == null)
+    {
+      String messageData = req.getParameter("MESSAGEDATA");
+      processStream(debug, session, profile, messageData);
+    } else
+    {
+      out.println(accessDenied);
+    }
     if (debug)
     {
       printMessageBatch();
@@ -256,6 +291,32 @@ public class IncomingServlet extends HttpServlet
     session.save(messageBatchManager.getMessageBatch());
     tx.commit();
   }
+  
+  private void saveAndCloseBatch(Session session)
+  {
+    messageBatchManager.close();
+    messageBatchManager.getMessageBatch().setSubmitStatus(SubmitStatus.QUEUED);
+    session.save(messageBatchManager.getMessageBatch());
+    MessageBatch messageBatch = messageBatchManager.getMessageBatch();
+    for (BatchIssues batchIssues : messageBatch.getBatchIssuesMap().values())
+    {
+      session.save(batchIssues);
+    }
+    for (BatchActions batchActions : messageBatch.getBatchActionsMap().values())
+    {
+      session.save(batchActions);
+    }
+    for (BatchCodeReceived batchCodeReceived : messageBatch.getBatchCodeReceivedMap().values())
+    {
+      session.save(batchCodeReceived);
+    }
+    for (BatchVaccineCvx batchVaccineCvx : messageBatch.getBatchVaccineCvxMap().values())
+    {
+      session.save(batchVaccineCvx);
+    }
+  }
+
+
 
   private void processMessage(VaccinationUpdateParserHL7 parser, StringBuilder sb, boolean debug,
       SubmitterProfile profile, Session session)

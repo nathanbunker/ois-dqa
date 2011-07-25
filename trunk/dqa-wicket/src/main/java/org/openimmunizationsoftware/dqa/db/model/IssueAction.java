@@ -72,4 +72,10 @@ public class IssueAction
     }
     return toString().equals(obj.toString());
   }
+  
+  @Override
+  public int hashCode()
+  {
+    return actionCode.hashCode();
+  }
 }

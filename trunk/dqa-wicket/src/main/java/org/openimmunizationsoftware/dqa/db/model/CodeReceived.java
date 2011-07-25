@@ -16,6 +16,13 @@ public class CodeReceived
     // default
   }
   
+  public CodeReceived(SubmitterProfile profile, CodeTable table, String receivedValue)
+  {
+    this.profile = profile;
+    this.table = table;
+    this.receivedValue = receivedValue;
+  }
+  
   public CodeReceived(CodeReceived parent, SubmitterProfile profile, String codeLabel)
   {
     this.profile = profile;
@@ -97,5 +104,29 @@ public class CodeReceived
   public void incReceivedCount()
   {
     this.receivedCount++;
+  }
+  
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof CodeReceived)
+    {
+      CodeReceived compareTo = (CodeReceived) obj;
+      if (profile != null && table != null & receivedValue != null)
+      {
+        return profile.equals(compareTo.getProfile()) && table.equals(compareTo.getTable()) && receivedValue.equals(compareTo.getReceivedValue());        
+      }
+    }
+    return super.equals(obj);
+  }
+  
+  @Override
+  public int hashCode()
+  {
+    if (profile != null && table != null & receivedValue != null)
+    {
+      return (profile.getProfileId() + "." + table.getTableId() + "." + receivedValue).hashCode();
+    }
+    return super.hashCode();
   }
 }
