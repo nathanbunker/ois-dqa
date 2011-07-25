@@ -7,7 +7,7 @@
         <param name="sequence">dqa_cvx_group_id_sequence</param>
       </generator>
     </id>
-    <many-to-one name="vaccineCvx" column="cvx_code" class="VaccineCvx" lazy="false"/>
+    <many-to-one name="vaccineCvx" column="cvx_id" class="VaccineCvx" lazy="false"/>
     <many-to-one name="vaccineGroup" column="group_id" class="VaccineGroup" lazy="false"/>
   </class>
 </hibernate-mapping>

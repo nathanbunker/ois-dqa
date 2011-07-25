@@ -13,6 +13,12 @@ public class BatchIssues
     // default
   }
   
+  public void inc(BatchIssues batchIssues)
+  {
+    this.issueCountPos += batchIssues.getIssueCountPos();
+    this.issueCountNeg += batchIssues.getIssueCountNeg();
+  }
+  
   public BatchIssues(PotentialIssue issue, MessageBatch messageBatch)
   {
     this.issue = issue;

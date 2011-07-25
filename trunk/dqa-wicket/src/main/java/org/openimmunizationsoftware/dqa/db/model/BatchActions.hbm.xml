@@ -3,10 +3,12 @@
 <hibernate-mapping package="org.openimmunizationsoftware.dqa.db.model">
   <class name="BatchActions" table="dqa_batch_actions">
     <id name="batchActionsId" column="batch_actions_id">
-      <generator class="native"/>
+      <generator class="native">
+        <param name="sequence">dqa_batch_action_sequence</param>
+      </generator>
     </id>
     <many-to-one name="messageBatch" column="batch_id" class="MessageBatch"/>
-    <many-to-one name="issueAction" column="issue_id" class="IssueAction"/>
+    <many-to-one name="issueAction" column="action_code" class="IssueAction"/>
     <property name="actionCount" column="action_count" type="integer"/>
   </class>
 </hibernate-mapping>

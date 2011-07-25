@@ -244,7 +244,14 @@ public class Validator extends ValidateMessage
     }
     if (cvxCode != null && !cvxCode.equals(""))
     {
-      vaccineCvx = (VaccineCvx) session.get(VaccineCvx.class, cvxCode);
+      try
+      {
+        int cvxId = Integer.parseInt(cvxCode);
+        vaccineCvx = (VaccineCvx) session.get(VaccineCvx.class, cvxId);
+      } catch (NumberFormatException nfe)
+      {
+        // ignore
+      }
     }
     if (vaccineCvx == null && vaccineCpt != null)
     {

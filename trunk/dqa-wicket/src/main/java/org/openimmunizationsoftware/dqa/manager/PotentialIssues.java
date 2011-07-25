@@ -1,11 +1,13 @@
 package org.openimmunizationsoftware.dqa.manager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.mapping.Array;
 import org.openimmunizationsoftware.dqa.InitializationException;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 
@@ -411,6 +413,12 @@ public class PotentialIssues
   }
 
   private HashMap<Field, HashMap<String, PotentialIssue>> fieldIssueMaps = new HashMap<PotentialIssues.Field, HashMap<String, PotentialIssue>>();
+  private List<PotentialIssue> allPotentialIssues = new ArrayList<PotentialIssue>();
+  
+  public List<PotentialIssue> getAllPotentialIssues()
+  {
+    return allPotentialIssues;
+  }
 
   private void addToFieldIssueMap(Field field, PotentialIssue issue)
   {
@@ -1219,6 +1227,7 @@ public class PotentialIssues
           + fieldValue + " not found");
     }
     pi = potentialIssues.get(0);
+    allPotentialIssues.add(pi);
     return pi;
   }
 

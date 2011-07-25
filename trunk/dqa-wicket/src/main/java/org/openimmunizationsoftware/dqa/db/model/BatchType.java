@@ -11,12 +11,12 @@ public class BatchType
   private String typeCode = "";
   private String typeLabel = "";
   
-  private BatchType()
+  public BatchType()
   {
     // default
   }
   
-  private BatchType(String typeCode, String typeLabel)
+  public BatchType(String typeCode, String typeLabel)
   {
     this.typeCode = typeCode;
     this.typeLabel = typeLabel;

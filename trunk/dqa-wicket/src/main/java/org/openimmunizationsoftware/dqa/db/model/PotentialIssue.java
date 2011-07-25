@@ -156,4 +156,21 @@ public class PotentialIssue
   {
     this.targetObject = targetObject;
   }
+  
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof PotentialIssue)
+    {
+      return issueId == ((PotentialIssue) obj).getIssueId();
+    }
+    return super.equals(obj);
+  }
+  
+  @Override
+  public int hashCode()
+  {
+    return issueId;
+  }
+  
 }

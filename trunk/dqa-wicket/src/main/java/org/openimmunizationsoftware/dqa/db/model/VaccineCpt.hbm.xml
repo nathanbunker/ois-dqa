@@ -11,6 +11,6 @@
     <property name="useStartDate" column="use_start_date" type="date"/>
     <property name="useEndDate" column="use_end_date" type="date"/>
     <property name="validEndDate" column="valid_end_date" type="date"/>
-    <many-to-one name="cvx" column="cvx_code" class="VaccineCvx" lazy="false"/>
+    <many-to-one name="cvx" column="cvx_id" class="VaccineCvx" lazy="false"/>
   </class>
 </hibernate-mapping>

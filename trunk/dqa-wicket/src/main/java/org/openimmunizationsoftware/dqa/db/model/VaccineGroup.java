@@ -8,6 +8,7 @@ import org.openimmunizationsoftware.dqa.quality.ToolTip;
 public class VaccineGroup
 {
   public static final String GROUP_STATUS_EXPECTED = "Expected";
+  public static final String GROUP_STATUS_RECCOMMENDED = "Recommended";
   public static final String GROUP_STATUS_NOT_EXPECTED = "Not Expected";
   public static final String GROUP_STATUS_OPTIONAL = "Optional";
 
@@ -75,5 +76,21 @@ public class VaccineGroup
   public void setToolTip(ToolTip toolTip)
   {
     this.toolTip = toolTip;
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof VaccineGroup)
+    {
+      return ((VaccineGroup) obj).getGroupId() == groupId;
+    }
+    return super.equals(obj);
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return groupId;
   }
 }

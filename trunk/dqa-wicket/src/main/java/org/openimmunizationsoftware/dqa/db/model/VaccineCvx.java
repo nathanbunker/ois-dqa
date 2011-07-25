@@ -12,6 +12,7 @@ public class VaccineCvx
   public static final String CONCEPT_TYPE_VACCINE = "vaccine";
   public static final String CONCEPT_TYPE_UNSPECIFIED = "unspecified";
   
+  private int cvxId = 0;
   private String cvxCode = "";
   private String cvxLabel = "";
   private Date validStartDate = null;
@@ -111,4 +112,13 @@ public class VaccineCvx
     return cvxCode.hashCode();
   }
   
+  public int getCvxId()
+  {
+    return cvxId;
+  }
+  public void setCvxId(int cvxId)
+  {
+    this.cvxId = cvxId;
+  }
+
 }

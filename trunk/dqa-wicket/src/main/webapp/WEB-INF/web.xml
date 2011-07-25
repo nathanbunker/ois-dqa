@@ -24,6 +24,10 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
+	<servlet>
+		<servlet-name>TestServlet</servlet-name>
+		<servlet-class>org.openimmunizationsoftware.dqa.TestServlet</servlet-class>
+	</servlet>
 	<!-- 
     
   <servlet>
@@ -89,6 +93,10 @@
 	<servlet-mapping>
 		<servlet-name>InServlet</servlet-name>
 		<url-pattern>/in</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>TestServlet</servlet-name>
+		<url-pattern>/test</url-pattern>
 	</servlet-mapping>
 	
 

@@ -23,6 +23,11 @@ public class MessageReceived
   private List<Vaccination> vaccinations = new ArrayList<Vaccination>();
   private List<IssueFound> issuesFound = new ArrayList<IssueFound>();
   
+  public void setIssuesFound(List<IssueFound> issuesFound)
+  {
+    this.issuesFound = issuesFound;
+  }
+
   public List<IssueFound> getIssuesFound()
   {
     return issuesFound;
