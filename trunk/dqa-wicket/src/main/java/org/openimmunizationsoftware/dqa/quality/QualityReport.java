@@ -24,6 +24,8 @@ import org.openimmunizationsoftware.dqa.manager.VaccineGroupManager;
 
 public class QualityReport
 {
+  private static final boolean SCORE_TIMELINESS_2_DAYS = false;
+  
   private static final ToolTip RECEIVED_PATIENTS = new ToolTip("Patients",
       "The number of patients sent, one per message").setEmphasize(true);
   private static final ToolTip RECEIVED_NEXT_OF_KINS = new ToolTip("Next-of-Kins",
@@ -255,8 +257,8 @@ public class QualityReport
     out.println("    <br>");
 
     out.println("    <h3><a name=\"completeness.vaccination\">Vaccination</h3>");
-    printCompletenessScoring("Vaccination", "#completeness.vaccination", vaccinationRequired, vaccinationExpected, vaccinationRecommended,
-        messageBatch.getCompletenessVaccinationScore(), 0.2);
+    printCompletenessScoring("Vaccination", "#completeness.vaccination", vaccinationRequired, vaccinationExpected,
+        vaccinationRecommended, messageBatch.getCompletenessVaccinationScore(), 0.2);
     out.println("    <br>");
     printCompleteness(vaccinationRequired, "completeness.vaccination.required", "Required", 0.2 * 0.5);
     out.println("    <br>");
@@ -392,8 +394,8 @@ public class QualityReport
     }
   }
 
-  private void printCompletenessScoring(String label, String link, ScoringSet required, ScoringSet expected, ScoringSet recommended,
-      int score, double weightFactor)
+  private void printCompletenessScoring(String label, String link, ScoringSet required, ScoringSet expected,
+      ScoringSet recommended, int score, double weightFactor)
   {
     out.println("    <table width=\"350\">");
     out.println("      <tr>");
@@ -419,7 +421,8 @@ public class QualityReport
     int score = (int) (100 * ss.getScore() + 0.5);
     boolean showRed = score < 70;
     out.println("      <tr>");
-    out.println("        <td align=\"left\"" + (showRed ? " class=\"alert\"" : "") + "><a href=\"" + link + "\">" + label + "</a></td>");
+    out.println("        <td align=\"left\"" + (showRed ? " class=\"alert\"" : "") + "><a href=\"" + link + "\">"
+        + label + "</a></td>");
     out.println("        <td align=\"center\"" + (showRed ? " class=\"alert\"" : "") + ">" + score + "</td>");
     out.println("        <td align=\"center\"" + (showRed ? " class=\"alert\"" : "") + ">" + getScoreDescription(score)
         + "</td>");
@@ -505,8 +508,11 @@ public class QualityReport
     printScoreOverall(SCORE_QUALITY_SCORE_WARNINGS, messageBatch.getQualityWarnScore(), "20%");
     printScoreOverall(SCORE_TIMELINESS, messageBatch.getTimelinessScore(), "10%");
     printScoreOverall(SCORE_TIMELINESS_SCORE_30_DAYS, messageBatch.getTimelinessScore30Days(), "6%");
-    printScoreOverall(SCORE_TIMELINESS_SCORE_7_DAYS, messageBatch.getTimelinessScore7Days(), "3%");
-    printScoreOverall(SCORE_TIMELINESS_SCORE_2_DAYS, messageBatch.getTimelinessScore2Days(), "1%");
+    printScoreOverall(SCORE_TIMELINESS_SCORE_7_DAYS, messageBatch.getTimelinessScore7Days(), "4%");
+    if (SCORE_TIMELINESS_2_DAYS)
+    {
+      printScoreOverall(SCORE_TIMELINESS_SCORE_2_DAYS, messageBatch.getTimelinessScore2Days(), "1%");
+    }
     out.println("    </table>");
   }
 
@@ -660,8 +666,11 @@ public class QualityReport
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
     printScore(TIMELINESS_SCORE_30_DAYS, messageBatch.getTimelinessScore30Days(), "6%");
-    printScore(TIMELINESS_SCORE_7_DAYS, messageBatch.getTimelinessScore7Days(), "3%");
-    printScore(TIMELINESS_SCORE_2_DAYS, messageBatch.getTimelinessScore2Days(), "1%");
+    printScore(TIMELINESS_SCORE_7_DAYS, messageBatch.getTimelinessScore7Days(), "4%");
+    if (SCORE_TIMELINESS_2_DAYS)
+    {
+      printScore(TIMELINESS_SCORE_2_DAYS, messageBatch.getTimelinessScore2Days(), "1%");
+    }
     out.println("    </table>");
     out.println("    <br>");
     out.println("    <table width=\"350\">");

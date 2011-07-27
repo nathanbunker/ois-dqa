@@ -12,3 +12,4 @@ delete from dqa_issue_found;
 delete from dqa_message_received;
 delete from dqa_potential_issue_status;
 commit;
+

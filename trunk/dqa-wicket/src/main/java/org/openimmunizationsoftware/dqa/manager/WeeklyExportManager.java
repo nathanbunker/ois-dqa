@@ -4,12 +4,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -28,6 +34,7 @@ import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 public class WeeklyExportManager extends ManagerThread
 {
 
+  private static final boolean EXPORT_UNIQUE = true;
   private static WeeklyExportManager singleton = null;
 
   public static WeeklyExportManager getWeeklyExportManager()
@@ -101,7 +108,7 @@ public class WeeklyExportManager extends ManagerThread
   @Override
   public void runNow(Date now) throws IOException
   {
-    internalLog.append("Running now\n");
+    internalLog.append("Running now " + sdf.format(new Date()) + " \n");
     Calendar cal = Calendar.getInstance();
     cal.setTime(now);
     int today = cal.get(Calendar.DAY_OF_WEEK);
@@ -130,7 +137,7 @@ public class WeeklyExportManager extends ManagerThread
 
   private void export(String transferPriority) throws IOException
   {
-    internalLog.append("Exporting profiles with " + transferPriority + " priority\n");
+    internalLog.append("Exporting profiles with " + transferPriority + " priority \n");
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
     Query query = session.createQuery("from SubmitterProfile where profileStatus = ? and transferPriority = ?");
@@ -141,24 +148,128 @@ public class WeeklyExportManager extends ManagerThread
     {
       internalLog.append("Looking for exports under profile " + profile.getProfileCode() + "\n");
       Transaction tx = session.beginTransaction();
-      query = session.createQuery("from MessageBatch where submitStatus = ? and profile = ? order by endDate");
-      query.setParameter(0, SubmitStatus.PREPARED);
-      query.setParameter(1, profile);
-      List<MessageBatch> messageBatches = query.list();
-      for (MessageBatch messageBatch : messageBatches)
+      if (EXPORT_UNIQUE)
       {
-        openOutputFile(profile, messageBatch.getEndDate());
-        export(messageBatch, profile, session);
-        out.close();
+        exportUnique(session, profile);
+      } else
+      {
+        exportSubmissionOrder(session, profile);
       }
       tx.commit();
     }
     session.close();
   }
 
+  private void exportUnique(Session session, SubmitterProfile profile) throws IOException
+  {
+    internalLog.append("Looking for exports from profile " + profile.getProfileCode() + " \n");
+    ConstructerInterface constructor = ConstructFactory.getConstructer(profile);
+    // Find profile to export
+    Query query = session.createQuery("from MessageBatch where profile = ? and submitStatus = ?");
+    query.setParameter(0, profile);
+    query.setParameter(1, SubmitStatus.PREPARED);
+    List<MessageBatch> messageBatchList = query.list();
+    for (MessageBatch messageBatch : messageBatchList)
+    {
+      internalLog.append(" +  Exporting batch for week ending " + sdf.format(messageBatch.getEndDate()) + " \n");
+      openOutputFile(profile, messageBatch.getEndDate());
+      MessageReceived currMr = null;
+      SQLQuery sqlQuery = session
+          .createSQLQuery("select rq.receive_queue_id " +
+          		"from dqa_receive_queue rq, dqa_patient pat, dqa_message_received mr " +
+          		"where rq.received_id = pat.received_id " +
+          		"  and rq.submit_code = 'P' " +
+          		"  and batch_id = ? " +
+          		"  and rq.received_id = mr.received_id " +
+          		"order by pat.name_last, pat.name_first, pat.name_middle, pat.id_submitter_number, mr.received_date");
+      sqlQuery.setParameter(0, messageBatch.getBatchId());
+      List<BigDecimal> receiveQueueIds = sqlQuery.list();
+      ReceiveQueue receiveQueue = null;
+      for (BigDecimal receiveQueueId : receiveQueueIds)
+      {
+        receiveQueue = (ReceiveQueue) session.get(ReceiveQueue.class, receiveQueueId.intValue());
+        MessageReceived nextMr = receiveQueue.getMessageReceived();
+        populate(session, receiveQueue, nextMr);
+        if (currMr == null)
+        {
+          currMr = nextMr;
+        } else
+        {
+          Patient nextPatient = nextMr.getPatient();
+          Patient currPatient = currMr.getPatient();
+          if (nextPatient.getIdSubmitterNumber().equals(currPatient.getIdSubmitterNumber()))
+          {
+            currMr.setPatient(nextPatient);
+            currMr.setNextOfKins(nextMr.getNextOfKins());
+            for (String id : nextMr.getVaccinationMap().keySet())
+            {
+              currMr.getVaccinationMap().put(id, nextMr.getVaccinationMap().get(id));
+            }
+          } else
+          {
+            currMr.setVaccinations(getAndSortVaccinations(currMr));
+            out.print(constructor.constructMessage(currMr));
+            currMr = nextMr;
+          }
+          receiveQueue.setSubmitStatus(SubmitStatus.SUBMITTED);
+          nextMr.setSubmitStatus(SubmitStatus.SUBMITTED);
+        }
+      }
+      if (currMr != null)
+      {
+        if (!receiveQueue.getSubmitStatus().isExcluded())
+        {
+          currMr.setVaccinations(getAndSortVaccinations(currMr));
+          out.print(constructor.constructMessage(currMr));
+        }
+      }
+      out.close();
+    }
+  }
+
+  private List<Vaccination> getAndSortVaccinations(MessageReceived currMr)
+  {
+    List<Vaccination> vaccinations = new ArrayList<Vaccination>(currMr.getVaccinationMap().values());
+    Collections.sort(vaccinations, new Comparator<Vaccination>() {
+      public int compare(Vaccination o1, Vaccination o2)
+      {
+        if (o1.getAdminDate() == null && o2.getAdminDate() == null)
+        {
+          return 0;
+        } else if (o1.getAdminDate() == null)
+        {
+          return 1;
+        } else if (o2.getAdminDate() == null)
+        {
+          return -1;
+        } else
+        {
+          return o1.getAdminDate().compareTo(o2.getAdminDate());
+        }
+      }
+    });
+    return vaccinations;
+  }
+
+  private void exportSubmissionOrder(Session session, SubmitterProfile profile) throws IOException
+  {
+    Query query;
+    query = session.createQuery("from MessageBatch where submitStatus = ? and profile = ? order by endDate");
+    query.setParameter(0, SubmitStatus.PREPARED);
+    query.setParameter(1, profile);
+    List<MessageBatch> messageBatches = query.list();
+    for (MessageBatch messageBatch : messageBatches)
+    {
+      openOutputFile(profile, messageBatch.getEndDate());
+      export(messageBatch, profile, session);
+      out.close();
+    }
+  }
+
   private void export(MessageBatch messageBatch, SubmitterProfile profile, Session session)
   {
     internalLog.append(" + " + messageBatch.getEndDate() + "\n");
+    ConstructerInterface constructor = ConstructFactory.getConstructer(profile);
     Query query = session.createQuery("from ReceiveQueue where messageBatch = ? and submitStatus = ?");
     query.setParameter(0, messageBatch);
     query.setParameter(1, SubmitStatus.PREPARED);
@@ -167,30 +278,51 @@ public class WeeklyExportManager extends ManagerThread
     for (ReceiveQueue receiveQueue : receiveQueues)
     {
       MessageReceived messageReceived = receiveQueue.getMessageReceived();
-      query = session.createQuery("from Patient where messageReceived = ?");
-      query.setParameter(0, messageReceived);
-      List<Patient> patients = query.list();
-      if (patients.size() == 0)
+      populate(session, receiveQueue, messageReceived);
+      if (!receiveQueue.getSubmitStatus().isExcluded())
       {
-        // This should not happen, but if it does
-        receiveQueue.setSubmitStatus(SubmitStatus.EXCLUDED);
-        continue;
+        out.print(constructor.constructMessage(messageReceived));
+        messageReceived.setSubmitStatus(SubmitStatus.SUBMITTED);
+        receiveQueue.setSubmitStatus(SubmitStatus.SUBMITTED);
       }
-      messageReceived.setPatient(patients.get(0));
-      query = session.createQuery("from NextOfKin where messageReceived = ?");
-      query.setParameter(0, messageReceived);
-      List<NextOfKin> nextOfKins = query.list();
-      messageReceived.setNextOfKins(nextOfKins);
-      query = session.createQuery("from Vaccination where messageReceived = ?");
-      query.setParameter(0, messageReceived);
-      List<Vaccination> vaccinations = query.list();
-      messageReceived.setVaccinations(vaccinations);
-      ConstructerInterface constructor = ConstructFactory.getConstructer(profile);
-      out.print(constructor.constructMessage(messageReceived));
-      messageReceived.setSubmitStatus(SubmitStatus.SUBMITTED);
-      receiveQueue.setSubmitStatus(SubmitStatus.SUBMITTED);
     }
     messageBatch.setSubmitStatus(SubmitStatus.SUBMITTED);
+  }
+
+  private void populate(Session session, ReceiveQueue receiveQueue, MessageReceived messageReceived)
+  {
+    Query query;
+    query = session.createQuery("from Patient where messageReceived = ?");
+    query.setParameter(0, messageReceived);
+    List<Patient> patients = query.list();
+    if (patients.size() == 0)
+    {
+      // This should not happen, but if it does
+      receiveQueue.setSubmitStatus(SubmitStatus.EXCLUDED);
+      messageReceived.setSubmitStatus(SubmitStatus.EXCLUDED);
+    }
+    messageReceived.setPatient(patients.get(0));
+    query = session.createQuery("from NextOfKin where messageReceived = ? order by positionId");
+    query.setParameter(0, messageReceived);
+    List<NextOfKin> nextOfKins = query.list();
+    messageReceived.setNextOfKins(nextOfKins);
+    query = session.createQuery("from Vaccination where messageReceived = ? order by positionId");
+    query.setParameter(0, messageReceived);
+    List<Vaccination> vaccinations = query.list();
+    HashMap<String, Vaccination> vaccinationMap = createVaccinationMap(vaccinations);
+    vaccinations = new ArrayList<Vaccination>(vaccinationMap.values());
+    messageReceived.setVaccinations(vaccinations);
+    messageReceived.setVaccinationMap(vaccinationMap);
+  }
+
+  private HashMap<String, Vaccination> createVaccinationMap(List<Vaccination> vaccinations)
+  {
+    HashMap<String, Vaccination> vaccinationMap = new HashMap<String, Vaccination>();
+    for (Vaccination vaccination : vaccinations)
+    {
+      vaccinationMap.put(vaccination.getIdSubmitter(), vaccination);
+    }
+    return vaccinationMap;
   }
 
   private boolean setWeeklyParameters()
@@ -208,7 +340,7 @@ public class WeeklyExportManager extends ManagerThread
       exportDayNormal = ksm.getKeyedValueInt(KeyedSetting.WEEKLY_EXPORT_DAY_NORMAL, 2);
       exportDayLow = ksm.getKeyedValueInt(KeyedSetting.WEEKLY_EXPORT_DAY_LOW, 2);
       exportDayLowest = ksm.getKeyedValueInt(KeyedSetting.WEEKLY_EXPORT_DAY_LOWEST, 2);
-      processingStartTime = getTimeToday(ksm.getKeyedValue(KeyedSetting.WEEKLY_EXPORT_START_TIME, "17:00"));
+      processingStartTime = getTimeToday(ksm.getKeyedValue(KeyedSetting.WEEKLY_EXPORT_START_TIME, "13:00"));
       processingEndTime = getTimeToday(ksm.getKeyedValue(KeyedSetting.WEEKLY_EXPORT_END_TIME, "19:00"));
       internalLog.append("Highest priority export day = " + exportDayHighest + "\r");
       internalLog.append("High priority export day = " + exportDayHigh + "\r");

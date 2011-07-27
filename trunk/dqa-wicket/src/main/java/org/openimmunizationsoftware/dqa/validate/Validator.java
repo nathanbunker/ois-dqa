@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.validate;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +31,9 @@ import org.openimmunizationsoftware.dqa.manager.VaccineProductManager;
 public class Validator extends ValidateMessage
 {
   private static final long AVERAGE_AGE_18_IN_MS = (long) (1000.0 * 60.0 * 60.0 * 24.0 * 365.25);
+
+  private static String[] INVALID_NAMES = { "X", "U", "UN", "UK", "UNK", "UKN", "UNKN", "NONE" };
+  private static String[] VALID_SUFFIX = { "SR", "JR", "II", "III", "IV" };
 
   private Session session = null;
   private Date now = new Date();
@@ -452,7 +456,19 @@ public class Validator extends ValidateMessage
     handleCodeReceived(vaccination.getGivenBy(), PotentialIssues.Field.VACCINATION_GIVEN_BY, administered);
     handleCodeReceived(vaccination.getOrderedBy(), PotentialIssues.Field.VACCINATION_ORDERED_BY, administered);
     handleCodeReceived(vaccination.getEnteredBy(), PotentialIssues.Field.VACCINATION_RECORDED_BY);
-    notEmpty(vaccination.getIdSubmitter(), pi.VaccinationIdIsMissing);
+    if (!notEmpty(vaccination.getIdSubmitter(), pi.VaccinationIdIsMissing))
+    {
+      // vaccination id is empty, need to set to default value
+      if (vaccination.getAdminDate() == null)
+      {
+        vaccination.setIdSubmitter("dqa-none-" + vaccination.getAdminCvxCode());
+      } else
+      {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        vaccination.setIdSubmitter("dqa-" + sdf.format(vaccination.getAdminDate()) + "-"
+            + vaccination.getAdminCvxCode());
+      }
+    }
     // TODO VaccinationIdOfReceiverIsMissing
     // TODO VaccinationIdOfReceiverIsUnrecognized
     // TODO VaccinationIdOfSenderIsMissing
@@ -550,13 +566,25 @@ public class Validator extends ValidateMessage
       }
     }
     handleCodeReceived(patient.getEthnicity(), PotentialIssues.Field.PATIENT_ETHNICITY);
+    specialNameHandling1(patient.getName());
+    specialNameHandling2(patient.getName());
+    specialNameHandling3(patient.getName());
+    specialNameHandling5(patient.getName());
+    specialNameHandling6(patient.getName());
+    specialNameHandling7(patient.getName());
     if (notEmpty(patient.getNameFirst(), pi.PatientFirstNameIsMissing))
     {
-      if (patient.getNameFirst().equalsIgnoreCase("unknown"))
+      for (String invalidName : INVALID_NAMES)
+      {
+        if (patient.getNameFirst().equalsIgnoreCase(invalidName))
+        {
+          registerIssue(pi.PatientFirstNameIsInvalid);
+        }
+      }
+      if (!validNameChars(patient.getNameFirst()))
       {
         registerIssue(pi.PatientFirstNameIsInvalid);
       }
-      // TODO PatientFirstNameIsInvalid
       // TODO PatientFirstNameMayIncludeMiddleInitial
     }
     handleCodeReceived(patient.getSex(), PotentialIssues.Field.PATIENT_GENDER);
@@ -569,11 +597,23 @@ public class Validator extends ValidateMessage
 
     if (notEmpty(patient.getNameLast(), pi.PatientLastNameIsMissing))
     {
-      // TODO PatientLastNameIsInvalid
+      for (String invalidName : INVALID_NAMES)
+      {
+        if (patient.getNameLast().equalsIgnoreCase(invalidName))
+        {
+          registerIssue(pi.PatientLastNameIsInvalid);
+        }
+      }
+      if (!validNameChars(patient.getNameLast()))
+      {
+        registerIssue(pi.PatientLastNameIsInvalid);
+      }
     }
     if (notEmpty(patient.getIdMedicaid(), pi.PatientMedicaidNumberIsMissing))
     {
-      // TODO PatientMedicaidNumberIsInvalid
+      String medicaid = patient.getIdMedicaidNumber();
+      medicaid = validateNumber(medicaid, pi.PatientMedicaidNumberIsInvalid);
+      patient.setIdMedicaidNumber(medicaid);
     }
 
     String middleName = patient.getNameMiddle();
@@ -582,9 +622,22 @@ public class Validator extends ValidateMessage
       middleName = patient.getNameMiddle();
       middleName = middleName.substring(0, middleName.length() - 1);
       patient.setNameMiddle(middleName);
+      if (!validNameChars(patient.getNameMiddle()))
+      {
+        // TODO registerIssue(pi.PatientFirstNameIsMiddle);
+      }
     }
     if (notEmpty(middleName, pi.PatientMiddleNameIsMissing))
     {
+      for (String invalidName : INVALID_NAMES)
+      {
+        if (patient.getNameMiddle().equalsIgnoreCase(invalidName))
+        {
+          // TODO middle name is invalid
+          patient.setNameMiddle("");
+        }
+      }
+
       // PatientMiddleNameMayBeInitial
       middleName = patient.getNameMiddle();
       if (middleName.length() == 1)
@@ -592,7 +645,48 @@ public class Validator extends ValidateMessage
         registerIssue(pi.PatientMiddleNameMayBeInitial);
       }
     }
-    notEmpty(patient.getMotherMaidenName(), pi.PatientMotherSMaidenNameIsMissing);
+    if (!isEmpty(patient.getNameSuffix()))
+    {
+      if (patient.getNameSuffix().equalsIgnoreCase("11") || patient.getNameSuffix().equalsIgnoreCase("2nd"))
+      {
+        patient.setNameSuffix("II");
+      } else if (patient.getNameSuffix().equalsIgnoreCase("111") || patient.getNameSuffix().equalsIgnoreCase("3rd"))
+      {
+        patient.setNameSuffix("III");
+      } else if (patient.getNameSuffix().equalsIgnoreCase("4th"))
+      {
+        patient.setNameSuffix("IV");
+      }
+      boolean isValid = false;
+      for (String valid : VALID_SUFFIX)
+      {
+        if (patient.getNameSuffix().equalsIgnoreCase(valid))
+        {
+          isValid = true;
+        }
+      }
+      if (!isValid)
+      {
+        // TODO suffix is invalid
+        patient.setNameSuffix("");
+      }
+    }
+    if (notEmpty(patient.getMotherMaidenName(), pi.PatientMotherSMaidenNameIsMissing))
+    {
+      for (String invalidName : INVALID_NAMES)
+      {
+        if (patient.getMotherMaidenName().equalsIgnoreCase(invalidName))
+        {
+          registerIssue(pi.PatientFirstNameIsInvalid);
+          patient.setMotherMaidenName("");
+        }
+      }
+      if (patient.getMotherMaidenName().length() == 1)
+      {
+        registerIssue(pi.PatientFirstNameIsInvalid);
+        patient.setMotherMaidenName("");
+      }
+    }
 
     // TODO PatientNameMayBeTemporaryNewbornName
     // TODO PatientNameMayBeTestName
@@ -615,7 +709,9 @@ public class Validator extends ValidateMessage
     }
     if (notEmpty(patient.getIdSsnNumber(), PotentialIssues.Field.PATIENT_SSN))
     {
-      // TODO PatientSsnIsInvalid
+      String ssn = patient.getIdSsnNumber();
+      ssn = validateNumber(ssn, pi.PatientSsnIsInvalid);
+      patient.setIdSsnNumber(ssn);
     }
     notEmpty(patient.getIdSubmitterNumber(), PotentialIssues.Field.PATIENT_SUBMITTER_ID);
 
@@ -634,6 +730,37 @@ public class Validator extends ValidateMessage
         registerIssue(pi.PatientDeathIndicatorIsInconsistent);
       }
     }
+  }
+
+  private String validateNumber(String ssn, PotentialIssue invalidIssue)
+  {
+    if (ssn.length() != 9 || ssn.equals("123456789") || ssn.equals("98765432"))
+    {
+      registerIssue(invalidIssue);
+      ssn = "";
+    } else
+    {
+      char lastC = 'S';
+      int count = 0;
+      for (char c : ssn.toCharArray())
+      {
+        if (lastC == c)
+        {
+          count++;
+        } else
+        {
+          count = 0;
+        }
+        if (count >= 6)
+        {
+          registerIssue(invalidIssue);
+          ssn = "";
+          break;
+        }
+        lastC = c;
+      }
+    }
+    return ssn;
   }
 
   private void validatePhone(PhoneNumber phone, PotentialIssues.Field piPhone)
@@ -658,6 +785,16 @@ public class Validator extends ValidateMessage
         registerIssue(pi.getIssue(piAddressCity, PotentialIssue.ISSUE_TYPE_IS_INVALID));
       }
     }
+    if (address.getState().getCode().equalsIgnoreCase("us"))
+    {
+      address.getState().setCode("TX");
+      address.getCountry().setCode("USA");
+    } else if (address.getState().getCode().equalsIgnoreCase("mx")
+        || address.getState().getCode().equalsIgnoreCase("mex")
+        || address.getState().getCode().equalsIgnoreCase("mexico"))
+    {
+      address.getCountry().setCode(address.getState().getCode());
+    }
 
     handleCodeReceived(address.getCountry(), piAddressCountry);
     handleCodeReceived(address.getCountyParish(), piAddressCounty);
@@ -666,7 +803,12 @@ public class Validator extends ValidateMessage
     notEmpty(address.getStreet2(), piAddressStreet2);
     if (notEmpty(address.getZip(), piAddressZip))
     {
-      // TODO Zip valid?
+      String zip = address.getZip();
+      int dash = zip.indexOf('-');
+      if (dash != 5 && dash != -1 && zip.length() != 5)
+      {
+        address.setZip("");
+      }
     }
 
     if (isEmpty(address.getStreet()) || isEmpty(city) || isEmpty(address.getZip()) || isEmpty(address.getState()))
@@ -937,5 +1079,105 @@ public class Validator extends ValidateMessage
   private static boolean areEqual(String field1, String field2)
   {
     return field1 != null && field1.equals(field2);
+  }
+
+  protected static void specialNameHandling1(Name name)
+  {
+    name.setFirst(specialNameHandling1(name.getFirst()));
+    name.setLast(specialNameHandling1(name.getLast()));
+    name.setMiddle(specialNameHandling1(name.getMiddle()));
+    name.setSuffix(specialNameHandling1(name.getSuffix()));
+  }
+
+  protected static String specialNameHandling1(String s)
+  {
+    return s.replace('0', 'o');
+  }
+
+  protected static void specialNameHandling2(Name name)
+  {
+    name.setFirst(specialNameHandling2(name.getFirst()));
+    name.setLast(specialNameHandling2(name.getLast()));
+    name.setMiddle(specialNameHandling2(name.getMiddle()));
+    name.setSuffix(specialNameHandling2(name.getSuffix()));
+  }
+
+  protected static String specialNameHandling2(String s)
+  {
+    return s.replace(',', ' ');
+  }
+
+  protected static void specialNameHandling3(Name name)
+  {
+    if (isEmpty(name.getMiddle()))
+    {
+      int pos = name.getFirst().lastIndexOf(' ');
+      if (pos > 0)
+      {
+        String middleName = name.getFirst().substring(pos).trim();
+        name.setMiddle(middleName);
+      }
+    }
+  }
+
+  protected static void specialNameHandling5(Name name)
+  {
+    name.setFirst(specialNameHandling5(name.getFirst()));
+    name.setLast(specialNameHandling5(name.getLast()));
+    name.setMiddle(specialNameHandling5(name.getMiddle()));
+    name.setSuffix(specialNameHandling5(name.getSuffix()));
+  }
+
+  protected static String specialNameHandling5(String s)
+  {
+    int pos = s.indexOf('(');
+    if (pos > 0)
+    {
+      s = s.substring(0, pos).trim();
+    }
+    pos = s.indexOf('{');
+    if (pos > 0)
+    {
+      s = s.substring(0, pos).trim();
+    }
+    pos = s.indexOf('[');
+    if (pos > 0)
+    {
+      s = s.substring(0, pos).trim();
+    }
+    return s;
+  }
+
+  protected static void specialNameHandling6(Name name)
+  {
+    if (name.getFirst().toUpperCase().endsWith(" JR"))
+    {
+      name.setSuffix("Jr");
+      name.setFirst(name.getFirst().substring(0, name.getFirst().length() - " JR".length()));
+    }
+  }
+
+  protected static void specialNameHandling7(Name name)
+  {
+    if (!isEmpty(name.getMiddle()))
+    {
+      int pos = name.getMiddle().lastIndexOf(".");
+      if (pos > 0)
+      {
+        name.setMiddle(name.getMiddle().substring(0, pos));
+      }
+    }
+  }
+
+  protected static boolean validNameChars(String s)
+  {
+    for (char c : s.toUpperCase().toCharArray())
+    {
+      if ((c < 'A' || c > 'Z') && c != '-' && c != '\'' && c != ' ')
+      {
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -78,7 +78,7 @@ public class TestVaccinationUpdateParserHL7 extends TestCase
     assertEquals("DR", patient.getNamePrefix());
     assertEquals("JR", patient.getNameSuffix());
     assertEquals("L", patient.getNameTypeCode());
-    assertEquals("", patient.getPhoneNumber());
+    assertEquals("(512)799-9399", patient.getPhoneNumber());
     assertEquals("", patient.getPhysicianNameLast());
     assertEquals("", patient.getPhysicianNameFirst());
     assertEquals("", patient.getPrimaryLanguageCode());
