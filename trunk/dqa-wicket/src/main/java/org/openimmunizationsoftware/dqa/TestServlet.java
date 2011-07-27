@@ -19,6 +19,12 @@ public class TestServlet extends HttpServlet
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
+    doGet(req, resp);
+  }
+
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+  {
     String action = req.getParameter("action");
     if (action != null)
     {
@@ -44,12 +50,6 @@ public class TestServlet extends HttpServlet
         }
       }
     }
-    doGet(req, resp);
-  }
-
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-  {
     String generateDate = req.getParameter("generateDate");
     if (generateDate == null)
     {
@@ -72,11 +72,23 @@ public class TestServlet extends HttpServlet
     out.println("    Generate Date <input type=\"text\" name=\"generateDate\" value=\"" + generateDate + "\"/><br>");
     out.println("    <input type=\"submit\" name=\"action\" value=\"Generate Weekly Batch\"/>");
     out.println("    </form>");
+    if (!generateDate.equals(""))
+    {
+      out.println("<pre>");
+      out.println(IncomingServlet.weeklyBatchManager.getInternalLog().toString());
+      out.println("</pre>");
+    }
     out.println("    <h2>Export Weekly Batch</h2>");
     out.println("    <form action=\"test\">");
     out.println("    Export Date <input type=\"text\" name=\"exportDate\" value=\"" + exportDate + "\"/><br>");
     out.println("    <input type=\"submit\" name=\"action\" value=\"Export Weekly Batch\"/>");
     out.println("    </form>");
+    if (!exportDate.equals(""))
+    {
+      out.println("<pre>");
+      out.println(IncomingServlet.weeklyExportManager.getInternalLog().toString());
+      out.println("</pre>");
+    }
     out.println("  </body>");
     out.println("</html>");
     out.close();

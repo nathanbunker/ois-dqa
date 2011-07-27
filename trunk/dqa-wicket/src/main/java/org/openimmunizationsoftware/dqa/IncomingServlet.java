@@ -50,9 +50,9 @@ import org.openimmunizationsoftware.dqa.validate.Validator;
 public class IncomingServlet extends HttpServlet
 {
 
-  private static FileImportManager fileImportManager = null;
-  private static WeeklyBatchManager weeklyBatchManager = null;
-  private static WeeklyExportManager weeklyExportManager = null;
+  protected static FileImportManager fileImportManager = null;
+  protected static WeeklyBatchManager weeklyBatchManager = null;
+  protected static WeeklyExportManager weeklyExportManager = null;
 
   private PrintWriter out = null;
   private MessageBatchManager messageBatchManager = null;

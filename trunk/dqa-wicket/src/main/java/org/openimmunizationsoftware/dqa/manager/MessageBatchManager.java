@@ -459,7 +459,7 @@ public class MessageBatchManager
       timelinessAverage = numeratorVaccinationAdminDateAge / (double) messageBatch.getMessageWithAdminCount();
     }
 
-    int timeliness = (int) (60.0 * score30days + 30.0 * score7days + 10.0 * score2days + 0.5);
+    int timeliness = (int) (60.0 * score30days + 40.0 * score7days + 0.0 * score2days + 0.5);
     if (timeliness > 100)
     {
       timeliness = 100;

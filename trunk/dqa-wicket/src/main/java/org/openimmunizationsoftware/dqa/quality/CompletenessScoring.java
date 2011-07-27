@@ -73,20 +73,20 @@ public class CompletenessScoring
     patExp.add("Middle Name", pi.PatientMiddleNameIsMissing, patient, 10);
     patExp.add("Phone", pi.PatientPhoneIsMissing, patient, 10);
     patExp.add("Mother's Maiden", pi.PatientMotherSMaidenNameIsMissing, patient, 10);
+    patExp.add("SSN", pi.PatientSsnIsMissing, patient, 10);
     patExp.add("Responsible Party", pi.PatientGuardianPartyIsMissing, patient, 1);
     patExp.add("First Name", pi.PatientGuardianFirstNameIsMissing, patient, 4).setIndent(true);
     patExp.add("Last Name", pi.PatientGuardianLastNameIsMissing, patient, 4).setIndent(true);
     patExp.add("Same as Patient", pi.PatientGuardianNameIsSameAsUnderagePatient, patient, -4).setIndent(true);
     patExp.add("Relationship", pi.PatientGuardianRelationshipIsMissing, patient, 1).setIndent(true);
 
-    patRec.add("Alias", pi.PatientAliasIsMissing, patient, 10);
     patRec.add("Birth Indicator", pi.PatientBirthIndicatorIsMissing, patient, 10);
     patRec.add("Ethnicity", pi.PatientEthnicityIsMissing, patient, 10);
     patRec.add("Race", pi.PatientRaceIsMissing, patient, 10);
-    patRec.add("SSN", pi.PatientSsnIsMissing, patient, 10);
     patRec.add("Medicaid Id", pi.PatientMedicaidNumberIsMissing, patient, 5);
-    patRec.add("Primary Language", pi.PatientPrimaryLanaguageIsMissing, patient, 5);
 
+    patOpt.add("Alias", pi.PatientAliasIsMissing, patient, 0);
+    patOpt.add("Primary Language", pi.PatientPrimaryLanaguageIsMissing, patient, 0);
     patOpt.add("Resp Party Address", pi.PatientGuardianAddressIsMissing, patient, 0);
     patOpt.add("Street", pi.PatientGuardianAddressStreetIsMissing, patient, 0).setIndent(true);
     patOpt.add("City", pi.PatientGuardianAddressCityIsMissing, patient, 0).setIndent(true);
@@ -122,9 +122,9 @@ public class CompletenessScoring
     vacExp.add("Invalid", pi.VaccinationAdministeredAmountIsInvalid, vaccinationAdmin, -10).setDemerit();
     vacExp.add("Missing Units", pi.VaccinationAdministeredUnitIsMissing, vaccinationAdmin, -2).setDemerit();
     vacExp.add("Facility Id", PotentialIssues.Field.VACCINATION_FACILITY_ID, vaccinationAdmin, 20);
-    vacExp.add("Body Site", PotentialIssues.Field.VACCINATION_BODY_SITE, vaccinationAdmin, 10);
-    vacExp.add("Body Route", PotentialIssues.Field.VACCINATION_BODY_ROUTE, vaccinationAdmin, 10);
 
+    vacReq.add("Body Site", PotentialIssues.Field.VACCINATION_BODY_SITE, vaccinationAdmin, 10);
+    vacReq.add("Body Route", PotentialIssues.Field.VACCINATION_BODY_ROUTE, vaccinationAdmin, 10);
     vacRec.add("Action Code", PotentialIssues.Field.VACCINATION_ACTION_CODE, vaccination, 10);
     vacRec.add("Given by Id", PotentialIssues.Field.VACCINATION_GIVEN_BY, vaccinationAdmin, 10);
     vacRec.add("Vaccination Id", PotentialIssues.Field.VACCINATION_ID, vaccinationAdmin, 10);

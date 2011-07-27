@@ -216,8 +216,7 @@ public class WeeklyBatchManager extends ManagerThread
       {
         File dqaDir = createDqaDir(profile, ksm, rootDir);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String filename = "Weekly DQA for " + profile.getProfileCode() + "." + sdf.format(endOfWeek.getTime()) + "."
-            + messageBatch.getBatchId() + "." + getScoreDescription(messageBatch.getOverallScore()) + "."
+        String filename = "Weekly DQA for " + profile.getProfileCode() + "." + sdf.format(endOfWeek.getTime()) + "." + getScoreDescription(messageBatch.getOverallScore()) + "."
             + messageBatch.getOverallScore() + ".html";
         try
         {
@@ -318,7 +317,7 @@ public class WeeklyBatchManager extends ManagerThread
     KeyedSettingManager ksm = KeyedSettingManager.getKeyedSettingManager();
     weekStartDay = ksm.getKeyedValueInt(KeyedSetting.WEEKLY_BATCH_DAY, 1);
     processingStartTime = getTimeToday(ksm.getKeyedValue(KeyedSetting.WEEKLY_BATCH_START_TIME, "01:00"));
-    processingEndTime = getTimeToday(ksm.getKeyedValue(KeyedSetting.WEEKLY_BATCH_END_TIME, "03:00"));
+    processingEndTime = getTimeToday(ksm.getKeyedValue(KeyedSetting.WEEKLY_BATCH_END_TIME, "12:00"));
     internalLog.append("Weekly batch day = " + weekStartDay + "\r");
     internalLog.append("Processing start time = " + processingStartTime + "\r");
     internalLog.append("Processing end time = " + processingEndTime + "\r");

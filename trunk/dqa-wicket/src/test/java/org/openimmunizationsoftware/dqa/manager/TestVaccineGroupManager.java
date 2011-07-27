@@ -12,7 +12,7 @@ public class TestVaccineGroupManager extends TestCase
   {
     VaccineGroupManager vaccineGroupManager = VaccineGroupManager.getVaccineGroupManager();
     List<VaccineGroup> vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_EXPECTED);
-    assertEquals(13, vaccineGroupList.size());
+    assertEquals(10, vaccineGroupList.size());
     VaccineGroup hepA = null;
     for (VaccineGroup vaccineGroup: vaccineGroupList)
     {
