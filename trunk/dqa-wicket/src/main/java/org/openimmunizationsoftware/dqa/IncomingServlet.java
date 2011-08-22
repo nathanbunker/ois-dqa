@@ -39,12 +39,13 @@ import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 import org.openimmunizationsoftware.dqa.manager.FileImportManager;
 import org.openimmunizationsoftware.dqa.manager.ManagerThread;
-import org.openimmunizationsoftware.dqa.manager.MessageBatchManager;
+import org.openimmunizationsoftware.dqa.manager.ManagerThreadMulti;
 import org.openimmunizationsoftware.dqa.manager.MessageReceivedManager;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
 import org.openimmunizationsoftware.dqa.manager.WeeklyBatchManager;
 import org.openimmunizationsoftware.dqa.manager.WeeklyExportManager;
 import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
+import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 import org.openimmunizationsoftware.dqa.validate.Validator;
 
 public class IncomingServlet extends HttpServlet
@@ -55,7 +56,7 @@ public class IncomingServlet extends HttpServlet
   protected static WeeklyExportManager weeklyExportManager = null;
 
   private PrintWriter out = null;
-  private MessageBatchManager messageBatchManager = null;
+  private QualityCollector messageBatchManager = null;
 
   @Override
   public void init() throws ServletException
@@ -107,7 +108,7 @@ public class IncomingServlet extends HttpServlet
     printManagerThread(weeklyBatchManager);
     printManagerThread(weeklyExportManager);
     out.println("    <hr>");
-    out.println("    <p>Version 0.5</p>");
+    out.println("    <p>Version 0.6</p>");
     out.println("  </body>");
     out.println("</html>");
     out.close();
@@ -118,19 +119,38 @@ public class IncomingServlet extends HttpServlet
   {
     if (mt.isKeepRunning())
     {
-      out.println("      <p>" + mt.getLabel() + " is running.<p>");
+      out.println("      <h3>Process Deamon '" + mt.getLabel() + "' is running.</h3>");
     }
     if (mt.getLastException() != null)
     {
-      out.println("      <p>Last Exception</p>");
+      out.println("      <h4>Last Exception</h4>");
       out.println("<pre>");
       mt.getLastException().printStackTrace(out);
       out.println("</pre>");
     }
-    out.println("      <p>Internal Log</p>");
+    out.println("      <h4>Internal Log</h4>");
     out.println("<pre>");
     out.print(mt.getInternalLog());
     out.println("</pre>");
+    out.println("      <h4>Progress Update</h4>");
+    if (mt.getProgressStart() > 0)
+    {
+      out.println("<pre>");
+      SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+      out.println("  + Started: " + sdf.format(mt.getProgressStart()));
+      out.println("  + Count:   " + mt.getProgressCount());
+      out.println("  + Rate:    " + ((float) mt.getProgressCount())
+          / ((System.currentTimeMillis() - mt.getProgressStart()) / 1000.0));
+      out.println("</pre>");
+    }
+    if (mt instanceof ManagerThreadMulti)
+    {
+      ManagerThreadMulti mtm = (ManagerThreadMulti) mt;
+      for (ManagerThread mtChild : mtm.getManagerThreads())
+      {
+        printManagerThread(mtChild);
+      }
+    }
   }
 
   @Override
@@ -264,7 +284,7 @@ public class IncomingServlet extends HttpServlet
     BufferedReader in = new BufferedReader(stringReader);
     String line = null;
     StringBuilder sb = new StringBuilder();
-    messageBatchManager = new MessageBatchManager("Realtime HTTPS", BatchType.SUBMISSION, profile);
+    messageBatchManager = new QualityCollector("Realtime HTTPS", BatchType.SUBMISSION, profile);
 
     while ((line = in.readLine()) != null)
     {
@@ -291,7 +311,7 @@ public class IncomingServlet extends HttpServlet
     session.save(messageBatchManager.getMessageBatch());
     tx.commit();
   }
-  
+
   private void saveAndCloseBatch(Session session)
   {
     messageBatchManager.close();
@@ -315,8 +335,6 @@ public class IncomingServlet extends HttpServlet
       session.save(batchVaccineCvx);
     }
   }
-
-
 
   private void processMessage(VaccinationUpdateParserHL7 parser, StringBuilder sb, boolean debug,
       SubmitterProfile profile, Session session)

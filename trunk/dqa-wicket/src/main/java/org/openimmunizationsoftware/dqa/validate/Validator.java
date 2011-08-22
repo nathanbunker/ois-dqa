@@ -1022,18 +1022,22 @@ public class Validator extends ValidateMessage
   // }
   // return cr;
   // }
+  
+  private static String trunc(String s, int length)
+  {
+    if (s == null || s.length() < length)
+    {
+      return s;
+    }
+    return s.substring(0, length);
+  }
 
   protected CodeReceived getCodeReceived(String receivedValue, String receivedLabel, CodeTable codeTable)
   {
+    receivedValue = trunc(receivedValue, 50);
+    receivedLabel = trunc(receivedLabel, 30);
     CodesReceived crs = profile.getCodesReceived(session);
     CodeReceived cr = crs.getCodeReceived(receivedValue, codeTable);
-    if (receivedLabel != null)
-    {
-      if (receivedLabel.length() > 30)
-      {
-        receivedLabel = receivedLabel.substring(0, 30);
-      }
-    }
     if (cr == null)
     {
       cr = new CodeReceived();

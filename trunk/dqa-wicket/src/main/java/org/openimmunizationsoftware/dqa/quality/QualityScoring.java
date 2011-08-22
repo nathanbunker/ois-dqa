@@ -8,7 +8,7 @@ import java.util.Map;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 
-public class CompletenessScoring
+public class QualityScoring
 {
 
   public static final String VACCINATION_REQUIRED = "vaccinationRequired";
@@ -34,7 +34,7 @@ public class CompletenessScoring
     return scoringSet;
   }
 
-  public CompletenessScoring() {
+  public QualityScoring() {
 
     String patient = PotentialIssue.REPORT_DENOMINATOR_PATIENT_COUNT;
     String vaccination = PotentialIssue.REPORT_DENOMINATOR_VACCINATION_COUNT;

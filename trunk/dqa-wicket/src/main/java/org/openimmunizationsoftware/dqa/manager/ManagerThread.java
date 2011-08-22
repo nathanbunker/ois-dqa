@@ -6,35 +6,40 @@ import java.util.Date;
 
 public class ManagerThread extends Thread
 {
-  public ManagerThread(String label)
-  {
+  protected StringBuilder internalLog = new StringBuilder();
+  protected boolean keepRunning = true;
+  protected String label = "";
+  protected Throwable lastException = null;
+  protected int progressCount = 0;
+  protected long progressStart = 0l;
+
+  public ManagerThread(String label) {
     this.label = label;
   }
-  private String label = "";
-  
-  public String getLabel()
-  {
-    return label;
-  }
-  protected boolean keepRunning = true;
-
-  public boolean isKeepRunning()
-  {
-    return keepRunning;
-  }
-
-  protected StringBuilder internalLog = new StringBuilder();
 
   public StringBuilder getInternalLog()
   {
     return internalLog;
   }
 
-  protected Throwable lastException = null;
+  public String getLabel()
+  {
+    return label;
+  }
 
   public Throwable getLastException()
   {
     return lastException;
+  }
+
+  public int getProgressCount()
+  {
+    return progressCount;
+  }
+
+  public long getProgressStart()
+  {
+    return progressStart;
   }
 
   protected Date getTimeToday(String startTimeString)
@@ -59,7 +64,12 @@ public class ManagerThread extends Thread
     }
     return date;
   }
-  
+
+  public boolean isKeepRunning()
+  {
+    return keepRunning;
+  }
+
   public synchronized void runNow(Date now) throws IOException
   {
     throw new IllegalArgumentException("This method has not been written");

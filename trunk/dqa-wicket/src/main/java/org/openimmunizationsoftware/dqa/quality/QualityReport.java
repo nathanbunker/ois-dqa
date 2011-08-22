@@ -19,7 +19,6 @@ import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineGroup;
-import org.openimmunizationsoftware.dqa.manager.MessageBatchManager;
 import org.openimmunizationsoftware.dqa.manager.VaccineGroupManager;
 
 public class QualityReport
@@ -118,7 +117,7 @@ public class QualityReport
   private static final ToolTip VACCINATION_GROUP_OTHER = new ToolTip("Undefined",
       "Vaccination is not classified as part of a particular vaccine group");
 
-  private MessageBatchManager messageBatchManager = null;
+  private QualityCollector messageBatchManager = null;
   private SubmitterProfile profile = null;
   private String filename = "";
   private PrintWriter out = null;
@@ -128,7 +127,7 @@ public class QualityReport
   private int patientCount = 0;
   private int vaccinationCount = 0;
 
-  public QualityReport(MessageBatchManager messageBatchManager, SubmitterProfile profile, PrintWriter out) {
+  public QualityReport(QualityCollector messageBatchManager, SubmitterProfile profile, PrintWriter out) {
     this.messageBatchManager = messageBatchManager;
     this.profile = profile;
     this.out = out;
@@ -214,15 +213,15 @@ public class QualityReport
 
   private void printCompleteness(MessageBatch messageBatch)
   {
-    CompletenessScoring scoring = messageBatchManager.getCompletenessScoring();
-    ScoringSet patientExpected = scoring.getScoringSet(CompletenessScoring.PATIENT_EXPECTED);
-    ScoringSet patientOptional = scoring.getScoringSet(CompletenessScoring.PATIENT_OPTIONAL);
-    ScoringSet patientRecommended = scoring.getScoringSet(CompletenessScoring.PATIENT_RECOMMENDED);
-    ScoringSet patientRequired = scoring.getScoringSet(CompletenessScoring.PATIENT_REQUIRED);
-    ScoringSet vaccinationExpected = scoring.getScoringSet(CompletenessScoring.VACCINATION_EXPECTED);
-    ScoringSet vaccinationOptional = scoring.getScoringSet(CompletenessScoring.VACCINATION_OPTIONAL);
-    ScoringSet vaccinationRecommended = scoring.getScoringSet(CompletenessScoring.VACCINATION_RECOMMENDED);
-    ScoringSet vaccinationRequired = scoring.getScoringSet(CompletenessScoring.VACCINATION_REQUIRED);
+    QualityScoring scoring = messageBatchManager.getCompletenessScoring();
+    ScoringSet patientExpected = scoring.getScoringSet(QualityScoring.PATIENT_EXPECTED);
+    ScoringSet patientOptional = scoring.getScoringSet(QualityScoring.PATIENT_OPTIONAL);
+    ScoringSet patientRecommended = scoring.getScoringSet(QualityScoring.PATIENT_RECOMMENDED);
+    ScoringSet patientRequired = scoring.getScoringSet(QualityScoring.PATIENT_REQUIRED);
+    ScoringSet vaccinationExpected = scoring.getScoringSet(QualityScoring.VACCINATION_EXPECTED);
+    ScoringSet vaccinationOptional = scoring.getScoringSet(QualityScoring.VACCINATION_OPTIONAL);
+    ScoringSet vaccinationRecommended = scoring.getScoringSet(QualityScoring.VACCINATION_RECOMMENDED);
+    ScoringSet vaccinationRequired = scoring.getScoringSet(QualityScoring.VACCINATION_REQUIRED);
     out.println("    <h2><a name=\"completeness\">Completeness</h2>");
     out.println("    <p>");
     out.println("      Completeness measures how many required, expected and ");
@@ -246,26 +245,26 @@ public class QualityReport
     out.println("    <h3><a name=\"completeness.patient\">Patient</h3>");
     printCompletenessScoring("Patient", "#completeness.patient", patientRequired, patientExpected, patientRecommended,
         messageBatch.getCompletenessPatientScore(), 0.2);
-    out.println("    <br>");
+    out.println("    <br/>");
     printCompleteness(patientRequired, "completeness.patient.required", "Required", 0.2 * 0.5);
-    out.println("    <br>");
+    out.println("    <br/>");
     printCompleteness(patientExpected, "completeness.patient.expected", "Expected", 0.2 * 0.3);
-    out.println("    <br>");
+    out.println("    <br/>");
     printCompleteness(patientRecommended, "completeness.patient.recommended", "Recommended", 0.2 * 0.2);
-    out.println("    <br>");
+    out.println("    <br/>");
     printCompleteness(patientOptional, "completeness.patient.optional", "Optional", 0.0);
-    out.println("    <br>");
+    out.println("    <br/>");
 
     out.println("    <h3><a name=\"completeness.vaccination\">Vaccination</h3>");
     printCompletenessScoring("Vaccination", "#completeness.vaccination", vaccinationRequired, vaccinationExpected,
         vaccinationRecommended, messageBatch.getCompletenessVaccinationScore(), 0.2);
-    out.println("    <br>");
+    out.println("    <br/>");
     printCompleteness(vaccinationRequired, "completeness.vaccination.required", "Required", 0.2 * 0.5);
-    out.println("    <br>");
+    out.println("    <br/>");
     printCompleteness(vaccinationExpected, "completeness.vaccination.expected", "Expected", 0.2 * 0.3);
-    out.println("    <br>");
+    out.println("    <br/>");
     printCompleteness(vaccinationRecommended, "completeness.vaccination.recommended", "Recommended", 0.2 * 0.2);
-    out.println("    <br>");
+    out.println("    <br/>");
     printCompleteness(vaccinationOptional, "completeness.vaccination.optional", "Optional", 0.0);
 
     out.println("    <h3><a name=\"completeness.vaccineGroup\">Vaccine Group</h3>");
@@ -273,15 +272,18 @@ public class QualityReport
     VaccineGroupManager vaccineGroupManager = VaccineGroupManager.getVaccineGroupManager();
     List<VaccineGroup> vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_EXPECTED);
     printVaccines("Expected", messageBatch, vaccinesNotYetPrinted, vaccineGroupList, false);
-    out.println("    <br>");
+    out.println("    <br/>");
+    vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_RECCOMMENDED);
+    printVaccines("Recommended", messageBatch, vaccinesNotYetPrinted, vaccineGroupList, true);
+    out.println("    <br/>");
     vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_OPTIONAL);
     printVaccines("Optional", messageBatch, vaccinesNotYetPrinted, vaccineGroupList, true);
-    out.println("    <br>");
+    out.println("    <br/>");
     vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_NOT_EXPECTED);
     printVaccines("Unexpected", messageBatch, vaccinesNotYetPrinted, vaccineGroupList, true);
     if (vaccinesNotYetPrinted.size() > 0)
     {
-      out.println("    <br>");
+      out.println("    <br/>");
       printVaccinesLeftover(messageBatch, vaccinesNotYetPrinted);
     }
   }
@@ -591,7 +593,7 @@ public class QualityReport
     printScore(QUALITY_SCORE_ERRORS, messageBatch.getQualityErrorScore(), "20%");
     printScore(QUALITY_SCORE_WARNINGS, messageBatch.getQualityWarnScore(), "20%");
     out.println("    </table>");
-    out.println("    <br>");
+    out.println("    <br/>");
     if (messageBatchManager.getInvalidCodes().size() > 0 || messageBatchManager.getUnrecognizedCodes().size() > 0
         || messageBatchManager.getErrorIssues().size() > 0)
     {
@@ -672,7 +674,7 @@ public class QualityReport
       printScore(TIMELINESS_SCORE_2_DAYS, messageBatch.getTimelinessScore2Days(), "1%");
     }
     out.println("    </table>");
-    out.println("    <br>");
+    out.println("    <br/>");
     out.println("    <table width=\"350\">");
     out.println("      <tr>");
     out.println("        <th align=\"left\">Vaccination Received</th>");
@@ -684,7 +686,7 @@ public class QualityReport
     printPer(TIMELINESS_WITHIN_7_DAYS, messageBatch.getTimelinessCount7Days(), messageBatch.getMessageWithAdminCount());
     printPer(TIMELINESS_WITHIN_2_DAYS, messageBatch.getTimelinessCount2Days(), messageBatch.getMessageWithAdminCount());
     out.println("    </table>");
-    out.println("    <br>");
+    out.println("    <br/>");
     out.println("    <table>");
     out.println("      <tr>");
     out.println("        <th align=\"left\" colspan=\"2\">Timeliness of Vaccination Update</th>");
