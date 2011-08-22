@@ -1,4 +1,4 @@
-package org.openimmunizationsoftware.dqa.manager;
+package org.openimmunizationsoftware.dqa.quality;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,11 +22,9 @@ import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineGroup;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
-import org.openimmunizationsoftware.dqa.quality.CompletenessRow;
-import org.openimmunizationsoftware.dqa.quality.CompletenessScoring;
-import org.openimmunizationsoftware.dqa.quality.ScoringSet;
+import org.openimmunizationsoftware.dqa.manager.VaccineGroupManager;
 
-public class MessageBatchManager
+public class QualityCollector
 {
   private Set<String> patientIds = new HashSet<String>();
   private Set<String> vaccinationIds = new HashSet<String>();
@@ -38,7 +36,7 @@ public class MessageBatchManager
   private Date vaccinationAdminDateEarliest = null;
   private Date vaccinationAdminDateLatest = null;
   private int numeratorVaccinationAdminDateAge = 0;
-  private CompletenessScoring scoring = null;
+  private QualityScoring scoring = null;
 
   public int getVaccineCvxCount(VaccineCvx vaccineCvx)
   {
@@ -50,7 +48,7 @@ public class MessageBatchManager
     return batchVaccineCvx.getReceivedCount();
   }
 
-  public CompletenessScoring getCompletenessScoring()
+  public QualityScoring getCompletenessScoring()
   {
     return scoring;
   }
@@ -65,7 +63,7 @@ public class MessageBatchManager
     return messageBatch;
   }
 
-  public MessageBatchManager(String title, BatchType batchType, SubmitterProfile profile) {
+  public QualityCollector(String title, BatchType batchType, SubmitterProfile profile) {
     messageBatch = new MessageBatch();
     messageBatch.setBatchTitle(title);
     messageBatch.setStartDate(new Date());
@@ -221,16 +219,16 @@ public class MessageBatchManager
 
   private void scoreCompleteness()
   {
-    scoring = new CompletenessScoring();
+    scoring = new QualityScoring();
     Map<PotentialIssue, BatchIssues> batchIssuesMap = messageBatch.getBatchIssuesMap();
-    ScoringSet patientExpected = scoring.getScoringSet(CompletenessScoring.PATIENT_EXPECTED);
-    ScoringSet patientOptional = scoring.getScoringSet(CompletenessScoring.PATIENT_OPTIONAL);
-    ScoringSet patientRecommended = scoring.getScoringSet(CompletenessScoring.PATIENT_RECOMMENDED);
-    ScoringSet patientRequired = scoring.getScoringSet(CompletenessScoring.PATIENT_REQUIRED);
-    ScoringSet vaccinationExpected = scoring.getScoringSet(CompletenessScoring.VACCINATION_EXPECTED);
-    ScoringSet vaccinationOptional = scoring.getScoringSet(CompletenessScoring.VACCINATION_OPTIONAL);
-    ScoringSet vaccinationRecommended = scoring.getScoringSet(CompletenessScoring.VACCINATION_RECOMMENDED);
-    ScoringSet vaccinationRequired = scoring.getScoringSet(CompletenessScoring.VACCINATION_REQUIRED);
+    ScoringSet patientExpected = scoring.getScoringSet(QualityScoring.PATIENT_EXPECTED);
+    ScoringSet patientOptional = scoring.getScoringSet(QualityScoring.PATIENT_OPTIONAL);
+    ScoringSet patientRecommended = scoring.getScoringSet(QualityScoring.PATIENT_RECOMMENDED);
+    ScoringSet patientRequired = scoring.getScoringSet(QualityScoring.PATIENT_REQUIRED);
+    ScoringSet vaccinationExpected = scoring.getScoringSet(QualityScoring.VACCINATION_EXPECTED);
+    ScoringSet vaccinationOptional = scoring.getScoringSet(QualityScoring.VACCINATION_OPTIONAL);
+    ScoringSet vaccinationRecommended = scoring.getScoringSet(QualityScoring.VACCINATION_RECOMMENDED);
+    ScoringSet vaccinationRequired = scoring.getScoringSet(QualityScoring.VACCINATION_REQUIRED);
 
     score(batchIssuesMap, patientExpected);
     score(batchIssuesMap, patientOptional);
@@ -265,7 +263,20 @@ public class MessageBatchManager
       {
         if (getVaccineCvxCount(vaccineCvx) > 0)
         {
-          groupsExpected++;
+          groupsExpected += 2;
+          break;
+        }
+      }
+    }
+    vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_RECCOMMENDED);
+    int groupsRecommended = 0;
+    for (VaccineGroup vaccineGroup : vaccineGroupList)
+    {
+      for (VaccineCvx vaccineCvx : vaccineGroup.getVaccineCvxList())
+      {
+        if (getVaccineCvxCount(vaccineCvx) > 0)
+        {
+          groupsRecommended++;
           break;
         }
       }
@@ -279,13 +290,13 @@ public class MessageBatchManager
       {
         if (getVaccineCvxCount(vaccineCvx) > 0)
         {
-          groupsNotExpected += 2;
+          groupsNotExpected += 4;
           break;
         }
       }
     }
 
-    double vaccinationGroupScore = denominator > 0 ? (groupsExpected - groupsNotExpected) / (float) denominator : 1.0;
+    double vaccinationGroupScore = denominator > 0 ? (groupsExpected + groupsRecommended - groupsNotExpected) / (float) denominator : 1.0;
     if (vaccinationGroupScore < 0)
     {
       vaccinationGroupScore = 0;

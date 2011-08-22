@@ -27,6 +27,7 @@ import org.openimmunizationsoftware.dqa.db.model.ReceiveQueue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitStatus;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.received.Patient;
+import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 import org.openimmunizationsoftware.dqa.quality.QualityReport;
 
 public class WeeklyBatchManager extends ManagerThread
@@ -134,7 +135,7 @@ public class WeeklyBatchManager extends ManagerThread
     {
       profile.getPotentialIssueStatus(pi);
     }
-    MessageBatchManager messageBatchManager = new MessageBatchManager("Weekly DQA", BatchType.WEEKLY, profile);
+    QualityCollector messageBatchManager = new QualityCollector("Weekly DQA", BatchType.WEEKLY, profile);
     MessageBatch messageBatch = messageBatchManager.getMessageBatch();
     messageBatch.setStartDate(startOfWeek.getTime());
     messageBatch.setEndDate(endOfWeek.getTime());
@@ -234,7 +235,7 @@ public class WeeklyBatchManager extends ManagerThread
     tx.commit();
   }
 
-  private void saveMessageBatch(Session session, SubmitterProfile profile, MessageBatchManager messageBatchManager,
+  private void saveMessageBatch(Session session, SubmitterProfile profile, QualityCollector messageBatchManager,
       MessageBatch messageBatch)
   {
     if (profile.isProfileStatusProd())
