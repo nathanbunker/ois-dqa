@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+	 version="2.4">
+
+	<display-name>Immunization Data Quality Assurance</display-name>
+	<!-- 
+	<listener>
+        <listener-class>org.apache.axis.transport.http.AxisHTTPSessionListener</listener-class>
+    </listener>
+     -->
+	
+	<context-param>
+         <param-name>configuration</param-name>
+         <!-- <param-value>development</param-value> -->
+         <param-value>deployment</param-value>
+    </context-param>
+    
+	<servlet>
+		<servlet-name>InServlet</servlet-name>
+		<display-name>DQA Incoming Interface</display-name>
+		<servlet-class>org.openimmunizationsoftware.dqa.IncomingServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>TestServlet</servlet-name>
+		<servlet-class>org.openimmunizationsoftware.dqa.TestServlet</servlet-class>
+	</servlet>
+	<!-- 
+    
+  <servlet>
+    <servlet-name>AxisServlet</servlet-name>
+    <display-name>Apache-Axis Servlet</display-name>
+    <servlet-class>
+        org.apache.axis.transport.http.AxisServlet
+    </servlet-class>
+  </servlet>
+
+  <servlet>
+    <servlet-name>AdminServlet</servlet-name>
+    <display-name>Axis Admin Servlet</display-name>
+    <servlet-class>
+        org.apache.axis.transport.http.AdminServlet
+    </servlet-class>
+    <load-on-startup>100</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>SOAPMonitorService</servlet-name>
+    <display-name>SOAPMonitorService</display-name>
+    <servlet-class>
+        org.apache.axis.monitor.SOAPMonitorService
+    </servlet-class>
+    <init-param>
+      <param-name>SOAPMonitorPort</param-name>
+      <param-value>5001</param-value>
+    </init-param>
+    <load-on-startup>100</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>AxisServlet</servlet-name>
+    <url-pattern>/servlet/AxisServlet</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>AxisServlet</servlet-name>
+    <url-pattern>*.jws</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>AxisServlet</servlet-name>
+    <url-pattern>/services/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>SOAPMonitorService</servlet-name>
+    <url-pattern>/SOAPMonitor</url-pattern>
+  </servlet-mapping>
+  
+   -->
+
+ <!-- uncomment this if you want the admin servlet -->
+ <!--
+  <servlet-mapping>
+    <servlet-name>AdminServlet</servlet-name>
+    <url-pattern>/servlet/AdminServlet</url-pattern>
+  </servlet-mapping>
+ -->
+	
+	<servlet-mapping>
+		<servlet-name>InServlet</servlet-name>
+		<url-pattern>/in</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>TestServlet</servlet-name>
+		<url-pattern>/test</url-pattern>
+	</servlet-mapping>
+	
+
+    <!-- currently the W3C havent settled on a media type for WSDL;
+    http://www.w3.org/TR/2003/WD-wsdl12-20030303/#ietf-draft
+    for now we go with the basic 'it's XML' response -->
+    <!-- 
+  <mime-mapping>
+    <extension>wsdl</extension>
+     <mime-type>text/xml</mime-type>
+  </mime-mapping>
+  
+  <mime-mapping>
+    <extension>xsd</extension>
+    <mime-type>text/xml</mime-type>
+  </mime-mapping>
+   -->
+	 <!--  
+	      There are three means to configure Wickets configuration mode and they are
+	      tested in the order given. 
+	      1) A system property: -Dwicket.configuration
+	      2) servlet specific <init-param>
+	      3) context specific <context-param>
+	      The value might be either "development" (reloading when templates change)
+	      or "deployment". If no configuration is found, "development" is the default.
+	-->
+
+	<filter>
+		<filter-name>wicket.dqa-wicket</filter-name>
+ 		<filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
+		<init-param>
+			<param-name>applicationClassName</param-name>
+			<param-value>org.openimmunizationsoftware.dqa.WicketApplication</param-value>
+ 		</init-param>
+ 	</filter>
+
+ <filter-mapping>
+  <filter-name>wicket.dqa-wicket</filter-name>
+	<url-pattern>/*</url-pattern>
+ </filter-mapping>
+
+
+</web-app>
