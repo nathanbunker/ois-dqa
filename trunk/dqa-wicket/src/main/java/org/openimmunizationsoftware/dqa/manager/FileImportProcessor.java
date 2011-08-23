@@ -171,7 +171,8 @@ public class FileImportProcessor extends ManagerThread
     } else
     {
       profile = submitterProfiles.get(0);
-      procLog("Using profile " + profile.getProfileId() + " '" + profile.getProfileLabel() + "'");
+      procLog("Using profile " + profile.getProfileId() + " '" + profile.getProfileLabel() + "' for organization '"
+          + profile.getOrganization().getOrgLabel() + "'");
     }
     parser = new VaccinationUpdateParserHL7(profile);
   }
@@ -239,7 +240,7 @@ public class FileImportProcessor extends ManagerThread
         progressCount++;
         processMessage(message, profile, session);
       }
-      printReport(inFile);
+      printReport(inFile, session);
       closeOutputs(acceptedOut);
     }
     in.close();
@@ -284,12 +285,14 @@ public class FileImportProcessor extends ManagerThread
     tx.commit();
   }
 
-  private void printReport(File inFile)
+  private void printReport(File inFile, Session session)
   {
+    Transaction tx = session.beginTransaction();
     messageBatchManager.score();
     QualityReport qualityReport = new QualityReport(messageBatchManager, profile, reportOut);
     qualityReport.setFilename(inFile.getName());
     qualityReport.printReport();
+    tx.commit();
   }
 
   /**
