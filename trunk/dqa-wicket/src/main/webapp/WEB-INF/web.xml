@@ -19,7 +19,6 @@
     
 	<servlet>
 		<servlet-name>InServlet</servlet-name>
-		<display-name>DQA Incoming Interface</display-name>
 		<servlet-class>org.openimmunizationsoftware.dqa.IncomingServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
