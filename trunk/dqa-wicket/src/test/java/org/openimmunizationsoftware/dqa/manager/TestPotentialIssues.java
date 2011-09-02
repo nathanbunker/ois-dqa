@@ -191,11 +191,11 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.PatientPrimaryFacilityIdIsMissing);
     assertNotNull(pi.PatientPrimaryFacilityIdIsUnrecognized);
     assertNotNull(pi.PatientPrimaryFacilityNameIsMissing);
-    assertNotNull(pi.PatientPrimaryLanaguageIsDeprecated);
-    assertNotNull(pi.PatientPrimaryLanaguageIsIgnored);
-    assertNotNull(pi.PatientPrimaryLanaguageIsInvalid);
-    assertNotNull(pi.PatientPrimaryLanaguageIsMissing);
-    assertNotNull(pi.PatientPrimaryLanaguageIsUnrecognized);
+    assertNotNull(pi.PatientPrimaryLanguageIsDeprecated);
+    assertNotNull(pi.PatientPrimaryLanguageIsIgnored);
+    assertNotNull(pi.PatientPrimaryLanguageIsInvalid);
+    assertNotNull(pi.PatientPrimaryLanguageIsMissing);
+    assertNotNull(pi.PatientPrimaryLanguageIsUnrecognized);
     assertNotNull(pi.PatientPrimaryPhysicianIdIsDeprecated);
     assertNotNull(pi.PatientPrimaryPhysicianIdIsIgnored);
     assertNotNull(pi.PatientPrimaryPhysicianIdIsInvalid);

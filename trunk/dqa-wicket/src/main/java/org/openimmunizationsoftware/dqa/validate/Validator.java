@@ -695,7 +695,7 @@ public class Validator extends ValidateMessage
 
     notEmpty(patient.getFacilityName(), pi.PatientPrimaryFacilityNameIsMissing);
     handleCodeReceived(patient.getFacility().getId(), PotentialIssues.Field.PATIENT_PRIMARY_FACILITY_ID);
-    handleCodeReceived(patient.getPrimaryLanguage(), PotentialIssues.Field.PATIENT_PRIMARY_LANAGUAGE);
+    handleCodeReceived(patient.getPrimaryLanguage(), PotentialIssues.Field.PATIENT_PRIMARY_LANGUAGE);
     handleCodeReceived(patient.getPhysician(), PotentialIssues.Field.PATIENT_PRIMARY_PHYSICIAN_ID);
     notEmpty(patient.getPhysician().getName(), pi.PatientPrimaryPhysicianNameIsMissing);
     handleCodeReceived(patient.getProtection(), PotentialIssues.Field.PATIENT_PROTECTION_INDICATOR);

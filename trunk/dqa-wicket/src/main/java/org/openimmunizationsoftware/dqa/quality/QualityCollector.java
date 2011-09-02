@@ -23,6 +23,9 @@ import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineGroup;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.manager.VaccineGroupManager;
+import org.openimmunizationsoftware.dqa.quality.model.ModelFactory;
+import org.openimmunizationsoftware.dqa.quality.model.ModelForm;
+import org.openimmunizationsoftware.dqa.quality.model.ModelSection;
 
 public class QualityCollector
 {
@@ -37,6 +40,12 @@ public class QualityCollector
   private Date vaccinationAdminDateLatest = null;
   private int numeratorVaccinationAdminDateAge = 0;
   private QualityScoring scoring = null;
+  private ModelForm modelForm = null;
+  
+  public ModelForm getModelForm()
+  {
+    return modelForm;
+  }
 
   public int getVaccineCvxCount(VaccineCvx vaccineCvx)
   {
@@ -71,6 +80,7 @@ public class QualityCollector
     messageBatch.setBatchType(batchType);
     messageBatch.setProfile(profile);
     this.profile = profile;
+    modelForm = ModelFactory.getModelFormDefault();
   }
 
   public void registerProcessedMessage(MessageReceived messageReceived)
@@ -212,14 +222,15 @@ public class QualityCollector
     scoreTimeliness();
     scoreQuality();
     scoreCompleteness();
-    int overallScore = (int) (0.1 * messageBatch.getTimelinessScore() + 0.4 * messageBatch.getQualityScore() + 0.5
+    int overallScore = (int) (modelForm.getWeight("timeliness") * messageBatch.getTimelinessScore()
+        + modelForm.getWeight("quality") * messageBatch.getQualityScore() + modelForm.getWeight("completeness")
         * messageBatch.getCompletenessScore() + 0.5);
     messageBatch.setOverallScore(overallScore);
   }
 
   private void scoreCompleteness()
   {
-    scoring = new QualityScoring();
+    scoring = new QualityScoring(modelForm);
     Map<PotentialIssue, BatchIssues> batchIssuesMap = messageBatch.getBatchIssuesMap();
     ScoringSet patientExpected = scoring.getScoringSet(QualityScoring.PATIENT_EXPECTED);
     ScoringSet patientOptional = scoring.getScoringSet(QualityScoring.PATIENT_OPTIONAL);
@@ -238,14 +249,21 @@ public class QualityCollector
     score(batchIssuesMap, vaccinationOptional);
     score(batchIssuesMap, vaccinationRecommended);
     score(batchIssuesMap, vaccinationRequired);
-    double patientScore = patientExpected.getWeightedScore() + patientOptional.getWeightedScore()
-        + patientRecommended.getWeightedScore() + patientRequired.getWeightedScore();
-    double vaccinationScore = vaccinationExpected.getWeightedScore() + vaccinationOptional.getWeightedScore()
-        + vaccinationRecommended.getWeightedScore() + vaccinationRequired.getWeightedScore();
+    double patientScore = patientExpected.getWeightedScore() * modelForm.getWeight("completeness.patient.expected")
+        + patientOptional.getWeightedScore() * modelForm.getWeight("completeness.patient.optional")
+        + patientRecommended.getWeightedScore() * modelForm.getWeight("completeness.patient.recommended")
+        + patientRequired.getWeightedScore() * modelForm.getWeight("completeness.patient.required");
+    double vaccinationScore = vaccinationExpected.getWeightedScore()
+        * modelForm.getWeight("completeness.vaccination.expected") + vaccinationOptional.getWeightedScore()
+        * modelForm.getWeight("completeness.vaccination.optional") + vaccinationRecommended.getWeightedScore()
+        * modelForm.getWeight("completeness.vaccination.recommended") + vaccinationRequired.getWeightedScore()
+        * modelForm.getWeight("completeness.vaccination.required");
 
     double vaccineGroupScore = scoreVaccineGroupScore();
 
-    int completenessScore = (int) (patientScore * 40 + vaccinationScore * 40 + vaccineGroupScore * 20 + 0.5);
+    int completenessScore = (int) (100.0 * patientScore * modelForm.getWeight("completeness.patient") + 100.0
+        * vaccinationScore * modelForm.getWeight("completeness.vaccination") + 100.0 * vaccineGroupScore
+        * modelForm.getWeight("completeness.vaccineGroup") + 0.5);
     messageBatch.setCompletenessPatientScore((int) (patientScore * 100 + 0.5));
     messageBatch.setCompletenessVaccinationScore((int) (vaccinationScore * 100 + 0.5));
     messageBatch.setCompletenessVaccineGroupScore((int) (vaccineGroupScore * 100 + 0.5));
@@ -255,61 +273,55 @@ public class QualityCollector
   private double scoreVaccineGroupScore()
   {
     VaccineGroupManager vaccineGroupManager = VaccineGroupManager.getVaccineGroupManager();
-    List<VaccineGroup> vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_EXPECTED);
-    int groupsExpected = 0;
-    for (VaccineGroup vaccineGroup : vaccineGroupList)
+    double score = 0.0;
+    ModelSection vgsection = modelForm.getModelSection("completeness.vaccineGroup.expected");
+    int overallDenominator = 0;
+    int denominator = vgsection.getSections().size();
+    overallDenominator += denominator;
+    score = scoreVaccineGroup(vaccineGroupManager, vgsection, denominator);
+    vgsection = modelForm.getModelSection("completeness.vaccineGroup.recommended");
+    denominator = vgsection.getSections().size();
+    overallDenominator += denominator;
+    score = score + scoreVaccineGroup(vaccineGroupManager, vgsection, denominator);
+    vgsection = modelForm.getModelSection("completeness.vaccineGroup.recommended");
+    Double demeritScore = scoreVaccineGroup(vaccineGroupManager, vgsection, overallDenominator);
+    score = score - demeritScore;
+    if (score < 0)
     {
-      for (VaccineCvx vaccineCvx : vaccineGroup.getVaccineCvxList())
-      {
-        if (getVaccineCvxCount(vaccineCvx) > 0)
-        {
-          groupsExpected += 2;
-          break;
-        }
-      }
+      score = 0;
     }
-    vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_RECCOMMENDED);
-    int groupsRecommended = 0;
-    for (VaccineGroup vaccineGroup : vaccineGroupList)
-    {
-      for (VaccineCvx vaccineCvx : vaccineGroup.getVaccineCvxList())
-      {
-        if (getVaccineCvxCount(vaccineCvx) > 0)
-        {
-          groupsRecommended++;
-          break;
-        }
-      }
-    }
-    int denominator = vaccineGroupList.size();
-    vaccineGroupList = vaccineGroupManager.getVaccineGroupList(VaccineGroup.GROUP_STATUS_NOT_EXPECTED);
-    int groupsNotExpected = 0;
-    for (VaccineGroup vaccineGroup : vaccineGroupList)
-    {
-      for (VaccineCvx vaccineCvx : vaccineGroup.getVaccineCvxList())
-      {
-        if (getVaccineCvxCount(vaccineCvx) > 0)
-        {
-          groupsNotExpected += 4;
-          break;
-        }
-      }
-    }
+    return score;
+  }
 
-    double vaccinationGroupScore = denominator > 0 ? (groupsExpected + groupsRecommended - groupsNotExpected) / (float) denominator : 1.0;
-    if (vaccinationGroupScore < 0)
+  private double scoreVaccineGroup(VaccineGroupManager vaccineGroupManager, ModelSection vgsection, int denominator)
+  {
+    int count = 0;
+    for (ModelSection section : vgsection.getSections())
     {
-      vaccinationGroupScore = 0;
+      VaccineGroup vaccineGroup = vaccineGroupManager.getVaccineGroup(section.getName());
+      if (vaccineGroup == null)
+      {
+        throw new IllegalArgumentException("Invalid vaccine group name '" + section.getName() + "'");
+      }
+      for (VaccineCvx vaccineCvx : vaccineGroup.getVaccineCvxList())
+      {
+        if (getVaccineCvxCount(vaccineCvx) > 0)
+        {
+          count++;
+          break;
+        }
+      }
     }
-    // return vaccinationGroupScore;
-    return vaccinationGroupScore;
+    double addScore = denominator > 0 ? count / denominator : 0;
+    addScore = addScore * vgsection.getWeight();
+    return addScore;
   }
 
   private void score(Map<PotentialIssue, BatchIssues> batchIssuesMap, ScoringSet scoringSet)
   {
     List<CompletenessRow> completenessRows = scoringSet.getCompletenessRow();
     double overallScore = 0.0;
-    int overallWeight = 0;
+    double overallWeight = 0;
     for (CompletenessRow completenessRow : completenessRows)
     {
       PotentialIssue potentialIssue = completenessRow.getPotentialIssue();
@@ -319,6 +331,7 @@ public class QualityCollector
       if (denominator > 0)
       {
         numerator = invertNumerator(completenessRow, numerator, denominator);
+        // System.out.println("--> " + completenessRow.getToolTip().getLabel() + " " + completenessRow.getScoreWeight() + " * " + numerator + " / " + denominator);
         double score = completenessRow.getScoreWeight() * numerator / (double) denominator;
         completenessRow.setScore(score);
         completenessRow.setCount(numerator);
@@ -372,25 +385,25 @@ public class QualityCollector
   private int getDenominator(CompletenessRow completenessRow)
   {
     int denominator = 0;
-    if (completenessRow.getReportDenominator().equals(PotentialIssue.REPORT_DENOMINATOR_MESSAGE_COUNT))
+    if (completenessRow.getReportDenominator() == ReportDenominator.MESSAGE_COUNT)
     {
       denominator = messageBatch.getMessageCount();
-    } else if (completenessRow.getReportDenominator().equals(PotentialIssue.REPORT_DENOMINATOR_NEXT_OF_KIN_COUNT))
+    } else if (completenessRow.getReportDenominator() == ReportDenominator.NEXTOFKIN_COUNT)
     {
       denominator = messageBatch.getNextOfKinCount();
-    } else if (completenessRow.getReportDenominator().equals(PotentialIssue.REPORT_DENOMINATOR_OBSERVATION_COUNT))
+    } else if (completenessRow.getReportDenominator() == ReportDenominator.OBSERVATION_COUNT)
     {
       denominator = 0;
-    } else if (completenessRow.getReportDenominator().equals(PotentialIssue.REPORT_DENOMINATOR_PATIENT_COUNT))
+    } else if (completenessRow.getReportDenominator() == ReportDenominator.PATIENT_COUNT)
     {
       denominator = messageBatch.getPatientCount();
-    } else if (completenessRow.getReportDenominator().equals(PotentialIssue.REPORT_DENOMINATOR_PATIENT_UNDERAGE_COUNT))
+    } else if (completenessRow.getReportDenominator() == ReportDenominator.PATIENT_UNDERAGE_COUNT)
     {
       denominator = messageBatch.getPatientUnderageCount();
-    } else if (completenessRow.getReportDenominator().equals(PotentialIssue.REPORT_DENOMINATOR_VACCINATION_COUNT))
+    } else if (completenessRow.getReportDenominator() == ReportDenominator.VACCINATION_COUNT)
     {
       denominator = messageBatch.getVaccinationCount();
-    } else if (completenessRow.getReportDenominator().equals(PotentialIssue.REPORT_DENOMINATOR_VACCINATION_ADMIN_COUNT))
+    } else if (completenessRow.getReportDenominator() == ReportDenominator.VACCINATION_ADMIN_COUNT)
     {
       denominator = messageBatch.getVaccinationAdministeredCount();
     }
@@ -453,7 +466,8 @@ public class QualityCollector
     }
     messageBatch.setQualityWarnScore((int) (100.0 * qualityWarnScore + 0.5));
     messageBatch.setQualityErrorScore((int) (100.0 * qualityErrorScore + 0.5));
-    messageBatch.setQualityScore((int) (qualityErrorScore * 50.0 + qualityWarnScore * 50.0 + 0.5));
+    messageBatch.setQualityScore((int) (100.0 * qualityErrorScore * modelForm.getWeight("quality.errors") + 100.0
+        * qualityWarnScore * modelForm.getWeight("quality.warnings") + 0.5));
   }
 
   private void scoreTimeliness()
@@ -469,8 +483,10 @@ public class QualityCollector
       score30days = messageBatch.getTimelinessCount30Days() / messageBatch.getMessageWithAdminCount();
       timelinessAverage = numeratorVaccinationAdminDateAge / (double) messageBatch.getMessageWithAdminCount();
     }
+    
 
-    int timeliness = (int) (60.0 * score30days + 40.0 * score7days + 0.0 * score2days + 0.5);
+    int timeliness = (int) (100 * (modelForm.getWeight("timeliness.30days") * score30days
+        + modelForm.getWeight("timeliness.7days") * score7days + modelForm.getWeight("timeliness.2days") * score2days) + 0.5);
     if (timeliness > 100)
     {
       timeliness = 100;

@@ -522,3 +522,5 @@ ALTER TABLE dqa_batch_vaccine_cvx ADD CONSTRAINT dqa_fk_batch_vaccine_cvx2 FOREI
 ALTER TABLE dqa_submitter_profile ADD CONSTRAINT dqa_fk_submitter_profile1 FOREIGN KEY(org_id) REFERENCES dqa_organization(org_id);
 
 
+update dqa_potential_issue set target_field = 'primary language' where target_field = 'primary lanaguage';
+update dqa_potential_issue set report_denominator = 'NextOfKin Count' where report_denominator='Next-of-Kin Count';

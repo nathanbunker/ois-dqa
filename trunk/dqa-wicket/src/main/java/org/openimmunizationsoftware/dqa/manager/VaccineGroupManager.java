@@ -27,8 +27,14 @@ public class VaccineGroupManager
     return singleton;
   }
 
+  private Map<String, VaccineGroup> vaccineGroups = new HashMap<String, VaccineGroup>();
   private Map<String, List<VaccineGroup>> vaccineGroupMapList = new HashMap<String, List<VaccineGroup>>();
   private Map<String, Set<VaccineGroup>> vaccineGroupMapSet = new HashMap<String, Set<VaccineGroup>>();
+  
+  public VaccineGroup getVaccineGroup(String groupCode)
+  {
+    return vaccineGroups.get(groupCode);
+  }
 
   public List<VaccineGroup> getVaccineGroupList(String groupStatus)
   {
@@ -67,6 +73,7 @@ public class VaccineGroupManager
         targetSet.add(vaccineGroup);
       }
       vaccineGroup.getVaccineCvxList().add(vaccineCvxGroup.getVaccineCvx());
+      vaccineGroups.put(vaccineGroup.getGroupCode(), vaccineGroup);
     }
 
     session.close();

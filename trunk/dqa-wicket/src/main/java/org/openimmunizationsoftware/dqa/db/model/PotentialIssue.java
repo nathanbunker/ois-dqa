@@ -1,6 +1,8 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import org.openimmunizationsoftware.dqa.quality.ReportDenominator;
 import org.openimmunizationsoftware.dqa.quality.ToolTip;
+import org.openimmunizationsoftware.dqa.quality.model.ModelScore;
 
 public class PotentialIssue
 {
@@ -22,22 +24,13 @@ public class PotentialIssue
   public static final String ISSUE_TYPE_IS_UNRECOGNIZED = "is unrecognized";
   public static final String ISSUE_TYPE_IS_VALUED_AS = "is valued as";
   
-  public static final String REPORT_DENOMINATOR_MESSAGE_COUNT = "Message Count";
-  public static final String REPORT_DENOMINATOR_NEXT_OF_KIN_COUNT = "Next-of-Kin Count";
-  public static final String REPORT_DENOMINATOR_OBSERVATION_COUNT = "Observation Count";
-  public static final String REPORT_DENOMINATOR_PATIENT_COUNT = "Patient Count";
-  public static final String REPORT_DENOMINATOR_PATIENT_UNDERAGE_COUNT = "Patient Underage Count";
-  
-  public static final String REPORT_DENOMINATOR_VACCINATION_COUNT = "Vaccination Count";
-  public static final String REPORT_DENOMINATOR_VACCINATION_ADMIN_COUNT = "Vaccination Admin Count";
-  
   private String changePriority = "";
   private IssueAction defaultIssueAction = null;
   private String fieldValue = "";
   private String issueDescription = "";
   private int issueId = 0;
   private String issueType = "";
-  private String reportDenominator = "";
+  private String reportDenominator;
   private String targetField = "";
   private String targetObject = "";
   private ToolTip toolTip = null;
@@ -141,12 +134,12 @@ public class PotentialIssue
   {
     this.issueType = issueType;
   }
-
+  
   public void setReportDenominator(String reportDenominator)
   {
     this.reportDenominator = reportDenominator;
   }
-
+  
   public void setTargetField(String targetField)
   {
     this.targetField = targetField;

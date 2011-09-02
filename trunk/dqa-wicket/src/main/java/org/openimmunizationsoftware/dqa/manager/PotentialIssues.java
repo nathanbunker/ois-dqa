@@ -3,11 +3,11 @@ package org.openimmunizationsoftware.dqa.manager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.mapping.Array;
 import org.openimmunizationsoftware.dqa.InitializationException;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 
@@ -194,11 +194,11 @@ public class PotentialIssues
   public PotentialIssue PatientPrimaryFacilityIdIsMissing = null;
   public PotentialIssue PatientPrimaryFacilityIdIsUnrecognized = null;
   public PotentialIssue PatientPrimaryFacilityNameIsMissing = null;
-  public PotentialIssue PatientPrimaryLanaguageIsDeprecated = null;
-  public PotentialIssue PatientPrimaryLanaguageIsIgnored = null;
-  public PotentialIssue PatientPrimaryLanaguageIsInvalid = null;
-  public PotentialIssue PatientPrimaryLanaguageIsMissing = null;
-  public PotentialIssue PatientPrimaryLanaguageIsUnrecognized = null;
+  public PotentialIssue PatientPrimaryLanguageIsDeprecated = null;
+  public PotentialIssue PatientPrimaryLanguageIsIgnored = null;
+  public PotentialIssue PatientPrimaryLanguageIsInvalid = null;
+  public PotentialIssue PatientPrimaryLanguageIsMissing = null;
+  public PotentialIssue PatientPrimaryLanguageIsUnrecognized = null;
   public PotentialIssue PatientPrimaryPhysicianIdIsDeprecated = null;
   public PotentialIssue PatientPrimaryPhysicianIdIsIgnored = null;
   public PotentialIssue PatientPrimaryPhysicianIdIsInvalid = null;
@@ -399,7 +399,7 @@ public class PotentialIssues
     PATIENT_GUARDIAN_PARTY, PATIENT_GUARDIAN_PHONE, PATIENT_GUARDIAN_RELATIONSHIP,
     PATIENT_IMMUNIZATION_REGISTRY_STATUS, PATIENT_LAST_NAME, PATIENT_MEDICAID_NUMBER, PATIENT_MIDDLE_NAME,
     PATIENT_MOTHERS_MAIDEN_NAME, PATIENT_NAME, PATIENT_PHONE, PATIENT_PRIMARY_FACILITY_ID,
-    PATIENT_PRIMARY_FACILITY_NAME, PATIENT_PRIMARY_LANAGUAGE, PATIENT_PRIMARY_PHYSICIAN_ID,
+    PATIENT_PRIMARY_FACILITY_NAME, PATIENT_PRIMARY_LANGUAGE, PATIENT_PRIMARY_PHYSICIAN_ID,
     PATIENT_PRIMARY_PHYSICIAN_NAME, PATIENT_PROTECTION_INDICATOR, PATIENT_PUBLICITY_CODE, PATIENT_RACE,
     PATIENT_REGISTRY_ID, PATIENT_REGISTRY_STATUS, PATIENT_SSN, PATIENT_SUBMITTER_ID, PATIENT_VFC_EFFECTIVE_DATE,
     PATIENT_VFC_STATUS, PATIENT_WIC_ID, VACCINATION_ACTION_CODE, VACCINATION_ADMIN_CODE, VACCINATION_ADMIN_DATE,
@@ -414,12 +414,28 @@ public class PotentialIssues
 
   private HashMap<Field, HashMap<String, PotentialIssue>> fieldIssueMaps = new HashMap<PotentialIssues.Field, HashMap<String, PotentialIssue>>();
   private List<PotentialIssue> allPotentialIssues = new ArrayList<PotentialIssue>();
+  private Map<String, PotentialIssue> allPotentialIssuesMap = new HashMap<String, PotentialIssue>();
   
   public List<PotentialIssue> getAllPotentialIssues()
   {
     return allPotentialIssues;
   }
+  
+  /**
+   * Returns the potential issue that has the given display text. If the potential issue is not
+   * found then null is returned.
+   * @param displayText
+   * @return
+   */
+  public PotentialIssue getPotentialIssueByDisplayText(String displayText)
+  {
+    return allPotentialIssuesMap.get(displayText);
+  }
 
+  public PotentialIssue getPotentialIssueByDisplayText(String displayText, String issueType)
+  {
+    return allPotentialIssuesMap.get(displayText + " " + issueType);
+  }
   private void addToFieldIssueMap(Field field, PotentialIssue issue)
   {
     if (issue.getIssueType().equals(PotentialIssue.ISSUE_TYPE_IS_VALUED_AS))
@@ -643,11 +659,11 @@ public class PotentialIssues
     PatientPrimaryFacilityIdIsMissing = getPotentialIssue(session, "Patient", "primary facility id", "is missing", "");
     PatientPrimaryFacilityIdIsUnrecognized = getPotentialIssue(session, "Patient", "primary facility id", "is unrecognized", "");
     PatientPrimaryFacilityNameIsMissing = getPotentialIssue(session, "Patient", "primary facility name", "is missing", "");
-    PatientPrimaryLanaguageIsDeprecated = getPotentialIssue(session, "Patient", "primary lanaguage", "is deprecated", "");
-    PatientPrimaryLanaguageIsIgnored = getPotentialIssue(session, "Patient", "primary lanaguage", "is ignored", "");
-    PatientPrimaryLanaguageIsInvalid = getPotentialIssue(session, "Patient", "primary lanaguage", "is invalid", "");
-    PatientPrimaryLanaguageIsMissing = getPotentialIssue(session, "Patient", "primary lanaguage", "is missing", "");
-    PatientPrimaryLanaguageIsUnrecognized = getPotentialIssue(session, "Patient", "primary lanaguage", "is unrecognized", "");
+    PatientPrimaryLanguageIsDeprecated = getPotentialIssue(session, "Patient", "primary language", "is deprecated", "");
+    PatientPrimaryLanguageIsIgnored = getPotentialIssue(session, "Patient", "primary language", "is ignored", "");
+    PatientPrimaryLanguageIsInvalid = getPotentialIssue(session, "Patient", "primary language", "is invalid", "");
+    PatientPrimaryLanguageIsMissing = getPotentialIssue(session, "Patient", "primary language", "is missing", "");
+    PatientPrimaryLanguageIsUnrecognized = getPotentialIssue(session, "Patient", "primary language", "is unrecognized", "");
     PatientPrimaryPhysicianIdIsDeprecated = getPotentialIssue(session, "Patient", "primary physician id", "is deprecated", "");
     PatientPrimaryPhysicianIdIsIgnored = getPotentialIssue(session, "Patient", "primary physician id", "is ignored", "");
     PatientPrimaryPhysicianIdIsInvalid = getPotentialIssue(session, "Patient", "primary physician id", "is invalid", "");
@@ -1014,11 +1030,11 @@ public class PotentialIssues
     addToFieldIssueMap(Field.PATIENT_PRIMARY_FACILITY_ID, PatientPrimaryFacilityIdIsMissing);
     addToFieldIssueMap(Field.PATIENT_PRIMARY_FACILITY_ID, PatientPrimaryFacilityIdIsUnrecognized);
     addToFieldIssueMap(Field.PATIENT_PRIMARY_FACILITY_NAME, PatientPrimaryFacilityNameIsMissing);
-    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANAGUAGE, PatientPrimaryLanaguageIsDeprecated);
-    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANAGUAGE, PatientPrimaryLanaguageIsIgnored);
-    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANAGUAGE, PatientPrimaryLanaguageIsInvalid);
-    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANAGUAGE, PatientPrimaryLanaguageIsMissing);
-    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANAGUAGE, PatientPrimaryLanaguageIsUnrecognized);
+    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANGUAGE, PatientPrimaryLanguageIsDeprecated);
+    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANGUAGE, PatientPrimaryLanguageIsIgnored);
+    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANGUAGE, PatientPrimaryLanguageIsInvalid);
+    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANGUAGE, PatientPrimaryLanguageIsMissing);
+    addToFieldIssueMap(Field.PATIENT_PRIMARY_LANGUAGE, PatientPrimaryLanguageIsUnrecognized);
     addToFieldIssueMap(Field.PATIENT_PRIMARY_PHYSICIAN_ID, PatientPrimaryPhysicianIdIsDeprecated);
     addToFieldIssueMap(Field.PATIENT_PRIMARY_PHYSICIAN_ID, PatientPrimaryPhysicianIdIsIgnored);
     addToFieldIssueMap(Field.PATIENT_PRIMARY_PHYSICIAN_ID, PatientPrimaryPhysicianIdIsInvalid);
@@ -1228,6 +1244,7 @@ public class PotentialIssues
     }
     pi = potentialIssues.get(0);
     allPotentialIssues.add(pi);
+    allPotentialIssuesMap.put(pi.getDisplayText(), pi);
     return pi;
   }
 

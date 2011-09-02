@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
-import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
+import org.openimmunizationsoftware.dqa.quality.model.ModelScore;
+import org.openimmunizationsoftware.dqa.quality.model.ModelSection;
 
 public class ScoringSet
 {
@@ -13,14 +14,14 @@ public class ScoringSet
   private double score = 0;
   private double weightedScore = 0;
   private String label = "";
-  private int overallWeight = 0;
+  private double overallWeight = 0;
 
-  public int getOverallWeight()
+  public double getOverallWeight()
   {
     return overallWeight;
   }
 
-  public void setOverallWeight(int overallWeight)
+  public void setOverallWeight(double overallWeight)
   {
     this.overallWeight = overallWeight;
   }
@@ -53,38 +54,44 @@ public class ScoringSet
   {
     completenessRow.add(row);
   }
-  
-  public CompletenessRow add(String label, PotentialIssue potentialIssue, String reportDenominator, int scoreWeight)
+
+  public void setSection(ModelSection modelSection)
+  {
+    this.weight = modelSection.getWeight();
+    for (ModelScore score : modelSection.getScores())
+    {
+      CompletenessRow cr = add(score);
+      if (score.getWeight() < 0)
+      {
+        cr.setDemerit();
+      }
+      else
+      {
+        boolean invert = score.getPotentialIssue().getIssueType().equals(PotentialIssue.ISSUE_TYPE_IS_MISSING);
+        cr.setInvert(invert);
+      }
+      for (ModelScore subScore : score.getScores())
+      {
+        cr = add(subScore).setIndent(true);
+        boolean invert = subScore.getPotentialIssue().getIssueType().equals(PotentialIssue.ISSUE_TYPE_IS_MISSING);
+        cr.setInvert(invert);
+      }
+    }
+
+  }
+
+  private CompletenessRow add(ModelScore score)
+  {
+    return add(score.getLabel(), score.getPotentialIssue(), score.getDenominator(),
+        score.getWeight());
+  }
+
+  private CompletenessRow add(String label, PotentialIssue potentialIssue, ReportDenominator reportDenominator,
+      float scoreWeight)
   {
     CompletenessRow row = new CompletenessRow(label, potentialIssue, reportDenominator, scoreWeight);
     completenessRow.add(row);
     return row;
-  }
-
-  public void add(String label, PotentialIssues.Field field, String denominator, int weight)
-  {
-    PotentialIssues pi = PotentialIssues.getPotentialIssues();
-    PotentialIssue missing = pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_MISSING);
-    if (missing != null)
-    {
-      add(new CompletenessRow(label, missing, denominator, weight));
-      PotentialIssue deprecate = pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_DEPRECATE);
-      if (deprecate != null)
-      {
-        add(new CompletenessRow("Deprecate", deprecate, denominator, -weight).setDemerit());
-      }
-      PotentialIssue invalid = pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_INVALID);
-      if (invalid != null)
-      {
-        add(new CompletenessRow("Invalid", invalid, denominator, -weight).setDemerit());
-      }
-      PotentialIssue unrecognized = pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_UNRECOGNIZED);
-      if (unrecognized != null)
-      {
-        add(new CompletenessRow("Unrecognized", unrecognized, denominator, -weight).setDemerit());
-      }
-    }
-
   }
 
   public double getWeight()

@@ -7,14 +7,18 @@ public class CompletenessRow
   private int count = 0;
   private int denominator = 0;
   private boolean invert = true;
+  private boolean demerit = false;
   private int okayHigh = 100;
   private int okayLow = 0;
   private PotentialIssue potentialIssue = null;
-  private String reportDenominator = "";
+  private ReportDenominator reportDenominator;
   private double score = 0;
-  private int scoreWeight = 0;
+  private float scoreWeight = 0;
   private ToolTip toolTip;
 
+  /**
+   * 
+   */
   public CompletenessRow() {
     // default
   }
@@ -27,7 +31,13 @@ public class CompletenessRow
     this.toolTip = new ToolTip(toolTip.getLabel(), "");
   }
 
-  public CompletenessRow(String label, PotentialIssue potentialIssue, String reportDenominator, int scoreWeight) {
+  /**
+   * @param label 
+   * @param potentialIssue
+   * @param reportDenominator
+   * @param scoreWeight
+   */
+  public CompletenessRow(String label, PotentialIssue potentialIssue, ReportDenominator reportDenominator, float scoreWeight) {
     this.potentialIssue = potentialIssue;
     this.reportDenominator = reportDenominator;
     this.scoreWeight = scoreWeight;
@@ -60,7 +70,7 @@ public class CompletenessRow
     return potentialIssue;
   }
 
-  public String getReportDenominator()
+  public ReportDenominator getReportDenominator()
   {
     return reportDenominator;
   }
@@ -70,7 +80,7 @@ public class CompletenessRow
     return score;
   }
 
-  public int getScoreWeight()
+  public float getScoreWeight()
   {
     return scoreWeight;
   }
@@ -103,6 +113,7 @@ public class CompletenessRow
   
   public CompletenessRow setDemerit()
   {
+    this.demerit = true;
     this.invert = false;
     this.toolTip.setIndent(true);
     return this;
@@ -129,7 +140,7 @@ public class CompletenessRow
     this.potentialIssue = potentialIssue;
   }
 
-  public void setReportDenominator(String reportDenominator)
+  public void setReportDenominator(ReportDenominator reportDenominator)
   {
     this.reportDenominator = reportDenominator;
   }
@@ -147,6 +158,11 @@ public class CompletenessRow
   public void setToolTip(ToolTip toolTip)
   {
     this.toolTip = toolTip;
+  }
+
+  public boolean isDemerit()
+  {
+    return demerit;
   }
 
 }
