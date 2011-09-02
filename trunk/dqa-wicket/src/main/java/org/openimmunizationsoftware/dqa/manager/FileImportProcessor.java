@@ -61,7 +61,7 @@ public class FileImportProcessor extends ManagerThread
   private PrintWriter errorsOut;
   private PrintWriter acceptedOut;
   private String profileCode = null;
-  private QualityCollector messageBatchManager = null;
+  private QualityCollector qualityCollector = null;
 
   protected FileImportProcessor(File dir, FileImportManager fileImportManager) {
     super("File Import Processor for " + dir.getName());
@@ -253,11 +253,11 @@ public class FileImportProcessor extends ManagerThread
 
   private void saveAndCloseBatch(Session session)
   {
-    messageBatchManager.close();
+    qualityCollector.close();
     Transaction tx = session.beginTransaction();
-    messageBatchManager.getMessageBatch().setSubmitStatus(SubmitStatus.QUEUED);
-    session.save(messageBatchManager.getMessageBatch());
-    MessageBatch messageBatch = messageBatchManager.getMessageBatch();
+    qualityCollector.getMessageBatch().setSubmitStatus(SubmitStatus.QUEUED);
+    session.save(qualityCollector.getMessageBatch());
+    MessageBatch messageBatch = qualityCollector.getMessageBatch();
     for (BatchIssues batchIssues : messageBatch.getBatchIssuesMap().values())
     {
       session.save(batchIssues);
@@ -280,16 +280,16 @@ public class FileImportProcessor extends ManagerThread
   private void createMessageBatch(Session session)
   {
     Transaction tx = session.beginTransaction();
-    messageBatchManager = new QualityCollector("File Import", BatchType.SUBMISSION, profile);
-    session.save(messageBatchManager.getMessageBatch());
+    qualityCollector = new QualityCollector("File Import", BatchType.SUBMISSION, profile);
+    session.save(qualityCollector.getMessageBatch());
     tx.commit();
   }
 
   private void printReport(File inFile, Session session)
   {
     Transaction tx = session.beginTransaction();
-    messageBatchManager.score();
-    QualityReport qualityReport = new QualityReport(messageBatchManager, profile, reportOut);
+    qualityCollector.score();
+    QualityReport qualityReport = new QualityReport(qualityCollector, profile, reportOut);
     qualityReport.setFilename(inFile.getName());
     qualityReport.printReport();
     tx.commit();
@@ -364,7 +364,7 @@ public class FileImportProcessor extends ManagerThread
       }
       IssueAction issueAction = determineIssueAction(messageReceived);
       messageReceived.setIssueAction(issueAction);
-      messageBatchManager.registerProcessedMessage(messageReceived);
+      qualityCollector.registerProcessedMessage(messageReceived);
 
       String ackMessage = parser.makeAckMessage(messageReceived);
       messageReceived.setResponseText(ackMessage);
@@ -414,7 +414,7 @@ public class FileImportProcessor extends ManagerThread
   private void saveInQueue(Session session, MessageReceived messageReceived)
   {
     ReceiveQueue receiveQueue = new ReceiveQueue();
-    receiveQueue.setMessageBatch(messageBatchManager.getMessageBatch());
+    receiveQueue.setMessageBatch(qualityCollector.getMessageBatch());
     receiveQueue.setMessageReceived(messageReceived);
     receiveQueue.setSubmitStatus(messageReceived.hasErrors() ? SubmitStatus.EXCLUDED : SubmitStatus.QUEUED);
     messageReceived.setSubmitStatus(receiveQueue.getSubmitStatus());

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.openimmunizationsoftware.dqa.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
@@ -21,6 +22,12 @@ import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 
 public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 {
+
+  public static final String ACK_ACCEPT = "AA";
+  public static final String ACK_ERROR = "AE";
+  public static final String ACK_REJECT = "AR";
+  public static final String PROCESSING_ID_DEBUG = "D";
+
   private char[] separators = new char[5];
   private static final int BAR = 0;
   private static final int CAR = 1;
@@ -521,19 +528,146 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   public String makeAckMessage(MessageReceived messageReceived)
   {
-    // TODO Message needs to be in a better format
+    String controlId = messageReceived.getHeader().getMessageId();
+    String processingId = message.getHeader().getProcessingId();
+    String ackCode = ACK_ACCEPT;
+    String text = "Message accepted";
     if (messageReceived.hasErrors())
+    {
+      text = "Message rejected: ";
+      ackCode = ACK_ERROR;
+      for (IssueFound issueFound : messageReceived.getIssuesFound())
+      {
+        if (issueFound.isError()) {
+          text += issueFound.getDisplayText();
+          break;
+        }
+      }
+    }
+    if (messageReceived.getPatient().isSkipped())
+    {
+      text = "Message skipped: ";
+      ackCode = ACK_ACCEPT;
+      for (IssueFound issueFound : messageReceived.getIssuesFound())
+      {
+        if (issueFound.isSkip()) {
+          text += issueFound.getDisplayText();
+          break;
+        }
+      }
+    }
+    if (text.length() > 80)
+    {
+      // HL7 has a max length for the ack text of 80 characters
+      text = text.substring(0, 80);
+    }
+    StringBuilder ack = new StringBuilder();
+    String receivingApplication = message.getHeader().getSendingApplication();
+    String receivingFacility = message.getHeader().getSendingFacility();
+    String sendingApplication = message.getHeader().getReceivingApplication();
+    String sendingFacility = message.getHeader().getReceivingFacility();
+    if (receivingApplication == null)
+    {
+      receivingApplication = "";
+    }
+    if (receivingFacility == null)
+    {
+      receivingFacility = "";
+    }
+    if (sendingApplication == null || sendingApplication.equals(""))
+    {
+      sendingApplication = "MCIR";
+    }
+    if (sendingFacility == null || sendingFacility.equals(""))
+    {
+      sendingFacility = "MCIR";
+    }
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssZ");
+    String messageDate = sdf.format(new Date());
+    // MSH
+    ack.append("MSH|^~\\&");
+    ack.append("|" + sendingApplication); // MSH-3 Sending Application
+    ack.append("|" + sendingFacility); // MSH-4 Sending Facility
+    ack.append("|" + receivingApplication); // MSH-5 Receiving Application
+    ack.append("|" + receivingFacility); // MSH-6 Receiving Facility
+    ack.append("|" + messageDate); // MSH-7 Date/Time of Message
+    ack.append("|"); // MSH-8 Security
+    ack.append("|ACK^" + message.getHeader().getMessageTrigger()); // MSH-9
+                                                                   // Message
+                                                                   // Type
+    ack.append("|" + messageDate + "." + getNextAckCount()); // MSH-10 Message
+                                                             // Control ID
+    ack.append("|P"); // MSH-11 Processing ID
+    ack.append("|2.5.1"); // MSH-12 Version ID
+    ack.append("|\r");
+    ack.append("SFT|" + SoftwareVersion.VENDOR + "|" + SoftwareVersion.VERSION + "|" + SoftwareVersion.PRODUCT + "|"
+        + SoftwareVersion.BINARY_ID + "|\r");
+    ack.append("MSA|" + ackCode + "|" + controlId + "|" + escapeHL7Chars(text) + "|\r");
+    for (IssueFound issueFound : messageReceived.getIssuesFound())
+    {
+      if (issueFound.isError())
+      {
+        ack.append("ERR|||0|E||||" + issueFound.getDisplayText() + "|\r");
+      }
+    }
+    for (IssueFound issueFound : messageReceived.getIssuesFound())
+    {
+      if (issueFound.isWarn() || issueFound.isSkip())
+      {
+        ack.append("ERR|||0|W||||" + issueFound.getDisplayText() + "|\r");
+      }
+    }
+    if (processingId.equals(PROCESSING_ID_DEBUG))
     {
       for (IssueFound issueFound : messageReceived.getIssuesFound())
       {
-        if (issueFound.isError())
-          return "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r" + "MSA|AE|TODO|"
-              + issueFound.getDisplayText() + "|\r";
+        if (issueFound.isAccept())
+        {
+          ack.append("ERR|||0|I||||" + issueFound.getDisplayText() + "|\r");
+        }
       }
     }
-    return "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r" + "MSA|AA|TODO|Message received for "
-        + messageReceived.getPatient().getNameFirst() + " " + messageReceived.getPatient().getNameLast() + "|\r";
+    return ack.toString();
 
+  }
+
+  private int ackCount = 1;
+
+  private int getNextAckCount()
+  {
+    if (ackCount == Integer.MAX_VALUE)
+    {
+      ackCount = 1;
+    }
+    return ackCount++;
+  }
+
+  public static String escapeHL7Chars(String s) {
+    StringBuilder sb = new StringBuilder();
+    for (char c : s.toCharArray()) {
+      if (c >= ' ') {
+        switch (c) {
+        case '~':
+          sb.append("\\R\\");
+          break;
+        case '\\':
+          sb.append("\\E\\");
+          break;
+        case '|':
+          sb.append("\\F\\");
+          break;
+        case '^':
+          sb.append("\\S\\");
+          break;
+        case '&':
+          sb.append("\\T\\");
+          break;
+        default:
+          sb.append(c);
+        }
+      }
+    }
+    return sb.toString();
   }
 
 }

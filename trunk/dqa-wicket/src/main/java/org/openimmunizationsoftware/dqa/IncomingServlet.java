@@ -108,7 +108,7 @@ public class IncomingServlet extends HttpServlet
     printManagerThread(weeklyBatchManager);
     printManagerThread(weeklyExportManager);
     out.println("    <hr>");
-    out.println("    <p>Version 0.6</p>");
+    out.println("    <p>Version " + SoftwareVersion.VERSION + "</p>");
     out.println("  </body>");
     out.println("</html>");
     out.close();

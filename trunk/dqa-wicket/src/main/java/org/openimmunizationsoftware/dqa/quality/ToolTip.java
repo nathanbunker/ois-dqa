@@ -53,6 +53,11 @@ public class ToolTip
   {
     return indent;
   }
+  
+  public boolean hasIndent()
+  {
+    return indent != null && !indent.equals("");
+  }
 
   public String getLabel()
   {
