@@ -59,6 +59,19 @@ public class SubmitterProfile
     return codesReceived;
   }
   
+  public void saveCodesReceived(Session session)
+  {
+    if (codesReceived != null)
+    {
+      codesReceived.saveCodesReceived(session);
+    }
+  }
+  
+  public void registerCodeReceived(CodeReceived codeReceived, Session session)
+  {
+    getCodesReceived(session).registerCodeReceived(codeReceived);
+  }
+  
   public String getDataFormat()
   {
     return dataFormat;

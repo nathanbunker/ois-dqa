@@ -11,6 +11,11 @@ public class Id
   private Name name = null;
   private String number = "";
   private CodedEntity type = new CodedEntity(CodeTable.Type.ID_TYPE_CODE);
+  
+  public boolean isEmpty()
+  {
+    return number == null || number.isEmpty();
+  }
 
   public Id(CodeTable.Type tableType) {
     this.tableType = tableType;

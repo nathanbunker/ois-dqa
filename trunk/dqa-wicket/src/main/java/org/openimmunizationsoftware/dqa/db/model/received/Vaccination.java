@@ -25,8 +25,8 @@ public class Vaccination implements Skippable
 
   private CodedEntity action = new CodedEntity(CodeTable.Type.VACCINATION_ACTION_CODE);
   private CodedEntity admin = new CodedEntity(CodeTable.Type.VACCINATION_CVX_CODE);
-  private CodedEntity adminCpt = new CodedEntity(CodeTable.Type.VACCINATION_CPT_CODE);
-  private CodedEntity adminCvx = new CodedEntity(CodeTable.Type.VACCINATION_CVX_CODE);
+  private final CodedEntity adminCpt = new CodedEntity(CodeTable.Type.VACCINATION_CPT_CODE);
+  private final CodedEntity adminCvx = new CodedEntity(CodeTable.Type.VACCINATION_CVX_CODE);
   private Date adminDate = null;
   private Date adminDateEnd = null;
   private String amount = "";
