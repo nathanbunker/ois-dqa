@@ -58,20 +58,20 @@ public class QualityReport
       "Indicates the completess of the type of vaccines reported", true).setLink("#completeness.vaccineGroup");
   private static final ToolTip SCORE_QUALITY = new ToolTip("Quality",
       "Indicates the level of errors and warnings generated").setEmphasize(true).setLink("#quality");
-  private static final ToolTip SCORE_QUALITY_SCORE_ERRORS = new ToolTip("Errors",
+  private static final ToolTip SCORE_QUALITY_SCORE_ERRORS = new ToolTip("No Errors",
       "Indicates the level of errors found, message are expected to generate less than one percent error rate", true)
       .setLink("#quality.errors");
-  private static final ToolTip SCORE_QUALITY_SCORE_WARNINGS = new ToolTip("Warnings",
+  private static final ToolTip SCORE_QUALITY_SCORE_WARNINGS = new ToolTip("No Warnings",
       "Indicates the level of warnings found, message are expected to generate less than ten percent warning rate",
       true).setLink("#quality.warnings");
   private static final ToolTip SCORE_TIMELINESS = new ToolTip("Timeliness",
       "Indicates the amount of time between administration of vaccinations and reporting them").setEmphasize(true)
       .setLink("#timeliness");
-  private static final ToolTip SCORE_TIMELINESS_SCORE_2_DAYS = new ToolTip("2 Days",
+  private static final ToolTip SCORE_TIMELINESS_SCORE_2_DAYS = new ToolTip("Within 2 Days",
       "Indicates the number of messages received within 48 hours of administration", true).setLink("#timeliness");
-  private static final ToolTip SCORE_TIMELINESS_SCORE_7_DAYS = new ToolTip("7 Days",
+  private static final ToolTip SCORE_TIMELINESS_SCORE_7_DAYS = new ToolTip("Within 7 Days",
       "Indicates the number of messages received within a week of administration", true).setLink("#timeliness");
-  private static final ToolTip SCORE_TIMELINESS_SCORE_30_DAYS = new ToolTip("30 Days",
+  private static final ToolTip SCORE_TIMELINESS_SCORE_30_DAYS = new ToolTip("Within 30 Days",
       "Indicates the number of messages received within 4 weeks of administration", true).setLink("#timeliness");
 
   private static final ToolTip COMPLETENESS_SCORE_PATIENT = new ToolTip("Patient",
@@ -81,10 +81,10 @@ public class QualityReport
   private static final ToolTip COMPLETENESS_SCORE_VACCINE_GROUP = new ToolTip("Vaccine Group",
       "Indicates the completess of the type of vaccines reported").setLink("#completeness.vaccineGroup");
 
-  private static final ToolTip QUALITY_SCORE_ERRORS = new ToolTip("Errors",
+  private static final ToolTip QUALITY_SCORE_NO_ERRORS = new ToolTip("No Errors",
       "Indicates the level of errors found, message are expected to generate less than one percent error rate")
       .setLink("#quality.errors");
-  private static final ToolTip QUALITY_SCORE_WARNINGS = new ToolTip("Warnings",
+  private static final ToolTip QUALITY_SCORE_NO_WARNINGS = new ToolTip("No Warnings",
       "Indicates the level of warnings found, message are expected to generate less than ten percent warning rate")
       .setLink("#quality.warnings");
 
@@ -96,21 +96,21 @@ public class QualityReport
   private static final ToolTip QUALITY_SCORE_DEPRECATED = new ToolTip("Unrecognized Codes",
       "Codes were recognized but standard codes are recommended").setLink("#quality.deprecatedCodes");
 
-  private static final ToolTip TIMELINESS_SCORE_2_DAYS = new ToolTip("2 Days",
+  private static final ToolTip TIMELINESS_SCORE_2_DAYS = new ToolTip("Within 2 Days",
       "Indicates the number of messages received within 48 hours of administration");
-  private static final ToolTip TIMELINESS_SCORE_7_DAYS = new ToolTip("7 Days",
+  private static final ToolTip TIMELINESS_SCORE_7_DAYS = new ToolTip("Within 7 Days",
       "Indicates the number of messages received within a week of administration");
-  private static final ToolTip TIMELINESS_SCORE_30_DAYS = new ToolTip("30 Days",
+  private static final ToolTip TIMELINESS_SCORE_30_DAYS = new ToolTip("Within 30 Days",
       "Indicates the number of messages received within 4 weeks of administration");
 
   private static final ToolTip TIMELINESS_WITHIN_2_DAYS = new ToolTip(
-      "2 Days",
+      "Within 2 Days",
       "Latest vaccination reported within 2 days (reports of previous administered vaccinations in same message and historical vaccinations not counted)");
   private static final ToolTip TIMELINESS_WITHIN_7_DAYS = new ToolTip(
-      "7 Days",
+      "Within 7 Days",
       "Latest vaccination reported within 1 week (reports of previous administered vaccinations in same message and historical vaccinations not counted)");
   private static final ToolTip TIMELINESS_WITHIN_30_DAYS = new ToolTip(
-      "30 Days",
+      "Within 30 Days",
       "Latest vaccination reported within 30 days (reports of previous administered vaccinations in same message and historical vaccinations not counted)");
 
   private static final ToolTip VACCINATION_GROUP_OTHER = new ToolTip("Undefined",
@@ -239,7 +239,7 @@ public class QualityReport
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
     printScore(COMPLETENESS_SCORE_PATIENT, messageBatch.getCompletenessPatientScore(), per(modelForm.getWeight("completeness.patient")));
-    printScore(COMPLETENESS_SCORE_VACCINATION, messageBatch.getCompletenessPatientScore(), per(modelForm.getWeight("completeness.vaccination")));
+    printScore(COMPLETENESS_SCORE_VACCINATION, messageBatch.getCompletenessVaccinationScore(), per(modelForm.getWeight("completeness.vaccination")));
     printScore(COMPLETENESS_SCORE_VACCINE_GROUP, messageBatch.getCompletenessVaccineGroupScore(), per(modelForm.getWeight("completeness.vaccineGroup")));
     out.println("    </table>");
 
@@ -512,7 +512,7 @@ public class QualityReport
     out.println("      </tr>");
     printScoreOverall(SCORE_COMPLETENESS, messageBatch.getCompletenessScore(), per(modelForm.getAbsoluteWeight("completeness")));
     printScoreOverall(SCORE_COMPLETENESS_SCORE_PATIENT, messageBatch.getCompletenessPatientScore(), per(modelForm.getAbsoluteWeight("completeness.patient")));
-    printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINATION, messageBatch.getCompletenessPatientScore(), per(modelForm.getAbsoluteWeight("completeness.vaccination")));
+    printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINATION, messageBatch.getCompletenessVaccinationScore(), per(modelForm.getAbsoluteWeight("completeness.vaccination")));
     printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINE_GROUP, messageBatch.getCompletenessVaccineGroupScore(), per(modelForm.getAbsoluteWeight("completeness.vaccineGroup")));
     printScoreOverall(SCORE_QUALITY, messageBatch.getQualityScore(), per(modelForm.getAbsoluteWeight("quality")));
     printScoreOverall(SCORE_QUALITY_SCORE_ERRORS, messageBatch.getQualityErrorScore(), per(modelForm.getAbsoluteWeight("quality.errors")));
@@ -599,8 +599,8 @@ public class QualityReport
     out.println("        <th align=\"center\">Description</th>");
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
-    printScore(QUALITY_SCORE_ERRORS, messageBatch.getQualityErrorScore(), per(modelForm.getAbsoluteWeight("quality.errors")));
-    printScore(QUALITY_SCORE_WARNINGS, messageBatch.getQualityWarnScore(), per(modelForm.getAbsoluteWeight("quality.warnings")));
+    printScore(QUALITY_SCORE_NO_ERRORS, messageBatch.getQualityErrorScore(), per(modelForm.getAbsoluteWeight("quality.errors")));
+    printScore(QUALITY_SCORE_NO_WARNINGS, messageBatch.getQualityWarnScore(), per(modelForm.getAbsoluteWeight("quality.warnings")));
     out.println("    </table>");
     out.println("    <br/>");
     if (qualityCollector.getInvalidCodes().size() > 0 || qualityCollector.getUnrecognizedCodes().size() > 0
@@ -627,11 +627,13 @@ public class QualityReport
     }
     if (qualityCollector.getErrorIssues().size() > 0)
     {
+      out.println("      <p>Errors are expected to be encountered on less than one percent of messages.</p>");
       out.println("    <h3><a name=\"quality.errors\">Errors</h3>");
       printBatchIssues(qualityCollector.getErrorIssues());
     }
     if (qualityCollector.getWarnIssues().size() > 0)
     {
+      out.println("      <p>Warning to message size rate is expected to be less than ten percent.</p>");
       out.println("    <h3><a name=\"quality.warnings\">Warnings</h3>");
       printBatchIssues(qualityCollector.getWarnIssues());
     }

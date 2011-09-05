@@ -186,8 +186,11 @@ public class FileImportProcessor extends ManagerThread
       long timeSinceLastChange = System.currentTimeMillis() - inFile.lastModified();
       if (timeSinceLastChange > 60 * 1000)
       {
-        procLog("Processing file " + filename);
-        processFile(session, filename, inFile);
+        if (fileContainsHL7(inFile))
+        {
+          procLog("Processing file " + filename);
+          processFile(session, filename, inFile);
+        }
       } else
       {
         procLog("Postponing processing, file recently changed");
@@ -196,6 +199,53 @@ public class FileImportProcessor extends ManagerThread
     {
       procLog("File does not exist or can not be read");
     }
+  }
+
+  /**
+   * Read the file before processing and ensure it looks like what we expect.
+   * First non blank line should be file header segment or message header
+   * segment. In addition if there is a file header segment then the last non
+   * blank line is expected to be the trailing segment. Otherwise the file
+   * is assumed to contain HL7 messages. It is important to note that this
+   * check does not validate HL7 format, but is built to ensure that the 
+   * entire file has been transmitted when batch header/footers are sent
+   * and that the file doesn't contain obvious non-HL7 content. 
+   * 
+   * @param inFile
+   * @return
+   * @throws IOException
+   */
+  private boolean fileContainsHL7(File inFile) throws IOException
+  {
+    BufferedReader in = new BufferedReader(new FileReader(inFile));
+    String line = readRealFirstLine(in);
+    boolean okay;
+    if (line.startsWith("FHS"))
+    {
+      String lastLine = line;
+      while ((line = in.readLine()) != null)
+      {
+        if (line.trim().length() > 0)
+        {
+          lastLine = line;
+        }
+      }
+      okay = lastLine.startsWith("FTS");
+      if (!okay)
+      {
+        procLog("ERROR: File does not end with FTS segment as expected, not processing");
+      }
+    } else if (line.startsWith("MSH"))
+    {
+      procLog("WARNING: File does not start with FHS segment as expected. ");
+      okay = true;
+    } else
+    {
+      okay = false;
+      procLog("ERROR: File does not appear to contain HL7. Must start with FHS or MSH segment.");
+    }
+    in.close();
+    return okay;
   }
 
   private void procLog(String message)
@@ -356,12 +406,14 @@ public class FileImportProcessor extends ManagerThread
       MessageReceived messageReceived = new MessageReceived();
       messageReceived.setProfile(profile);
       messageReceived.setRequestText(message.toString());
+      // profile.getCodesReceived(session).dumpInternalDetails(System.out);
       parser.createVaccinationUpdateMessage(messageReceived);
       if (!messageReceived.hasErrors())
       {
         Validator validator = new Validator(profile, session);
         validator.validateVaccinationUpdateMessage(messageReceived);
       }
+      // profile.getCodesReceived(session).dumpInternalDetails(System.out);
       IssueAction issueAction = determineIssueAction(messageReceived);
       messageReceived.setIssueAction(issueAction);
       qualityCollector.registerProcessedMessage(messageReceived);
@@ -370,6 +422,7 @@ public class FileImportProcessor extends ManagerThread
       messageReceived.setResponseText(ackMessage);
       MessageReceivedManager.saveMessageReceived(profile, messageReceived, session);
       saveInQueue(session, messageReceived);
+      // profile.saveCodesReceived(session);
       ackOut.print(ackMessage);
       printLogDetails(message, messageReceived, logOut, false);
       if (issueAction.isError())

@@ -112,7 +112,7 @@ public class ModelFactory
             totalWeight += score.getWeight();
           }
           rootSection.getScores().add(score);
-          totalWeight += addSubScores(node, map, rootSection.getScores());
+          totalWeight += addSubScores(node, map, score.getScores());
         }
       }
     }

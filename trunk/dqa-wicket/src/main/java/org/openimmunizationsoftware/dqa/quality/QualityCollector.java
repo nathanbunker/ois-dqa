@@ -41,7 +41,7 @@ public class QualityCollector
   private int numeratorVaccinationAdminDateAge = 0;
   private QualityScoring scoring = null;
   private ModelForm modelForm = null;
-  
+
   public ModelForm getModelForm()
   {
     return modelForm;
@@ -249,15 +249,10 @@ public class QualityCollector
     score(batchIssuesMap, vaccinationOptional);
     score(batchIssuesMap, vaccinationRecommended);
     score(batchIssuesMap, vaccinationRequired);
-    double patientScore = patientExpected.getWeightedScore() * modelForm.getWeight("completeness.patient.expected")
-        + patientOptional.getWeightedScore() * modelForm.getWeight("completeness.patient.optional")
-        + patientRecommended.getWeightedScore() * modelForm.getWeight("completeness.patient.recommended")
-        + patientRequired.getWeightedScore() * modelForm.getWeight("completeness.patient.required");
-    double vaccinationScore = vaccinationExpected.getWeightedScore()
-        * modelForm.getWeight("completeness.vaccination.expected") + vaccinationOptional.getWeightedScore()
-        * modelForm.getWeight("completeness.vaccination.optional") + vaccinationRecommended.getWeightedScore()
-        * modelForm.getWeight("completeness.vaccination.recommended") + vaccinationRequired.getWeightedScore()
-        * modelForm.getWeight("completeness.vaccination.required");
+    double patientScore = patientExpected.getWeightedScore() + patientOptional.getWeightedScore()
+        + patientRecommended.getWeightedScore() + patientRequired.getWeightedScore();
+    double vaccinationScore = vaccinationExpected.getWeightedScore() + vaccinationOptional.getWeightedScore()
+        + vaccinationRecommended.getWeightedScore() + vaccinationRequired.getWeightedScore();
 
     double vaccineGroupScore = scoreVaccineGroupScore();
 
@@ -331,7 +326,6 @@ public class QualityCollector
       if (denominator > 0)
       {
         numerator = invertNumerator(completenessRow, numerator, denominator);
-        // System.out.println("--> " + completenessRow.getToolTip().getLabel() + " " + completenessRow.getScoreWeight() + " * " + numerator + " / " + denominator);
         double score = completenessRow.getScoreWeight() * numerator / (double) denominator;
         completenessRow.setScore(score);
         completenessRow.setCount(numerator);
@@ -483,7 +477,6 @@ public class QualityCollector
       score30days = messageBatch.getTimelinessCount30Days() / messageBatch.getMessageWithAdminCount();
       timelinessAverage = numeratorVaccinationAdminDateAge / (double) messageBatch.getMessageWithAdminCount();
     }
-    
 
     int timeliness = (int) (100 * (modelForm.getWeight("timeliness.30days") * score30days
         + modelForm.getWeight("timeliness.7days") * score7days + modelForm.getWeight("timeliness.2days") * score2days) + 0.5);

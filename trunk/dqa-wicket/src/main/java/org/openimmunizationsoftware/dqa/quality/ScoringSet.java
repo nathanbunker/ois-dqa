@@ -77,7 +77,6 @@ public class ScoringSet
         cr.setInvert(invert);
       }
     }
-
   }
 
   private CompletenessRow add(ModelScore score)

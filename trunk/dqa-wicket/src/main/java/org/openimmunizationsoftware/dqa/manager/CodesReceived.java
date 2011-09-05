@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.manager;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,25 @@ public class CodesReceived
     return singleton;
   }
 
+  public void dumpInternalDetails(PrintStream out)
+  {
+    out.println("*** CODES RECEIVED ****");
+    out.println("Code table count: " + codeTableMaps.size());
+    for (CodeTable codeTable : codeTableMaps.keySet())
+    {
+      if (codeTableMaps.get(codeTable).size() > 0)
+      {
+        out.println(" * " + codeTable.getTableLabel() + " [" + codeTable.getTableId() + "]");
+        for (CodeReceived codeReceived : codeTableMaps.get(codeTable).values())
+        {
+          out.println("    - '" + codeReceived.getReceivedValue() + "' ==> '" + codeReceived.getCodeValue() + "' #"
+              + codeReceived.getReceivedCount() + " [" + codeReceived.getCodeId() + "] profile="
+              + codeReceived.getProfile().getProfileId());
+        }
+      }
+    }
+  }
+
   public static CodesReceived getCodesReceived(SubmitterProfile profile, Session session)
   {
     getCodesReceived();
@@ -43,11 +63,35 @@ public class CodesReceived
       query.setParameter(0, profile);
       query.setParameter(1, codeTable);
       codesReceived.addToCodeTableMaps(codeTable, query.list());
+
     }
     return codesReceived;
   }
+
+  public void saveCodesReceived(Session session)
+  {
+    for (Map<String, CodeReceived> map : codeTableMaps.values())
+    {
+      for (CodeReceived cr : map.values())
+      {
+        session.saveOrUpdate(cr);
+      }
+    }
+    // private Map<CodeTable, Map<String, CodeReceived>> codeTableMaps = new
+    // HashMap<CodeTable, Map<String, CodeReceived>>();
+  }
   
-  
+  public void registerCodeReceived(CodeReceived codeReceived)
+  {
+    Map<String, CodeReceived> codesReceived = codeTableMaps.get(codeReceived.getTable());
+    if (codesReceived == null)
+    {
+      codesReceived = new HashMap<String, CodeReceived>();
+      codeTableMaps.put(codeReceived.getTable(), codesReceived);
+    }
+    codesReceived.put(codeReceived.getReceivedValue(), codeReceived);
+  }
+
   public CodeReceived getCodeReceived(String receivedValue, CodeTable codeTable)
   {
     CodeReceived cr = null;
@@ -58,11 +102,12 @@ public class CodesReceived
     }
     if (cr == null && parent != null)
     {
+      // Didn't find under profile, looking at parent now
       cr = parent.getCodeReceived(receivedValue, codeTable);
     }
     return cr;
   }
-  
+
   public List<CodeReceived> getCodesReceived(CodeTable codeTable)
   {
     List<CodeReceived> codesReceived = new ArrayList<CodeReceived>();
@@ -89,7 +134,7 @@ public class CodesReceived
   {
     return codeTables;
   }
-  
+
   public List<CodeTable> getCodeTableList()
   {
     List<CodeTable> list = new ArrayList<CodeTable>(codeTables.values());

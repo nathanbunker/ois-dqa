@@ -8,6 +8,7 @@ import java.util.List;
 import org.openimmunizationsoftware.dqa.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
+import org.openimmunizationsoftware.dqa.db.model.MessageReceived.Header;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
@@ -17,6 +18,7 @@ import org.openimmunizationsoftware.dqa.db.model.received.types.Address;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Id;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Name;
+import org.openimmunizationsoftware.dqa.db.model.received.types.OrganizationName;
 import org.openimmunizationsoftware.dqa.db.model.received.types.PhoneNumber;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 
@@ -77,6 +79,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
     patient = message.getPatient();
     List<String> orcSegment = null;
+    currentSegment = segments.get(0);
+    populateMSH(message);
     while (moveNext())
     {
       if (segmentName.equals("PID"))
@@ -146,6 +150,25 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     return false;
   }
 
+  private void populateMSH(MessageReceived message)
+  {
+    Header header = message.getHeader();
+    header.setSendingApplication(getValue(3));
+    header.setSendingFacility(getValue(4));
+    header.setReceivingApplication(getValue(5));
+    header.setReceivingFacility(getValue(6));
+    header.setMessageDate(getValueDate(7, pi.Hl7MshMessageDateIsInvalid));
+    String[] field = getValues(9);
+    header.setMessageType(field.length > 1 ? field[0] : "");
+    header.setMessageTrigger(field.length > 2 ? field[1] : "");
+    header.setMessageControlId(getValue(10));
+    header.setProcessingId(getValue(11));
+    header.setVersionId(getValue(12));
+    header.setAckTypeAccept(getValue(15));
+    header.setAckTypeApplication(getValue(16));
+    header.setMessageProfileId(getValue(21));
+  }
+
   private void populatePID(MessageReceived message)
   {
 
@@ -196,7 +219,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     vaccination.setAmountUnitCode(getValue(7));
     readCodeEntity(9, vaccination.getInformationSource());
     // TODO 10 XCN private Id givenBy = new Id();
-    // TODO 11 LA2 private OrganizationName facility = new OrganizationName();
+    readLocationWithAddress(11, vaccination.getFacility());
     vaccination.setLotNumber(getValue(15));
     vaccination.setExpirationDate(getValueDate(16, pi.VaccinationLotExpirationDateIsInvalid));
     readCodeEntity(17, vaccination.getManufacturer());
@@ -347,6 +370,17 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     ce.setAltText(field.length >= 5 ? field[4] : "");
     ce.setAltTable(field.length >= 6 ? field[5] : "");
   }
+  
+  private void readLocationWithAddress(int fieldNumber, OrganizationName orgName)
+  {
+    String[] field = getValues(fieldNumber);
+    orgName.getId().setNumber(field.length > 4 ? field[3] : "");
+    if (orgName.getId().getNumber().isEmpty())
+    {
+      orgName.getId().setNumber(field.length > 1 ? field[0] : "");
+    }
+    orgName.setName(field.length > 4 ? field[3] : "");
+  }
 
   private void readName(int fieldNumber, Name name)
   {
@@ -370,8 +404,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       {
         // end of segment, break
         currentSegment.add(messageText.substring(startField, i));
-        currentSegment = new ArrayList<String>();
         segments.add(currentSegment);
+        currentSegment = new ArrayList<String>();
         startField = i + 1;
       } else if (c == separators[BAR])
       {
@@ -386,6 +420,19 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         startField = i + 1;
       }
     }
+    // The last segment should have ended with a \r so the startField would be 
+    // equal to the length of the message. If not, then there is a mistake, but
+    // the last line should still be added on as is. 
+    if (startField < messageText.length())
+    {
+      currentSegment.add(messageText.substring(startField));
+    }
+    // This shouldn't happen, unless no \r is sent at the end of the last
+    // segment.
+    if (currentSegment.size() > 0)
+    {
+      segments.add(currentSegment);
+    }
   }
 
   private Date getValueDate(int fieldNumber, PotentialIssue pi)
@@ -398,6 +445,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     if (fieldValue.length() < 14)
     {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+      sdf.setLenient(false);
       try
       {
         return sdf.parse(fieldValue.substring(0, 8));
@@ -408,6 +456,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       }
     }
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+    sdf.setLenient(false);
     try
     {
       return sdf.parse(fieldValue.substring(0, 14));
@@ -505,6 +554,27 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       separators[TIL] = messageText.charAt(TIL + 3);
       separators[SLA] = messageText.charAt(SLA + 3);
       separators[AMP] = messageText.charAt(AMP + 3);
+      // Make sure separators are unique for each other
+      for (int i = 0; i < separators.length; i++)
+      {
+        for (int j = i + 1; j < separators.length; j++)
+        {
+          if (separators[i] == separators[j])
+          {
+            registerError(pi.Hl7MshEncodingCharacterIsInvalid);
+          }
+        }
+      }
+      if (separators[BAR] != '|' || separators[CAR] != '^' || separators[TIL] != '~' || separators[SLA] != '\\'
+          || separators[AMP] != '&')
+      {
+        registerIssue(pi.Hl7MshEncodingCharacterIsNonStandard);
+      }
+      // Bar should be used again after the 4 encoding characters
+      if (separators[BAR] != messageText.charAt(8))
+      {
+        registerError(pi.Hl7MshEncodingCharacterIsInvalid);
+      }
     } else
     {
       separators[BAR] = '|';
@@ -528,7 +598,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   public String makeAckMessage(MessageReceived messageReceived)
   {
-    String controlId = messageReceived.getHeader().getMessageId();
+    String controlId = messageReceived.getHeader().getMessageControlId();
     String processingId = message.getHeader().getProcessingId();
     String ackCode = ACK_ACCEPT;
     String text = "Message accepted";
@@ -538,7 +608,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       ackCode = ACK_ERROR;
       for (IssueFound issueFound : messageReceived.getIssuesFound())
       {
-        if (issueFound.isError()) {
+        if (issueFound.isError())
+        {
           text += issueFound.getDisplayText();
           break;
         }
@@ -550,7 +621,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       ackCode = ACK_ACCEPT;
       for (IssueFound issueFound : messageReceived.getIssuesFound())
       {
-        if (issueFound.isSkip()) {
+        if (issueFound.isSkip())
+        {
           text += issueFound.getDisplayText();
           break;
         }
@@ -642,11 +714,15 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     return ackCount++;
   }
 
-  public static String escapeHL7Chars(String s) {
+  public static String escapeHL7Chars(String s)
+  {
     StringBuilder sb = new StringBuilder();
-    for (char c : s.toCharArray()) {
-      if (c >= ' ') {
-        switch (c) {
+    for (char c : s.toCharArray())
+    {
+      if (c >= ' ')
+      {
+        switch (c)
+        {
         case '~':
           sb.append("\\R\\");
           break;
