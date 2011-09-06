@@ -4,7 +4,7 @@
 	<groupId>org.openimmunizationsoftware.dqa</groupId>
 	<artifactId>ois-dqa</artifactId>
 	<packaging>war</packaging>
-	<version>0.7-SNAPSHOT</version>
+	<version>0.8</version>
 	<name>DQA</name>
 	<description></description>
     <organization> 
