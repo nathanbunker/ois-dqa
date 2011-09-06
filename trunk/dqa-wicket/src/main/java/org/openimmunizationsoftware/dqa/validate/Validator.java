@@ -1010,7 +1010,7 @@ public class Validator extends ValidateMessage
       CodeTable codeTable = CodesReceived.getCodeTable(id.getTableType());
       cr = getCodeReceived(id.getNumber(), id.getName().getFullName(), codeTable);
       cr.incReceivedCount();
-      session.save(cr);
+      session.saveOrUpdate(cr);
       if (cr.getCodeStatus().isValid())
       {
         id.setCodeReceived(cr);
@@ -1175,7 +1175,7 @@ public class Validator extends ValidateMessage
       cr.setCodeStatus(CodeStatus.UNRECOGNIZED);
       cr.setCodeLabel(receivedLabel);
       profile.registerCodeReceived(cr, session);
-      session.save(cr);
+      session.saveOrUpdate(cr);
     } else if (!cr.getProfile().equals(profile))
     {
       cr = new CodeReceived(cr, profile, receivedLabel);
