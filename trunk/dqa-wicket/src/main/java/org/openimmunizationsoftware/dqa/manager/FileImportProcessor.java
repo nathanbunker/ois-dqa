@@ -22,7 +22,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.openimmunizationsoftware.dqa.Version;
+import org.openimmunizationsoftware.dqa.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.db.model.BatchActions;
 import org.openimmunizationsoftware.dqa.db.model.BatchCodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.BatchIssues;
@@ -436,7 +436,7 @@ public class FileImportProcessor extends ManagerThread
     logOut.println("Message/Second:   " + ((float) progressCount) / ((progressEnd - progressStart) / 1000.0));
     logOut.println("Software Label:   " + KeyedSettingManager.getApplication().getApplicationLabel());
     logOut.println("Software Type:    " + KeyedSettingManager.getApplication().getApplicationType());
-    logOut.println("Software Version: " + Version.SOFTWARE_VERSION);
+    logOut.println("Software Version: " + SoftwareVersion.VENDOR + " " + SoftwareVersion.PRODUCT + " " + SoftwareVersion.VERSION + " " + SoftwareVersion.BINARY_ID);
     acceptedOut.close();
     ackOut.close();
     logOut.close();
