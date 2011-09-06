@@ -65,7 +65,7 @@ public class QualityCollector
   private static final long AS_THE_DAY_IS_LONG = 24 * 60 * 60 * 1000;
   private static final long DAYS_2 = 2 * 24 * 60 * 60 * 1000;
   private static final long DAYS_7 = 7 * 24 * 60 * 60 * 1000;
-  private static final long DAYS_30 = 30 * 24 * 60 * 60 * 1000;
+  private static final long DAYS_30 = 30l * 24 * 60 * 60 * 1000;
 
   public MessageBatch getMessageBatch()
   {

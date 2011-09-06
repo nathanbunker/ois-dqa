@@ -16,7 +16,6 @@ public class MessageReceivedManager
   public static void saveMessageReceived(SubmitterProfile profile, MessageReceived messageReceived, Session session)
   {
     messageReceived.setProfile(profile);
-    messageReceived.setReceivedDate(new Date());
     messageReceived.setSubmitStatus(SubmitStatus.HOLD);
     session.saveOrUpdate(messageReceived);
     Patient patient = messageReceived.getPatient();

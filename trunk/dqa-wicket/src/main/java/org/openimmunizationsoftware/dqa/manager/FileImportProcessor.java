@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -256,6 +257,7 @@ public class FileImportProcessor extends ManagerThread
 
   private void processFile(Session session, String filename, File inFile) throws FileNotFoundException, IOException
   {
+    Date receivedDate = determineReceivedDate(filename);
     progressStart = System.currentTimeMillis();
     createMessageBatch(session);
     BufferedReader in = new BufferedReader(new FileReader(inFile));
@@ -275,7 +277,7 @@ public class FileImportProcessor extends ManagerThread
           if (message.length() > 0)
           {
             progressCount++;
-            processMessage(message, profile, session);
+            processMessage(message, profile, session, receivedDate);
           }
           message.setLength(0);
         } else if (line.startsWith("FHS") || line.startsWith("BHS") || line.startsWith("BTS") || line.startsWith("FTS"))
@@ -288,7 +290,7 @@ public class FileImportProcessor extends ManagerThread
       if (message.length() > 0)
       {
         progressCount++;
-        processMessage(message, profile, session);
+        processMessage(message, profile, session, receivedDate);
       }
       printReport(inFile, session);
       closeOutputs(acceptedOut);
@@ -299,6 +301,52 @@ public class FileImportProcessor extends ManagerThread
       saveAndCloseBatch(session);
     }
     inFile.delete();
+  }
+
+  private Date determineReceivedDate(String filename)
+  {
+    Date receivedDate = new Date();
+    int pos = filename.indexOf("!"); 
+    if (pos != -1)
+    {
+      procLog("Filename appears to include received date");
+      pos++;
+      if (pos < filename.length()) {
+        String s = filename.substring(pos);
+        pos = s.indexOf('.');
+        if (pos == -1)
+        {
+          pos = filename.length();
+        }
+        if (pos == 8)
+        {
+          SimpleDateFormat fileDate = new SimpleDateFormat("yyyyMMdd");
+          fileDate.setLenient(false);
+          try
+          {
+            receivedDate = fileDate.parse(s.substring(0, pos));
+            if (receivedDate.getTime() > System.currentTimeMillis())
+            {
+              procLog("Unable to set received date in the future, using today's date");
+              receivedDate = new Date();
+            }
+            else
+            {
+              procLog("Setting received date for file to " + sdf.format(receivedDate));
+            }
+          }
+          catch (ParseException pe)
+          {
+            procLog("Tried to set received date from file name but unable to parse date in YYYYMMDD format");
+          }
+        }
+        else
+        {
+          procLog("Expected received date in file but was not available");
+        }
+      }
+    }
+    return receivedDate;
   }
 
   private void saveAndCloseBatch(Session session)
@@ -398,22 +446,21 @@ public class FileImportProcessor extends ManagerThread
     progressCount = 0;
   }
 
-  private void processMessage(StringBuilder message, SubmitterProfile profile, Session session)
+  private void processMessage(StringBuilder message, SubmitterProfile profile, Session session, Date receivedDate)
   {
     Transaction tx = session.beginTransaction();
     try
     {
       MessageReceived messageReceived = new MessageReceived();
+      messageReceived.setReceivedDate(receivedDate);
       messageReceived.setProfile(profile);
       messageReceived.setRequestText(message.toString());
-      // profile.getCodesReceived(session).dumpInternalDetails(System.out);
       parser.createVaccinationUpdateMessage(messageReceived);
       if (!messageReceived.hasErrors())
       {
         Validator validator = new Validator(profile, session);
         validator.validateVaccinationUpdateMessage(messageReceived);
       }
-      // profile.getCodesReceived(session).dumpInternalDetails(System.out);
       IssueAction issueAction = determineIssueAction(messageReceived);
       messageReceived.setIssueAction(issueAction);
       qualityCollector.registerProcessedMessage(messageReceived);
