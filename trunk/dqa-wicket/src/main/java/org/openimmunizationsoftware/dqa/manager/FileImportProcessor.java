@@ -92,6 +92,7 @@ public class FileImportProcessor extends ManagerThread
         }
       });
       procLog("Found " + filesToProcess.length + " files to process in " + submitDir.getAbsolutePath());
+      internalLog.append("Found " + filesToProcess.length + " files to process in " + submitDir.getAbsolutePath());
       for (String filename : filesToProcess)
       {
         lookToProcessFile(session, filename);
@@ -182,6 +183,7 @@ public class FileImportProcessor extends ManagerThread
   {
     File inFile = new File(submitDir, filename);
     procLog("Looking at file " + filename);
+    internalLog.append("Looking at file " + filename);
     if (inFile.exists() && inFile.canRead() && inFile.length() > 0)
     {
       long timeSinceLastChange = System.currentTimeMillis() - inFile.lastModified();
@@ -190,15 +192,18 @@ public class FileImportProcessor extends ManagerThread
         if (fileContainsHL7(inFile))
         {
           procLog("Processing file " + filename);
+          internalLog.append("  + processing file... ");
           processFile(session, filename, inFile);
         }
       } else
       {
         procLog("Postponing processing, file recently changed");
+        internalLog.append(" + postponing processing, file recently changed");
       }
     } else
     {
       procLog("File does not exist or can not be read");
+      internalLog.append(" + file does not exist or can not be read");
     }
   }
 
@@ -293,13 +298,13 @@ public class FileImportProcessor extends ManagerThread
         processMessage(message, profile, session, receivedDate);
       }
       printReport(inFile, session);
+      if (progressCount > 0)
+      {
+        saveAndCloseBatch(session);
+      }
       closeOutputs(acceptedOut);
     }
     in.close();
-    if (progressCount > 0)
-    {
-      saveAndCloseBatch(session);
-    }
     inFile.delete();
   }
 
@@ -353,9 +358,9 @@ public class FileImportProcessor extends ManagerThread
   {
     qualityCollector.close();
     Transaction tx = session.beginTransaction();
-    qualityCollector.getMessageBatch().setSubmitStatus(SubmitStatus.QUEUED);
-    session.save(qualityCollector.getMessageBatch());
     MessageBatch messageBatch = qualityCollector.getMessageBatch();
+    messageBatch.setSubmitStatus(SubmitStatus.QUEUED);
+    session.save(messageBatch);
     for (BatchIssues batchIssues : messageBatch.getBatchIssuesMap().values())
     {
       session.save(batchIssues);
