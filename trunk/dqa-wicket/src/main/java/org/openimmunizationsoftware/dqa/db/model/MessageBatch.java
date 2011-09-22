@@ -8,6 +8,11 @@ import java.util.Set;
 
 public class MessageBatch
 {
+  
+  public MessageBatch()
+  {
+    //default
+  }
   private Map<IssueAction, BatchActions> batchActionsMap = new HashMap<IssueAction, BatchActions>();
   private int batchId = 0;
   private Map<PotentialIssue, BatchIssues> batchIssuesMap = new HashMap<PotentialIssue, BatchIssues>();
