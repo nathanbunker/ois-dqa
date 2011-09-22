@@ -1,0 +1,107 @@
+package org.openimmunizationsoftware.dqa.quality.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ModelSection
+{
+  private String name = "";
+  private List<ModelScore> scores = new ArrayList<ModelScore>();
+  private List<ModelSection> sections = new ArrayList<ModelSection>();
+  private float weight = 0;
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public List<ModelScore> getScores()
+  {
+    return scores;
+  }
+
+  public List<ModelSection> getSections()
+  {
+    return sections;
+  }
+
+  public float getWeight()
+  {
+    return weight;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public void setWeight(float weight)
+  {
+    this.weight = weight;
+  }
+  
+  public float getWeight(String path)
+  {
+    return getModelSection(path).getWeight();
+  }
+  
+  public float getAbsoluteWeight(String path)
+  {
+    String firstPart = path;
+    int pos = path.indexOf(".");
+    if (pos == -1)
+    {
+      path = "";
+    }
+    else 
+    {
+      firstPart = path.substring(0, pos);
+      path = path.substring(pos + 1);
+    }
+    for (ModelSection section : sections)
+    {
+      if (section.getName().equalsIgnoreCase(firstPart))
+      {
+        if (path.length() == 0)
+        {
+          return section.getWeight();          
+        }
+        else
+        {
+          return section.getWeight() * section.getAbsoluteWeight(path);
+        }
+      }
+    }
+    throw new IllegalArgumentException("Unable to find section named " + firstPart);
+  }
+  
+  public ModelSection getModelSection(String path)
+  {
+    String firstPart = path;
+    int pos = path.indexOf(".");
+    if (pos == -1)
+    {
+      path = "";
+    }
+    else 
+    {
+      firstPart = path.substring(0, pos);
+      path = path.substring(pos + 1);
+    }
+    for (ModelSection section : sections)
+    {
+      if (section.getName().equalsIgnoreCase(firstPart))
+      {
+        if (path.length() == 0)
+        {
+          return section;          
+        }
+        else
+        {
+          return section.getModelSection(path);
+        }
+      }
+    }
+    throw new IllegalArgumentException("Unable to find section named " + firstPart);
+  }
+}
