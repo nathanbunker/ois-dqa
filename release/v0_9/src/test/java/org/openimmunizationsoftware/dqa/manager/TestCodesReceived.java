@@ -11,7 +11,7 @@ public class TestCodesReceived extends TestCase
   public void testGetCodesReceived()
   {
     CodesReceived codesReceived = CodesReceived.getCodesReceived();
-    assertEquals(32, codesReceived.getCodeTables().size());
+    assertEquals(33, codesReceived.getCodeTables().size());
     CodeReceived cr = codesReceived.getCodeReceived("90700",
         CodesReceived.getCodeTable(CodeTable.Type.VACCINATION_CPT_CODE));
     assertNotNull(cr);

@@ -13,7 +13,7 @@ public class TestKeyedSettingManager extends TestCase
      assertNotNull(ksm);
      assertNotNull(KeyedSettingManager.getApplication());
      Application application = KeyedSettingManager.getApplication();
-     assertEquals("DQA Dev", application.getApplicationLabel());
+     assertTrue(application.getApplicationLabel().length() > 0);
      assertTrue(application.getRunThis());
    }
 }
