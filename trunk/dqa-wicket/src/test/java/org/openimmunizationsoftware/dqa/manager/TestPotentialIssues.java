@@ -53,6 +53,7 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.Hl7MshVersionIsValuedAs2_5);
     assertNotNull(pi.Hl7Nk1SegmentIsMissing);
     assertNotNull(pi.Hl7Nk1SegmentIsRepeated);
+    assertNotNull(pi.Hl7Nk1SetIdIsMissing);
     assertNotNull(pi.Hl7ObxSegmentIsMissing);
     assertNotNull(pi.Hl7OrcSegmentIsMissing);
     assertNotNull(pi.Hl7OrcSegmentIsRepeated);
@@ -358,6 +359,11 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.VaccinationOrderedByIsInvalid);
     assertNotNull(pi.VaccinationOrderedByIsMissing);
     assertNotNull(pi.VaccinationOrderedByIsUnrecognized);
+    assertNotNull(pi.VaccinationOrderControlCodeIsDeprecated);
+    assertNotNull(pi.VaccinationOrderControlCodeIsIgnored);
+    assertNotNull(pi.VaccinationOrderControlCodeIsInvalid);
+    assertNotNull(pi.VaccinationOrderControlCodeIsMissing);
+    assertNotNull(pi.VaccinationOrderControlCodeIsUnrecognized);
     assertNotNull(pi.VaccinationProductIsDeprecated);
     assertNotNull(pi.VaccinationProductIsInvalid);
     assertNotNull(pi.VaccinationProductIsMissing);
