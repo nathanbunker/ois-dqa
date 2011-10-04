@@ -1,6 +1,7 @@
 package org.openimmunizationsoftware.dqa.parse;
 
 import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 import org.openimmunizationsoftware.dqa.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
-import org.openimmunizationsoftware.dqa.db.model.MessageReceived.Header;
+import org.openimmunizationsoftware.dqa.db.model.Header;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
@@ -78,33 +79,43 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     readFields(messageText);
 
     patient = message.getPatient();
-    List<String> orcSegment = null;
     currentSegment = segments.get(0);
+    boolean foundPID = false;
+    boolean foundPV1 = false;
     populateMSH(message);
     while (moveNext())
     {
       if (segmentName.equals("PID"))
       {
+        foundPID = true;
         populatePID(message);
       } else if (segmentName.equals("PV1"))
       {
+        foundPID = assertPIDFound(foundPID);
         populatePV1(message);
+        foundPV1 = true;
       } else if (segmentName.equals("PD1"))
       {
+        foundPID = assertPIDFound(foundPID);
         populatePD1(message);
       } else if (segmentName.equals("NK1"))
       {
+        foundPID = assertPIDFound(foundPID);
         nextOfKinCount++;
         nextOfKin = new NextOfKin();
+        skippableItem = nextOfKin;
         nextOfKin.setPositionId(nextOfKinCount);
         message.getNextOfKins().add(nextOfKin);
         nextOfKin.setReceivedId(message.getNextOfKins().size());
         populateNK1(message);
-      } else if (segmentName.equals("ORC"))
+      } else if (segmentName.equals("ORC") || segmentName.equals("RXA"))
       {
-        orcSegment = currentSegment;
-      } else if (segmentName.equals("RXA"))
-      {
+        if (!foundPV1)
+        {
+          registerIssue(pi.Hl7Pv1SegmentIsMissing);
+          foundPV1 = true;
+        }
+        foundPID = assertPIDFound(foundPID);
         if (vaccination == null)
         {
           positionId = 0;
@@ -112,15 +123,27 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         positionId++;
         vaccinationCount++;
         vaccination = new Vaccination();
+        skippableItem = vaccination;
         vaccination.setPositionId(vaccinationCount);
         message.getVaccinations().add(vaccination);
-        populateRXA(message);
-        if (orcSegment != null)
+        if (segmentName.equals("ORC"))
         {
-          currentSegment = orcSegment;
-          populateORC(message);
-          orcSegment = null;
+          populateORC(messageReceived);
+          if (!moveNext() || !segmentName.equals("RXA"))
+          {
+            registerIssue(pi.Hl7RxaSegmentIsMissing);
+            moveBack();
+            continue;
+          }
+        } else
+        {
+          if (!message.getHeader().getVersionId().startsWith("2.3")
+              && !message.getHeader().getVersionId().startsWith("2.4"))
+          {
+            registerIssue(pi.Hl7OrcSegmentIsMissing);
+          }
         }
+        populateRXA(message);
       } else if (segmentName.equals("RXR"))
       {
         if (vaccination == null)
@@ -129,9 +152,25 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
           continue;
         }
         populateRXR(message);
+        vaccination = null;
       }
-
     }
+    positionId = 0;
+    assertPIDFound(foundPID);
+    if (foundPV1)
+    {
+      registerIssue(pi.Hl7Pv1SegmentIsMissing);
+    }
+  }
+
+  private boolean assertPIDFound(boolean foundPID)
+  {
+    if (!foundPID)
+    {
+      registerIssue(pi.Hl7PidSegmentIsMissing);
+      foundPID = true;
+    }
+    return foundPID;
   }
 
   private boolean moveNext()
@@ -148,6 +187,22 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       currentSegmentPos++;
     }
     return false;
+  }
+
+  private void moveBack()
+  {
+    currentSegmentPos--;
+    while (currentSegmentPos >= 0)
+    {
+      currentSegment = segments.get(currentSegmentPos);
+      if (currentSegment.size() > 0)
+      {
+        segmentName = currentSegment.get(0);
+        return;
+      }
+      currentSegmentPos--;
+    }
+
   }
 
   private void populateMSH(MessageReceived message)
@@ -203,6 +258,11 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   private void populateNK1(MessageReceived message)
   {
+    String setId = getValue(1);
+    if (setId.equals(""))
+    {
+      registerIssue(pi.Hl7Nk1SetIdIsMissing);
+    }
     readAddress(4, nextOfKin.getAddress());
     readPhoneNumber(5, nextOfKin.getPhone());
     readCodeEntity(3, nextOfKin.getRelationship());
@@ -287,10 +347,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   private void populateORC(MessageReceived message)
   {
-    // TODO private CodedEntity confidentiality = new CodedEntity();
-    // TODO private Id enteredBy = new Id();
-    // TODO private String idSubmitter = "";
-    // TODO private Id orderedBy = new Id();
+    readCodeEntity(1, vaccination.getOrderControl());
   }
 
   private void populatePV1(MessageReceived message)
@@ -370,7 +427,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     ce.setAltText(field.length >= 5 ? field[4] : "");
     ce.setAltTable(field.length >= 6 ? field[5] : "");
   }
-  
+
   private void readLocationWithAddress(int fieldNumber, OrganizationName orgName)
   {
     String[] field = getValues(fieldNumber);
@@ -420,9 +477,9 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         startField = i + 1;
       }
     }
-    // The last segment should have ended with a \r so the startField would be 
+    // The last segment should have ended with a \r so the startField would be
     // equal to the length of the message. If not, then there is a mistake, but
-    // the last line should still be added on as is. 
+    // the last line should still be added on as is.
     if (startField < messageText.length())
     {
       currentSegment.add(messageText.substring(startField));
@@ -601,7 +658,25 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     String controlId = messageReceived.getHeader().getMessageControlId();
     String processingId = message.getHeader().getProcessingId();
     String ackCode = ACK_ACCEPT;
+    int countVaccNotSkipped = 0;
+    for (Vaccination vaccination : messageReceived.getVaccinations())
+    {
+      if (!vaccination.isSkipped())
+      {
+        countVaccNotSkipped++;
+      }
+    }
     String text = "Message accepted";
+    if (countVaccNotSkipped == 0)
+    {
+      text = "Message accepted with no vaccinations";
+    } else if (countVaccNotSkipped == 1)
+    {
+      text = "Message accepted with 1 vaccination";
+    } else
+    {
+      text = "Message accepted with " + countVaccNotSkipped + " vaccinations";
+    }
     if (messageReceived.hasErrors())
     {
       text = "Message rejected: ";
@@ -684,9 +759,13 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     }
     for (IssueFound issueFound : messageReceived.getIssuesFound())
     {
-      if (issueFound.isWarn() || issueFound.isSkip())
+      if (issueFound.isWarn())
       {
         ack.append("ERR|||0|W||||" + issueFound.getDisplayText() + "|\r");
+      }
+      if (issueFound.isSkip())
+      {
+        ack.append("ERR|||0|W||||Skipped: " + issueFound.getDisplayText() + "|\r");
       }
     }
     if (processingId.equals(PROCESSING_ID_DEBUG))
