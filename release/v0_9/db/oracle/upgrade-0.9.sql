@@ -39,3 +39,4 @@ INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(34
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 34, 'RE', 'Observations to follow', 'RE', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 34, 'OK', 'Order accepted &'||' OK', 'OK', 'I');
 
+ALTER TABLE dqa_vaccination ADD (order_control_code VARCHAR2(250));
