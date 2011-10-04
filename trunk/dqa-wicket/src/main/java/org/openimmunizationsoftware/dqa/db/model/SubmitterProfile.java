@@ -9,6 +9,9 @@ import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 
 public class SubmitterProfile
 {
+  public static final int MASTER_HL7 = 1;
+  public static final int TEST_HL7 = 101;
+  
   public static final String DATA_FORMAT_HL7V2 = "HL7v2";
 
   public static final String PROFILE_STATUS_CLOSED = "Closed";
@@ -16,6 +19,7 @@ public class SubmitterProfile
   public static final String PROFILE_STATUS_PROD = "Prod";
   public static final String PROFILE_STATUS_SETUP = "Setup";
   public static final String PROFILE_STATUS_TEMPLATE = "Template";
+  public static final String PROFILE_STATUS_VALIDATE = "Validate";
   public static final String PROFILE_STATUS_TEST = "Test";
   
   public static final String TRANSFER_PRIORITY_HIGH = "High";
