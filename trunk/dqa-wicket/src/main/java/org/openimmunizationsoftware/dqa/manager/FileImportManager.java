@@ -29,6 +29,8 @@ public class FileImportManager extends ManagerThreadMulti
     super("File Import Manager");
   }
 
+  private static String DQA_IN_FILE_DIR = "dqa.in.file.dir";
+
   @Override
   public void run()
   {
@@ -42,11 +44,17 @@ public class FileImportManager extends ManagerThreadMulti
         if (ksm.getKeyedValueBoolean(KeyedSetting.IN_FILE_ENABLE, false))
         {
           internalLog.append("Import enabled\r");
-          String rootDirString = ksm.getKeyedValue(KeyedSetting.IN_FILE_DIR, "c:/data/in");
+          internalLog.append("Looking in system settings first for path\r");
+          String rootDirString = System.getProperty(DQA_IN_FILE_DIR);
+          if (rootDirString == null || rootDirString.equals(""))
+          {
+            internalLog.append("Not found in system settings, looking in keyed settings\r");
+            rootDirString = ksm.getKeyedValue(KeyedSetting.IN_FILE_DIR, "c:/data/in");
+          }
           File rootDir = new File(rootDirString);
           if (rootDir.exists() && rootDir.isDirectory())
           {
-            internalLog.append("Root dir exists, begin processing\r");
+            internalLog.append("Root dir " + rootDirString + " exists, begin processing\r");
             processDataDir(ksm, rootDir);
           } else
           {

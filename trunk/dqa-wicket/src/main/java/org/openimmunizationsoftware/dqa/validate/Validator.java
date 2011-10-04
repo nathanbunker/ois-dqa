@@ -1,6 +1,7 @@
 package org.openimmunizationsoftware.dqa.validate;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -10,9 +11,9 @@ import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeStatus;
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
+import org.openimmunizationsoftware.dqa.db.model.Header;
 import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
-import org.openimmunizationsoftware.dqa.db.model.MessageReceived.Header;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCpt;
@@ -30,6 +31,7 @@ import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 import org.openimmunizationsoftware.dqa.manager.KeyedSettingManager;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 import org.openimmunizationsoftware.dqa.manager.VaccineProductManager;
+import org.openimmunizationsoftware.dqa.validate.immtrac.PfsSupport;
 
 public class Validator extends ValidateMessage
 {
@@ -48,12 +50,45 @@ public class Validator extends ValidateMessage
   private PotentialIssues.Field piAddressState;
   private PotentialIssues.Field piAddressStreet2;
   private PotentialIssues.Field piAddressZip;
-  private KeyedSettingManager ksm;
+  protected KeyedSettingManager ksm;
+
+  private static List<SectionValidator> headerValidators = new ArrayList<SectionValidator>();
+  private static List<SectionValidator> patientValidators = new ArrayList<SectionValidator>();
+  private static List<SectionValidator> vaccinationValidators = new ArrayList<SectionValidator>();
+
+  private static boolean initialized = false;
+  
+  public List<SectionValidator> getHeaderValidators()
+  {
+    return headerValidators;
+  }
+  
+  public List<SectionValidator> getPatientValidators()
+  {
+    return patientValidators;
+  }
+  
+  public List<SectionValidator> getVaccinationValidators()
+  {
+    return vaccinationValidators;
+  }
+
+  private static void init()
+  {
+    if (!initialized)
+    {
+      headerValidators.add(new FacilityValidator());
+      vaccinationValidators.add(new FacilityValidator());
+      vaccinationValidators.add(new GivenBy());
+      initialized = true;
+    }
+  }
 
   public Validator(SubmitterProfile profile, Session session) {
     super(profile);
     this.session = session;
     ksm = KeyedSettingManager.getKeyedSettingManager();
+    init();
   }
 
   public void validateVaccinationUpdateMessage(MessageReceived message)
@@ -133,6 +168,10 @@ public class Validator extends ValidateMessage
 
     boolean notEmptyFirst = notEmpty(nextOfKin.getNameLast(), pi.NextOfKinNameLastIsMissing);
     boolean notEmptyLast = notEmpty(nextOfKin.getNameLast(), pi.NextOfKinNameFirstIsMissing);
+    if (!notEmptyFirst && ! notEmptyLast)
+    {
+      registerIssue(pi.NextOfKinNameIsMissing);
+    }
     if (notEmptyFirst && notEmptyLast && patientUnderAge && isResponsibleParty)
     {
       if (areEqual(nextOfKin.getNameLast(), patient.getNameLast())
@@ -195,12 +234,11 @@ public class Validator extends ValidateMessage
       registerIssue(pi.VaccinationActionCodeIsValuedAsDelete);
     }
 
-    boolean administered = false;
     if (notEmpty(vaccination.getInformationSourceCode(), pi.VaccinationInformationSourceIsMissing))
     {
       handleCodeReceived(vaccination.getInformationSource(), PotentialIssues.Field.VACCINATION_INFORMATION_SOURCE);
-      administered = Vaccination.INFO_SOURCE_ADMIN.equals(vaccination.getInformationSourceCode());
-      if (administered)
+      vaccination.setAdministered(Vaccination.INFO_SOURCE_ADMIN.equals(vaccination.getInformationSourceCode()));
+      if (vaccination.isAdministered())
       {
         registerIssue(pi.VaccinationInformationSourceIsValuedAsAdministered);
       } else if (Vaccination.INFO_SOURCE_HIST.equals(vaccination.getInformationSourceCode()))
@@ -318,7 +356,7 @@ public class Validator extends ValidateMessage
     {
       if (vaccineCvx.getConceptType().equals(VaccineCvx.CONCEPT_TYPE_UNSPECIFIED))
       {
-        if (administered)
+        if (vaccination.isAdministered())
         {
           registerIssue(pi.VaccinationAdminCodeIsNotSpecific, vaccineCr);
         }
@@ -350,13 +388,14 @@ public class Validator extends ValidateMessage
         }
       }
     }
-    handleCodeReceived(vaccination.getManufacturer(), PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE, administered);
+    handleCodeReceived(vaccination.getManufacturer(), PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE,
+        vaccination.isAdministered());
     VaccineMvx vaccineMvx = null;
     if (vaccination.getManufacturerCode() != null && !vaccination.getManufacturerCode().equals(""))
     {
       vaccineMvx = (VaccineMvx) session.get(VaccineMvx.class, vaccination.getManufacturerCode());
     }
-    if (administered)
+    if (vaccination.isAdministered())
     {
       if (vaccineMvx != null && !vaccineMvx.getMvxCode().equals("") && vaccineCvx != null
           && !vaccineCvx.getCvxCode().equals("")
@@ -386,7 +425,7 @@ public class Validator extends ValidateMessage
 
     if (vaccination.getAdminDate() != null)
     {
-      if (administered)
+      if (vaccination.isAdministered())
       {
         if (vaccination.getExpirationDate() != null)
         {
@@ -435,7 +474,7 @@ public class Validator extends ValidateMessage
 
     if (vaccination.getAmount() == null || vaccination.getAmount().equals("") || vaccination.getAmount().equals("999"))
     {
-      if (administered)
+      if (vaccination.isAdministered())
       {
         registerIssue(pi.VaccinationAdministeredAmountIsMissing);
         registerIssue(pi.VaccinationAdministeredAmountIsValuedAsUnknown);
@@ -448,23 +487,26 @@ public class Validator extends ValidateMessage
         float amount = Float.parseFloat(vaccination.getAmount());
         if (amount == 0)
         {
-          if (administered)
+          if (vaccination.isAdministered())
           {
             registerIssue(pi.VaccinationAdministeredAmountIsValuedAsZero);
           }
         }
       } catch (NumberFormatException nfe)
       {
-        if (administered)
+        if (vaccination.isAdministered())
         {
           registerIssue(pi.VaccinationAdministeredAmountIsInvalid);
         }
         vaccination.setAmount("");
       }
     }
-    handleCodeReceived(vaccination.getAmountUnit(), PotentialIssues.Field.VACCINATION_ADMINISTERED_UNIT, administered);
-    handleCodeReceived(vaccination.getBodyRoute(), PotentialIssues.Field.VACCINATION_BODY_ROUTE, administered);
-    handleCodeReceived(vaccination.getBodySite(), PotentialIssues.Field.VACCINATION_BODY_SITE, administered);
+    handleCodeReceived(vaccination.getAmountUnit(), PotentialIssues.Field.VACCINATION_ADMINISTERED_UNIT,
+        vaccination.isAdministered());
+    handleCodeReceived(vaccination.getBodyRoute(), PotentialIssues.Field.VACCINATION_BODY_ROUTE,
+        vaccination.isAdministered());
+    handleCodeReceived(vaccination.getBodySite(), PotentialIssues.Field.VACCINATION_BODY_SITE,
+        vaccination.isAdministered());
 
     // TODO VaccinationBodyRouteIsInvalidForVaccineIndicated
     // TODO VaccinationBodySiteIsInvalidForVaccineIndicated
@@ -489,22 +531,13 @@ public class Validator extends ValidateMessage
       // TODO VaccinationCvxCodeAndCptCodeAreInconsistent
     }
 
-    handleCodeReceived(vaccination.getFacility().getId(), PotentialIssues.Field.VACCINATION_FACILITY_ID, administered);
-    if (!vaccination.getFacility().getId().isEmpty())
+    for (SectionValidator sectionValidator : vaccinationValidators)
     {
-      String id = vaccination.getFacility().getId().getNumber();
-
-      int minLen = ksm.getKeyedValueInt(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MIN_LEN, 0);
-      int maxLen = ksm.getKeyedValueInt(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MAX_LEN, 30);
-      boolean mustBeNumeric = ksm.getKeyedValueBoolean(KeyedSetting.VALIDATE_VACCINATION_FACILITY_NUMERIC, false);
-
-      if (!goodId(id, minLen, maxLen, mustBeNumeric))
-      {
-        registerIssue(pi.VaccinationFacilityIdIsInvalid);
-      }
+      sectionValidator.validateVaccination(vaccination, this);
     }
-    handleCodeReceived(vaccination.getGivenBy(), PotentialIssues.Field.VACCINATION_GIVEN_BY, administered);
-    handleCodeReceived(vaccination.getOrderedBy(), PotentialIssues.Field.VACCINATION_ORDERED_BY, administered);
+
+    handleCodeReceived(vaccination.getOrderedBy(), PotentialIssues.Field.VACCINATION_ORDERED_BY,
+        vaccination.isAdministered());
     handleCodeReceived(vaccination.getEnteredBy(), PotentialIssues.Field.VACCINATION_RECORDED_BY);
     if (!notEmpty(vaccination.getIdSubmitter(), pi.VaccinationIdIsMissing))
     {
@@ -524,7 +557,7 @@ public class Validator extends ValidateMessage
     // TODO VaccinationIdOfSenderIsMissing
     // TODO VaccinationIdOfSenderIsUnrecognized
 
-    if (administered)
+    if (vaccination.isAdministered())
     {
       notEmpty(vaccination.getFacilityName(), pi.VaccinationFacilityNameIsMissing);
       notEmpty(vaccination.getExpirationDate(), pi.VaccinationLotExpirationDateIsMissing);
@@ -548,6 +581,7 @@ public class Validator extends ValidateMessage
 
   private void validateHeader()
   {
+    documentHeaderMain("Header");
     Header header = message.getHeader();
     if (notEmpty(header.getReceivingApplication(), pi.Hl7MshReceivingApplicationIsMissing))
     {
@@ -561,18 +595,11 @@ public class Validator extends ValidateMessage
     {
       // TODO
     }
-    if (notEmpty(header.getSendingFacility(), pi.Hl7MshSendingFacilityIsMissing))
+    for (SectionValidator sectionValidator : headerValidators)
     {
-      String id = header.getSendingFacility();
-      int minLen = ksm.getKeyedValueInt(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MIN_LEN, 0);
-      int maxLen = ksm.getKeyedValueInt(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MAX_LEN, 30);
-      boolean mustBeNumeric = ksm.getKeyedValueBoolean(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_NUMERIC, false);
-
-      if (!goodId(id, minLen, maxLen, mustBeNumeric))
-      {
-        registerIssue(pi.Hl7MshSendingFacilityIsInvalid);
-      }
+      sectionValidator.validateHeader(message, this);
     }
+
     if (notEmpty(header.getAckTypeApplication(), pi.Hl7MshAcknowledgementTypeIsMissing))
     {
       // TODO
@@ -966,7 +993,7 @@ public class Validator extends ValidateMessage
     return notEmpty(fieldValue, pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_MISSING));
   }
 
-  private boolean notEmpty(String fieldValue, PotentialIssue potentialIssue)
+  protected boolean notEmpty(String fieldValue, PotentialIssue potentialIssue)
   {
     boolean empty = fieldValue == null || fieldValue.equals("");
     if (empty)
@@ -1091,64 +1118,6 @@ public class Validator extends ValidateMessage
     }
     codedEntity.setCodeReceived(cr);
   }
-
-  // protected CodeReceived handleCodeReceived(String receivedValue, CodeTable
-  // codeTable, PotentialIssues.Field field)
-  // {
-  // return handleCodeReceived(receivedValue, codeTable, field, true);
-  // }
-  //
-  // protected CodeReceived handleCodeReceived(String value, CodeTable
-  // codeTable, PotentialIssues.Field field,
-  // boolean notSilent)
-  // {
-  // CodeReceived cr = null;
-  // if (notEmpty(value, field))
-  // {
-  // cr = getCodeReceived(value, codeTable);
-  // cr.incReceivedCount();
-  // session.save(cr);
-  // if (cr.getCodeStatus().isValid())
-  // {
-  // // Do nothing
-  // // registerIssue(pi.getIssue(field,
-  // // PotentialIssue.ISSUE_TYPE_IS_INVALID), cr);
-  // } else if (cr.getCodeStatus().isInvalid())
-  // {
-  // if (notSilent)
-  // {
-  // registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_INVALID),
-  // cr);
-  // }
-  // } else if (cr.getCodeStatus().isUnrecognized())
-  // {
-  // if (notSilent)
-  // {
-  // registerIssue(pi.getIssue(field,
-  // PotentialIssue.ISSUE_TYPE_IS_UNRECOGNIZED), cr);
-  // }
-  // } else if (cr.getCodeStatus().isDeprecated())
-  // {
-  // if (notSilent)
-  // {
-  // registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_DEPRECATE),
-  // cr);
-  // }
-  // } else if (cr.getCodeStatus().isIgnored())
-  // {
-  // if (notSilent)
-  // {
-  // registerIssue(pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_IGNORED),
-  // cr);
-  // }
-  // }
-  // }
-  // if (cr == null)
-  // {
-  // cr = new CodeReceived();
-  // }
-  // return cr;
-  // }
 
   private static String trunc(String s, int length)
   {

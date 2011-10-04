@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.validate;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
@@ -14,7 +15,6 @@ import org.openimmunizationsoftware.dqa.db.model.received.Skippable;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 
-
 public abstract class ValidateMessage
 {
 
@@ -27,6 +27,116 @@ public abstract class ValidateMessage
   protected PotentialIssues pi = PotentialIssues.getPotentialIssues();
   protected int positionId = 0;
   protected List<IssueFound> issuesFound = null;
+  protected PrintWriter documentOut = null;
+
+  public void document(String s)
+  {
+    if (documentOut != null)
+    {
+      documentOut.print(s);
+    }
+  }
+
+  public void documentHeaderSub(String s)
+  {
+    if (documentOut != null)
+    {
+      documentOut.print("<h5>");
+      documentOut.print(s);
+      documentOut.println("</h5>");
+    }
+  }
+
+  public void documentHeaderMain(String s)
+  {
+    if (documentOut != null)
+    {
+      documentOut.print("<h4>");
+      documentOut.print(s);
+      documentOut.println("</h4>");
+    }
+  }
+
+  public void documentValuesFound(String... values)
+  {
+    if (documentOut != null)
+    {
+      boolean headerPrinted = false;
+      for (int i = 1; i < values.length; i = i + 2)
+      {
+        if (!headerPrinted)
+        {
+          documentOut.println("<table>");
+          documentOut.println("  <tr>");
+          documentOut.println("    <th>Field</th>");
+          documentOut.println("    <th>Value</th>");
+          documentOut.println("  </tr>");
+          headerPrinted = true;
+        }
+        documentOut.println("  <tr>");
+        documentOut.println("    <td>" + values[i - 1] + "</td>");
+        if (values[i] == null || values[i].length() == 0)
+        {
+          documentOut.println("    <td>&nbsp;</td>");
+        } else
+        {
+          documentOut.println("    <td>" + values[i] + "</td>");
+
+        }
+        documentOut.println("  </tr>");
+      }
+      if (headerPrinted)
+      {
+        documentOut.println("</table>");
+      }
+    }
+  }
+
+  public void documentParagraph(String s)
+  {
+    if (documentOut != null)
+    {
+      documentOut.println("<p>");
+      documentOut.println(s);
+      documentOut.println("</p>");
+    }
+  }
+
+  public void documentIssueFound(IssueFound issueFound)
+  {
+    if (documentOut != null)
+    {
+      IssueAction action = issueFound.getIssueAction();
+      String cssClass = "";
+      if (issueFound.isError())
+      {
+        cssClass = "problem";
+      } else if (issueFound.isWarn())
+      {
+        cssClass = "poor";
+      } else if (issueFound.isSkip())
+      {
+        cssClass = "poor";
+      }
+      documentOut.println("<p class=\"" + cssClass + "\">");
+      if (!action.isAccept())
+      {
+        documentOut.print(action.getActionLabel() + ": ");
+      }
+      documentOut.println(issueFound.getDisplayText());
+      documentOut.println("</p>");
+    }
+  }
+
+  public boolean isDocument()
+  {
+    return documentOut != null;
+  }
+
+  public void setDocumentOut(PrintWriter documentOut)
+  {
+    this.documentOut = documentOut;
+  }
 
   protected ValidateMessage(SubmitterProfile profile) {
     this.profile = profile;
@@ -44,8 +154,9 @@ public abstract class ValidateMessage
       registerIssue(potentialIssue, profile.getPotentialIssueStatus(potentialIssue).getAction(), null);
     }
   }
+
   protected void registerIssue(PotentialIssue potentialIssue, CodeReceived codeReceived)
-    {
+  {
     if (potentialIssue != null)
     {
       registerIssue(potentialIssue, profile.getPotentialIssueStatus(potentialIssue).getAction(), codeReceived);
@@ -53,10 +164,10 @@ public abstract class ValidateMessage
   }
 
   protected void registerIssue(PotentialIssue potentialIssue, IssueAction issueAction)
-  {    
+  {
     registerIssue(potentialIssue, issueAction, null);
   }
-  
+
   protected void registerIssue(PotentialIssue potentialIssue, IssueAction issueAction, CodeReceived codeReceived)
   {
     if (potentialIssue != null)
@@ -67,14 +178,16 @@ public abstract class ValidateMessage
       issueFound.setIssue(potentialIssue);
       issueFound.setIssueAction(issueAction);
       issueFound.setCodeReceived(codeReceived);
-      issuesFound.add(issueFound);
+      if (issuesFound != null)
+      {
+        issuesFound.add(issueFound);
+      }
       if (issueAction.isSkip() && skippableItem != null)
       {
         skippableItem.setSkipped(true);
       }
+      documentIssueFound(issueFound);
     }
   }
-  
-  
 
 }

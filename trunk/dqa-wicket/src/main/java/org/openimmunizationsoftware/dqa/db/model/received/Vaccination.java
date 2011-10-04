@@ -54,6 +54,18 @@ public class Vaccination implements Skippable
   private long vaccinationId = 0l;
   private VaccineCvx vaccineCvx = null;
   private Date visPublicationDate = null;
+  private CodedEntity orderControl = new CodedEntity(CodeTable.Type.VACCINATION_ORDER_CONTROL_CODE);
+  private boolean administered = false;
+
+  public boolean isAdministered()
+  {
+    return administered;
+  }
+
+  public void setAdministered(boolean administered)
+  {
+    this.administered = administered;
+  }
 
   public CodedEntity getAction()
   {
@@ -565,6 +577,21 @@ public class Vaccination implements Skippable
   public void setVisPublicationDate(Date visPublicationDate)
   {
     this.visPublicationDate = visPublicationDate;
+  }
+  
+  public String getOrderControlCode()
+  {
+    return orderControl.getCode();
+  }
+  
+  public void setOrderControlCode(String code)
+  {
+    orderControl.setCode(code);
+  }
+  
+  public CodedEntity getOrderControl()
+  {
+    return orderControl;
   }
 
 }

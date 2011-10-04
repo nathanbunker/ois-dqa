@@ -1,7 +1,5 @@
 package org.openimmunizationsoftware.dqa.manager;
 
-import java.util.Date;
-
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
