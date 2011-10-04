@@ -1,5 +1,11 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+/**
+ * Batch Actions represent an count of the number of actions that 
+ * were encountered while processing a batch of messages.
+ * @author nathan
+ *
+ */
 public class BatchActions
 {
   private int batchActionsId = 0;

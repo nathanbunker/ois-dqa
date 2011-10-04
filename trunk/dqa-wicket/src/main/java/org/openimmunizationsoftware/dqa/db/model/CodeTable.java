@@ -9,7 +9,7 @@ public class CodeTable
     PATIENT_SEX(19), PERSON_LANGUAGE(20), PERSON_NAME_TYPE(21), PERSON_RELATIONSHIP(22), PHYSICIAN_NUMBER(23),
     REGISTRY_STATUS(24), VACCINATION_ACTION_CODE(25), VACCINATION_COMPLETION(26), VACCINATION_CONFIDENTIALITY(27),
     VACCINATION_CPT_CODE(28), VACCINATION_CVX_CODE(29), VACCINATION_INFORMATION_SOURCE(30),
-    VACCINATION_MANUFACTURER_CODE(31), VACCINATION_REFUSAL(32), VACCINE_PRODUCT(33);
+    VACCINATION_MANUFACTURER_CODE(31), VACCINATION_ORDER_CONTROL_CODE(34), VACCINATION_REFUSAL(32), VACCINE_PRODUCT(33);
 
     int tableId = 0;
 
@@ -56,17 +56,17 @@ public class CodeTable
   {
     this.defaultCodeValue = defaultCodeValue;
   }
-  
+
   @Override
   public boolean equals(Object obj)
   {
     if (obj instanceof CodeTable)
     {
-      return ((CodeTable)obj).getTableId() == tableId;
+      return ((CodeTable) obj).getTableId() == tableId;
     }
     return super.equals(obj);
   }
-  
+
   @Override
   public int hashCode()
   {

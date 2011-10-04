@@ -27,12 +27,14 @@ public class KeyedSetting
   public static final String WEEKLY_EXPORT_START_TIME = "weekly.export.start_time";
   public static final String WEEKLY_EXPORT_END_TIME = "weekly.export.end_time";
   public static final String VALIDATE_HEADER_SENDING_FACILITY_NUMERIC = "validate.header.sending_facility.numeric";
+  public static final String VALIDATE_HEADER_SENDING_FACILITY_PFS = "validate.header.sending_facility.pfs";
   public static final String VALIDATE_HEADER_SENDING_FACILITY_MIN_LEN = "validate.header.sending_facility.min_len";
   public static final String VALIDATE_HEADER_SENDING_FACILITY_MAX_LEN = "validate.header.sending_facility.max_len";
   public static final String VALIDATE_VACCINATION_FACILITY_NUMERIC = "validate.vaccination.facility.numeric";
+  public static final String VALIDATE_VACCINATION_FACILITY_PFS = "validate.vaccination.facility.pfs";
   public static final String VALIDATE_VACCINATION_FACILITY_MIN_LEN = "validate.vaccination.facility.min_len";
   public static final String VALIDATE_VACCINATION_FACILITY_MAX_LEN = "validate.vaccination.facility.max_len";
-  
+
   
   
   private String keyedCode = "";

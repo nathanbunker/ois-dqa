@@ -4,13 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -22,11 +16,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.openimmunizationsoftware.dqa.db.model.BatchActions;
-import org.openimmunizationsoftware.dqa.db.model.BatchCodeReceived;
-import org.openimmunizationsoftware.dqa.db.model.BatchIssues;
 import org.openimmunizationsoftware.dqa.db.model.BatchType;
-import org.openimmunizationsoftware.dqa.db.model.BatchVaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.IssueAction;
@@ -34,8 +24,8 @@ import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
-import org.openimmunizationsoftware.dqa.db.model.SubmitStatus;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
+import org.openimmunizationsoftware.dqa.db.model.UserAccount;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 import org.openimmunizationsoftware.dqa.manager.FileImportManager;
 import org.openimmunizationsoftware.dqa.manager.ManagerThread;
@@ -44,6 +34,7 @@ import org.openimmunizationsoftware.dqa.manager.MessageReceivedManager;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
 import org.openimmunizationsoftware.dqa.manager.WeeklyBatchManager;
 import org.openimmunizationsoftware.dqa.manager.WeeklyExportManager;
+import org.openimmunizationsoftware.dqa.parse.PrintBean;
 import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
 import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 import org.openimmunizationsoftware.dqa.validate.Validator;
@@ -156,36 +147,131 @@ public class IncomingServlet extends HttpServlet
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
-    String profileCode = req.getParameter("USERID");
-    String accessKey = req.getParameter("PASSWORD");
-    String profileId = req.getParameter("FACILITYID");
+    String userId = req.getParameter("USERID");
+    String password = req.getParameter("PASSWORD");
+    String facilityId = req.getParameter("FACILITYID");
     boolean debug = req.getParameter("DEBUG") != null;
     resp.setContentType("text/plain");
     out = new PrintWriter(resp.getOutputStream());
 
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
-    if (profileId == null || profileId.equals(""))
+    String accessDenied = null;
+    if (userId == null || userId.equals(""))
     {
-      profileId = "1";
+      accessDenied = "USERID was not specified and is required for real time submission";
+    } else if (password == null || password.equals(""))
+    {
+      accessDenied = "PASSWORD was not specified and is required for real time submission";
+    } else if (facilityId == null || facilityId.equals(""))
+    {
+      accessDenied = "FACILITYID was not specified and is required for real time submission";
     }
     SubmitterProfile profile = null;
-    String accessDenied = null;
-    Query query = session.createQuery("from SubmitterProfile where profileCode = ? and accessKey = ?");
-    query.setParameter(0, profileCode);
-    query.setParameter(1, accessKey);
-    List<SubmitterProfile> submitterProfiles = query.list();
-    if (submitterProfiles.size() == 0)
+    if (accessDenied == null)
     {
-      accessDenied = "Authorization failed, invalid USERID or PASSWORD";
-    } else
-    {
-      profile = submitterProfiles.get(0);
+      boolean isEmail = false;
+      int pos = userId.indexOf("@");
+      isEmail = pos > 1 && pos < (userId.length() - 2);
+      String emailUsername = "";
+      String emailHost = "";
+      if (isEmail)
+      {
+        emailUsername = userId.substring(0, pos);
+        emailHost = userId.substring(pos + 1);
+      }
+      if (isEmail)
+      {
+        Query query = session.createQuery("from UserAccount where email = ?");
+        query.setParameter(0, userId);
+        List<UserAccount> userAccounts = query.list();
+        UserAccount userAccount = null;
+        if (userAccounts.size() > 0)
+        {
+          userAccount = userAccounts.get(0);
+        } else
+        {
+          query = session.createQuery("from Organization where orgLocalCode = ?");
+          query.setParameter(0, emailHost); // Use email host as the
+                                            // organization name
+          List<Organization> organizations = query.list();
+          Organization organization = null;
+          if (organizations.size() == 0)
+          {
+            organization = new Organization();
+            organization.setOrgLabel(emailHost);
+            organization.setOrgLocalCode(emailHost);
+            organization.setParentOrganization((Organization) session.get(Organization.class, 1));
+            session.save(organization);
+          } else
+          {
+            organization = organizations.get(0);
+          }
+          // find unique user name
+          String username = null;
+          int i = 0;
+          while (username == null)
+          {
+            username = (i == 0 ? emailUsername : emailUsername + i);
+            query = session.createQuery("from UserAccount where username = ?");
+            query.setParameter(0, username);
+            if (query.list().size() > 0)
+            {
+              username = null;
+              i++;
+            }
+          }
+          userAccount = new UserAccount();
+          userAccount.setAccountType(UserAccount.ACCOUNT_TYPE_SUBMITTER);
+          userAccount.setEmail(userId);
+          userAccount.setUsername(username);
+          userAccount.setOrganization(organization);
+          userAccount.setPassword(password);
+          session.save(userAccount);
+        }
+        query = session.createQuery("from SubmitterProfile where organization = ? and profileLabel = ?");
+        query.setParameter(0, userAccount.getOrganization());
+        query.setParameter(1, facilityId);
+        List<SubmitterProfile> submitterProfiles = query.list();
+        if (submitterProfiles.size() == 0)
+        {
+          profile = new SubmitterProfile();
+          profile.setAccessKey(password);
+          profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
+          profile.setOrganization(userAccount.getOrganization());
+          profile.setProfileCode(facilityId);
+          profile.setProfileLabel(facilityId);
+          profile.setProfileStatus(SubmitterProfile.PROFILE_STATUS_TEST);
+          profile.setTransferPriority(SubmitterProfile.TRANSFER_PRIORITY_NORMAL);
+          session.save(profile);
+        } else
+        {
+          profile = submitterProfiles.get(0);
+          if (!profile.getAccessKey().equals(password))
+          {
+            accessDenied = "Unrecognized USERID, PASSWORD or FACILITYID";
+            profile = null;
+          }
+        }
+      } else
+      {
+        Query query = session.createQuery("from SubmitterProfile where profileCode = ? and accessKey = ?");
+        query.setParameter(0, userId);
+        query.setParameter(1, password);
+        List<SubmitterProfile> submitterProfiles = query.list();
+        if (submitterProfiles.size() == 0)
+        {
+          accessDenied = "Authorization failed, invalid USERID or PASSWORD";
+        } else
+        {
+          profile = submitterProfiles.get(0);
+        }
+      }
     }
     if (accessDenied == null)
     {
       String messageData = req.getParameter("MESSAGEDATA");
-      processStream(debug, session, profile, messageData);
+      debug = processStream(debug, session, profile, messageData);
     } else
     {
       out.println(accessDenied);
@@ -276,7 +362,7 @@ public class IncomingServlet extends HttpServlet
     out.print(" + Deleted:          " + mb.getVaccinationDeleteCount() + "\r");
   }
 
-  public void processStream(boolean debug, Session session, SubmitterProfile profile, String messageData)
+  public boolean processStream(boolean debug, Session session, SubmitterProfile profile, String messageData)
       throws IOException
   {
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -292,7 +378,7 @@ public class IncomingServlet extends HttpServlet
       {
         if (sb.length() > 0)
         {
-          processMessage(parser, sb, debug, profile, session);
+          debug = processMessage(parser, sb, debug, profile, session);
         }
         sb.setLength(0);
       } else if (line.startsWith("FHS") || line.startsWith("BHS") || line.startsWith("BTS") || line.startsWith("FTS"))
@@ -304,39 +390,16 @@ public class IncomingServlet extends HttpServlet
     }
     if (sb.length() > 0)
     {
-      processMessage(parser, sb, debug, profile, session);
+      debug = processMessage(parser, sb, debug, profile, session);
     }
     Transaction tx = session.beginTransaction();
     messageBatchManager.close();
     session.save(messageBatchManager.getMessageBatch());
     tx.commit();
+    return debug;
   }
 
-  private void saveAndCloseBatch(Session session)
-  {
-    messageBatchManager.close();
-    messageBatchManager.getMessageBatch().setSubmitStatus(SubmitStatus.QUEUED);
-    session.save(messageBatchManager.getMessageBatch());
-    MessageBatch messageBatch = messageBatchManager.getMessageBatch();
-    for (BatchIssues batchIssues : messageBatch.getBatchIssuesMap().values())
-    {
-      session.save(batchIssues);
-    }
-    for (BatchActions batchActions : messageBatch.getBatchActionsMap().values())
-    {
-      session.save(batchActions);
-    }
-    for (BatchCodeReceived batchCodeReceived : messageBatch.getBatchCodeReceivedMap().values())
-    {
-      session.save(batchCodeReceived);
-    }
-    for (BatchVaccineCvx batchVaccineCvx : messageBatch.getBatchVaccineCvxMap().values())
-    {
-      session.save(batchVaccineCvx);
-    }
-  }
-
-  private void processMessage(VaccinationUpdateParserHL7 parser, StringBuilder sb, boolean debug,
+  private boolean processMessage(VaccinationUpdateParserHL7 parser, StringBuilder sb, boolean debug,
       SubmitterProfile profile, Session session)
   {
     try
@@ -347,6 +410,10 @@ public class IncomingServlet extends HttpServlet
       messageReceived.setProfile(profile);
       messageReceived.setRequestText(sb.toString());
       parser.createVaccinationUpdateMessage(messageReceived);
+      if (profile.isProfileStatusTest() && messageReceived.getHeader().getProcessingId().equals(org.openimmunizationsoftware.dqa.db.model.Header.PROCESSING_ID_DEBUGGING))
+      {
+        debug = true;
+      }
       if (!messageReceived.hasErrors())
       {
         Validator validator = new Validator(profile, session);
@@ -406,7 +473,7 @@ public class IncomingServlet extends HttpServlet
             }
           }
           out.print("Message Data: \r");
-          printBean(messageReceived, "  ");
+          PrintBean.print(messageReceived, out);
           out.print("-- DEBUG END ---------------------------------------------------------\r");
         } catch (Exception e)
         {
@@ -425,6 +492,7 @@ public class IncomingServlet extends HttpServlet
       }
       exception.printStackTrace();
     }
+    return debug;
   }
 
   private void printIssueFound(IssueFound issueFound)
@@ -432,82 +500,6 @@ public class IncomingServlet extends HttpServlet
     out.print("  + ");
     out.print(issueFound.getDisplayText());
     out.print("\r");
-  }
-
-  private List<String> printBean(Object object, String indent) throws IllegalAccessException, InvocationTargetException
-  {
-    List<String> thisPrinted = new ArrayList<String>();
-    List<String> subPrinted = new ArrayList<String>();
-    Method[] methods = object.getClass().getMethods();
-    Arrays.sort(methods, new Comparator<Method>() {
-      public int compare(Method o1, Method o2)
-      {
-        return o1.getName().compareTo(o2.getName());
-      }
-    });
-    for (Method method : methods)
-    {
-      if (method.getName().startsWith("get") && !method.getName().equals("getClass")
-          && !method.getName().equals("getMessageReceived") && !method.getName().equals("getProfile")
-          && !method.getName().equals("getRequestText") && !method.getName().equals("getResponseText")
-          && !method.getName().equals("getIssuesFound") && !method.getReturnType().equals(Void.TYPE)
-          && method.getParameterTypes().length == 0)
-      {
-        Object returnValue = method.invoke(object);
-        String fieldName = method.getName().substring(3);
-        if (returnValue == null || subPrinted.contains(fieldName))
-        {
-          // do nothing
-        } else if (method.getReturnType() == String.class)
-        {
-          if (!((String) returnValue).equals(""))
-          {
-            out.print(indent);
-            out.print(fieldName);
-            out.print(" = '");
-            out.print(returnValue);
-            out.print("'");
-            out.print("\r");
-            thisPrinted.add(fieldName);
-          }
-        } else if (method.getReturnType() == Date.class)
-        {
-          out.print(indent);
-          out.print(fieldName);
-          SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-          out.print(" = ");
-          out.print(sdf.format((Date) returnValue));
-          out.print("\r");
-          thisPrinted.add(fieldName);
-        } else if (method.getReturnType() == List.class)
-        {
-          List list = (List) returnValue;
-          for (int i = 0; i < list.size(); i++)
-          {
-            out.print(indent);
-            out.print(fieldName);
-            out.print(" #");
-            out.print(i + 1);
-            out.print("\r");
-            printBean(list.get(i), indent + "  ");
-          }
-        } else if (method.getReturnType() == CodeTable.Type.class)
-        {
-          // don't process
-        } else
-        {
-          out.print(indent);
-          out.print(fieldName);
-          out.print("\r");
-          List<String> returnPrints = printBean(returnValue, indent + "  ");
-          for (String returnPrint : returnPrints)
-          {
-            subPrinted.add(fieldName + returnPrint);
-          }
-        }
-      }
-    }
-    return thisPrinted;
   }
 
   private static final String PAD = "                                                                                                          ";
