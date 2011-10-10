@@ -10,6 +10,7 @@ public class KeyedSetting
   public static final String IN_FILE_RECEIVE_DIR_NAME = "in.file.receive_dir.name";
   public static final String IN_FILE_SUBMIT_DIR_NAME = "in.file.submit_dir.name";
   public static final String IN_FILE_DQA_DIR_NAME = "in.file.dqa_dir.name";
+  public static final String IN_FILE_THREAD_COUNT_MAX = "in.file.thread.count.max";
   public static final String OUT_FILE_DIR = "out.file.dir";
   public static final String OUT_HL7_MSH_RECEIVING_APPLICATION = "out.hl7.msh.receiving_application";
   public static final String OUT_HL7_MSH_RECEIVING_FACILITY = "out.hl7.msh.receiving_facility";
