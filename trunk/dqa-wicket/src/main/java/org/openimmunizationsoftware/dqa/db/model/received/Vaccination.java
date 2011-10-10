@@ -29,6 +29,7 @@ public class Vaccination implements Skippable
   private final CodedEntity adminCvx = new CodedEntity(CodeTable.Type.VACCINATION_CVX_CODE);
   private Date adminDate = null;
   private Date adminDateEnd = null;
+  private boolean administered = false;
   private String amount = "";
   private CodedEntity amountUnit = new CodedEntity(CodeTable.Type.ADMINISTRATION_UNIT);
   private CodedEntity bodyRoute = new CodedEntity(CodeTable.Type.BODY_ROUTE);
@@ -38,13 +39,15 @@ public class Vaccination implements Skippable
   private Id enteredBy = new Id(CodeTable.Type.PHYSICIAN_NUMBER);
   private Date expirationDate = null;
   private OrganizationName facility = new OrganizationName();
-  private CodedEntity financialEligibility = new CodedEntity(CodeTable.Type.FINANICAL_STATUS_CODE);
+  private CodedEntity financialEligibility = new CodedEntity(CodeTable.Type.FINANCIAL_STATUS_CODE);
   private Id givenBy = new Id(CodeTable.Type.PHYSICIAN_NUMBER);
+  private String idPlacer = "";
   private String idSubmitter = "";
   private CodedEntity informationSource = new CodedEntity(CodeTable.Type.VACCINATION_INFORMATION_SOURCE);
   private String lotNumber = "";
   private CodedEntity manufacturer = new CodedEntity(CodeTable.Type.VACCINATION_MANUFACTURER_CODE);
   private MessageReceived messageReceived = null;
+  private CodedEntity orderControl = new CodedEntity(CodeTable.Type.VACCINATION_ORDER_CONTROL_CODE);
   private Id orderedBy = new Id(CodeTable.Type.PHYSICIAN_NUMBER);
   private int positionId = 0;
   private CodedEntity product = new CodedEntity(CodeTable.Type.VACCINE_PRODUCT);
@@ -54,18 +57,6 @@ public class Vaccination implements Skippable
   private long vaccinationId = 0l;
   private VaccineCvx vaccineCvx = null;
   private Date visPublicationDate = null;
-  private CodedEntity orderControl = new CodedEntity(CodeTable.Type.VACCINATION_ORDER_CONTROL_CODE);
-  private boolean administered = false;
-
-  public boolean isAdministered()
-  {
-    return administered;
-  }
-
-  public void setAdministered(boolean administered)
-  {
-    this.administered = administered;
-  }
 
   public CodedEntity getAction()
   {
@@ -87,13 +78,6 @@ public class Vaccination implements Skippable
     return admin.getCode();
   }
 
-  // public static final String ACTION_CODE_ADD = "A";
-  // public static final String ACTION_CODE_DELETE = "D";
-  // public static final String ACTION_CODE_UPDATE = "U";
-  //
-  // public static final String INFO_SOURCE_ADMIN = "00";
-  // public static final String INFO_SOURCE_HIST = "01";
-
   public CodedEntity getAdminCpt()
   {
     return adminCpt;
@@ -103,6 +87,13 @@ public class Vaccination implements Skippable
   {
     return adminCpt.getCode();
   }
+
+  // public static final String ACTION_CODE_ADD = "A";
+  // public static final String ACTION_CODE_DELETE = "D";
+  // public static final String ACTION_CODE_UPDATE = "U";
+  //
+  // public static final String INFO_SOURCE_ADMIN = "00";
+  // public static final String INFO_SOURCE_HIST = "01";
 
   public CodedEntity getAdminCvx()
   {
@@ -249,6 +240,11 @@ public class Vaccination implements Skippable
     return givenBy.getNumber();
   }
 
+  public String getIdPlacer()
+  {
+    return idPlacer;
+  }
+
   public String getIdSubmitter()
   {
     return idSubmitter;
@@ -282,6 +278,16 @@ public class Vaccination implements Skippable
   public MessageReceived getMessageReceived()
   {
     return messageReceived;
+  }
+
+  public CodedEntity getOrderControl()
+  {
+    return orderControl;
+  }
+
+  public String getOrderControlCode()
+  {
+    return orderControl.getCode();
   }
 
   public Id getOrderedBy()
@@ -359,6 +365,11 @@ public class Vaccination implements Skippable
     return action.getCode() != null && action.getCode().equals(ACTION_CODE_UPDATE);
   }
 
+  public boolean isAdministered()
+  {
+    return administered;
+  }
+
   public boolean isCompletionCompleted()
   {
     return completion.getCode() != null && completion.getCode().equals(COMPLETION_COMPLETED);
@@ -422,6 +433,11 @@ public class Vaccination implements Skippable
   public void setAdminDateEnd(Date adminDateEnd)
   {
     this.adminDateEnd = adminDateEnd;
+  }
+
+  public void setAdministered(boolean administered)
+  {
+    this.administered = administered;
   }
 
   public void setAmount(String amount)
@@ -504,6 +520,11 @@ public class Vaccination implements Skippable
     givenBy.setNumber(givenByNumber);
   }
 
+  public void setIdPlacer(String idPlacer)
+  {
+    this.idPlacer = idPlacer;
+  }
+
   public void setIdSubmitter(String idSubmitter)
   {
     this.idSubmitter = idSubmitter;
@@ -527,6 +548,11 @@ public class Vaccination implements Skippable
   public void setMessageReceived(MessageReceived messageReceived)
   {
     this.messageReceived = messageReceived;
+  }
+
+  public void setOrderControlCode(String code)
+  {
+    orderControl.setCode(code);
   }
 
   public void setOrderedByNameFirst(String orderedByNameFirst)
@@ -577,21 +603,6 @@ public class Vaccination implements Skippable
   public void setVisPublicationDate(Date visPublicationDate)
   {
     this.visPublicationDate = visPublicationDate;
-  }
-  
-  public String getOrderControlCode()
-  {
-    return orderControl.getCode();
-  }
-  
-  public void setOrderControlCode(String code)
-  {
-    orderControl.setCode(code);
-  }
-  
-  public CodedEntity getOrderControl()
-  {
-    return orderControl;
   }
 
 }

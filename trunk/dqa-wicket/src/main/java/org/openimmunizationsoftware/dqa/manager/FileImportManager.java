@@ -91,9 +91,14 @@ public class FileImportManager extends ManagerThreadMulti
         return new File(arg0, arg1).isDirectory();
       }
     });
-    internalLog.append("Found " + dirNames.length + " directories to look in\r");
+    internalLog.append("Found " + dirNames.length + " directories to look in \r");
     for (String dirName : dirNames)
     {
+      if (threads.size() > ksm.getKeyedValueInt(KeyedSetting.IN_FILE_THREAD_COUNT_MAX, 5))
+      {
+        internalLog.append("Too many threads are currently running, waiting before starting more threads \r");
+        break;
+      }
       File dir = new File(rootDir, dirName);
       internalLog.append(" + " + dirName);
       ManagerThread thread = threads.get(dir.getName());

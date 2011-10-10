@@ -1,0 +1,32 @@
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(35, 'Country Code', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(36, 'Character Set', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(37, 'Message Profile Id', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(38, 'Patient Class', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(40, 'Acknowledgement Type', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(41, 'Telecommunication Use', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(42, 'Telecommunication Equipment', '');
+
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 38, 'R', 'Recurring', 'R', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'AL', '', 'AL', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'NE', '', 'NE', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'ER', '', 'ER', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'SU', '', 'SU', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'PRN', 'Primary residence number', 'PRN', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'ORN', 'Other residence number', 'ORN', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'WPN', 'Work number', 'WPN', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'VHN', 'Vacation home number', 'VHN', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'ASN', 'Answering service number', 'ASN', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'EMR', 'Emergency number', 'EMR', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'NET', 'Network (email) address', 'NET', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'BPN', 'Beeper number', 'BPN', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 42, 'PH', 'Telephone', 'PH', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 42, 'FX', 'Fax', 'FX', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 42, 'MD', 'Modem', 'MD', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 42, 'CP', 'Cellular phone', 'CP', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 42, 'BP', 'Beeper', 'BP', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 42, 'Internet', 'Internet address', 'Internet', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 42, 'X.400', 'X.400 email address', 'X.400', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 42, 'TDD', 'Telecommunications Device for the Deaf', 'TDD', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 42, 'TTY', 'Teletypewriter', 'TTY', 'V');
+
+ALTER TABLE dqa_vaccination ADD (order_control_code VARCHAR2(250));

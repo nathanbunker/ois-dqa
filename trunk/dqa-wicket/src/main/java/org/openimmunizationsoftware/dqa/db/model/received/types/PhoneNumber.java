@@ -1,10 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model.received.types;
 
+import org.openimmunizationsoftware.dqa.db.model.CodeTable;
+
 public class PhoneNumber
 {
   private String number = "";
-  private String telUseCode = "";
-  private String telEquipCode = "";
+  private CodedEntity telUse = new CodedEntity(CodeTable.Type.TELECOMMUNICATION_USE);
+  private CodedEntity telEquip = new CodedEntity(CodeTable.Type.TELECOMMUNICATION_EQUIPMENT);
   private String email = "";
   private String countryCode = "";
   private String areaCode = "";
@@ -71,24 +73,34 @@ public class PhoneNumber
     }
   }
 
+  public CodedEntity getTelUse()
+  {
+    return telUse;
+  }
+
   public String getTelUseCode()
   {
-    return telUseCode;
+    return telUse.getCode();
   }
 
   public void setTelUseCode(String telUseCode)
   {
-    this.telUseCode = telUseCode;
+    this.telUse.setCode(telUseCode);
   }
 
   public String getTelEquipCode()
   {
-    return telEquipCode;
+    return telEquip.getCode();
+  }
+
+  public CodedEntity getTelEquip()
+  {
+    return telEquip;
   }
 
   public void setTelEquipCode(String telEquipCode)
   {
-    this.telEquipCode = telEquipCode;
+    this.telEquip.setCode(telEquipCode);
   }
 
   public String getEmail()

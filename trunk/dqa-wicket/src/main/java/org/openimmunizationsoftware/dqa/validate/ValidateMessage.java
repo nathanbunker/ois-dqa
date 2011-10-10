@@ -29,6 +29,22 @@ public abstract class ValidateMessage
   protected List<IssueFound> issuesFound = null;
   protected PrintWriter documentOut = null;
 
+  public boolean hasIssue(PotentialIssue pi)
+  {
+    return getIssueFoundFirst(pi) != null;
+  }
+  public IssueFound getIssueFoundFirst(PotentialIssue pi)
+  {
+    for (IssueFound issueFound : issuesFound)
+    {
+      if (issueFound.getIssue() == pi)
+      {
+        return issueFound;
+      }
+    }
+    return null;
+  }
+
   public void document(String s)
   {
     if (documentOut != null)

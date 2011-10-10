@@ -3,8 +3,8 @@
     <section name="patient" weight="20">
       <section name="required" weight="10">
         <score label="Patient Id" denominator="patient count" numerator="Patient submitter id" weight="10" />
-        <score label="First Name" denominator="patient count" numerator="Patient first name" weight="5" />
-        <score label="Last Name" denominator="patient count" numerator="Patient last name" weight="5" />
+        <score label="First Name" denominator="patient count" numerator="Patient name first" weight="5" />
+        <score label="Last Name" denominator="patient count" numerator="Patient name last" weight="5" />
         <score label="Possible Test Name" denominator="patient count" numerator="Patient name may be test name" weight="-5" />
         <score label="Possible Baby Name" denominator="patient count" numerator="Patient name may be temporary newborn name" weight="-10" />
         <score label="Birth Date" denominator="patient count" numerator="Patient birth date" weight="10" />
@@ -22,8 +22,8 @@
         <score label="Mother's Maiden" denominator="patient count" numerator="Patient mother's maiden name" weight="10" />
         <score label="SSN" denominator="patient count" numerator="Patient SSN" weight="10" />
         <score label="Responsible Party" denominator="patient count" numerator="Patient guardian party" weight="1">
-          <score label="First Name" denominator="patient count" numerator="Patient guardian first name" weight="4" />
-          <score label="Last Name" denominator="patient count" numerator="Patient guardian last name" weight="4" />
+          <score label="First Name" denominator="patient count" numerator="Patient guardian name first" weight="4" />
+          <score label="Last Name" denominator="patient count" numerator="Patient guardian name last" weight="4" />
           <score label="Same as Patient" denominator="patient count" numerator="Patient guardian name is same as underage patient" weight="-8" />
           <score label="Relationship" denominator="patient count" numerator="Patient guardian relationship" weight="1" />
         </score>

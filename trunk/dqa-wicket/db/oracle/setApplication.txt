@@ -1,7 +1,7 @@
 UPDATE dqa_application set run_this = 'N';
-
 UPDATE dqa_application SET run_this = 'Y' 
 WHERE application_label = 'ImmTrac' AND application_type = 'Dev';
 
+UPDATE dqa_application set run_this = 'N';
 UPDATE dqa_application SET run_this = 'Y' 
-WHERE application_label = 'ImmTrac' AND application_type = 'Dev';
+WHERE application_label = 'DQA Dev' AND application_type = 'Dev';
