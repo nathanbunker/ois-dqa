@@ -23,7 +23,7 @@ public class Patient implements Skippable
   private String deathIndicator = "";
   private CodedEntity ethnicity = new CodedEntity(CodeTable.Type.PATIENT_ETHNICITY);
   private OrganizationName facility = new OrganizationName();
-  private CodedEntity financialEligibility = new CodedEntity(CodeTable.Type.FINANICAL_STATUS_CODE);
+  private CodedEntity financialEligibility = new CodedEntity(CodeTable.Type.FINANCIAL_STATUS_CODE);
   private Id idMedicaid = new Id(CodeTable.Type.PATIENT_ID);
   private Id idRegistry = new Id(CodeTable.Type.PATIENT_ID);
   private Id idSsn = new Id(CodeTable.Type.PATIENT_ID);
@@ -39,6 +39,7 @@ public class Patient implements Skippable
   private CodedEntity publicity = new CodedEntity(CodeTable.Type.PATIENT_PUBLICITY);
   private CodedEntity race = new CodedEntity(CodeTable.Type.PATIENT_RACE);
   private CodedEntity registryStatus = new CodedEntity(CodeTable.Type.REGISTRY_STATUS);
+  private CodedEntity patientClass = new CodedEntity(CodeTable.Type.PATIENT_CLASS);
   private NextOfKin responsibleParty = null;
   private CodedEntity sex = new CodedEntity(CodeTable.Type.PATIENT_SEX);
   private boolean skipped = false;
@@ -646,5 +647,20 @@ public class Patient implements Skippable
   public void setSkipped(boolean skipped)
   {
     this.skipped = skipped;
+  }
+  
+  public String getPatientClassCode()
+  {
+    return patientClass.getCode();
+  }
+  
+  public void setPatientClassCode(String code)
+  {
+    patientClass.setCode(code);
+  }
+  
+  public CodedEntity getPatientClass()
+  {
+    return patientClass;
   }
 }

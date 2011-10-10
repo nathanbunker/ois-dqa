@@ -1,6 +1,5 @@
 package org.openimmunizationsoftware.dqa.validate;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -12,12 +11,12 @@ import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeStatus;
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.Header;
-import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCpt;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
+import org.openimmunizationsoftware.dqa.db.model.VaccineCvxGroup;
 import org.openimmunizationsoftware.dqa.db.model.VaccineMvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineProduct;
 import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
@@ -30,8 +29,8 @@ import org.openimmunizationsoftware.dqa.db.model.received.types.PhoneNumber;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 import org.openimmunizationsoftware.dqa.manager.KeyedSettingManager;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
+import org.openimmunizationsoftware.dqa.manager.VaccineGroupManager;
 import org.openimmunizationsoftware.dqa.manager.VaccineProductManager;
-import org.openimmunizationsoftware.dqa.validate.immtrac.PfsSupport;
 
 public class Validator extends ValidateMessage
 {
@@ -50,6 +49,7 @@ public class Validator extends ValidateMessage
   private PotentialIssues.Field piAddressState;
   private PotentialIssues.Field piAddressStreet2;
   private PotentialIssues.Field piAddressZip;
+  private PotentialIssues.Field piAddressType;
   protected KeyedSettingManager ksm;
 
   private static List<SectionValidator> headerValidators = new ArrayList<SectionValidator>();
@@ -57,17 +57,17 @@ public class Validator extends ValidateMessage
   private static List<SectionValidator> vaccinationValidators = new ArrayList<SectionValidator>();
 
   private static boolean initialized = false;
-  
+
   public List<SectionValidator> getHeaderValidators()
   {
     return headerValidators;
   }
-  
+
   public List<SectionValidator> getPatientValidators()
   {
     return patientValidators;
   }
-  
+
   public List<SectionValidator> getVaccinationValidators()
   {
     return vaccinationValidators;
@@ -77,7 +77,16 @@ public class Validator extends ValidateMessage
   {
     if (!initialized)
     {
+      // header validations
       headerValidators.add(new FacilityValidator());
+
+      // patient validations
+      patientValidators.add(new PatientClassValidator());
+      patientValidators.add(new RegistryStatusValidator());
+
+      // vaccination validations
+      vaccinationValidators.add(new OrderControlValidator());
+      vaccinationValidators.add(new OrderNumberValidator());
       vaccinationValidators.add(new FacilityValidator());
       vaccinationValidators.add(new GivenBy());
       initialized = true;
@@ -102,9 +111,12 @@ public class Validator extends ValidateMessage
     validatePatient();
     for (NextOfKin nextOfKin : message.getNextOfKins())
     {
-      positionId = nextOfKin.getPositionId();
-      skippableItem = nextOfKin;
-      validateNextOfKin(nextOfKin);
+      if (!nextOfKin.isSkipped())
+      {
+        positionId = nextOfKin.getPositionId();
+        skippableItem = nextOfKin;
+        validateNextOfKin(nextOfKin);
+      }
     }
     if (patient.getResponsibleParty() == null)
     {
@@ -112,9 +124,12 @@ public class Validator extends ValidateMessage
     }
     for (Vaccination vaccination : message.getVaccinations())
     {
-      positionId = vaccination.getPositionId();
-      skippableItem = vaccination;
-      validateVaccination(vaccination);
+      if (!vaccination.isSkipped())
+      {
+        positionId = vaccination.getPositionId();
+        skippableItem = vaccination;
+        validateVaccination(vaccination);
+      }
     }
   }
 
@@ -128,6 +143,7 @@ public class Validator extends ValidateMessage
     piAddressState = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_STATE;
     piAddressStreet2 = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_STREET2;
     piAddressZip = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_ZIP;
+    piAddressType = PotentialIssues.Field.NEXT_OF_KIN_ADDRESS_TYPE;
     if (validateAddress(nextOfKin.getAddress()))
     {
       Address p = patient.getAddress();
@@ -160,15 +176,15 @@ public class Validator extends ValidateMessage
           break;
         }
       }
-      if (!isResponsibleParty)
-      {
-        registerIssue(pi.NextOfKinRelationshipIsNotResponsibleParty);
-      }
+    }
+    if (patientUnderAge && !isResponsibleParty)
+    {
+      registerIssue(pi.NextOfKinRelationshipIsNotResponsibleParty);
     }
 
     boolean notEmptyFirst = notEmpty(nextOfKin.getNameLast(), pi.NextOfKinNameLastIsMissing);
     boolean notEmptyLast = notEmpty(nextOfKin.getNameLast(), pi.NextOfKinNameFirstIsMissing);
-    if (!notEmptyFirst && ! notEmptyLast)
+    if (!notEmptyFirst && !notEmptyLast)
     {
       registerIssue(pi.NextOfKinNameIsMissing);
     }
@@ -189,13 +205,13 @@ public class Validator extends ValidateMessage
       if (patient.getResponsibleParty() == null)
       {
         patient.setResponsibleParty(nextOfKin);
-        notEmpty(patient.getAddressCity(), piAddressCity = PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
-        notEmpty(patient.getAddressStateCode(), piAddressCity = PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_STATE);
-        notEmpty(patient.getAddressCity(), piAddressCity = PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
-        notEmpty(patient.getAddressZip(), piAddressCity = PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_ZIP);
+        notEmpty(patient.getAddressCity(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
+        notEmpty(patient.getAddressStateCode(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_STATE);
+        notEmpty(patient.getAddressCity(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
+        notEmpty(patient.getAddressZip(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_ZIP);
 
-        boolean firstNotEmpty = notEmpty(nextOfKin.getNameFirst(), pi.PatientGuardianFirstNameIsMissing);
-        boolean lastNotEmpty = notEmpty(nextOfKin.getNameLast(), pi.PatientGuardianLastNameIsMissing);
+        boolean firstNotEmpty = notEmpty(nextOfKin.getNameFirst(), pi.PatientGuardianNameFirstIsMissing);
+        boolean lastNotEmpty = notEmpty(nextOfKin.getNameLast(), pi.PatientGuardianNameLastIsMissing);
         if (!firstNotEmpty && !lastNotEmpty)
         {
           registerIssue(pi.PatientGuardianNameIsMissing);
@@ -526,9 +542,12 @@ public class Validator extends ValidateMessage
     }
     handleCodeReceived(vaccination.getConfidentiality(), PotentialIssues.Field.VACCINATION_CONFIDENTIALITY_CODE);
 
-    if (vaccineCpt != null && vaccineCvx != null)
+    if (vaccineCpt != null && vaccineCpt.getCvx() != null && vaccineCvx != null)
     {
-      // TODO VaccinationCvxCodeAndCptCodeAreInconsistent
+      if (!checkGroupMatch(vaccineCvx, vaccineCpt))
+      {
+        registerIssue(pi.VaccinationCvxCodeAndCptCodeAreInconsistent);
+      }
     }
 
     for (SectionValidator sectionValidator : vaccinationValidators)
@@ -539,19 +558,7 @@ public class Validator extends ValidateMessage
     handleCodeReceived(vaccination.getOrderedBy(), PotentialIssues.Field.VACCINATION_ORDERED_BY,
         vaccination.isAdministered());
     handleCodeReceived(vaccination.getEnteredBy(), PotentialIssues.Field.VACCINATION_RECORDED_BY);
-    if (!notEmpty(vaccination.getIdSubmitter(), pi.VaccinationIdIsMissing))
-    {
-      // vaccination id is empty, need to set to default value
-      if (vaccination.getAdminDate() == null)
-      {
-        vaccination.setIdSubmitter("dqa-none-" + vaccination.getAdminCvxCode());
-      } else
-      {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        vaccination.setIdSubmitter("dqa-" + sdf.format(vaccination.getAdminDate()) + "-"
-            + vaccination.getAdminCvxCode());
-      }
-    }
+
     // TODO VaccinationIdOfReceiverIsMissing
     // TODO VaccinationIdOfReceiverIsUnrecognized
     // TODO VaccinationIdOfSenderIsMissing
@@ -566,9 +573,8 @@ public class Validator extends ValidateMessage
         // TODO VaccinationLotNumberIsInvalid
       }
     }
-    handleCodeReceived(vaccination.getRefusal(), PotentialIssues.Field.VACCINATION_REFUSAL_REASON);
-    // TODO add logic to indicate if refusal reason is given but completion is
-    // RE
+    handleCodeReceived(vaccination.getRefusal(), PotentialIssues.Field.VACCINATION_REFUSAL_REASON,
+        vaccination.isCompletionRefused());
 
     if (notEmpty(vaccination.getSystemEntryDate(), pi.VaccinationSystemEntryTimeIsMissing))
     {
@@ -577,6 +583,27 @@ public class Validator extends ValidateMessage
         registerIssue(pi.VaccinationSystemEntryTimeIsInFuture);
       }
     }
+  }
+
+  private boolean checkGroupMatch(VaccineCvx vaccineCvx, VaccineCpt vaccineCpt)
+  {
+    if (vaccineCvx.equals(vaccineCpt.getCvx()))
+    {
+      return true;
+    }
+    // CPT doesn't map to CVX, so need to check if it's in the same family
+    VaccineGroupManager vgm = VaccineGroupManager.getVaccineGroupManager();
+    for (VaccineCvxGroup cvxGroup : vgm.getVaccineCvxGroups(vaccineCvx))
+    {
+      for (VaccineCvxGroup cptGroup : vgm.getVaccineCvxGroups(vaccineCpt.getCvx()))
+      {
+        if (cvxGroup.getVaccineGroup().equals(cptGroup.getVaccineGroup()))
+        {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private void validateHeader()
@@ -600,10 +627,9 @@ public class Validator extends ValidateMessage
       sectionValidator.validateHeader(message, this);
     }
 
-    if (notEmpty(header.getAckTypeApplication(), pi.Hl7MshAcknowledgementTypeIsMissing))
-    {
-      // TODO
-    }
+    handleCodeReceived(header.getAckTypeApplication(), PotentialIssues.Field.HL7_MSH_APP_ACK_TYPE);
+    handleCodeReceived(header.getAckTypeAccept(), PotentialIssues.Field.HL7_MSH_ACCEPT_ACK_TYPE);
+
     if (notEmpty(header.getMessageControlId(), pi.Hl7MshMessageControlIdIsMissing))
     {
       // TODO
@@ -612,43 +638,59 @@ public class Validator extends ValidateMessage
     {
       // TODO
     }
-    if (notEmpty(header.getMessageTrigger(), pi.Hl7MshMessageTriggerIsMissing))
-    {
-      // TODO
-    }
     if (notEmpty(header.getMessageType(), pi.Hl7MshMessageTypeIsMissing))
     {
+      if (!header.getMessageType().equals("VXU"))
+      {
+        registerIssue(pi.Hl7MshMessageTypeIsUnrecognized);
+      }
+      if (notEmpty(header.getMessageTrigger(), pi.Hl7MshMessageTriggerIsMissing))
+      {
+        if (!header.getMessageTrigger().equals("V04"))
+        {
+          registerIssue(pi.Hl7MshMessageTriggerIsUnrecognized);
+        }
+        if (notEmpty(header.getMessageStructure(), pi.Hl7MshMessageStructureIsMissing))
+        {
+          if (!header.getMessageStructure().equals("VXU_V04"))
+          {
+            registerIssue(pi.Hl7MshMessageStructureIsUnrecognized);
+          }
+        }
+        // TODO
+      }
       // TODO
     }
-    if (notEmpty(header.getProcessingId(), pi.Hl7MshProcessingIdIsMissing))
+    handleCodeReceived(header.getProcessingId(), PotentialIssues.Field.HL7_MSH_PROCESSING_ID);
+    if (header.getProcessingIdCode().equals("T"))
     {
-      // TODO
+      registerIssue(pi.Hl7MshProcessingIdIsValuedAsTraining);
+    } else if (header.getProcessingIdCode().equals("P"))
+    {
+      registerIssue(pi.Hl7MshProcessingIdIsValuedAsProduction);
+    } else if (header.getProcessingIdCode().equals("D"))
+    {
+      registerIssue(pi.Hl7MshProcessingIdIsValuedAsDebug);
     }
     if (notEmpty(header.getVersionId(), pi.Hl7MshVersionIsMissing))
     {
-      // TODO
-    }
-
-  }
-
-  private boolean goodId(String sf, int minLen, int maxLen, boolean validateNumeric)
-  {
-    boolean good = sf.length() >= minLen && sf.length() <= maxLen;
-    if (good)
-    {
-      if (validateNumeric)
+      if (header.getVersionId().equals("2.5.1"))
       {
-        for (char c : sf.toCharArray())
-        {
-          if (c < '0' || c > '9')
-          {
-            good = false;
-            break;
-          }
-        }
+        registerIssue(pi.Hl7MshVersionIsValuedAs2_5);
+      } else if (header.getVersionId().equals("2.3.1"))
+      {
+        registerIssue(pi.Hl7MshVersionIsValuedAs2_3_1);
+      } else if (header.getVersionId().equals("2.4"))
+      {
+        registerIssue(pi.Hl7MshVersionIsValuedAs2_4);
+      } else
+      {
+        registerIssue(pi.Hl7MshVersionIsUnrecognized);
       }
     }
-    return good;
+    handleCodeReceived(header.getCountry(), PotentialIssues.Field.HL7_MSH_COUNTRY_CODE);
+    handleCodeReceived(header.getCharacterSet(), PotentialIssues.Field.HL7_MSH_CHARACTER_SET);
+    handleCodeReceived(header.getCharacterSetAlt(), PotentialIssues.Field.HL7_MSH_ALT_CHARACTER_SET);
   }
 
   private void validatePatient()
@@ -661,6 +703,7 @@ public class Validator extends ValidateMessage
     piAddressState = PotentialIssues.Field.PATIENT_ADDRESS_STATE;
     piAddressStreet2 = PotentialIssues.Field.PATIENT_ADDRESS_STREET2;
     piAddressZip = PotentialIssues.Field.PATIENT_ADDRESS_ZIP;
+    piAddressType = PotentialIssues.Field.PATIENT_ADDRESS_TYPE;
     validateAddress(patient.getAddress());
 
     String aliasFirst = patient.getAliasFirst();
@@ -726,41 +769,35 @@ public class Validator extends ValidateMessage
     specialNameHandling5(patient.getName());
     specialNameHandling6(patient.getName());
     specialNameHandling7(patient.getName());
-    if (notEmpty(patient.getNameFirst(), pi.PatientFirstNameIsMissing))
+    if (notEmpty(patient.getNameFirst(), pi.PatientNameFirstIsMissing))
     {
       for (String invalidName : INVALID_NAMES)
       {
         if (patient.getNameFirst().equalsIgnoreCase(invalidName))
         {
-          registerIssue(pi.PatientFirstNameIsInvalid);
+          registerIssue(pi.PatientNameFirstIsInvalid);
         }
       }
       if (!validNameChars(patient.getNameFirst()))
       {
-        registerIssue(pi.PatientFirstNameIsInvalid);
+        registerIssue(pi.PatientNameFirstIsInvalid);
       }
-      // TODO PatientFirstNameMayIncludeMiddleInitial
+      // TODO PatientNameFirstMayIncludeMiddleInitial
     }
     handleCodeReceived(patient.getSex(), PotentialIssues.Field.PATIENT_GENDER);
-    // TODO
-    // String registryStatus = patient.getRegistryStatus();
-    // handleCodeReceived(registryStatus,
-    // CodesReceived.getCodeTable(CodesReceived.REGISTRY_STATUS),
-    // PotentialIssues.Field.PATIENT_REGISTRY_ID);
-    handleCodeReceived(patient.getRegistryStatus(), PotentialIssues.Field.PATIENT_REGISTRY_STATUS);
 
-    if (notEmpty(patient.getNameLast(), pi.PatientLastNameIsMissing))
+    if (notEmpty(patient.getNameLast(), pi.PatientNameLastIsMissing))
     {
       for (String invalidName : INVALID_NAMES)
       {
         if (patient.getNameLast().equalsIgnoreCase(invalidName))
         {
-          registerIssue(pi.PatientLastNameIsInvalid);
+          registerIssue(pi.PatientNameLastIsInvalid);
         }
       }
       if (!validNameChars(patient.getNameLast()))
       {
-        registerIssue(pi.PatientLastNameIsInvalid);
+        registerIssue(pi.PatientNameLastIsInvalid);
       }
     }
     if (notEmpty(patient.getIdMedicaid(), pi.PatientMedicaidNumberIsMissing))
@@ -778,7 +815,7 @@ public class Validator extends ValidateMessage
       patient.setNameMiddle(middleName);
       if (!validNameChars(patient.getNameMiddle()))
       {
-        // TODO registerIssue(pi.PatientFirstNameIsMiddle);
+        // TODO registerIssue(pi.PatientNameFirstIsMiddle);
       }
     }
     if (notEmpty(middleName, pi.PatientMiddleNameIsMissing))
@@ -825,19 +862,20 @@ public class Validator extends ValidateMessage
         patient.setNameSuffix("");
       }
     }
+    handleCodeReceived(patient.getName().getType(), PotentialIssues.Field.PATIENT_NAME_TYPE_CODE);
     if (notEmpty(patient.getMotherMaidenName(), pi.PatientMotherSMaidenNameIsMissing))
     {
       for (String invalidName : INVALID_NAMES)
       {
         if (patient.getMotherMaidenName().equalsIgnoreCase(invalidName))
         {
-          registerIssue(pi.PatientFirstNameIsInvalid);
+          registerIssue(pi.PatientNameFirstIsInvalid);
           patient.setMotherMaidenName("");
         }
       }
       if (patient.getMotherMaidenName().length() == 1)
       {
-        registerIssue(pi.PatientFirstNameIsInvalid);
+        registerIssue(pi.PatientNameFirstIsInvalid);
         patient.setMotherMaidenName("");
       }
     }
@@ -845,7 +883,8 @@ public class Validator extends ValidateMessage
     // TODO PatientNameMayBeTemporaryNewbornName
     // TODO PatientNameMayBeTestName
 
-    validatePhone(patient.getPhone(), PotentialIssues.Field.PATIENT_PHONE);
+    validatePhone(patient.getPhone(), PotentialIssues.Field.PATIENT_PHONE,
+        PotentialIssues.Field.PATIENT_PHONE_TEL_USE_CODE, PotentialIssues.Field.PATIENT_PHONE_TEL_EQUIP_CODE);
 
     notEmpty(patient.getFacilityName(), pi.PatientPrimaryFacilityNameIsMissing);
     handleCodeReceived(patient.getFacility().getId(), PotentialIssues.Field.PATIENT_PRIMARY_FACILITY_ID);
@@ -867,7 +906,11 @@ public class Validator extends ValidateMessage
       ssn = validateNumber(ssn, pi.PatientSsnIsInvalid, 9);
       patient.setIdSsnNumber(ssn);
     }
-    notEmpty(patient.getIdSubmitterNumber(), PotentialIssues.Field.PATIENT_SUBMITTER_ID);
+    if (notEmpty(patient.getIdSubmitterNumber(), PotentialIssues.Field.PATIENT_SUBMITTER_ID))
+    {
+      notEmpty(patient.getIdSubmitterAssigningAuthorityCode(), PotentialIssues.Field.PATIENT_SUBMITTER_ID_AUTHORITY);
+      notEmpty(patient.getIdSubmitterTypeCode(), PotentialIssues.Field.PATIENT_SUBMITTER_ID_TYPE_CODE);
+    }
 
     // TODO PatientVfcEffectiveDateIsBeforeBirth
     // TODO PatientVfcEffectiveDateIsInFuture
@@ -884,6 +927,12 @@ public class Validator extends ValidateMessage
         registerIssue(pi.PatientDeathIndicatorIsInconsistent);
       }
     }
+
+    for (SectionValidator sectionValidator : patientValidators)
+    {
+      sectionValidator.validatePatient(message, this);
+    }
+
   }
 
   private String validateNumber(String numericId, PotentialIssue invalidIssue, int length)
@@ -919,11 +968,25 @@ public class Validator extends ValidateMessage
 
   private void validatePhone(PhoneNumber phone, PotentialIssues.Field piPhone)
   {
+    validatePhone(phone, piPhone, null, null);
+  }
+
+  private void validatePhone(PhoneNumber phone, PotentialIssues.Field piPhone, PotentialIssues.Field piPhoneTelUse,
+      PotentialIssues.Field piPhoneTelEquip)
+  {
     if (notEmpty(phone.getNumber(), piPhone))
     {
       if (phone.getAreaCode().equals("") || phone.getLocalNumber().equals(""))
       {
-        // TODO PatientPhoneIsIncomplete
+        registerIssue(pi.getIssue(piPhone, PotentialIssue.ISSUE_TYPE_IS_INCOMPLETE));
+      }
+      if (piPhoneTelUse != null)
+      {
+        handleCodeReceived(phone.getTelUse(), piPhoneTelUse);
+      }
+      if (piPhoneTelEquip != null)
+      {
+        handleCodeReceived(phone.getTelEquip(), piPhoneTelEquip);
       }
       // TODO PatientPhoneIsInvalid
     }
@@ -964,6 +1027,10 @@ public class Validator extends ValidateMessage
         address.setZip("");
       }
     }
+    if (piAddressType != null)
+    {
+      notEmpty(address.getTypeCode(), piAddressType);
+    }
 
     if (isEmpty(address.getStreet()) || isEmpty(city) || isEmpty(address.getZip()) || isEmpty(address.getState()))
     {
@@ -990,13 +1057,23 @@ public class Validator extends ValidateMessage
 
   private boolean notEmpty(String fieldValue, PotentialIssues.Field field)
   {
-    return notEmpty(fieldValue, pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_MISSING));
+    return notEmpty(fieldValue, pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_MISSING), true);
+  }
+
+  private boolean notEmpty(String fieldValue, PotentialIssues.Field field, boolean notSilent)
+  {
+    return notEmpty(fieldValue, pi.getIssue(field, PotentialIssue.ISSUE_TYPE_IS_MISSING), notSilent);
   }
 
   protected boolean notEmpty(String fieldValue, PotentialIssue potentialIssue)
   {
+    return notEmpty(fieldValue, potentialIssue, true);
+  }
+
+  protected boolean notEmpty(String fieldValue, PotentialIssue potentialIssue, boolean notSilent)
+  {
     boolean empty = fieldValue == null || fieldValue.equals("");
-    if (empty)
+    if (notSilent && empty)
     {
       registerIssue(potentialIssue);
     }
@@ -1079,7 +1156,7 @@ public class Validator extends ValidateMessage
   protected void handleCodeReceived(CodedEntity codedEntity, PotentialIssues.Field field, boolean notSilent)
   {
     CodeReceived cr = null;
-    if (notEmpty(codedEntity.getCode(), field))
+    if (notEmpty(codedEntity.getCode(), field, notSilent))
     {
       CodeTable codeTable = CodesReceived.getCodeTable(codedEntity.getTableType());
       cr = getCodeReceived(codedEntity.getCode(), codedEntity.getText(), codeTable);

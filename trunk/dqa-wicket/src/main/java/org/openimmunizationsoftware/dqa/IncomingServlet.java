@@ -410,7 +410,7 @@ public class IncomingServlet extends HttpServlet
       messageReceived.setProfile(profile);
       messageReceived.setRequestText(sb.toString());
       parser.createVaccinationUpdateMessage(messageReceived);
-      if (profile.isProfileStatusTest() && messageReceived.getHeader().getProcessingId().equals(org.openimmunizationsoftware.dqa.db.model.Header.PROCESSING_ID_DEBUGGING))
+      if (profile.isProfileStatusTest() && messageReceived.getHeader().getProcessingIdCode().equals(org.openimmunizationsoftware.dqa.db.model.Header.PROCESSING_ID_DEBUGGING))
       {
         debug = true;
       }

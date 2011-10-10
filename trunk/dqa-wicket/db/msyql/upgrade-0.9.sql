@@ -37,5 +37,5 @@ INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(34
 INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (34, 'RE', 'Observations to follow', 'RE', 'V');
 INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (34, 'OK', 'Order accepted & OK', 'OK', 'I');
 
-
 ALTER TABLE dqa_vaccination ADD (order_control_code VARCHAR(250));
+

@@ -5,18 +5,17 @@ import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 
 public class OrderControlValidator extends SectionValidator
 {
-  public OrderControlValidator()
-  {
+  public OrderControlValidator() {
     super("Order Control");
   }
-  
+
   @Override
   public void validateVaccination(Vaccination vaccination, Validator validator)
   {
     super.validateVaccination(vaccination, validator);
     validator.documentParagraph("The vaccination order control id should always be RE.");
     validator.documentValuesFound("Vaccination Order Control Code", vaccination.getOrderControlCode());
-    validator.handleCodeReceived(vaccination.getFacility().getId(), PotentialIssues.Field.VACCINATION_FACILITY_ID,
-        vaccination.isAdministered());
+    validator.handleCodeReceived(vaccination.getOrderControl(), PotentialIssues.Field.VACCINATION_ORDER_CONTROL_CODE,
+        !validator.hasIssue(pi.Hl7OrcSegmentIsMissing));
   }
 }

@@ -465,8 +465,8 @@ public class Scenarios extends TestCase
     messageReceived.setProfile(profile);
     parser.createVaccinationUpdateMessage(messageReceived);
     validator.validateVaccinationUpdateMessage(messageReceived);
-    assertFalse(hasIssue(messageReceived, pi.PatientGuardianFirstNameIsMissing));
-    assertFalse(hasIssue(messageReceived, pi.PatientGuardianLastNameIsMissing));
+    assertFalse(hasIssue(messageReceived, pi.PatientGuardianNameFirstIsMissing));
+    assertFalse(hasIssue(messageReceived, pi.PatientGuardianNameLastIsMissing));
     assertFalse(hasIssue(messageReceived, pi.PatientGuardianRelationshipIsMissing));
     tx.rollback();
 
@@ -476,8 +476,8 @@ public class Scenarios extends TestCase
     messageReceived.setProfile(profile);
     parser.createVaccinationUpdateMessage(messageReceived);
     validator.validateVaccinationUpdateMessage(messageReceived);
-    assertTrue(hasIssue(messageReceived, pi.PatientGuardianFirstNameIsMissing));
-    assertTrue(hasIssue(messageReceived, pi.PatientGuardianLastNameIsMissing));
+    assertTrue(hasIssue(messageReceived, pi.PatientGuardianNameFirstIsMissing));
+    assertTrue(hasIssue(messageReceived, pi.PatientGuardianNameLastIsMissing));
     assertTrue(hasIssue(messageReceived, pi.PatientGuardianRelationshipIsMissing));
     tx.rollback();
 

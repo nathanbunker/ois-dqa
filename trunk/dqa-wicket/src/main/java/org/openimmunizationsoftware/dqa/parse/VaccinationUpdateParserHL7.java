@@ -87,19 +87,35 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     {
       if (segmentName.equals("PID"))
       {
-        foundPID = true;
-        populatePID(message);
+        if (foundPID)
+        {
+          registerIssue(pi.Hl7PidSegmentIsRepeated);
+        } else
+        {
+          foundPID = true;
+          populatePID(message);
+        }
       } else if (segmentName.equals("PV1"))
       {
-        foundPID = assertPIDFound(foundPID);
-        populatePV1(message);
-        foundPV1 = true;
+        if (foundPV1)
+        {
+          registerIssue(pi.Hl7Pv1SegmentIsRepeated);
+        } else
+        {
+          foundPID = assertPIDFound(foundPID);
+          populatePV1(message);
+          foundPV1 = true;
+        }
       } else if (segmentName.equals("PD1"))
       {
         foundPID = assertPIDFound(foundPID);
         populatePD1(message);
       } else if (segmentName.equals("NK1"))
       {
+        if (foundPV1)
+        {
+          registerIssue(pi.Hl7SegmentsOutOfOrder);
+        }
         foundPID = assertPIDFound(foundPID);
         nextOfKinCount++;
         nextOfKin = new NextOfKin();
@@ -157,7 +173,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     }
     positionId = 0;
     assertPIDFound(foundPID);
-    if (foundPV1)
+    if (!foundPV1)
     {
       registerIssue(pi.Hl7Pv1SegmentIsMissing);
     }
@@ -214,13 +230,16 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     header.setReceivingFacility(getValue(6));
     header.setMessageDate(getValueDate(7, pi.Hl7MshMessageDateIsInvalid));
     String[] field = getValues(9);
-    header.setMessageType(field.length > 1 ? field[0] : "");
-    header.setMessageTrigger(field.length > 2 ? field[1] : "");
+    header.setMessageType(field.length >= 1 ? field[0] : "");
+    header.setMessageTrigger(field.length >= 2 ? field[1] : "");
+    header.setMessageStructure(field.length >= 3 ? field[2] : "");
     header.setMessageControlId(getValue(10));
-    header.setProcessingId(getValue(11));
+    header.setProcessingIdCode(getValue(11));
     header.setVersionId(getValue(12));
-    header.setAckTypeAccept(getValue(15));
-    header.setAckTypeApplication(getValue(16));
+    header.setAckTypeAcceptCode(getValue(15));
+    header.setAckTypeApplicationCode(getValue(16));
+    header.setCharacterSetCode(getValue(18));
+    header.setCharacterSetAltCode(getValue(20));
     header.setMessageProfileId(getValue(21));
   }
 
@@ -248,12 +267,12 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   private void populatePD1(MessageReceived message)
   {
+    patient.setRegistryStatusCode(getValue(16));
+    patient.setPublicityCode(getValue(11));
+    patient.setProtectionCode(getValue(12));
     // TODO private OrganizationName facility = new OrganizationName();
     // TODO private Id idSubmitter = new Id();
     // TODO private Id physician = new Id();
-    // TODO private CodedEntity protection = new CodedEntity();
-    // TODO private CodedEntity publicity = new CodedEntity();
-    // TODO private String registryStatus = "";
   }
 
   private void populateNK1(MessageReceived message)
@@ -271,6 +290,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   private void populateRXA(MessageReceived message)
   {
+    registerIssueIfEmpty(1, pi.Hl7RxaGiveSubIdIsMissing);
+    registerIssueIfEmpty(2, pi.Hl7RxaAdminSubIdCounterIsMissing);
     vaccination.setAdminDate(getValueDate(3, pi.VaccinationAdminDateIsInvalid));
     readCodeEntity(5, vaccination.getAdmin());
     CodedEntity admin = vaccination.getAdmin();
@@ -348,11 +369,14 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
   private void populateORC(MessageReceived message)
   {
     readCodeEntity(1, vaccination.getOrderControl());
+    vaccination.setIdPlacer(getValue(2));
+    vaccination.setIdSubmitter(getValue(3));
   }
 
   private void populatePV1(MessageReceived message)
   {
-    // TODO private String financialEligibility = "";
+    patient.setPatientClassCode(getValue(2));
+    patient.setFinancialEligibilityCode(getValue(20));
   }
 
   private void readPhoneNumber(int fieldNumber, PhoneNumber phoneNumber)
@@ -524,6 +548,19 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     }
   }
 
+  private void registerIssueIfEmpty(int fieldNumber, PotentialIssue pi)
+  {
+    if (isEmpty(fieldNumber))
+    {
+      registerIssue(pi);
+    }
+  }
+
+  private boolean isEmpty(int fieldNumber)
+  {
+    return getValue(fieldNumber).equals("");
+  }
+
   private String getValue(int fieldNumber)
   {
     String value = null;
@@ -656,7 +693,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
   public String makeAckMessage(MessageReceived messageReceived)
   {
     String controlId = messageReceived.getHeader().getMessageControlId();
-    String processingId = message.getHeader().getProcessingId();
+    String processingId = message.getHeader().getProcessingIdCode();
     String ackCode = ACK_ACCEPT;
     int countVaccNotSkipped = 0;
     for (Vaccination vaccination : messageReceived.getVaccinations())

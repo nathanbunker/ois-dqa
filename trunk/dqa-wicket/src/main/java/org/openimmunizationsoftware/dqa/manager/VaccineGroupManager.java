@@ -11,6 +11,7 @@ import java.util.Set;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCvxGroup;
 import org.openimmunizationsoftware.dqa.db.model.VaccineGroup;
 
@@ -30,6 +31,20 @@ public class VaccineGroupManager
   private Map<String, VaccineGroup> vaccineGroups = new HashMap<String, VaccineGroup>();
   private Map<String, List<VaccineGroup>> vaccineGroupMapList = new HashMap<String, List<VaccineGroup>>();
   private Map<String, Set<VaccineGroup>> vaccineGroupMapSet = new HashMap<String, Set<VaccineGroup>>();
+  private List<VaccineCvxGroup> vaccineCvxGroups = null;
+  
+  public List<VaccineCvxGroup> getVaccineCvxGroups(VaccineCvx vaccineCvx)
+  {
+    List<VaccineCvxGroup> list = new ArrayList<VaccineCvxGroup>();
+    for (VaccineCvxGroup vaccineCvxGroup : vaccineCvxGroups)
+    {
+      if (vaccineCvxGroup.getVaccineCvx().equals(vaccineCvx))
+      {
+        list.add(vaccineCvxGroup);
+      }
+    }
+    return list;
+  }
   
   public VaccineGroup getVaccineGroup(String groupCode)
   {
@@ -46,12 +61,13 @@ public class VaccineGroupManager
     }
     return vaccineGroupList;
   }
+ 
 
   public VaccineGroupManager() {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
     Query query = session.createQuery("from VaccineCvxGroup");
-    List<VaccineCvxGroup> vaccineCvxGroups = query.list();
+    vaccineCvxGroups = query.list();
     for (VaccineCvxGroup vaccineCvxGroup : vaccineCvxGroups)
     {
       VaccineGroup vaccineGroup = vaccineCvxGroup.getVaccineGroup();
