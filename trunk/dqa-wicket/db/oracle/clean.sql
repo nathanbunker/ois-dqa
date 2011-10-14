@@ -2,7 +2,6 @@ ALTER TABLE dqa_issue_found DROP CONSTRAINT dqa_fk_issue_found4;
 ALTER TABLE dqa_code_received DROP CONSTRAINT dqa_fk_code_received1;
 ALTER TABLE dqa_code_received DROP CONSTRAINT dqa_fk_code_received2;
 ALTER TABLE dqa_code_received DROP CONSTRAINT dqa_fk_code_received3;
-ALTER TABLE dqa_issue_found DROP CONSTRAINT dqa_fk_issue_found4;
 ALTER TABLE dqa_batch_code_received DROP CONSTRAINT dqa_fk_batch_code_received2;
 ALTER TABLE dqa_receive_queue DROP CONSTRAINT dqa_fk_receive_queue2;
 ALTER TABLE dqa_next_of_kin DROP CONSTRAINT dqa_fk_next_of_kin1;
@@ -32,7 +31,6 @@ ALTER TABLE dqa_issue_found ADD CONSTRAINT dqa_fk_issue_found4 FOREIGN KEY(code_
 ALTER TABLE dqa_code_received ADD CONSTRAINT dqa_fk_code_received1 FOREIGN KEY(profile_id) REFERENCES dqa_submitter_profile(profile_id);
 ALTER TABLE dqa_code_received ADD CONSTRAINT dqa_fk_code_received2 FOREIGN KEY(table_id) REFERENCES dqa_code_table(table_id);
 ALTER TABLE dqa_code_received ADD CONSTRAINT dqa_fk_code_received3 FOREIGN KEY(code_status) REFERENCES dqa_code_status(code_status);
-ALTER TABLE dqa_issue_found ADD CONSTRAINT dqa_fk_issue_found4 FOREIGN KEY(code_id) REFERENCES dqa_code_received(code_id);
 ALTER TABLE dqa_batch_code_received ADD CONSTRAINT dqa_fk_batch_code_received2 FOREIGN KEY(coded_id) REFERENCES dqa_code_received(code_id);
 ALTER TABLE dqa_receive_queue ADD CONSTRAINT dqa_fk_receive_queue2 FOREIGN KEY(received_id) REFERENCES dqa_message_received(received_id);
 ALTER TABLE dqa_next_of_kin ADD CONSTRAINT dqa_fk_next_of_kin1 FOREIGN KEY(received_id) REFERENCES dqa_message_received(received_id);
