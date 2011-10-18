@@ -537,7 +537,7 @@ public class FileImportProcessor extends ManagerThread
       boolean first = true;
       for (IssueFound issueFound : issuesFound)
       {
-        if (!issueFound.getIssueNegate() && issueFound.isError())
+        if (issueFound.isError())
         {
           if (first)
           {
@@ -550,7 +550,7 @@ public class FileImportProcessor extends ManagerThread
       first = true;
       for (IssueFound issueFound : issuesFound)
       {
-        if (!issueFound.getIssueNegate() && issueFound.isWarn())
+        if (issueFound.isWarn())
         {
           if (first)
           {
@@ -563,7 +563,7 @@ public class FileImportProcessor extends ManagerThread
       first = true;
       for (IssueFound issueFound : issuesFound)
       {
-        if (!issueFound.getIssueNegate() && issueFound.isSkip())
+        if (issueFound.isSkip())
         {
           if (first)
           {

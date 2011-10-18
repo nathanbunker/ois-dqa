@@ -11,6 +11,7 @@ import java.util.Set;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCvxGroup;
 import org.openimmunizationsoftware.dqa.db.model.VaccineGroup;
@@ -66,6 +67,7 @@ public class VaccineGroupManager
   public VaccineGroupManager() {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
     Query query = session.createQuery("from VaccineCvxGroup");
     vaccineCvxGroups = query.list();
     for (VaccineCvxGroup vaccineCvxGroup : vaccineCvxGroups)
@@ -91,7 +93,7 @@ public class VaccineGroupManager
       vaccineGroup.getVaccineCvxList().add(vaccineCvxGroup.getVaccineCvx());
       vaccineGroups.put(vaccineGroup.getGroupCode(), vaccineGroup);
     }
-
+    tx.commit();
     session.close();
   }
 }

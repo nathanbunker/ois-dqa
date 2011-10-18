@@ -16,6 +16,7 @@ import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.IssueAction;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
+import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineGroup;
@@ -214,6 +215,7 @@ public class QualityReport
 
   private void printCompleteness(MessageBatch messageBatch)
   {
+    BatchReport report = messageBatch.getBatchReport();
     QualityScoring scoring = qualityCollector.getCompletenessScoring();
     ScoringSet patientExpected = scoring.getScoringSet(QualityScoring.PATIENT_EXPECTED);
     ScoringSet patientOptional = scoring.getScoringSet(QualityScoring.PATIENT_OPTIONAL);
@@ -230,7 +232,7 @@ public class QualityReport
     out.println("      if expected vaccinations have been reported. ");
     out.println("    </p>");
     out.println("    <h3>Score</h3>");
-    printScoringSummary("Completeness", messageBatch.getCompletenessScore());
+    printScoringSummary("Completeness", report.getCompletenessScore());
     out.println("    <table width=\"350\">");
     out.println("      <tr>");
     out.println("        <th align=\"left\">Measurement</th>");
@@ -238,35 +240,47 @@ public class QualityReport
     out.println("        <th align=\"center\">Description</th>");
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
-    printScore(COMPLETENESS_SCORE_PATIENT, messageBatch.getCompletenessPatientScore(), per(modelForm.getWeight("completeness.patient")));
-    printScore(COMPLETENESS_SCORE_VACCINATION, messageBatch.getCompletenessVaccinationScore(), per(modelForm.getWeight("completeness.vaccination")));
-    printScore(COMPLETENESS_SCORE_VACCINE_GROUP, messageBatch.getCompletenessVaccineGroupScore(), per(modelForm.getWeight("completeness.vaccineGroup")));
+    printScore(COMPLETENESS_SCORE_PATIENT, report.getCompletenessPatientScore(),
+        per(modelForm.getWeight("completeness.patient")));
+    printScore(COMPLETENESS_SCORE_VACCINATION, report.getCompletenessVaccinationScore(),
+        per(modelForm.getWeight("completeness.vaccination")));
+    printScore(COMPLETENESS_SCORE_VACCINE_GROUP, report.getCompletenessVaccineGroupScore(),
+        per(modelForm.getWeight("completeness.vaccineGroup")));
     out.println("    </table>");
 
     out.println("    <h3><a name=\"completeness.patient\">Patient</h3>");
     printCompletenessScoring("Patient", "#completeness.patient", patientRequired, patientExpected, patientRecommended,
-        messageBatch.getCompletenessPatientScore(), modelForm.getAbsoluteWeight("completeness.patient"));
+        report.getCompletenessPatientScore(), modelForm.getAbsoluteWeight("completeness.patient"));
     out.println("    <br/>");
-    printCompleteness(patientRequired, "completeness.patient.required", "Required", modelForm.getAbsoluteWeight("completeness.patient.required"));
+    printCompleteness(patientRequired, "completeness.patient.required", "Required",
+        modelForm.getAbsoluteWeight("completeness.patient.required"));
     out.println("    <br/>");
-    printCompleteness(patientExpected, "completeness.patient.expected", "Expected", modelForm.getAbsoluteWeight("completeness.patient.expected"));
+    printCompleteness(patientExpected, "completeness.patient.expected", "Expected",
+        modelForm.getAbsoluteWeight("completeness.patient.expected"));
     out.println("    <br/>");
-    printCompleteness(patientRecommended, "completeness.patient.recommended", "Recommended", modelForm.getAbsoluteWeight("completeness.patient.recommended"));
+    printCompleteness(patientRecommended, "completeness.patient.recommended", "Recommended",
+        modelForm.getAbsoluteWeight("completeness.patient.recommended"));
     out.println("    <br/>");
-    printCompleteness(patientOptional, "completeness.patient.optional", "Optional", modelForm.getAbsoluteWeight("completeness.patient.optional"));
+    printCompleteness(patientOptional, "completeness.patient.optional", "Optional",
+        modelForm.getAbsoluteWeight("completeness.patient.optional"));
     out.println("    <br/>");
 
     out.println("    <h3><a name=\"completeness.vaccination\">Vaccination</h3>");
     printCompletenessScoring("Vaccination", "#completeness.vaccination", vaccinationRequired, vaccinationExpected,
-        vaccinationRecommended, messageBatch.getCompletenessVaccinationScore(), modelForm.getAbsoluteWeight("completeness.vaccination"));
+        vaccinationRecommended, report.getCompletenessVaccinationScore(),
+        modelForm.getAbsoluteWeight("completeness.vaccination"));
     out.println("    <br/>");
-    printCompleteness(vaccinationRequired, "completeness.vaccination.required", "Required", modelForm.getAbsoluteWeight("completeness.vaccination.required"));
+    printCompleteness(vaccinationRequired, "completeness.vaccination.required", "Required",
+        modelForm.getAbsoluteWeight("completeness.vaccination.required"));
     out.println("    <br/>");
-    printCompleteness(vaccinationExpected, "completeness.vaccination.expected", "Expected", modelForm.getAbsoluteWeight("completeness.vaccination.expected"));
+    printCompleteness(vaccinationExpected, "completeness.vaccination.expected", "Expected",
+        modelForm.getAbsoluteWeight("completeness.vaccination.expected"));
     out.println("    <br/>");
-    printCompleteness(vaccinationRecommended, "completeness.vaccination.recommended", "Recommended", modelForm.getAbsoluteWeight("completeness.vaccination.recommended"));
+    printCompleteness(vaccinationRecommended, "completeness.vaccination.recommended", "Recommended",
+        modelForm.getAbsoluteWeight("completeness.vaccination.recommended"));
     out.println("    <br/>");
-    printCompleteness(vaccinationOptional, "completeness.vaccination.optional", "Optional", modelForm.getAbsoluteWeight("completeness.vaccination.optional"));
+    printCompleteness(vaccinationOptional, "completeness.vaccination.optional", "Optional",
+        modelForm.getAbsoluteWeight("completeness.vaccination.optional"));
 
     out.println("    <h3><a name=\"completeness.vaccineGroup\">Vaccine Group</h3>");
     Set<VaccineCvx> vaccinesNotYetPrinted = new HashSet<VaccineCvx>(messageBatch.getBatchVaccineCvxMap().keySet());
@@ -352,48 +366,48 @@ public class QualityReport
   private void printVaccinesRow(MessageBatch messageBatch, Set<VaccineCvx> vaccinesNotPrinted,
       List<VaccineCvx> vaccinesToPrint, int size, ToolTip toolTip, boolean outOfRange)
   {
+    BatchReport report = messageBatch.getBatchReport();
+
+    out.println("      <tr>");
+    out.println("        <td align=\"left\"" + (outOfRange ? " class=\"alert\"" : "") + " rowspan=\"" + size + "\">"
+        + toolTip.getHtml());
+    out.println("        </td>");
+    boolean nextRow = false;
+    for (VaccineCvx vaccineCvx : vaccinesToPrint)
     {
-      out.println("      <tr>");
-      out.println("        <td align=\"left\"" + (outOfRange ? " class=\"alert\"" : "") + " rowspan=\"" + size + "\">"
-          + toolTip.getHtml());
-      out.println("        </td>");
-      boolean nextRow = false;
-      for (VaccineCvx vaccineCvx : vaccinesToPrint)
+      int count = qualityCollector.getVaccineCvxCount(vaccineCvx);
+      int denominator = report.getVaccinationAdministeredCount();
+      String percent = "&nbsp;";
+      if (denominator != 0)
       {
-        int count = qualityCollector.getVaccineCvxCount(vaccineCvx);
-        int denominator = messageBatch.getVaccinationAdministeredCount();
-        String percent = "&nbsp;";
-        if (denominator != 0)
+        if (count == 0)
         {
-          if (count == 0)
-          {
-            percent = "-";
-          } else
-          {
-            percent = per((100.0 * count) / denominator); 
-          }
-        }
-        if (nextRow)
+          percent = "-";
+        } else
         {
-          out.println("      </tr>");
-          out.println("      <tr>");
+          percent = per((100.0 * count) / denominator);
         }
-        String[] fields = { vaccineCvx.getCvxCode(), vaccineCvx.getCvxLabel(), num(count), percent };
-        for (int i = 0; i < fields.length; i++)
-        {
-          String align = i == 1 ? "left" : "center";
-          out.println("        <td align=\"" + align + "\"" + (outOfRange ? " class=\"alert\"" : "") + ">" + fields[i]
-              + "</td>");
-        }
-        vaccinesNotPrinted.remove(vaccineCvx);
-        nextRow = true;
       }
-      if (!nextRow)
+      if (nextRow)
       {
-        out.println("       <td colspan=\"4\"><span class=\"problem\">Problem: no vaccines received for this group</span></td>");
+        out.println("      </tr>");
+        out.println("      <tr>");
       }
-      out.println("      </tr>");
+      String[] fields = { vaccineCvx.getCvxCode(), vaccineCvx.getCvxLabel(), num(count), percent };
+      for (int i = 0; i < fields.length; i++)
+      {
+        String align = i == 1 ? "left" : "center";
+        out.println("        <td align=\"" + align + "\"" + (outOfRange ? " class=\"alert\"" : "") + ">" + fields[i]
+            + "</td>");
+      }
+      vaccinesNotPrinted.remove(vaccineCvx);
+      nextRow = true;
     }
+    if (!nextRow)
+    {
+      out.println("       <td colspan=\"4\"><span class=\"problem\">Problem: no vaccines received for this group</span></td>");
+    }
+    out.println("      </tr>");
   }
 
   private void printCompletenessScoring(String label, String link, ScoringSet required, ScoringSet expected,
@@ -468,6 +482,7 @@ public class QualityReport
 
   private void printTitleBar(MessageBatch messageBatch)
   {
+    BatchReport report = messageBatch.getBatchReport();
     out.println("    <h1>" + profile.getOrganization().getOrgLabel() + " Quality Report</h1>");
     out.println("    <table width=\"720\">");
     out.println("      <tr>");
@@ -502,7 +517,7 @@ public class QualityReport
     // out.println("      been valued. ");
     // out.println("    </p>");
     out.println("    <h3>Scoring Summary</h3>");
-    printScoringSummary("DQA", messageBatch.getOverallScore());
+    printScoringSummary("DQA", report.getOverallScore());
     out.println("    <table width=\"400\">");
     out.println("      <tr>");
     out.println("        <th align=\"left\">Measurement</th>");
@@ -510,19 +525,28 @@ public class QualityReport
     out.println("        <th align=\"center\">Description</th>");
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
-    printScoreOverall(SCORE_COMPLETENESS, messageBatch.getCompletenessScore(), per(modelForm.getAbsoluteWeight("completeness")));
-    printScoreOverall(SCORE_COMPLETENESS_SCORE_PATIENT, messageBatch.getCompletenessPatientScore(), per(modelForm.getAbsoluteWeight("completeness.patient")));
-    printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINATION, messageBatch.getCompletenessVaccinationScore(), per(modelForm.getAbsoluteWeight("completeness.vaccination")));
-    printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINE_GROUP, messageBatch.getCompletenessVaccineGroupScore(), per(modelForm.getAbsoluteWeight("completeness.vaccineGroup")));
-    printScoreOverall(SCORE_QUALITY, messageBatch.getQualityScore(), per(modelForm.getAbsoluteWeight("quality")));
-    printScoreOverall(SCORE_QUALITY_SCORE_ERRORS, messageBatch.getQualityErrorScore(), per(modelForm.getAbsoluteWeight("quality.errors")));
-    printScoreOverall(SCORE_QUALITY_SCORE_WARNINGS, messageBatch.getQualityWarnScore(), per(modelForm.getAbsoluteWeight("quality.warnings")));
-    printScoreOverall(SCORE_TIMELINESS, messageBatch.getTimelinessScore(), per(modelForm.getAbsoluteWeight("timeliness")));
-    printScoreOverall(SCORE_TIMELINESS_SCORE_30_DAYS, messageBatch.getTimelinessScore30Days(), per(modelForm.getAbsoluteWeight("timeliness.30days")));
-    printScoreOverall(SCORE_TIMELINESS_SCORE_7_DAYS, messageBatch.getTimelinessScore7Days(), per(modelForm.getAbsoluteWeight("timeliness.7days")));
+    printScoreOverall(SCORE_COMPLETENESS, report.getCompletenessScore(),
+        per(modelForm.getAbsoluteWeight("completeness")));
+    printScoreOverall(SCORE_COMPLETENESS_SCORE_PATIENT, report.getCompletenessPatientScore(),
+        per(modelForm.getAbsoluteWeight("completeness.patient")));
+    printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINATION, report.getCompletenessVaccinationScore(),
+        per(modelForm.getAbsoluteWeight("completeness.vaccination")));
+    printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINE_GROUP, report.getCompletenessVaccineGroupScore(),
+        per(modelForm.getAbsoluteWeight("completeness.vaccineGroup")));
+    printScoreOverall(SCORE_QUALITY, report.getQualityScore(), per(modelForm.getAbsoluteWeight("quality")));
+    printScoreOverall(SCORE_QUALITY_SCORE_ERRORS, report.getQualityErrorScore(),
+        per(modelForm.getAbsoluteWeight("quality.errors")));
+    printScoreOverall(SCORE_QUALITY_SCORE_WARNINGS, report.getQualityWarnScore(),
+        per(modelForm.getAbsoluteWeight("quality.warnings")));
+    printScoreOverall(SCORE_TIMELINESS, report.getTimelinessScore(), per(modelForm.getAbsoluteWeight("timeliness")));
+    printScoreOverall(SCORE_TIMELINESS_SCORE_30_DAYS, report.getTimelinessScore30Days(),
+        per(modelForm.getAbsoluteWeight("timeliness.30days")));
+    printScoreOverall(SCORE_TIMELINESS_SCORE_7_DAYS, report.getTimelinessScore7Days(),
+        per(modelForm.getAbsoluteWeight("timeliness.7days")));
     if (modelForm.getWeight("timeliness.2days") > 0)
     {
-      printScoreOverall(SCORE_TIMELINESS_SCORE_2_DAYS, messageBatch.getTimelinessScore2Days(), per(modelForm.getAbsoluteWeight("timeliness.2days")));
+      printScoreOverall(SCORE_TIMELINESS_SCORE_2_DAYS, report.getTimelinessScore2Days(),
+          per(modelForm.getAbsoluteWeight("timeliness.2days")));
     }
     out.println("    </table>");
   }
@@ -545,6 +569,7 @@ public class QualityReport
 
   private void printSummary(MessageBatch messageBatch)
   {
+    BatchReport report = messageBatch.getBatchReport();
     out.println("    <h3>Data Received</h3>");
     out.println("    <table width=\"350\">");
     out.println("      <tr>");
@@ -552,18 +577,17 @@ public class QualityReport
     out.println("        <th width=\"20%\" align=\"center\">Count</th>");
     out.println("        <th width=\"20%\" align=\"center\">Percent</th>");
     out.println("      </tr>");
-    messageCount = messageBatch.getMessageCount();
-    patientCount = messageBatch.getPatientCount();
-    vaccinationCount = messageBatch.getVaccinationCount();
-    nextOfKinCount = messageBatch.getNextOfKinCount();
+    messageCount = report.getMessageCount();
+    patientCount = report.getPatientCount();
+    vaccinationCount = report.getVaccinationCount();
+    nextOfKinCount = report.getNextOfKinCount();
     printPer(RECEIVED_PATIENTS, patientCount, 0);
     printPer(RECEIVED_NEXT_OF_KINS, nextOfKinCount, 0);
     printPer(RECEIVED_VACCINATIONS, vaccinationCount, 0);
-    printPer(RECEIVED_VACCINATIONS_ADMININISTERED, messageBatch.getVaccinationAdministeredCount(), vaccinationCount);
-    printPer(RECEIVED_VACCINATIONS_HISTORICAL, messageBatch.getVaccinationHistoricalCount(), vaccinationCount);
-    printPer(RECEIVED_VACCINATIONS_DELETED, messageBatch.getVaccinationDeleteCount(), vaccinationCount);
-    printPer(RECEIVED_VACCINATIONS_NOT_ADMINISTERED, messageBatch.getVaccinationNotAdministeredCount(),
-        vaccinationCount);
+    printPer(RECEIVED_VACCINATIONS_ADMININISTERED, report.getVaccinationAdministeredCount(), vaccinationCount);
+    printPer(RECEIVED_VACCINATIONS_HISTORICAL, report.getVaccinationHistoricalCount(), vaccinationCount);
+    printPer(RECEIVED_VACCINATIONS_DELETED, report.getVaccinationDeleteCount(), vaccinationCount);
+    printPer(RECEIVED_VACCINATIONS_NOT_ADMINISTERED, report.getVaccinationNotAdministeredCount(), vaccinationCount);
     out.println("    </table>");
     out.println("    <h3>Processing Status</h3>");
     out.println("    <table width=\"350\">");
@@ -581,6 +605,7 @@ public class QualityReport
 
   private void printQuality(MessageBatch messageBatch)
   {
+    BatchReport report = messageBatch.getBatchReport();
     out.println("    <h2><a name=\"quality\">Quality</h2>");
     out.println("    <p>");
     out.println("      Quality  measures the number of errors and warnings that are encountered");
@@ -591,7 +616,7 @@ public class QualityReport
     out.println("      less than ten percent of the total patients and vaccinations. ");
     out.println("    </p>");
     out.println("    <h3>Quality Score</h3>");
-    printScoringSummary("Quality", messageBatch.getQualityScore());
+    printScoringSummary("Quality", report.getQualityScore());
     out.println("    <table width=\"400\">");
     out.println("      <tr>");
     out.println("        <th align=\"left\">Measurement</th>");
@@ -599,8 +624,10 @@ public class QualityReport
     out.println("        <th align=\"center\">Description</th>");
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
-    printScore(QUALITY_SCORE_NO_ERRORS, messageBatch.getQualityErrorScore(), per(modelForm.getAbsoluteWeight("quality.errors")));
-    printScore(QUALITY_SCORE_NO_WARNINGS, messageBatch.getQualityWarnScore(), per(modelForm.getAbsoluteWeight("quality.warnings")));
+    printScore(QUALITY_SCORE_NO_ERRORS, report.getQualityErrorScore(),
+        per(modelForm.getAbsoluteWeight("quality.errors")));
+    printScore(QUALITY_SCORE_NO_WARNINGS, report.getQualityWarnScore(),
+        per(modelForm.getAbsoluteWeight("quality.warnings")));
     out.println("    </table>");
     out.println("    <br/>");
     if (qualityCollector.getInvalidCodes().size() > 0 || qualityCollector.getUnrecognizedCodes().size() > 0
@@ -661,6 +688,7 @@ public class QualityReport
 
   private void printTimeliness(MessageBatch messageBatch)
   {
+    BatchReport report = messageBatch.getBatchReport();
     out.println("    <h2><a name=\"timeliness\">Timeliness</h2>");
     out.println("    <p>");
     out.println("      Timeliness measures the number of days between the");
@@ -670,7 +698,7 @@ public class QualityReport
     out.println("      administration, normally once a week. ");
     out.println("    </p>");
     out.println("    <h3>Timeliness Score</h3>");
-    printScoringSummary("Timeliness", messageBatch.getTimelinessScore());
+    printScoringSummary("Timeliness", report.getTimelinessScore());
     out.println("    <table width=\"400\">");
     out.println("      <tr>");
     out.println("        <th align=\"left\">Measurement</th>");
@@ -678,11 +706,14 @@ public class QualityReport
     out.println("        <th align=\"center\">Description</th>");
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
-    printScore(TIMELINESS_SCORE_30_DAYS, messageBatch.getTimelinessScore30Days(), per(modelForm.getAbsoluteWeight("timeliness.30days")));
-    printScore(TIMELINESS_SCORE_7_DAYS, messageBatch.getTimelinessScore7Days(), per(modelForm.getAbsoluteWeight("timeliness.7days")));
+    printScore(TIMELINESS_SCORE_30_DAYS, report.getTimelinessScore30Days(),
+        per(modelForm.getAbsoluteWeight("timeliness.30days")));
+    printScore(TIMELINESS_SCORE_7_DAYS, report.getTimelinessScore7Days(),
+        per(modelForm.getAbsoluteWeight("timeliness.7days")));
     if (modelForm.getWeight("timeliness.2days") > 0)
     {
-      printScore(TIMELINESS_SCORE_2_DAYS, messageBatch.getTimelinessScore2Days(), per(modelForm.getAbsoluteWeight("timeliness.2days")));
+      printScore(TIMELINESS_SCORE_2_DAYS, report.getTimelinessScore2Days(),
+          per(modelForm.getAbsoluteWeight("timeliness.2days")));
     }
     out.println("    </table>");
     out.println("    <br/>");
@@ -692,22 +723,21 @@ public class QualityReport
     out.println("        <th align=\"center\">Count</th>");
     out.println("        <th align=\"center\">Percent</th>");
     out.println("      </tr>");
-    printPer(TIMELINESS_WITHIN_30_DAYS, messageBatch.getTimelinessCount30Days(),
-        messageBatch.getMessageWithAdminCount());
-    printPer(TIMELINESS_WITHIN_7_DAYS, messageBatch.getTimelinessCount7Days(), messageBatch.getMessageWithAdminCount());
-    printPer(TIMELINESS_WITHIN_2_DAYS, messageBatch.getTimelinessCount2Days(), messageBatch.getMessageWithAdminCount());
+    printPer(TIMELINESS_WITHIN_30_DAYS, report.getTimelinessCount30Days(), report.getMessageWithAdminCount());
+    printPer(TIMELINESS_WITHIN_7_DAYS, report.getTimelinessCount7Days(), report.getMessageWithAdminCount());
+    printPer(TIMELINESS_WITHIN_2_DAYS, report.getTimelinessCount2Days(), report.getMessageWithAdminCount());
     out.println("    </table>");
     out.println("    <br/>");
     out.println("    <table>");
     out.println("      <tr>");
     out.println("        <th align=\"left\" colspan=\"2\">Timeliness of Vaccination Update</th>");
     out.println("      </tr>");
-    if (messageBatch.getTimelinessDateFirst() != null && messageBatch.getTimelinessDateLast() != null)
+    if (report.getTimelinessDateFirst() != null && report.getTimelinessDateLast() != null)
     {
       out.println("      <tr>");
       out.println("        <th align=\"left\">Vaccination Admininistered</th>");
-      out.println("        <td>"
-          + makeDateRange(messageBatch.getTimelinessDateFirst(), messageBatch.getTimelinessDateLast()) + "</th>");
+      out.println("        <td>" + makeDateRange(report.getTimelinessDateFirst(), report.getTimelinessDateLast())
+          + "</th>");
       out.println("      </tr>");
     }
     out.println("      <tr>");
@@ -717,7 +747,7 @@ public class QualityReport
     out.println("      <tr>");
     out.println("        <th align=\"left\">Average Elapsed Days</th>");
     DecimalFormat df = new DecimalFormat("0.0");
-    out.println("        <td>" + df.format(messageBatch.getTimelinessAverage()) + "</th>");
+    out.println("        <td>" + df.format(report.getTimelinessAverage()) + "</th>");
     out.println("      </tr>");
     out.println("    </table>");
 
@@ -766,8 +796,8 @@ public class QualityReport
     Collections.sort(batchIssuesList, new Comparator<BatchIssues>() {
       public int compare(BatchIssues arg0, BatchIssues arg1)
       {
-        Integer count0 = arg0.getIssueCountPos();
-        Integer count1 = arg1.getIssueCountPos();
+        Integer count0 = arg0.getIssueCount();
+        Integer count1 = arg1.getIssueCount();
         return count1.compareTo(count0);
       }
     });
@@ -796,7 +826,7 @@ public class QualityReport
       {
         denominator = vaccinationCount;
       }
-      printPer(issue.getToolTip(), batchIssues.getIssueCountPos(), denominator);
+      printPer(issue.getToolTip(), batchIssues.getIssueCount(), denominator);
     }
     out.println("    </table>");
   }
@@ -1062,7 +1092,7 @@ public class QualityReport
   {
     return df.format(i);
   }
-  
+
   private String per(double d)
   {
     return ((int) (100.0 * d + 0.5)) + "%";

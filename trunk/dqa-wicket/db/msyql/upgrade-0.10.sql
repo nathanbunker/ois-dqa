@@ -1,13 +1,15 @@
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(34, 'Vaccination Order Control Code', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(35, 'Country Code', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(36, 'Character Set', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(37, 'Message Profile Id', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(38, 'Patient Class', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(39, 'Message Processing Id', '');
-INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(39, 'Message Processing Id', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(40, 'Acknowledgement Type', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(41, 'Telecommunication Use', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(42, 'Telecommunication Equipment', '');
 
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (34, 'RE', 'Observations to follow', 'RE', 'V');
+INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (34, 'OK', 'Order accepted & OK', 'OK', 'I');
 INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (38, 'R', 'Recurring', 'R', 'V');
 INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (39, 'P', 'Production', 'P', 'V');
 INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (39, 'T', 'Training', 'T', 'V');
@@ -42,6 +44,8 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (3, 'General', 'configuration', 'exception', '', 'E', 'Blocked', 'Message Count', 'Profile is not configured properly, unable to accept messages');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (4, 'General', 'parse', 'exception', '', 'E', 'Blocked', 'Message Count', 'Message can not be parsed');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (5, 'General', 'processing', 'exception', '', 'E', 'Blocked', 'Message Count', 'General unexpected exception while processing message');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (463, 'HL7', 'segment', 'is unrecognized', '', 'W', 'May', 'Message Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (464, 'HL7', 'segment', 'is invalid', '', 'W', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (452, 'HL7', 'segments', 'out of order', '', 'W', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (415, 'HL7 MSH', 'accept ack type', 'is deprecated', '', 'W', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (417, 'HL7 MSH', 'accept ack type', 'is ignored', '', 'S', 'May', 'Message Count', '');
@@ -101,8 +105,6 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (24, 'HL7 MSH', 'processing id', 'is valued as', 'debug', 'W', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (25, 'HL7 MSH', 'processing id', 'is valued as', 'production', 'A', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (26, 'HL7 MSH', 'processing id', 'is valued as', 'training', 'W', 'May', 'Message Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (27, 'HL7 MSH', 'profile id', 'is missing', '', 'A', 'May', 'Message Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (28, 'HL7 MSH', 'profile id', 'is unrecognized', '', 'A', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (29, 'HL7 MSH', 'receiving application', 'is invalid', '', 'W', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (30, 'HL7 MSH', 'receiving application', 'is missing', '', 'A', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (31, 'HL7 MSH', 'receiving facility', 'is invalid', '', 'W', 'May', 'Message Count', '');
@@ -113,7 +115,7 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (36, 'HL7 MSH', 'sending facility', 'is invalid', '', 'W', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (37, 'HL7 MSH', 'sending facility', 'is missing', '', 'A', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (38, 'HL7 MSH', 'version', 'is missing', '', 'E', 'May', 'Message Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (39, 'HL7 MSH', 'version', 'is unrecognized', '', 'W', 'May', 'Message Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (39, 'HL7 MSH', 'version', 'is unrecognized', '', 'E', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (40, 'HL7 MSH', 'version', 'is valued as', '2.3.1', 'A', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (41, 'HL7 MSH', 'version', 'is valued as', '2.4', 'A', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (42, 'HL7 MSH', 'version', 'is valued as', '2.5', 'A', 'May', 'Message Count', '');
@@ -122,10 +124,10 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (368, 'HL7 NK1', 'set id', 'is missing', '', 'S', 'May', 'NextOfKin Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (45, 'HL7 OBX', 'segment', 'is missing', '', 'A', 'May', 'Observation Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (46, 'HL7 ORC', 'segment', 'is missing', '', 'S', 'May', 'Vaccination Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (47, 'HL7 ORC', 'segment', 'is repeated', '', 'E', 'Blocked', 'Message Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (47, 'HL7 ORC', 'segment', 'is repeated', '', 'E', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (48, 'HL7 PD1', 'segment', 'is missing', '', 'A', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (49, 'HL7 PID', 'segment', 'is missing', '', 'E', 'Blocked', 'Message Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (50, 'HL7 PID', 'segment', 'is repeated', '', 'E', 'Blocked', 'Message Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (50, 'HL7 PID', 'segment', 'is repeated', '', 'W', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (51, 'HL7 PV1', 'segment', 'is missing', '', 'W', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (400, 'HL7 PV1', 'segment', 'is repeated', '', 'W', 'May', 'Message Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (390, 'HL7 RXA', 'admin sub id counter', 'is missing', '', 'S', 'May', 'Vaccination Count', '');
@@ -173,7 +175,7 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (87, 'Next-of-kin', 'relationship', 'is invalid', '', 'S', 'May', 'NextOfKin Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (88, 'Next-of-kin', 'relationship', 'is missing', '', 'S', 'Should', 'NextOfKin Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (89, 'Next-of-kin', 'relationship', 'is not responsible party', '', 'S', 'May', 'NextOfKin Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (90, 'Next-of-kin', 'relationship', 'is unrecognized', '', 'W', 'May', 'NextOfKin Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (90, 'Next-of-kin', 'relationship', 'is unrecognized', '', 'S', 'May', 'NextOfKin Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (91, 'Next-of-kin', 'SSN', 'is missing', '', 'A', 'May', 'NextOfKin Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (92, 'Patient', 'address', 'is missing', '', 'W', 'Should', 'Patient Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (93, 'Patient', 'address city', 'is invalid', '', 'W', 'May', 'Patient Count', '');
@@ -271,6 +273,16 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (174, 'Patient', 'phone', 'is incomplete', '', 'W', 'May', 'Patient Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (175, 'Patient', 'phone', 'is invalid', '', 'W', 'May', 'Patient Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (176, 'Patient', 'phone', 'is missing', '', 'A', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (453, 'Patient', 'phone tel use code', 'is deprecated', '', 'W', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (454, 'Patient', 'phone tel use code', 'is ignored', '', 'S', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (455, 'Patient', 'phone tel use code', 'is invalid', '', 'W', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (456, 'Patient', 'phone tel use code', 'is missing', '', 'W', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (457, 'Patient', 'phone tel use code', 'is unrecognized', '', 'W', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (458, 'Patient', 'phone tel equip code', 'is deprecated', '', 'W', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (459, 'Patient', 'phone tel equip code', 'is ignored', '', 'S', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (460, 'Patient', 'phone tel equip code', 'is invalid', '', 'W', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (461, 'Patient', 'phone tel equip code', 'is missing', '', 'W', 'May', 'Patient Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (462, 'Patient', 'phone tel equip code', 'is unrecognized', '', 'W', 'May', 'Patient Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (177, 'Patient', 'primary facility id', 'is deprecated', '', 'W', 'May', 'Patient Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (178, 'Patient', 'primary facility id', 'is ignored', '', 'S', 'May', 'Patient Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (179, 'Patient', 'primary facility id', 'is invalid', '', 'E', 'May', 'Patient Count', '');
@@ -343,7 +355,7 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (244, 'Vaccination', 'admin code', 'is missing', '', 'S', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (245, 'Vaccination', 'admin code', 'is not specific', '', 'W', 'May', 'Vaccination Admin Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (246, 'Vaccination', 'admin code', 'is not vaccine', '', 'W', 'May', 'Vaccination Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (247, 'Vaccination', 'admin code', 'is unrecognized', '', 'E', 'May', 'Vaccination Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (247, 'Vaccination', 'admin code', 'is unrecognized', '', 'S', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (248, 'Vaccination', 'admin code', 'is valued as', 'not administered', 'S', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (249, 'Vaccination', 'admin code', 'is valued as', 'unknown', 'W', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (250, 'Vaccination', 'admin code', 'may be variation of previously reported codes', '', 'W', 'May', 'Vaccination Count', '');
@@ -389,7 +401,7 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (286, 'Vaccination', 'completion status', 'is ignored', '', 'W', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (287, 'Vaccination', 'completion status', 'is invalid', '', 'E', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (288, 'Vaccination', 'completion status', 'is missing', '', 'A', 'May', 'Vaccination Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (289, 'Vaccination', 'completion status', 'is unrecognized', '', 'E', 'May', 'Vaccination Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (289, 'Vaccination', 'completion status', 'is unrecognized', '', 'W', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (290, 'Vaccination', 'completion status', 'is valued as', 'completed', 'A', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (291, 'Vaccination', 'completion status', 'is valued as', 'not administered', 'W', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (292, 'Vaccination', 'completion status', 'is valued as', 'partially administered', 'W', 'May', 'Vaccination Count', '');
@@ -454,7 +466,7 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (369, 'Vaccination', 'order control code', 'is ignored', '', 'S', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (370, 'Vaccination', 'order control code', 'is invalid', '', 'W', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (371, 'Vaccination', 'order control code', 'is missing', '', 'S', 'May', 'Vaccination Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (372, 'Vaccination', 'order control code', 'is unrecognized', '', 'W', 'May', 'Vaccination Count', '');
+REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (372, 'Vaccination', 'order control code', 'is unrecognized', '', 'S', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (442, 'Vaccination', 'order facility id', 'is deprecated', '', 'A', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (443, 'Vaccination', 'order facility id', 'is ignored', '', 'S', 'May', 'Vaccination Count', '');
 REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (444, 'Vaccination', 'order facility id', 'is invalid', '', 'W', 'May', 'Vaccination Count', '');
@@ -493,3 +505,74 @@ REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_ty
 
 ALTER TABLE dqa_issue_found ADD CONSTRAINT dqa_fk_issue_found2 FOREIGN KEY(issue_id) REFERENCES dqa_potential_issue(issue_id);
 
+ALTER TABLE dqa_message_received DROP patient_id;
+
+CREATE TABLE dqa_batch_report 
+(
+  batch_report_id            INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  batch_id                   INTEGER NOT NULL,
+  comp_patient_score         INTEGER,
+  comp_score                 INTEGER,
+  comp_vaccination_score     INTEGER,
+  comp_vaccine_group_score   INTEGER,
+  message_count              INTEGER,
+  message_with_admin_count   INTEGER,
+  next_of_kin_count          INTEGER,
+  overall_score              INTEGER,
+  patient_count              INTEGER,
+  patient_underage_count     INTEGER,
+  qual_error_score           INTEGER,
+  qual_score                 INTEGER,
+  qual_warn_score            INTEGER,
+  time_average               FLOAT,
+  time_count_2_days          INTEGER,
+  time_count_30_days         INTEGER,
+  time_count_7_days          INTEGER,
+  time_date_first            DATE,
+  time_date_last             DATE,
+  time_score                 INTEGER,
+  time_score_2_days          INTEGER,
+  time_score_30_days         INTEGER,
+  time_score_7_days          INTEGER,
+  vacc_admin_count           INTEGER,
+  vacc_delete_count          INTEGER,
+  vacc_historical_count      INTEGER,
+  vacc_not_admin_count       INTEGER
+);
+
+ALTER TABLE dqa_message_batch DROP comp_patient_score;
+ALTER TABLE dqa_message_batch DROP comp_score;
+ALTER TABLE dqa_message_batch DROP comp_vaccination_score;
+ALTER TABLE dqa_message_batch DROP comp_vaccine_group_score;
+ALTER TABLE dqa_message_batch DROP message_count;
+ALTER TABLE dqa_message_batch DROP message_with_admin_count;
+ALTER TABLE dqa_message_batch DROP next_of_kin_count;
+ALTER TABLE dqa_message_batch DROP overall_score;
+ALTER TABLE dqa_message_batch DROP patient_count;
+ALTER TABLE dqa_message_batch DROP patient_underage_count;
+ALTER TABLE dqa_message_batch DROP qual_error_score;
+ALTER TABLE dqa_message_batch DROP qual_score;
+ALTER TABLE dqa_message_batch DROP qual_warn_score;
+ALTER TABLE dqa_message_batch DROP time_average;
+ALTER TABLE dqa_message_batch DROP time_count_2_days;
+ALTER TABLE dqa_message_batch DROP time_count_30_days;
+ALTER TABLE dqa_message_batch DROP time_count_7_days;
+ALTER TABLE dqa_message_batch DROP time_date_first;
+ALTER TABLE dqa_message_batch DROP time_date_last;
+ALTER TABLE dqa_message_batch DROP time_score;
+ALTER TABLE dqa_message_batch DROP time_score_2_days;
+ALTER TABLE dqa_message_batch DROP time_score_30_days;
+ALTER TABLE dqa_message_batch DROP time_score_7_days;
+ALTER TABLE dqa_message_batch DROP vacc_admin_count;
+ALTER TABLE dqa_message_batch DROP vacc_delete_count;
+ALTER TABLE dqa_message_batch DROP vacc_historical_count;
+ALTER TABLE dqa_message_batch DROP vacc_not_admin_count;
+
+ALTER TABLE dqa_batch_issues DROP issue_count_neg;
+ALTER TABLE dqa_batch_issues CHANGE issue_count_pos issue_count INTEGER;
+
+ALTER TABLE dqa_issue_found DROP issue_negate;
+
+INSERT INTO dqa_keyed_setting (keyed_code, object_code, object_id, keyed_value) VALUES ('validate.vaccination.facility.pfs', 'Application', 2, 'Y');
+INSERT INTO dqa_keyed_setting (keyed_code, object_code, object_id, keyed_value) VALUES ('validate.vaccination.facility.pfs', 'Application', 3, 'Y');
+INSERT INTO dqa_keyed_setting (keyed_code, object_code, object_id, keyed_value) VALUES ('validate.vaccination.facility.pfs', 'Application', 10, 'Y');

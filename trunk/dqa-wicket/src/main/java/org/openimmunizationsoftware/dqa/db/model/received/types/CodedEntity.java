@@ -2,7 +2,6 @@ package org.openimmunizationsoftware.dqa.db.model.received.types;
 
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
-import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 
 public class CodedEntity
 {
@@ -71,7 +70,7 @@ public class CodedEntity
 
   public void setCode(String code)
   {
-    this.code = code;
+    this.code = nullSafe(code);
   }
 
   public String getText()
@@ -81,7 +80,7 @@ public class CodedEntity
 
   public void setText(String text)
   {
-    this.text = text;
+    this.text = nullSafe(text);
   }
 
   public String getTable()
@@ -91,7 +90,7 @@ public class CodedEntity
 
   public void setTable(String table)
   {
-    this.table = table;
+    this.table = nullSafe(table);
   }
 
   public String getAltCode()
@@ -111,7 +110,7 @@ public class CodedEntity
 
   public void setAltText(String altText)
   {
-    this.altText = altText;
+    this.altText = nullSafe(altText);
   }
 
   public String getAltTable()
@@ -121,6 +120,18 @@ public class CodedEntity
 
   public void setAltTable(String altTable)
   {
-    this.altTable = altTable;
+    this.altTable = nullSafe(altTable);
+  }
+  
+  private static String nullSafe(String s)
+  {
+    if (s == null)
+    {
+      return "";
+    }
+    else
+    {
+      return s;
+    }
   }
 }

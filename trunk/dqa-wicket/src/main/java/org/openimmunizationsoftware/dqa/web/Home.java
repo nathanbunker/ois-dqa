@@ -6,6 +6,7 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
@@ -30,10 +31,13 @@ public class Home extends WebPage
 
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
+
     Organization organization = (Organization) session.get(Organization.class, 1);
     SubmitterProfile submitterProfile = organization.getPrimaryProfile();
     // Add the simplest type of label
     add(new Label("messageField", "Hello, primary organization = " + organization.getOrgLabel() + ""));
+    tx.commit();
     session.close();
   }
 }

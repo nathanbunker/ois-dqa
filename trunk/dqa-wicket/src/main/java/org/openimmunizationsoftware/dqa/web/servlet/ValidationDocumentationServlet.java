@@ -20,8 +20,6 @@ import org.openimmunizationsoftware.dqa.manager.KeyedSettingManager;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
 import org.openimmunizationsoftware.dqa.parse.PrintBean;
 import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
-import org.openimmunizationsoftware.dqa.validate.SectionValidator;
-import org.openimmunizationsoftware.dqa.validate.ValidateMessage;
 import org.openimmunizationsoftware.dqa.validate.Validator;
 
 public class ValidationDocumentationServlet extends HttpServlet
@@ -141,7 +139,7 @@ public class ValidationDocumentationServlet extends HttpServlet
       boolean first = true;
       for (IssueFound issueFound : issuesFound)
       {
-        if (!issueFound.getIssueNegate() && issueFound.isError())
+        if (issueFound.isError())
         {
           if (first)
           {
@@ -159,7 +157,7 @@ public class ValidationDocumentationServlet extends HttpServlet
       first = true;
       for (IssueFound issueFound : issuesFound)
       {
-        if (!issueFound.getIssueNegate() && issueFound.isWarn())
+        if (issueFound.isWarn())
         {
           if (first)
           {
@@ -177,7 +175,7 @@ public class ValidationDocumentationServlet extends HttpServlet
       first = true;
       for (IssueFound issueFound : issuesFound)
       {
-        if (!issueFound.getIssueNegate() && issueFound.isSkip())
+        if (issueFound.isSkip())
         {
           if (first)
           {

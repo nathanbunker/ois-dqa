@@ -24,6 +24,7 @@ import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.ReceiveQueue;
+import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.SubmitStatus;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.received.Patient;
@@ -102,17 +103,21 @@ public class WeeklyBatchManager extends ManagerThread
     determineStartAndEndOfWeek(now);
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
     Query query = session
-        .createQuery("from SubmitterProfile where profile_status = 'Prod' or profile_status = 'Test' or profile_status = 'Hold'");
+        .createQuery("from SubmitterProfile where (profile_status = 'Prod' or profile_status = 'Test' or profile_status = 'Hold') and profile_id >= 1200");
     List<SubmitterProfile> profiles = query.list();
+    tx.commit();
     for (SubmitterProfile profile : profiles)
     {
+      tx = session.beginTransaction();
       internalLog.append("Looking at profile " + profile.getProfileLabel() + " for " + profile.getProfileCode() + "\r");
       query = session.createQuery("from MessageBatch where profile = ? and batchType = ? and endDate = ?");
       query.setParameter(0, profile);
       query.setParameter(1, BatchType.WEEKLY);
       query.setParameter(2, endOfWeek.getTime());
       List<MessageBatch> messageBatchList = query.list();
+      tx.commit();
       if (messageBatchList.size() == 0)
       {
         internalLog.append(" + Creating batch\r");
@@ -150,6 +155,13 @@ public class WeeklyBatchManager extends ManagerThread
       List<MessageBatch> submittedBatches = query.list();
       for (MessageBatch submittedBatch : submittedBatches)
       {
+        query = session.createQuery("from BatchReport where messageBatch = ?");
+        query.setParameter(0, submittedBatch);
+        List<BatchReport> reportList = query.list();
+        if (reportList.size() > 0)
+        {
+          submittedBatch.setBatchReport(reportList.get(0));
+        }
         messageBatch.addToCounts(submittedBatch);
         query = session.createQuery("from BatchIssues where messageBatch = ?");
         query.setParameter(0, submittedBatch);
@@ -217,8 +229,8 @@ public class WeeklyBatchManager extends ManagerThread
       {
         File dqaDir = createDqaDir(profile, ksm, rootDir);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String filename = "Weekly DQA for " + profile.getProfileCode() + "." + sdf.format(endOfWeek.getTime()) + "." + getScoreDescription(messageBatch.getOverallScore()) + "."
-            + messageBatch.getOverallScore() + ".html";
+        String filename = "Weekly DQA for " + profile.getProfileCode() + "." + sdf.format(endOfWeek.getTime()) + "." + getScoreDescription(messageBatch.getBatchReport().getOverallScore()) + "."
+            + messageBatch.getBatchReport().getOverallScore() + ".html";
         try
         {
           PrintWriter reportOut = new PrintWriter(new FileWriter(new File(dqaDir, filename)));

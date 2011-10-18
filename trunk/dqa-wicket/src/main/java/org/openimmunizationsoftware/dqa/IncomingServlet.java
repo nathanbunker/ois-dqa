@@ -24,6 +24,7 @@ import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
+import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.UserAccount;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
@@ -156,6 +157,7 @@ public class IncomingServlet extends HttpServlet
 
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
     String accessDenied = null;
     if (userId == null || userId.equals(""))
     {
@@ -268,6 +270,7 @@ public class IncomingServlet extends HttpServlet
         }
       }
     }
+    tx.commit();
     if (accessDenied == null)
     {
       String messageData = req.getParameter("MESSAGEDATA");
@@ -350,16 +353,17 @@ public class IncomingServlet extends HttpServlet
   private void printMessageBatch()
   {
     MessageBatch mb = messageBatchManager.getMessageBatch();
+    BatchReport r = mb.getBatchReport();
     out.print("\r");
     out.print("\r");
     out.print("Message Batch Summary: \r");
-    out.print("Message Count:       " + mb.getMessageCount() + "\r");
-    out.print("Patient Count:       " + mb.getMessageCount() + "\r");
+    out.print("Message Count:       " + r.getMessageCount() + "\r");
+    out.print("Patient Count:       " + r.getMessageCount() + "\r");
     out.print("Vaccination      \r");
-    out.print(" + Administered:     " + mb.getVaccinationAdministeredCount() + "\r");
-    out.print(" + Historical:       " + mb.getVaccinationHistoricalCount() + "\r");
-    out.print(" + Not Administered: " + mb.getVaccinationNotAdministeredCount() + "\r");
-    out.print(" + Deleted:          " + mb.getVaccinationDeleteCount() + "\r");
+    out.print(" + Administered:     " + r.getVaccinationAdministeredCount() + "\r");
+    out.print(" + Historical:       " + r.getVaccinationHistoricalCount() + "\r");
+    out.print(" + Not Administered: " + r.getVaccinationNotAdministeredCount() + "\r");
+    out.print(" + Deleted:          " + r.getVaccinationDeleteCount() + "\r");
   }
 
   public boolean processStream(boolean debug, Session session, SubmitterProfile profile, String messageData)
@@ -395,6 +399,7 @@ public class IncomingServlet extends HttpServlet
     Transaction tx = session.beginTransaction();
     messageBatchManager.close();
     session.save(messageBatchManager.getMessageBatch());
+    session.save(messageBatchManager.getMessageBatch().getBatchReport());
     tx.commit();
     return debug;
   }
@@ -431,12 +436,12 @@ public class IncomingServlet extends HttpServlet
         try
         {
           out.print("-- DEBUG START -------------------------------------------------------\r");
-          out.print("Processed message: " + messageBatchManager.getMessageBatch().getMessageCount() + "\r");
+          out.print("Processed message: " + messageBatchManager.getMessageBatch().getBatchReport().getMessageCount() + "\r");
           List<IssueFound> issuesFound = messageReceived.getIssuesFound();
           boolean first = true;
           for (IssueFound issueFound : issuesFound)
           {
-            if (!issueFound.getIssueNegate() && issueFound.isError())
+            if (issueFound.isError())
             {
               if (first)
               {
@@ -449,7 +454,7 @@ public class IncomingServlet extends HttpServlet
           first = true;
           for (IssueFound issueFound : issuesFound)
           {
-            if (!issueFound.getIssueNegate() && issueFound.isWarn())
+            if (issueFound.isWarn())
             {
               if (first)
               {
@@ -462,7 +467,7 @@ public class IncomingServlet extends HttpServlet
           first = true;
           for (IssueFound issueFound : issuesFound)
           {
-            if (!issueFound.getIssueNegate() && issueFound.isSkip())
+            if (issueFound.isSkip())
             {
               if (first)
               {

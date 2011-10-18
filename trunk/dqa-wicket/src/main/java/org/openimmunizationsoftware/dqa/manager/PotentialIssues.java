@@ -8,10 +8,11 @@ import java.util.Map;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.InitializationException;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 
-public class PotentialIssues
+public class PotentialIssues implements Reload
 {
   public PotentialIssue GeneralAuthorizationException = null;
   public PotentialIssue GeneralConfigurationException = null;
@@ -476,53 +477,22 @@ public class PotentialIssues
   public PotentialIssue VaccinationSystemEntryTimeIsMissing = null;
 
   public static enum Field {
-    GENERAL_AUTHORIZATION,
-    GENERAL_CONFIGURATION,
-    GENERAL_PARSE,
-    GENERAL_PROCESSING,
-    HL7_SEGMENTS,
+    GENERAL_AUTHORIZATION, GENERAL_CONFIGURATION, GENERAL_PARSE, GENERAL_PROCESSING, HL7_SEGMENTS,
     HL7_MSH_ACCEPT_ACK_TYPE,
-
-
-
-
-
-
 
     HL7_MSH_ALT_CHARACTER_SET,
 
-
-
-
     HL7_MSH_APP_ACK_TYPE,
-
-
-
-
-
-
 
     HL7_MSH_CHARACTER_SET,
 
-
-
-
     HL7_MSH_COUNTRY_CODE,
-
-
-
 
     HL7_MSH_ENCODING_CHARACTER,
 
-
-    HL7_MSH_MESSAGE_CONTROL_ID,
-    HL7_MSH_MESSAGE_DATE,
-
+    HL7_MSH_MESSAGE_CONTROL_ID, HL7_MSH_MESSAGE_DATE,
 
     HL7_MSH_MESSAGE_PROFILE_ID,
-
-
-
 
     HL7_MSH_MESSAGE_STRUCTURE,
 
@@ -530,14 +500,7 @@ public class PotentialIssues
 
     HL7_MSH_MESSAGE_TYPE,
 
-
     HL7_MSH_PROCESSING_ID,
-
-
-
-
-
-
 
     HL7_MSH_PROFILE_ID,
 
@@ -545,30 +508,21 @@ public class PotentialIssues
 
     HL7_MSH_RECEIVING_FACILITY,
 
-    HL7_MSH_SEGMENT,
-    HL7_MSH_SENDING_APPLICATION,
+    HL7_MSH_SEGMENT, HL7_MSH_SENDING_APPLICATION,
 
     HL7_MSH_SENDING_FACILITY,
 
     HL7_MSH_VERSION,
 
-
-
-
     HL7_NK1_SEGMENT,
 
-    HL7_NK1_SET_ID,
-    HL7_OBX_SEGMENT,
-    HL7_ORC_SEGMENT,
+    HL7_NK1_SET_ID, HL7_OBX_SEGMENT, HL7_ORC_SEGMENT,
 
-    HL7_PD1_SEGMENT,
-    HL7_PID_SEGMENT,
+    HL7_PD1_SEGMENT, HL7_PID_SEGMENT,
 
     HL7_PV1_SEGMENT,
 
-    HL7_RXA_ADMIN_SUB_ID_COUNTER,
-    HL7_RXA_GIVE_SUB_ID,
-    HL7_RXA_SEGMENT,
+    HL7_RXA_ADMIN_SUB_ID_COUNTER, HL7_RXA_GIVE_SUB_ID, HL7_RXA_SEGMENT,
 
     HL7_RXR_SEGMENT,
 
@@ -578,316 +532,129 @@ public class PotentialIssues
 
     NEXT_OF_KIN_ADDRESS_COUNTRY,
 
-
-
-
     NEXT_OF_KIN_ADDRESS_COUNTY,
-
-
-
 
     NEXT_OF_KIN_ADDRESS_STATE,
 
-
-
-
-    NEXT_OF_KIN_ADDRESS_STREET,
-    NEXT_OF_KIN_ADDRESS_STREET2,
-    NEXT_OF_KIN_ADDRESS_TYPE,
-
-
-
+    NEXT_OF_KIN_ADDRESS_STREET, NEXT_OF_KIN_ADDRESS_STREET2, NEXT_OF_KIN_ADDRESS_TYPE,
 
     NEXT_OF_KIN_ADDRESS_ZIP,
 
-    NEXT_OF_KIN_NAME,
-    NEXT_OF_KIN_NAME_FIRST,
-    NEXT_OF_KIN_NAME_LAST,
-    NEXT_OF_KIN_PHONE_NUMBER,
-
+    NEXT_OF_KIN_NAME, NEXT_OF_KIN_NAME_FIRST, NEXT_OF_KIN_NAME_LAST, NEXT_OF_KIN_PHONE_NUMBER,
 
     NEXT_OF_KIN_RELATIONSHIP,
 
-
-
-
-
-    NEXT_OF_KIN_SSN,
-    PATIENT_ADDRESS,
-    PATIENT_ADDRESS_CITY,
+    NEXT_OF_KIN_SSN, PATIENT_ADDRESS, PATIENT_ADDRESS_CITY,
 
     PATIENT_ADDRESS_COUNTRY,
 
-
-
-
     PATIENT_ADDRESS_COUNTY,
-
-
-
 
     PATIENT_ADDRESS_STATE,
 
+    PATIENT_ADDRESS_STREET, PATIENT_ADDRESS_STREET2, PATIENT_ADDRESS_TYPE, PATIENT_ADDRESS_ZIP,
 
-
-
-    PATIENT_ADDRESS_STREET,
-    PATIENT_ADDRESS_STREET2,
-    PATIENT_ADDRESS_TYPE,
-    PATIENT_ADDRESS_ZIP,
-
-    PATIENT_ALIAS,
-    PATIENT_BIRTH_DATE,
-
-
-
-
+    PATIENT_ALIAS, PATIENT_BIRTH_DATE,
 
     PATIENT_BIRTH_INDICATOR,
 
     PATIENT_BIRTH_ORDER,
 
-
-    PATIENT_BIRTH_PLACE,
-    PATIENT_BIRTH_REGISTRY_ID,
+    PATIENT_BIRTH_PLACE, PATIENT_BIRTH_REGISTRY_ID,
 
     PATIENT_CLASS,
 
-
-
-
     PATIENT_DEATH_DATE,
-
-
 
     PATIENT_DEATH_INDICATOR,
 
     PATIENT_ETHNICITY,
 
-
-
-
     PATIENT_GENDER,
 
+    PATIENT_GUARDIAN_ADDRESS, PATIENT_GUARDIAN_ADDRESS_CITY, PATIENT_GUARDIAN_ADDRESS_STATE,
+    PATIENT_GUARDIAN_ADDRESS_STREET, PATIENT_GUARDIAN_ADDRESS_ZIP, PATIENT_GUARDIAN_NAME,
 
-
-
-    PATIENT_GUARDIAN_ADDRESS,
-    PATIENT_GUARDIAN_ADDRESS_CITY,
-    PATIENT_GUARDIAN_ADDRESS_STATE,
-    PATIENT_GUARDIAN_ADDRESS_STREET,
-    PATIENT_GUARDIAN_ADDRESS_ZIP,
-    PATIENT_GUARDIAN_NAME,
-
-    PATIENT_GUARDIAN_NAME_FIRST,
-    PATIENT_GUARDIAN_NAME_LAST,
-    PATIENT_GUARDIAN_PARTY,
-    PATIENT_GUARDIAN_PHONE,
-    PATIENT_GUARDIAN_RELATIONSHIP,
-    PATIENT_IMMUNIZATION_REGISTRY_STATUS,
-
-
-
+    PATIENT_GUARDIAN_NAME_FIRST, PATIENT_GUARDIAN_NAME_LAST, PATIENT_GUARDIAN_PARTY, PATIENT_GUARDIAN_PHONE,
+    PATIENT_GUARDIAN_RELATIONSHIP, PATIENT_IMMUNIZATION_REGISTRY_STATUS,
 
     PATIENT_MEDICAID_NUMBER,
 
     PATIENT_MIDDLE_NAME,
 
-    PATIENT_MOTHERS_MAIDEN_NAME,
-    PATIENT_NAME,
+    PATIENT_MOTHERS_MAIDEN_NAME, PATIENT_NAME,
 
     PATIENT_NAME_FIRST,
-
 
     PATIENT_NAME_LAST,
 
     PATIENT_NAME_TYPE_CODE,
 
-
-
-
     PATIENT_PHONE,
-
 
     PATIENT_PHONE_TEL_USE_CODE,
 
-
-
-
     PATIENT_PHONE_TEL_EQUIP_CODE,
-
-
-
 
     PATIENT_PRIMARY_FACILITY_ID,
 
-
-
-
-    PATIENT_PRIMARY_FACILITY_NAME,
-    PATIENT_PRIMARY_LANGUAGE,
-
-
-
+    PATIENT_PRIMARY_FACILITY_NAME, PATIENT_PRIMARY_LANGUAGE,
 
     PATIENT_PRIMARY_PHYSICIAN_ID,
 
-
-
-
-    PATIENT_PRIMARY_PHYSICIAN_NAME,
-    PATIENT_PROTECTION_INDICATOR,
-
-
-
-
-
+    PATIENT_PRIMARY_PHYSICIAN_NAME, PATIENT_PROTECTION_INDICATOR,
 
     PATIENT_PUBLICITY_CODE,
 
-
-
-
     PATIENT_RACE,
-
-
-
 
     PATIENT_REGISTRY_ID,
 
     PATIENT_REGISTRY_STATUS,
 
-
-
-
     PATIENT_SSN,
 
-    PATIENT_SUBMITTER_ID,
-    PATIENT_SUBMITTER_ID_AUTHORITY,
-    PATIENT_SUBMITTER_ID_TYPE_CODE,
-    PATIENT_VFC_EFFECTIVE_DATE,
-
-
+    PATIENT_SUBMITTER_ID, PATIENT_SUBMITTER_ID_AUTHORITY, PATIENT_SUBMITTER_ID_TYPE_CODE, PATIENT_VFC_EFFECTIVE_DATE,
 
     PATIENT_VFC_STATUS,
-
-
-
 
     PATIENT_WIC_ID,
 
     VACCINATION_ACTION_CODE,
 
-
-
-
-
-
-
-
     VACCINATION_ADMIN_CODE,
 
-
-
-
-
-
-
-
-
     VACCINATION_ADMIN_DATE,
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     VACCINATION_ADMIN_DATE_END,
 
     VACCINATION_ADMINISTERED_AMOUNT,
 
-
-
     VACCINATION_ADMINISTERED_UNIT,
-
-
-
 
     VACCINATION_BODY_ROUTE,
 
-
-
-
-
     VACCINATION_BODY_SITE,
-
-
-
-
 
     VACCINATION_COMPLETION_STATUS,
 
-
-
-
-
-
-
-
     VACCINATION_CONFIDENTIALITY_CODE,
-
-
-
-
 
     VACCINATION_CPT_CODE,
 
-
-
-
     VACCINATION_CVX_CODE,
 
+    VACCINATION_CVX_CODE_AND_CPT_CODE, VACCINATION_FACILITY_ID,
 
-
-
-    VACCINATION_CVX_CODE_AND_CPT_CODE,
-    VACCINATION_FACILITY_ID,
-
-
-
-
-    VACCINATION_FACILITY_NAME,
-    VACCINATION_FILLER_ORDER_NUMBER,
-
-
-
+    VACCINATION_FACILITY_NAME, VACCINATION_FILLER_ORDER_NUMBER,
 
     VACCINATION_GIVEN_BY,
 
-
-
-
-    VACCINATION_ID,
-    VACCINATION_ID_OF_RECEIVER,
+    VACCINATION_ID, VACCINATION_ID_OF_RECEIVER,
 
     VACCINATION_ID_OF_SENDER,
 
     VACCINATION_INFORMATION_SOURCE,
-
-
-
-
-
-
-
 
     VACCINATION_LOT_EXPIRATION_DATE,
 
@@ -895,44 +662,19 @@ public class PotentialIssues
 
     VACCINATION_MANUFACTURER_CODE,
 
-
-
-
     VACCINATION_ORDER_CONTROL_CODE,
-
-
-
 
     VACCINATION_ORDER_FACILITY_ID,
 
-
-
-
-    VACCINATION_ORDER_FACILITY_NAME,
-    VACCINATION_ORDERED_BY,
-
-
-
+    VACCINATION_ORDER_FACILITY_NAME, VACCINATION_ORDERED_BY,
 
     VACCINATION_PLACER_ORDER_NUMBER,
 
-
-
-
     VACCINATION_PRODUCT,
-
-
 
     VACCINATION_RECORDED_BY,
 
-
-
-
     VACCINATION_REFUSAL_REASON,
-
-
-
-
 
     VACCINATION_SYSTEM_ENTRY_TIME;
   }
@@ -992,18 +734,34 @@ public class PotentialIssues
 
   private static PotentialIssues singleton = null;
 
+  private static String INIT_BLOCK = "";
+
   public static PotentialIssues getPotentialIssues()
   {
     if (singleton == null)
     {
-      singleton = new PotentialIssues();
+      synchronized (INIT_BLOCK)
+      {
+        if (singleton == null)
+        {
+          singleton = new PotentialIssues();
+          ReloadManager.registerReload(singleton);
+        }
+      }
     }
     return singleton;
+  }
+
+  public void reload()
+  {
+    singleton = null;
+    getPotentialIssues();
   }
 
   private PotentialIssues() {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     GeneralAuthorizationException = getPotentialIssue(session, "General", "authorization", "exception", "");
     GeneralConfigurationException = getPotentialIssue(session, "General", "configuration", "exception", "");
@@ -1015,14 +773,18 @@ public class PotentialIssues
     Hl7MshAcceptAckTypeIsInvalid = getPotentialIssue(session, "HL7 MSH", "accept ack type", "is invalid", "");
     Hl7MshAcceptAckTypeIsMissing = getPotentialIssue(session, "HL7 MSH", "accept ack type", "is missing", "");
     Hl7MshAcceptAckTypeIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "accept ack type", "is unrecognized", "");
-    Hl7MshAcceptAckTypeIsValuedAsAlways = getPotentialIssue(session, "HL7 MSH", "accept ack type", "is valued as", "always");
-    Hl7MshAcceptAckTypeIsValuedAsNever = getPotentialIssue(session, "HL7 MSH", "accept ack type", "is valued as", "never");
-    Hl7MshAcceptAckTypeIsValuedAsOnlyOnErrors = getPotentialIssue(session, "HL7 MSH", "accept ack type", "is valued as", "only on errors");
+    Hl7MshAcceptAckTypeIsValuedAsAlways = getPotentialIssue(session, "HL7 MSH", "accept ack type", "is valued as",
+        "always");
+    Hl7MshAcceptAckTypeIsValuedAsNever = getPotentialIssue(session, "HL7 MSH", "accept ack type", "is valued as",
+        "never");
+    Hl7MshAcceptAckTypeIsValuedAsOnlyOnErrors = getPotentialIssue(session, "HL7 MSH", "accept ack type",
+        "is valued as", "only on errors");
     Hl7MshAltCharacterSetIsDeprecated = getPotentialIssue(session, "HL7 MSH", "alt character set", "is deprecated", "");
     Hl7MshAltCharacterSetIsIgnored = getPotentialIssue(session, "HL7 MSH", "alt character set", "is ignored", "");
     Hl7MshAltCharacterSetIsInvalid = getPotentialIssue(session, "HL7 MSH", "alt character set", "is invalid", "");
     Hl7MshAltCharacterSetIsMissing = getPotentialIssue(session, "HL7 MSH", "alt character set", "is missing", "");
-    Hl7MshAltCharacterSetIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "alt character set", "is unrecognized", "");
+    Hl7MshAltCharacterSetIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "alt character set", "is unrecognized",
+        "");
     Hl7MshAppAckTypeIsDeprecated = getPotentialIssue(session, "HL7 MSH", "app ack type", "is deprecated", "");
     Hl7MshAppAckTypeIsIgnored = getPotentialIssue(session, "HL7 MSH", "app ack type", "is ignored", "");
     Hl7MshAppAckTypeIsInvalid = getPotentialIssue(session, "HL7 MSH", "app ack type", "is invalid", "");
@@ -1030,7 +792,8 @@ public class PotentialIssues
     Hl7MshAppAckTypeIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "app ack type", "is unrecognized", "");
     Hl7MshAppAckTypeIsValuedAsAlways = getPotentialIssue(session, "HL7 MSH", "app ack type", "is valued as", "always");
     Hl7MshAppAckTypeIsValuedAsNever = getPotentialIssue(session, "HL7 MSH", "app ack type", "is valued as", "never");
-    Hl7MshAppAckTypeIsValuedAsOnlyOnErrors = getPotentialIssue(session, "HL7 MSH", "app ack type", "is valued as", "only on errors");
+    Hl7MshAppAckTypeIsValuedAsOnlyOnErrors = getPotentialIssue(session, "HL7 MSH", "app ack type", "is valued as",
+        "only on errors");
     Hl7MshCharacterSetIsDeprecated = getPotentialIssue(session, "HL7 MSH", "character set", "is deprecated", "");
     Hl7MshCharacterSetIsIgnored = getPotentialIssue(session, "HL7 MSH", "character set", "is ignored", "");
     Hl7MshCharacterSetIsInvalid = getPotentialIssue(session, "HL7 MSH", "character set", "is invalid", "");
@@ -1043,18 +806,22 @@ public class PotentialIssues
     Hl7MshCountryCodeIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "country code", "is unrecognized", "");
     Hl7MshEncodingCharacterIsInvalid = getPotentialIssue(session, "HL7 MSH", "encoding character", "is invalid", "");
     Hl7MshEncodingCharacterIsMissing = getPotentialIssue(session, "HL7 MSH", "encoding character", "is missing", "");
-    Hl7MshEncodingCharacterIsNonStandard = getPotentialIssue(session, "HL7 MSH", "encoding character", "is non-standard", "");
+    Hl7MshEncodingCharacterIsNonStandard = getPotentialIssue(session, "HL7 MSH", "encoding character",
+        "is non-standard", "");
     Hl7MshMessageControlIdIsMissing = getPotentialIssue(session, "HL7 MSH", "message control id", "is missing", "");
     Hl7MshMessageDateIsInFuture = getPotentialIssue(session, "HL7 MSH", "message date", "is in future", "");
     Hl7MshMessageDateIsInvalid = getPotentialIssue(session, "HL7 MSH", "message date", "is invalid", "");
     Hl7MshMessageDateIsMissing = getPotentialIssue(session, "HL7 MSH", "message date", "is missing", "");
-    Hl7MshMessageProfileIdIsDeprecated = getPotentialIssue(session, "HL7 MSH", "message profile id", "is deprecated", "");
+    Hl7MshMessageProfileIdIsDeprecated = getPotentialIssue(session, "HL7 MSH", "message profile id", "is deprecated",
+        "");
     Hl7MshMessageProfileIdIsIgnored = getPotentialIssue(session, "HL7 MSH", "message profile id", "is ignored", "");
     Hl7MshMessageProfileIdIsInvalid = getPotentialIssue(session, "HL7 MSH", "message profile id", "is invalid", "");
     Hl7MshMessageProfileIdIsMissing = getPotentialIssue(session, "HL7 MSH", "message profile id", "is missing", "");
-    Hl7MshMessageProfileIdIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "message profile id", "is unrecognized", "");
+    Hl7MshMessageProfileIdIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "message profile id",
+        "is unrecognized", "");
     Hl7MshMessageStructureIsMissing = getPotentialIssue(session, "HL7 MSH", "message structure", "is missing", "");
-    Hl7MshMessageStructureIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "message structure", "is unrecognized", "");
+    Hl7MshMessageStructureIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "message structure",
+        "is unrecognized", "");
     Hl7MshMessageTriggerIsMissing = getPotentialIssue(session, "HL7 MSH", "message trigger", "is missing", "");
     Hl7MshMessageTriggerIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "message trigger", "is unrecognized", "");
     Hl7MshMessageTypeIsMissing = getPotentialIssue(session, "HL7 MSH", "message type", "is missing", "");
@@ -1066,12 +833,16 @@ public class PotentialIssues
     Hl7MshProcessingIdIsMissing = getPotentialIssue(session, "HL7 MSH", "processing id", "is missing", "");
     Hl7MshProcessingIdIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "processing id", "is unrecognized", "");
     Hl7MshProcessingIdIsValuedAsDebug = getPotentialIssue(session, "HL7 MSH", "processing id", "is valued as", "debug");
-    Hl7MshProcessingIdIsValuedAsProduction = getPotentialIssue(session, "HL7 MSH", "processing id", "is valued as", "production");
-    Hl7MshProcessingIdIsValuedAsTraining = getPotentialIssue(session, "HL7 MSH", "processing id", "is valued as", "training");
+    Hl7MshProcessingIdIsValuedAsProduction = getPotentialIssue(session, "HL7 MSH", "processing id", "is valued as",
+        "production");
+    Hl7MshProcessingIdIsValuedAsTraining = getPotentialIssue(session, "HL7 MSH", "processing id", "is valued as",
+        "training");
     Hl7MshProfileIdIsMissing = getPotentialIssue(session, "HL7 MSH", "profile id", "is missing", "");
     Hl7MshProfileIdIsUnrecognized = getPotentialIssue(session, "HL7 MSH", "profile id", "is unrecognized", "");
-    Hl7MshReceivingApplicationIsInvalid = getPotentialIssue(session, "HL7 MSH", "receiving application", "is invalid", "");
-    Hl7MshReceivingApplicationIsMissing = getPotentialIssue(session, "HL7 MSH", "receiving application", "is missing", "");
+    Hl7MshReceivingApplicationIsInvalid = getPotentialIssue(session, "HL7 MSH", "receiving application", "is invalid",
+        "");
+    Hl7MshReceivingApplicationIsMissing = getPotentialIssue(session, "HL7 MSH", "receiving application", "is missing",
+        "");
     Hl7MshReceivingFacilityIsInvalid = getPotentialIssue(session, "HL7 MSH", "receiving facility", "is invalid", "");
     Hl7MshReceivingFacilityIsMissing = getPotentialIssue(session, "HL7 MSH", "receiving facility", "is missing", "");
     Hl7MshSegmentIsMissing = getPotentialIssue(session, "HL7 MSH", "segment", "is missing", "");
@@ -1101,32 +872,39 @@ public class PotentialIssues
     Hl7RxaSegmentIsRepeated = getPotentialIssue(session, "HL7 RXA", "segment", "is repeated", "");
     Hl7RxrSegmentIsMissing = getPotentialIssue(session, "HL7 RXR", "segment", "is missing", "");
     Hl7RxrSegmentIsRepeated = getPotentialIssue(session, "HL7 RXR", "segment", "is repeated", "");
-    NextOfKinAddressIsDifferentFromPatientAddress = getPotentialIssue(session, "Next-of-kin", "address", "is different from patient address", "");
+    NextOfKinAddressIsDifferentFromPatientAddress = getPotentialIssue(session, "Next-of-kin", "address",
+        "is different from patient address", "");
     NextOfKinAddressIsMissing = getPotentialIssue(session, "Next-of-kin", "address", "is missing", "");
     NextOfKinAddressCityIsInvalid = getPotentialIssue(session, "Next-of-kin", "address city", "is invalid", "");
     NextOfKinAddressCityIsMissing = getPotentialIssue(session, "Next-of-kin", "address city", "is missing", "");
-    NextOfKinAddressCountryIsDeprecated = getPotentialIssue(session, "Next-of-kin", "address country", "is deprecated", "");
+    NextOfKinAddressCountryIsDeprecated = getPotentialIssue(session, "Next-of-kin", "address country", "is deprecated",
+        "");
     NextOfKinAddressCountryIsIgnored = getPotentialIssue(session, "Next-of-kin", "address country", "is ignored", "");
     NextOfKinAddressCountryIsInvalid = getPotentialIssue(session, "Next-of-kin", "address country", "is invalid", "");
     NextOfKinAddressCountryIsMissing = getPotentialIssue(session, "Next-of-kin", "address country", "is missing", "");
-    NextOfKinAddressCountryIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "address country", "is unrecognized", "");
-    NextOfKinAddressCountyIsDeprecated = getPotentialIssue(session, "Next-of-kin", "address county", "is deprecated", "");
+    NextOfKinAddressCountryIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "address country",
+        "is unrecognized", "");
+    NextOfKinAddressCountyIsDeprecated = getPotentialIssue(session, "Next-of-kin", "address county", "is deprecated",
+        "");
     NextOfKinAddressCountyIsIgnored = getPotentialIssue(session, "Next-of-kin", "address county", "is ignored", "");
     NextOfKinAddressCountyIsInvalid = getPotentialIssue(session, "Next-of-kin", "address county", "is invalid", "");
     NextOfKinAddressCountyIsMissing = getPotentialIssue(session, "Next-of-kin", "address county", "is missing", "");
-    NextOfKinAddressCountyIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "address county", "is unrecognized", "");
+    NextOfKinAddressCountyIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "address county",
+        "is unrecognized", "");
     NextOfKinAddressStateIsDeprecated = getPotentialIssue(session, "Next-of-kin", "address state", "is deprecated", "");
     NextOfKinAddressStateIsIgnored = getPotentialIssue(session, "Next-of-kin", "address state", "is ignored", "");
     NextOfKinAddressStateIsInvalid = getPotentialIssue(session, "Next-of-kin", "address state", "is invalid", "");
     NextOfKinAddressStateIsMissing = getPotentialIssue(session, "Next-of-kin", "address state", "is missing", "");
-    NextOfKinAddressStateIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "address state", "is unrecognized", "");
+    NextOfKinAddressStateIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "address state", "is unrecognized",
+        "");
     NextOfKinAddressStreetIsMissing = getPotentialIssue(session, "Next-of-kin", "address street", "is missing", "");
     NextOfKinAddressStreet2IsMissing = getPotentialIssue(session, "Next-of-kin", "address street2", "is missing", "");
     NextOfKinAddressTypeIsDeprecated = getPotentialIssue(session, "Next-of-kin", "address type", "is deprecated", "");
     NextOfKinAddressTypeIsIgnored = getPotentialIssue(session, "Next-of-kin", "address type", "is ignored", "");
     NextOfKinAddressTypeIsInvalid = getPotentialIssue(session, "Next-of-kin", "address type", "is invalid", "");
     NextOfKinAddressTypeIsMissing = getPotentialIssue(session, "Next-of-kin", "address type", "is missing", "");
-    NextOfKinAddressTypeIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "address type", "is unrecognized", "");
+    NextOfKinAddressTypeIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "address type", "is unrecognized",
+        "");
     NextOfKinAddressZipIsInvalid = getPotentialIssue(session, "Next-of-kin", "address zip", "is invalid", "");
     NextOfKinAddressZipIsMissing = getPotentialIssue(session, "Next-of-kin", "address zip", "is missing", "");
     NextOfKinNameIsMissing = getPotentialIssue(session, "Next-of-kin", "name", "is missing", "");
@@ -1139,8 +917,10 @@ public class PotentialIssues
     NextOfKinRelationshipIsIgnored = getPotentialIssue(session, "Next-of-kin", "relationship", "is ignored", "");
     NextOfKinRelationshipIsInvalid = getPotentialIssue(session, "Next-of-kin", "relationship", "is invalid", "");
     NextOfKinRelationshipIsMissing = getPotentialIssue(session, "Next-of-kin", "relationship", "is missing", "");
-    NextOfKinRelationshipIsNotResponsibleParty = getPotentialIssue(session, "Next-of-kin", "relationship", "is not responsible party", "");
-    NextOfKinRelationshipIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "relationship", "is unrecognized", "");
+    NextOfKinRelationshipIsNotResponsibleParty = getPotentialIssue(session, "Next-of-kin", "relationship",
+        "is not responsible party", "");
+    NextOfKinRelationshipIsUnrecognized = getPotentialIssue(session, "Next-of-kin", "relationship", "is unrecognized",
+        "");
     NextOfKinSsnIsMissing = getPotentialIssue(session, "Next-of-kin", "SSN", "is missing", "");
     PatientAddressIsMissing = getPotentialIssue(session, "Patient", "address", "is missing", "");
     PatientAddressCityIsInvalid = getPotentialIssue(session, "Patient", "address city", "is invalid", "");
@@ -1149,7 +929,8 @@ public class PotentialIssues
     PatientAddressCountryIsIgnored = getPotentialIssue(session, "Patient", "address country", "is ignored", "");
     PatientAddressCountryIsInvalid = getPotentialIssue(session, "Patient", "address country", "is invalid", "");
     PatientAddressCountryIsMissing = getPotentialIssue(session, "Patient", "address country", "is missing", "");
-    PatientAddressCountryIsUnrecognized = getPotentialIssue(session, "Patient", "address country", "is unrecognized", "");
+    PatientAddressCountryIsUnrecognized = getPotentialIssue(session, "Patient", "address country", "is unrecognized",
+        "");
     PatientAddressCountyIsDeprecated = getPotentialIssue(session, "Patient", "address county", "is deprecated", "");
     PatientAddressCountyIsIgnored = getPotentialIssue(session, "Patient", "address county", "is ignored", "");
     PatientAddressCountyIsInvalid = getPotentialIssue(session, "Patient", "address county", "is invalid", "");
@@ -1176,7 +957,8 @@ public class PotentialIssues
     PatientBirthIndicatorIsMissing = getPotentialIssue(session, "Patient", "birth indicator", "is missing", "");
     PatientBirthOrderIsInvalid = getPotentialIssue(session, "Patient", "birth order", "is invalid", "");
     PatientBirthOrderIsMissing = getPotentialIssue(session, "Patient", "birth order", "is missing", "");
-    PatientBirthOrderIsMissingAndMultipleBirthIndicated = getPotentialIssue(session, "Patient", "birth order", "is missing and multiple birth indicated", "");
+    PatientBirthOrderIsMissingAndMultipleBirthIndicated = getPotentialIssue(session, "Patient", "birth order",
+        "is missing and multiple birth indicated", "");
     PatientBirthPlaceIsMissing = getPotentialIssue(session, "Patient", "birth place", "is missing", "");
     PatientBirthRegistryIdIsInvalid = getPotentialIssue(session, "Patient", "birth registry id", "is invalid", "");
     PatientBirthRegistryIdIsMissing = getPotentialIssue(session, "Patient", "birth registry id", "is missing", "");
@@ -1189,7 +971,8 @@ public class PotentialIssues
     PatientDeathDateIsInFuture = getPotentialIssue(session, "Patient", "death date", "is in future", "");
     PatientDeathDateIsInvalid = getPotentialIssue(session, "Patient", "death date", "is invalid", "");
     PatientDeathDateIsMissing = getPotentialIssue(session, "Patient", "death date", "is missing", "");
-    PatientDeathIndicatorIsInconsistent = getPotentialIssue(session, "Patient", "death indicator", "is inconsistent", "");
+    PatientDeathIndicatorIsInconsistent = getPotentialIssue(session, "Patient", "death indicator", "is inconsistent",
+        "");
     PatientDeathIndicatorIsMissing = getPotentialIssue(session, "Patient", "death indicator", "is missing", "");
     PatientEthnicityIsDeprecated = getPotentialIssue(session, "Patient", "ethnicity", "is deprecated", "");
     PatientEthnicityIsIgnored = getPotentialIssue(session, "Patient", "ethnicity", "is ignored", "");
@@ -1202,32 +985,44 @@ public class PotentialIssues
     PatientGenderIsMissing = getPotentialIssue(session, "Patient", "gender", "is missing", "");
     PatientGenderIsUnrecognized = getPotentialIssue(session, "Patient", "gender", "is unrecognized", "");
     PatientGuardianAddressIsMissing = getPotentialIssue(session, "Patient", "guardian address", "is missing", "");
-    PatientGuardianAddressCityIsMissing = getPotentialIssue(session, "Patient", "guardian address city", "is missing", "");
-    PatientGuardianAddressStateIsMissing = getPotentialIssue(session, "Patient", "guardian address state", "is missing", "");
-    PatientGuardianAddressStreetIsMissing = getPotentialIssue(session, "Patient", "guardian address street", "is missing", "");
+    PatientGuardianAddressCityIsMissing = getPotentialIssue(session, "Patient", "guardian address city", "is missing",
+        "");
+    PatientGuardianAddressStateIsMissing = getPotentialIssue(session, "Patient", "guardian address state",
+        "is missing", "");
+    PatientGuardianAddressStreetIsMissing = getPotentialIssue(session, "Patient", "guardian address street",
+        "is missing", "");
     PatientGuardianAddressZipIsMissing = getPotentialIssue(session, "Patient", "guardian address zip", "is missing", "");
     PatientGuardianNameIsMissing = getPotentialIssue(session, "Patient", "guardian name", "is missing", "");
-    PatientGuardianNameIsSameAsUnderagePatient = getPotentialIssue(session, "Patient", "guardian name", "is same as underage patient", "");
+    PatientGuardianNameIsSameAsUnderagePatient = getPotentialIssue(session, "Patient", "guardian name",
+        "is same as underage patient", "");
     PatientGuardianNameFirstIsMissing = getPotentialIssue(session, "Patient", "guardian name first", "is missing", "");
     PatientGuardianNameLastIsMissing = getPotentialIssue(session, "Patient", "guardian name last", "is missing", "");
     PatientGuardianPartyIsMissing = getPotentialIssue(session, "Patient", "guardian party", "is missing", "");
     PatientGuardianPhoneIsMissing = getPotentialIssue(session, "Patient", "guardian phone", "is missing", "");
-    PatientGuardianRelationshipIsMissing = getPotentialIssue(session, "Patient", "guardian relationship", "is missing", "");
-    PatientImmunizationRegistryStatusIsDeprecated = getPotentialIssue(session, "Patient", "immunization registry status", "is deprecated", "");
-    PatientImmunizationRegistryStatusIsIgnored = getPotentialIssue(session, "Patient", "immunization registry status", "is ignored", "");
-    PatientImmunizationRegistryStatusIsInvalid = getPotentialIssue(session, "Patient", "immunization registry status", "is invalid", "");
-    PatientImmunizationRegistryStatusIsMissing = getPotentialIssue(session, "Patient", "immunization registry status", "is missing", "");
-    PatientImmunizationRegistryStatusIsUnrecognized = getPotentialIssue(session, "Patient", "immunization registry status", "is unrecognized", "");
+    PatientGuardianRelationshipIsMissing = getPotentialIssue(session, "Patient", "guardian relationship", "is missing",
+        "");
+    PatientImmunizationRegistryStatusIsDeprecated = getPotentialIssue(session, "Patient",
+        "immunization registry status", "is deprecated", "");
+    PatientImmunizationRegistryStatusIsIgnored = getPotentialIssue(session, "Patient", "immunization registry status",
+        "is ignored", "");
+    PatientImmunizationRegistryStatusIsInvalid = getPotentialIssue(session, "Patient", "immunization registry status",
+        "is invalid", "");
+    PatientImmunizationRegistryStatusIsMissing = getPotentialIssue(session, "Patient", "immunization registry status",
+        "is missing", "");
+    PatientImmunizationRegistryStatusIsUnrecognized = getPotentialIssue(session, "Patient",
+        "immunization registry status", "is unrecognized", "");
     PatientMedicaidNumberIsInvalid = getPotentialIssue(session, "Patient", "Medicaid number", "is invalid", "");
     PatientMedicaidNumberIsMissing = getPotentialIssue(session, "Patient", "Medicaid number", "is missing", "");
     PatientMiddleNameIsMissing = getPotentialIssue(session, "Patient", "middle name", "is missing", "");
     PatientMiddleNameMayBeInitial = getPotentialIssue(session, "Patient", "middle name", "may be initial", "");
     PatientMotherSMaidenNameIsMissing = getPotentialIssue(session, "Patient", "mother's maiden name", "is missing", "");
-    PatientNameMayBeTemporaryNewbornName = getPotentialIssue(session, "Patient", "name", "may be temporary newborn name", "");
+    PatientNameMayBeTemporaryNewbornName = getPotentialIssue(session, "Patient", "name",
+        "may be temporary newborn name", "");
     PatientNameMayBeTestName = getPotentialIssue(session, "Patient", "name", "may be test name", "");
     PatientNameFirstIsInvalid = getPotentialIssue(session, "Patient", "name first", "is invalid", "");
     PatientNameFirstIsMissing = getPotentialIssue(session, "Patient", "name first", "is missing", "");
-    PatientNameFirstMayIncludeMiddleInitial = getPotentialIssue(session, "Patient", "name first", "may include middle initial", "");
+    PatientNameFirstMayIncludeMiddleInitial = getPotentialIssue(session, "Patient", "name first",
+        "may include middle initial", "");
     PatientNameLastIsInvalid = getPotentialIssue(session, "Patient", "name last", "is invalid", "");
     PatientNameLastIsMissing = getPotentialIssue(session, "Patient", "name last", "is missing", "");
     PatientNameTypeCodeIsDeprecated = getPotentialIssue(session, "Patient", "name type code", "is deprecated", "");
@@ -1238,40 +1033,58 @@ public class PotentialIssues
     PatientPhoneIsIncomplete = getPotentialIssue(session, "Patient", "phone", "is incomplete", "");
     PatientPhoneIsInvalid = getPotentialIssue(session, "Patient", "phone", "is invalid", "");
     PatientPhoneIsMissing = getPotentialIssue(session, "Patient", "phone", "is missing", "");
-    PatientPhoneTelUseCodeIsDeprecated = getPotentialIssue(session, "Patient", "phone tel use code", "is deprecated", "");
+    PatientPhoneTelUseCodeIsDeprecated = getPotentialIssue(session, "Patient", "phone tel use code", "is deprecated",
+        "");
     PatientPhoneTelUseCodeIsIgnored = getPotentialIssue(session, "Patient", "phone tel use code", "is ignored", "");
     PatientPhoneTelUseCodeIsInvalid = getPotentialIssue(session, "Patient", "phone tel use code", "is invalid", "");
     PatientPhoneTelUseCodeIsMissing = getPotentialIssue(session, "Patient", "phone tel use code", "is missing", "");
-    PatientPhoneTelUseCodeIsUnrecognized = getPotentialIssue(session, "Patient", "phone tel use code", "is unrecognized", "");
-    PatientPhoneTelEquipCodeIsDeprecated = getPotentialIssue(session, "Patient", "phone tel equip code", "is deprecated", "");
+    PatientPhoneTelUseCodeIsUnrecognized = getPotentialIssue(session, "Patient", "phone tel use code",
+        "is unrecognized", "");
+    PatientPhoneTelEquipCodeIsDeprecated = getPotentialIssue(session, "Patient", "phone tel equip code",
+        "is deprecated", "");
     PatientPhoneTelEquipCodeIsIgnored = getPotentialIssue(session, "Patient", "phone tel equip code", "is ignored", "");
     PatientPhoneTelEquipCodeIsInvalid = getPotentialIssue(session, "Patient", "phone tel equip code", "is invalid", "");
     PatientPhoneTelEquipCodeIsMissing = getPotentialIssue(session, "Patient", "phone tel equip code", "is missing", "");
-    PatientPhoneTelEquipCodeIsUnrecognized = getPotentialIssue(session, "Patient", "phone tel equip code", "is unrecognized", "");
-    PatientPrimaryFacilityIdIsDeprecated = getPotentialIssue(session, "Patient", "primary facility id", "is deprecated", "");
+    PatientPhoneTelEquipCodeIsUnrecognized = getPotentialIssue(session, "Patient", "phone tel equip code",
+        "is unrecognized", "");
+    PatientPrimaryFacilityIdIsDeprecated = getPotentialIssue(session, "Patient", "primary facility id",
+        "is deprecated", "");
     PatientPrimaryFacilityIdIsIgnored = getPotentialIssue(session, "Patient", "primary facility id", "is ignored", "");
     PatientPrimaryFacilityIdIsInvalid = getPotentialIssue(session, "Patient", "primary facility id", "is invalid", "");
     PatientPrimaryFacilityIdIsMissing = getPotentialIssue(session, "Patient", "primary facility id", "is missing", "");
-    PatientPrimaryFacilityIdIsUnrecognized = getPotentialIssue(session, "Patient", "primary facility id", "is unrecognized", "");
-    PatientPrimaryFacilityNameIsMissing = getPotentialIssue(session, "Patient", "primary facility name", "is missing", "");
+    PatientPrimaryFacilityIdIsUnrecognized = getPotentialIssue(session, "Patient", "primary facility id",
+        "is unrecognized", "");
+    PatientPrimaryFacilityNameIsMissing = getPotentialIssue(session, "Patient", "primary facility name", "is missing",
+        "");
     PatientPrimaryLanguageIsDeprecated = getPotentialIssue(session, "Patient", "primary language", "is deprecated", "");
     PatientPrimaryLanguageIsIgnored = getPotentialIssue(session, "Patient", "primary language", "is ignored", "");
     PatientPrimaryLanguageIsInvalid = getPotentialIssue(session, "Patient", "primary language", "is invalid", "");
     PatientPrimaryLanguageIsMissing = getPotentialIssue(session, "Patient", "primary language", "is missing", "");
-    PatientPrimaryLanguageIsUnrecognized = getPotentialIssue(session, "Patient", "primary language", "is unrecognized", "");
-    PatientPrimaryPhysicianIdIsDeprecated = getPotentialIssue(session, "Patient", "primary physician id", "is deprecated", "");
+    PatientPrimaryLanguageIsUnrecognized = getPotentialIssue(session, "Patient", "primary language", "is unrecognized",
+        "");
+    PatientPrimaryPhysicianIdIsDeprecated = getPotentialIssue(session, "Patient", "primary physician id",
+        "is deprecated", "");
     PatientPrimaryPhysicianIdIsIgnored = getPotentialIssue(session, "Patient", "primary physician id", "is ignored", "");
     PatientPrimaryPhysicianIdIsInvalid = getPotentialIssue(session, "Patient", "primary physician id", "is invalid", "");
     PatientPrimaryPhysicianIdIsMissing = getPotentialIssue(session, "Patient", "primary physician id", "is missing", "");
-    PatientPrimaryPhysicianIdIsUnrecognized = getPotentialIssue(session, "Patient", "primary physician id", "is unrecognized", "");
-    PatientPrimaryPhysicianNameIsMissing = getPotentialIssue(session, "Patient", "primary physician name", "is missing", "");
-    PatientProtectionIndicatorIsDeprecated = getPotentialIssue(session, "Patient", "protection indicator", "is deprecated", "");
-    PatientProtectionIndicatorIsIgnored = getPotentialIssue(session, "Patient", "protection indicator", "is ignored", "");
-    PatientProtectionIndicatorIsInvalid = getPotentialIssue(session, "Patient", "protection indicator", "is invalid", "");
-    PatientProtectionIndicatorIsMissing = getPotentialIssue(session, "Patient", "protection indicator", "is missing", "");
-    PatientProtectionIndicatorIsUnrecognized = getPotentialIssue(session, "Patient", "protection indicator", "is unrecognized", "");
-    PatientProtectionIndicatorIsValuedAsNo = getPotentialIssue(session, "Patient", "protection indicator", "is valued as", "no");
-    PatientProtectionIndicatorIsValuedAsYes = getPotentialIssue(session, "Patient", "protection indicator", "is valued as", "yes");
+    PatientPrimaryPhysicianIdIsUnrecognized = getPotentialIssue(session, "Patient", "primary physician id",
+        "is unrecognized", "");
+    PatientPrimaryPhysicianNameIsMissing = getPotentialIssue(session, "Patient", "primary physician name",
+        "is missing", "");
+    PatientProtectionIndicatorIsDeprecated = getPotentialIssue(session, "Patient", "protection indicator",
+        "is deprecated", "");
+    PatientProtectionIndicatorIsIgnored = getPotentialIssue(session, "Patient", "protection indicator", "is ignored",
+        "");
+    PatientProtectionIndicatorIsInvalid = getPotentialIssue(session, "Patient", "protection indicator", "is invalid",
+        "");
+    PatientProtectionIndicatorIsMissing = getPotentialIssue(session, "Patient", "protection indicator", "is missing",
+        "");
+    PatientProtectionIndicatorIsUnrecognized = getPotentialIssue(session, "Patient", "protection indicator",
+        "is unrecognized", "");
+    PatientProtectionIndicatorIsValuedAsNo = getPotentialIssue(session, "Patient", "protection indicator",
+        "is valued as", "no");
+    PatientProtectionIndicatorIsValuedAsYes = getPotentialIssue(session, "Patient", "protection indicator",
+        "is valued as", "yes");
     PatientPublicityCodeIsDeprecated = getPotentialIssue(session, "Patient", "publicity code", "is deprecated", "");
     PatientPublicityCodeIsIgnored = getPotentialIssue(session, "Patient", "publicity code", "is ignored", "");
     PatientPublicityCodeIsInvalid = getPotentialIssue(session, "Patient", "publicity code", "is invalid", "");
@@ -1288,13 +1101,17 @@ public class PotentialIssues
     PatientRegistryStatusIsIgnored = getPotentialIssue(session, "Patient", "registry status", "is ignored", "");
     PatientRegistryStatusIsInvalid = getPotentialIssue(session, "Patient", "registry status", "is invalid", "");
     PatientRegistryStatusIsMissing = getPotentialIssue(session, "Patient", "registry status", "is missing", "");
-    PatientRegistryStatusIsUnrecognized = getPotentialIssue(session, "Patient", "registry status", "is unrecognized", "");
+    PatientRegistryStatusIsUnrecognized = getPotentialIssue(session, "Patient", "registry status", "is unrecognized",
+        "");
     PatientSsnIsInvalid = getPotentialIssue(session, "Patient", "SSN", "is invalid", "");
     PatientSsnIsMissing = getPotentialIssue(session, "Patient", "SSN", "is missing", "");
     PatientSubmitterIdIsMissing = getPotentialIssue(session, "Patient", "submitter id", "is missing", "");
-    PatientSubmitterIdAuthorityIsMissing = getPotentialIssue(session, "Patient", "submitter id authority", "is missing", "");
-    PatientSubmitterIdTypeCodeIsMissing = getPotentialIssue(session, "Patient", "submitter id type code", "is missing", "");
-    PatientVfcEffectiveDateIsBeforeBirth = getPotentialIssue(session, "Patient", "VFC effective date", "is before birth", "");
+    PatientSubmitterIdAuthorityIsMissing = getPotentialIssue(session, "Patient", "submitter id authority",
+        "is missing", "");
+    PatientSubmitterIdTypeCodeIsMissing = getPotentialIssue(session, "Patient", "submitter id type code", "is missing",
+        "");
+    PatientVfcEffectiveDateIsBeforeBirth = getPotentialIssue(session, "Patient", "VFC effective date",
+        "is before birth", "");
     PatientVfcEffectiveDateIsInFuture = getPotentialIssue(session, "Patient", "VFC effective date", "is in future", "");
     PatientVfcEffectiveDateIsInvalid = getPotentialIssue(session, "Patient", "VFC effective date", "is invalid", "");
     PatientVfcEffectiveDateIsMissing = getPotentialIssue(session, "Patient", "VFC effective date", "is missing", "");
@@ -1309,11 +1126,15 @@ public class PotentialIssues
     VaccinationActionCodeIsIgnored = getPotentialIssue(session, "Vaccination", "action code", "is ignored", "");
     VaccinationActionCodeIsInvalid = getPotentialIssue(session, "Vaccination", "action code", "is invalid", "");
     VaccinationActionCodeIsMissing = getPotentialIssue(session, "Vaccination", "action code", "is missing", "");
-    VaccinationActionCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "action code", "is unrecognized", "");
+    VaccinationActionCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "action code", "is unrecognized",
+        "");
     VaccinationActionCodeIsValuedAsAdd = getPotentialIssue(session, "Vaccination", "action code", "is valued as", "add");
-    VaccinationActionCodeIsValuedAsAddOrUpdate = getPotentialIssue(session, "Vaccination", "action code", "is valued as", "add or update");
-    VaccinationActionCodeIsValuedAsDelete = getPotentialIssue(session, "Vaccination", "action code", "is valued as", "delete");
-    VaccinationActionCodeIsValuedAsUpdate = getPotentialIssue(session, "Vaccination", "action code", "is valued as", "update");
+    VaccinationActionCodeIsValuedAsAddOrUpdate = getPotentialIssue(session, "Vaccination", "action code",
+        "is valued as", "add or update");
+    VaccinationActionCodeIsValuedAsDelete = getPotentialIssue(session, "Vaccination", "action code", "is valued as",
+        "delete");
+    VaccinationActionCodeIsValuedAsUpdate = getPotentialIssue(session, "Vaccination", "action code", "is valued as",
+        "update");
     VaccinationAdminCodeIsDeprecated = getPotentialIssue(session, "Vaccination", "admin code", "is deprecated", "");
     VaccinationAdminCodeIsIgnored = getPotentialIssue(session, "Vaccination", "admin code", "is ignored", "");
     VaccinationAdminCodeIsInvalid = getPotentialIssue(session, "Vaccination", "admin code", "is invalid", "");
@@ -1321,62 +1142,103 @@ public class PotentialIssues
     VaccinationAdminCodeIsNotSpecific = getPotentialIssue(session, "Vaccination", "admin code", "is not specific", "");
     VaccinationAdminCodeIsNotVaccine = getPotentialIssue(session, "Vaccination", "admin code", "is not vaccine", "");
     VaccinationAdminCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "admin code", "is unrecognized", "");
-    VaccinationAdminCodeIsValuedAsNotAdministered = getPotentialIssue(session, "Vaccination", "admin code", "is valued as", "not administered");
-    VaccinationAdminCodeIsValuedAsUnknown = getPotentialIssue(session, "Vaccination", "admin code", "is valued as", "unknown");
-    VaccinationAdminCodeMayBeVariationOfPreviouslyReportedCodes = getPotentialIssue(session, "Vaccination", "admin code", "may be variation of previously reported codes", "");
-    VaccinationAdminDateIsAfterLotExpirationDate = getPotentialIssue(session, "Vaccination", "admin date", "is after lot expiration date", "");
-    VaccinationAdminDateIsAfterMessageSubmitted = getPotentialIssue(session, "Vaccination", "admin date", "is after message submitted", "");
-    VaccinationAdminDateIsAfterPatientDeathDate = getPotentialIssue(session, "Vaccination", "admin date", "is after patient death date", "");
-    VaccinationAdminDateIsAfterSystemEntryDate = getPotentialIssue(session, "Vaccination", "admin date", "is after system entry date", "");
+    VaccinationAdminCodeIsValuedAsNotAdministered = getPotentialIssue(session, "Vaccination", "admin code",
+        "is valued as", "not administered");
+    VaccinationAdminCodeIsValuedAsUnknown = getPotentialIssue(session, "Vaccination", "admin code", "is valued as",
+        "unknown");
+    VaccinationAdminCodeMayBeVariationOfPreviouslyReportedCodes = getPotentialIssue(session, "Vaccination",
+        "admin code", "may be variation of previously reported codes", "");
+    VaccinationAdminDateIsAfterLotExpirationDate = getPotentialIssue(session, "Vaccination", "admin date",
+        "is after lot expiration date", "");
+    VaccinationAdminDateIsAfterMessageSubmitted = getPotentialIssue(session, "Vaccination", "admin date",
+        "is after message submitted", "");
+    VaccinationAdminDateIsAfterPatientDeathDate = getPotentialIssue(session, "Vaccination", "admin date",
+        "is after patient death date", "");
+    VaccinationAdminDateIsAfterSystemEntryDate = getPotentialIssue(session, "Vaccination", "admin date",
+        "is after system entry date", "");
     VaccinationAdminDateIsBeforeBirth = getPotentialIssue(session, "Vaccination", "admin date", "is before birth", "");
-    VaccinationAdminDateIsBeforeOrAfterExpectedVaccineUsageRange = getPotentialIssue(session, "Vaccination", "admin date", "is before or after expected vaccine usage range", "");
-    VaccinationAdminDateIsBeforeOrAfterLicensedVaccineRange = getPotentialIssue(session, "Vaccination", "admin date", "is before or after licensed vaccine range", "");
-    VaccinationAdminDateIsBeforeOrAfterWhenExpectedForPatientAge = getPotentialIssue(session, "Vaccination", "admin date", "is before or after when expected for patient age", "");
-    VaccinationAdminDateIsBeforeOrAfterWhenValidForPatientAge = getPotentialIssue(session, "Vaccination", "admin date", "is before or after when valid for patient age", "");
+    VaccinationAdminDateIsBeforeOrAfterExpectedVaccineUsageRange = getPotentialIssue(session, "Vaccination",
+        "admin date", "is before or after expected vaccine usage range", "");
+    VaccinationAdminDateIsBeforeOrAfterLicensedVaccineRange = getPotentialIssue(session, "Vaccination", "admin date",
+        "is before or after licensed vaccine range", "");
+    VaccinationAdminDateIsBeforeOrAfterWhenExpectedForPatientAge = getPotentialIssue(session, "Vaccination",
+        "admin date", "is before or after when expected for patient age", "");
+    VaccinationAdminDateIsBeforeOrAfterWhenValidForPatientAge = getPotentialIssue(session, "Vaccination", "admin date",
+        "is before or after when valid for patient age", "");
     VaccinationAdminDateIsInvalid = getPotentialIssue(session, "Vaccination", "admin date", "is invalid", "");
     VaccinationAdminDateIsMissing = getPotentialIssue(session, "Vaccination", "admin date", "is missing", "");
-    VaccinationAdminDateIsOn15ThDayOfMonth = getPotentialIssue(session, "Vaccination", "admin date", "is on 15th day of month", "");
-    VaccinationAdminDateIsOnFirstDayOfMonth = getPotentialIssue(session, "Vaccination", "admin date", "is on first day of month", "");
-    VaccinationAdminDateIsOnLastDayOfMonth = getPotentialIssue(session, "Vaccination", "admin date", "is on last day of month", "");
+    VaccinationAdminDateIsOn15ThDayOfMonth = getPotentialIssue(session, "Vaccination", "admin date",
+        "is on 15th day of month", "");
+    VaccinationAdminDateIsOnFirstDayOfMonth = getPotentialIssue(session, "Vaccination", "admin date",
+        "is on first day of month", "");
+    VaccinationAdminDateIsOnLastDayOfMonth = getPotentialIssue(session, "Vaccination", "admin date",
+        "is on last day of month", "");
     VaccinationAdminDateIsReportedLate = getPotentialIssue(session, "Vaccination", "admin date", "is reported late", "");
-    VaccinationAdminDateEndIsDifferentFromStartDate = getPotentialIssue(session, "Vaccination", "admin date end", "is different from start date", "");
+    VaccinationAdminDateEndIsDifferentFromStartDate = getPotentialIssue(session, "Vaccination", "admin date end",
+        "is different from start date", "");
     VaccinationAdminDateEndIsMissing = getPotentialIssue(session, "Vaccination", "admin date end", "is missing", "");
-    VaccinationAdministeredAmountIsInvalid = getPotentialIssue(session, "Vaccination", "administered amount", "is invalid", "");
-    VaccinationAdministeredAmountIsMissing = getPotentialIssue(session, "Vaccination", "administered amount", "is missing", "");
-    VaccinationAdministeredAmountIsValuedAsZero = getPotentialIssue(session, "Vaccination", "administered amount", "is valued as", "zero");
-    VaccinationAdministeredAmountIsValuedAsUnknown = getPotentialIssue(session, "Vaccination", "administered amount", "is valued as", "unknown");
-    VaccinationAdministeredUnitIsDeprecated = getPotentialIssue(session, "Vaccination", "administered unit", "is deprecated", "");
-    VaccinationAdministeredUnitIsIgnored = getPotentialIssue(session, "Vaccination", "administered unit", "is ignored", "");
-    VaccinationAdministeredUnitIsInvalid = getPotentialIssue(session, "Vaccination", "administered unit", "is invalid", "");
-    VaccinationAdministeredUnitIsMissing = getPotentialIssue(session, "Vaccination", "administered unit", "is missing", "");
-    VaccinationAdministeredUnitIsUnrecognized = getPotentialIssue(session, "Vaccination", "administered unit", "is unrecognized", "");
+    VaccinationAdministeredAmountIsInvalid = getPotentialIssue(session, "Vaccination", "administered amount",
+        "is invalid", "");
+    VaccinationAdministeredAmountIsMissing = getPotentialIssue(session, "Vaccination", "administered amount",
+        "is missing", "");
+    VaccinationAdministeredAmountIsValuedAsZero = getPotentialIssue(session, "Vaccination", "administered amount",
+        "is valued as", "zero");
+    VaccinationAdministeredAmountIsValuedAsUnknown = getPotentialIssue(session, "Vaccination", "administered amount",
+        "is valued as", "unknown");
+    VaccinationAdministeredUnitIsDeprecated = getPotentialIssue(session, "Vaccination", "administered unit",
+        "is deprecated", "");
+    VaccinationAdministeredUnitIsIgnored = getPotentialIssue(session, "Vaccination", "administered unit", "is ignored",
+        "");
+    VaccinationAdministeredUnitIsInvalid = getPotentialIssue(session, "Vaccination", "administered unit", "is invalid",
+        "");
+    VaccinationAdministeredUnitIsMissing = getPotentialIssue(session, "Vaccination", "administered unit", "is missing",
+        "");
+    VaccinationAdministeredUnitIsUnrecognized = getPotentialIssue(session, "Vaccination", "administered unit",
+        "is unrecognized", "");
     VaccinationBodyRouteIsDeprecated = getPotentialIssue(session, "Vaccination", "body route", "is deprecated", "");
     VaccinationBodyRouteIsIgnored = getPotentialIssue(session, "Vaccination", "body route", "is ignored", "");
     VaccinationBodyRouteIsInvalid = getPotentialIssue(session, "Vaccination", "body route", "is invalid", "");
-    VaccinationBodyRouteIsInvalidForVaccineIndicated = getPotentialIssue(session, "Vaccination", "body route", "is invalid for vaccine indicated", "");
+    VaccinationBodyRouteIsInvalidForVaccineIndicated = getPotentialIssue(session, "Vaccination", "body route",
+        "is invalid for vaccine indicated", "");
     VaccinationBodyRouteIsMissing = getPotentialIssue(session, "Vaccination", "body route", "is missing", "");
     VaccinationBodyRouteIsUnrecognized = getPotentialIssue(session, "Vaccination", "body route", "is unrecognized", "");
     VaccinationBodySiteIsDeprecated = getPotentialIssue(session, "Vaccination", "body site", "is deprecated", "");
     VaccinationBodySiteIsIgnored = getPotentialIssue(session, "Vaccination", "body site", "is ignored", "");
     VaccinationBodySiteIsInvalid = getPotentialIssue(session, "Vaccination", "body site", "is invalid", "");
-    VaccinationBodySiteIsInvalidForVaccineIndicated = getPotentialIssue(session, "Vaccination", "body site", "is invalid for vaccine indicated", "");
+    VaccinationBodySiteIsInvalidForVaccineIndicated = getPotentialIssue(session, "Vaccination", "body site",
+        "is invalid for vaccine indicated", "");
     VaccinationBodySiteIsMissing = getPotentialIssue(session, "Vaccination", "body site", "is missing", "");
     VaccinationBodySiteIsUnrecognized = getPotentialIssue(session, "Vaccination", "body site", "is unrecognized", "");
-    VaccinationCompletionStatusIsDeprecated = getPotentialIssue(session, "Vaccination", "completion status", "is deprecated", "");
-    VaccinationCompletionStatusIsIgnored = getPotentialIssue(session, "Vaccination", "completion status", "is ignored", "");
-    VaccinationCompletionStatusIsInvalid = getPotentialIssue(session, "Vaccination", "completion status", "is invalid", "");
-    VaccinationCompletionStatusIsMissing = getPotentialIssue(session, "Vaccination", "completion status", "is missing", "");
-    VaccinationCompletionStatusIsUnrecognized = getPotentialIssue(session, "Vaccination", "completion status", "is unrecognized", "");
-    VaccinationCompletionStatusIsValuedAsCompleted = getPotentialIssue(session, "Vaccination", "completion status", "is valued as", "completed");
-    VaccinationCompletionStatusIsValuedAsNotAdministered = getPotentialIssue(session, "Vaccination", "completion status", "is valued as", "not administered");
-    VaccinationCompletionStatusIsValuedAsPartiallyAdministered = getPotentialIssue(session, "Vaccination", "completion status", "is valued as", "partially administered");
-    VaccinationCompletionStatusIsValuedAsRefused = getPotentialIssue(session, "Vaccination", "completion status", "is valued as", "refused");
-    VaccinationConfidentialityCodeIsDeprecated = getPotentialIssue(session, "Vaccination", "confidentiality code", "is deprecated", "");
-    VaccinationConfidentialityCodeIsIgnored = getPotentialIssue(session, "Vaccination", "confidentiality code", "is ignored", "");
-    VaccinationConfidentialityCodeIsInvalid = getPotentialIssue(session, "Vaccination", "confidentiality code", "is invalid", "");
-    VaccinationConfidentialityCodeIsMissing = getPotentialIssue(session, "Vaccination", "confidentiality code", "is missing", "");
-    VaccinationConfidentialityCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "confidentiality code", "is unrecognized", "");
-    VaccinationConfidentialityCodeIsValuedAsRestricted = getPotentialIssue(session, "Vaccination", "confidentiality code", "is valued as", "restricted");
+    VaccinationCompletionStatusIsDeprecated = getPotentialIssue(session, "Vaccination", "completion status",
+        "is deprecated", "");
+    VaccinationCompletionStatusIsIgnored = getPotentialIssue(session, "Vaccination", "completion status", "is ignored",
+        "");
+    VaccinationCompletionStatusIsInvalid = getPotentialIssue(session, "Vaccination", "completion status", "is invalid",
+        "");
+    VaccinationCompletionStatusIsMissing = getPotentialIssue(session, "Vaccination", "completion status", "is missing",
+        "");
+    VaccinationCompletionStatusIsUnrecognized = getPotentialIssue(session, "Vaccination", "completion status",
+        "is unrecognized", "");
+    VaccinationCompletionStatusIsValuedAsCompleted = getPotentialIssue(session, "Vaccination", "completion status",
+        "is valued as", "completed");
+    VaccinationCompletionStatusIsValuedAsNotAdministered = getPotentialIssue(session, "Vaccination",
+        "completion status", "is valued as", "not administered");
+    VaccinationCompletionStatusIsValuedAsPartiallyAdministered = getPotentialIssue(session, "Vaccination",
+        "completion status", "is valued as", "partially administered");
+    VaccinationCompletionStatusIsValuedAsRefused = getPotentialIssue(session, "Vaccination", "completion status",
+        "is valued as", "refused");
+    VaccinationConfidentialityCodeIsDeprecated = getPotentialIssue(session, "Vaccination", "confidentiality code",
+        "is deprecated", "");
+    VaccinationConfidentialityCodeIsIgnored = getPotentialIssue(session, "Vaccination", "confidentiality code",
+        "is ignored", "");
+    VaccinationConfidentialityCodeIsInvalid = getPotentialIssue(session, "Vaccination", "confidentiality code",
+        "is invalid", "");
+    VaccinationConfidentialityCodeIsMissing = getPotentialIssue(session, "Vaccination", "confidentiality code",
+        "is missing", "");
+    VaccinationConfidentialityCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "confidentiality code",
+        "is unrecognized", "");
+    VaccinationConfidentialityCodeIsValuedAsRestricted = getPotentialIssue(session, "Vaccination",
+        "confidentiality code", "is valued as", "restricted");
     VaccinationCptCodeIsDeprecated = getPotentialIssue(session, "Vaccination", "CPT code", "is deprecated", "");
     VaccinationCptCodeIsIgnored = getPotentialIssue(session, "Vaccination", "CPT code", "is ignored", "");
     VaccinationCptCodeIsInvalid = getPotentialIssue(session, "Vaccination", "CPT code", "is invalid", "");
@@ -1387,18 +1249,25 @@ public class PotentialIssues
     VaccinationCvxCodeIsInvalid = getPotentialIssue(session, "Vaccination", "CVX code", "is invalid", "");
     VaccinationCvxCodeIsMissing = getPotentialIssue(session, "Vaccination", "CVX code", "is missing", "");
     VaccinationCvxCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "CVX code", "is unrecognized", "");
-    VaccinationCvxCodeAndCptCodeAreInconsistent = getPotentialIssue(session, "Vaccination", "CVX code and CPT code", "are inconsistent", "");
+    VaccinationCvxCodeAndCptCodeAreInconsistent = getPotentialIssue(session, "Vaccination", "CVX code and CPT code",
+        "are inconsistent", "");
     VaccinationFacilityIdIsDeprecated = getPotentialIssue(session, "Vaccination", "facility id", "is deprecated", "");
     VaccinationFacilityIdIsIgnored = getPotentialIssue(session, "Vaccination", "facility id", "is ignored", "");
     VaccinationFacilityIdIsInvalid = getPotentialIssue(session, "Vaccination", "facility id", "is invalid", "");
     VaccinationFacilityIdIsMissing = getPotentialIssue(session, "Vaccination", "facility id", "is missing", "");
-    VaccinationFacilityIdIsUnrecognized = getPotentialIssue(session, "Vaccination", "facility id", "is unrecognized", "");
+    VaccinationFacilityIdIsUnrecognized = getPotentialIssue(session, "Vaccination", "facility id", "is unrecognized",
+        "");
     VaccinationFacilityNameIsMissing = getPotentialIssue(session, "Vaccination", "facility name", "is missing", "");
-    VaccinationFillerOrderNumberIsDeprecated = getPotentialIssue(session, "Vaccination", "filler order number", "is deprecated", "");
-    VaccinationFillerOrderNumberIsIgnored = getPotentialIssue(session, "Vaccination", "filler order number", "is ignored", "");
-    VaccinationFillerOrderNumberIsInvalid = getPotentialIssue(session, "Vaccination", "filler order number", "is invalid", "");
-    VaccinationFillerOrderNumberIsMissing = getPotentialIssue(session, "Vaccination", "filler order number", "is missing", "");
-    VaccinationFillerOrderNumberIsUnrecognized = getPotentialIssue(session, "Vaccination", "filler order number", "is unrecognized", "");
+    VaccinationFillerOrderNumberIsDeprecated = getPotentialIssue(session, "Vaccination", "filler order number",
+        "is deprecated", "");
+    VaccinationFillerOrderNumberIsIgnored = getPotentialIssue(session, "Vaccination", "filler order number",
+        "is ignored", "");
+    VaccinationFillerOrderNumberIsInvalid = getPotentialIssue(session, "Vaccination", "filler order number",
+        "is invalid", "");
+    VaccinationFillerOrderNumberIsMissing = getPotentialIssue(session, "Vaccination", "filler order number",
+        "is missing", "");
+    VaccinationFillerOrderNumberIsUnrecognized = getPotentialIssue(session, "Vaccination", "filler order number",
+        "is unrecognized", "");
     VaccinationGivenByIsDeprecated = getPotentialIssue(session, "Vaccination", "given by", "is deprecated", "");
     VaccinationGivenByIsIgnored = getPotentialIssue(session, "Vaccination", "given by", "is ignored", "");
     VaccinationGivenByIsInvalid = getPotentialIssue(session, "Vaccination", "given by", "is invalid", "");
@@ -1406,48 +1275,82 @@ public class PotentialIssues
     VaccinationGivenByIsUnrecognized = getPotentialIssue(session, "Vaccination", "given by", "is unrecognized", "");
     VaccinationIdIsMissing = getPotentialIssue(session, "Vaccination", "id", "is missing", "");
     VaccinationIdOfReceiverIsMissing = getPotentialIssue(session, "Vaccination", "id of receiver", "is missing", "");
-    VaccinationIdOfReceiverIsUnrecognized = getPotentialIssue(session, "Vaccination", "id of receiver", "is unrecognized", "");
+    VaccinationIdOfReceiverIsUnrecognized = getPotentialIssue(session, "Vaccination", "id of receiver",
+        "is unrecognized", "");
     VaccinationIdOfSenderIsMissing = getPotentialIssue(session, "Vaccination", "id of sender", "is missing", "");
-    VaccinationIdOfSenderIsUnrecognized = getPotentialIssue(session, "Vaccination", "id of sender", "is unrecognized", "");
-    VaccinationInformationSourceIsAdministeredButAppearsToHistorical = getPotentialIssue(session, "Vaccination", "information source", "is administered but appears to historical", "");
-    VaccinationInformationSourceIsDeprecated = getPotentialIssue(session, "Vaccination", "information source", "is deprecated", "");
-    VaccinationInformationSourceIsHistoricalButAppearsToBeAdministered = getPotentialIssue(session, "Vaccination", "information source", "is historical but appears to be administered", "");
-    VaccinationInformationSourceIsIgnored = getPotentialIssue(session, "Vaccination", "information source", "is ignored", "");
-    VaccinationInformationSourceIsInvalid = getPotentialIssue(session, "Vaccination", "information source", "is invalid", "");
-    VaccinationInformationSourceIsMissing = getPotentialIssue(session, "Vaccination", "information source", "is missing", "");
-    VaccinationInformationSourceIsUnrecognized = getPotentialIssue(session, "Vaccination", "information source", "is unrecognized", "");
-    VaccinationInformationSourceIsValuedAsAdministered = getPotentialIssue(session, "Vaccination", "information source", "is valued as", "administered");
-    VaccinationInformationSourceIsValuedAsHistorical = getPotentialIssue(session, "Vaccination", "information source", "is valued as", "historical");
-    VaccinationLotExpirationDateIsInvalid = getPotentialIssue(session, "Vaccination", "lot expiration date", "is invalid", "");
-    VaccinationLotExpirationDateIsMissing = getPotentialIssue(session, "Vaccination", "lot expiration date", "is missing", "");
+    VaccinationIdOfSenderIsUnrecognized = getPotentialIssue(session, "Vaccination", "id of sender", "is unrecognized",
+        "");
+    VaccinationInformationSourceIsAdministeredButAppearsToHistorical = getPotentialIssue(session, "Vaccination",
+        "information source", "is administered but appears to historical", "");
+    VaccinationInformationSourceIsDeprecated = getPotentialIssue(session, "Vaccination", "information source",
+        "is deprecated", "");
+    VaccinationInformationSourceIsHistoricalButAppearsToBeAdministered = getPotentialIssue(session, "Vaccination",
+        "information source", "is historical but appears to be administered", "");
+    VaccinationInformationSourceIsIgnored = getPotentialIssue(session, "Vaccination", "information source",
+        "is ignored", "");
+    VaccinationInformationSourceIsInvalid = getPotentialIssue(session, "Vaccination", "information source",
+        "is invalid", "");
+    VaccinationInformationSourceIsMissing = getPotentialIssue(session, "Vaccination", "information source",
+        "is missing", "");
+    VaccinationInformationSourceIsUnrecognized = getPotentialIssue(session, "Vaccination", "information source",
+        "is unrecognized", "");
+    VaccinationInformationSourceIsValuedAsAdministered = getPotentialIssue(session, "Vaccination",
+        "information source", "is valued as", "administered");
+    VaccinationInformationSourceIsValuedAsHistorical = getPotentialIssue(session, "Vaccination", "information source",
+        "is valued as", "historical");
+    VaccinationLotExpirationDateIsInvalid = getPotentialIssue(session, "Vaccination", "lot expiration date",
+        "is invalid", "");
+    VaccinationLotExpirationDateIsMissing = getPotentialIssue(session, "Vaccination", "lot expiration date",
+        "is missing", "");
     VaccinationLotNumberIsInvalid = getPotentialIssue(session, "Vaccination", "lot number", "is invalid", "");
     VaccinationLotNumberIsMissing = getPotentialIssue(session, "Vaccination", "lot number", "is missing", "");
-    VaccinationManufacturerCodeIsDeprecated = getPotentialIssue(session, "Vaccination", "manufacturer code", "is deprecated", "");
-    VaccinationManufacturerCodeIsIgnored = getPotentialIssue(session, "Vaccination", "manufacturer code", "is ignored", "");
-    VaccinationManufacturerCodeIsInvalid = getPotentialIssue(session, "Vaccination", "manufacturer code", "is invalid", "");
-    VaccinationManufacturerCodeIsMissing = getPotentialIssue(session, "Vaccination", "manufacturer code", "is missing", "");
-    VaccinationManufacturerCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "manufacturer code", "is unrecognized", "");
-    VaccinationOrderControlCodeIsDeprecated = getPotentialIssue(session, "Vaccination", "order control code", "is deprecated", "");
-    VaccinationOrderControlCodeIsIgnored = getPotentialIssue(session, "Vaccination", "order control code", "is ignored", "");
-    VaccinationOrderControlCodeIsInvalid = getPotentialIssue(session, "Vaccination", "order control code", "is invalid", "");
-    VaccinationOrderControlCodeIsMissing = getPotentialIssue(session, "Vaccination", "order control code", "is missing", "");
-    VaccinationOrderControlCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "order control code", "is unrecognized", "");
-    VaccinationOrderFacilityIdIsDeprecated = getPotentialIssue(session, "Vaccination", "order facility id", "is deprecated", "");
-    VaccinationOrderFacilityIdIsIgnored = getPotentialIssue(session, "Vaccination", "order facility id", "is ignored", "");
-    VaccinationOrderFacilityIdIsInvalid = getPotentialIssue(session, "Vaccination", "order facility id", "is invalid", "");
-    VaccinationOrderFacilityIdIsMissing = getPotentialIssue(session, "Vaccination", "order facility id", "is missing", "");
-    VaccinationOrderFacilityIdIsUnrecognized = getPotentialIssue(session, "Vaccination", "order facility id", "is unrecognized", "");
-    VaccinationOrderFacilityNameIsMissing = getPotentialIssue(session, "Vaccination", "order facility name", "is missing", "");
+    VaccinationManufacturerCodeIsDeprecated = getPotentialIssue(session, "Vaccination", "manufacturer code",
+        "is deprecated", "");
+    VaccinationManufacturerCodeIsIgnored = getPotentialIssue(session, "Vaccination", "manufacturer code", "is ignored",
+        "");
+    VaccinationManufacturerCodeIsInvalid = getPotentialIssue(session, "Vaccination", "manufacturer code", "is invalid",
+        "");
+    VaccinationManufacturerCodeIsMissing = getPotentialIssue(session, "Vaccination", "manufacturer code", "is missing",
+        "");
+    VaccinationManufacturerCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "manufacturer code",
+        "is unrecognized", "");
+    VaccinationOrderControlCodeIsDeprecated = getPotentialIssue(session, "Vaccination", "order control code",
+        "is deprecated", "");
+    VaccinationOrderControlCodeIsIgnored = getPotentialIssue(session, "Vaccination", "order control code",
+        "is ignored", "");
+    VaccinationOrderControlCodeIsInvalid = getPotentialIssue(session, "Vaccination", "order control code",
+        "is invalid", "");
+    VaccinationOrderControlCodeIsMissing = getPotentialIssue(session, "Vaccination", "order control code",
+        "is missing", "");
+    VaccinationOrderControlCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "order control code",
+        "is unrecognized", "");
+    VaccinationOrderFacilityIdIsDeprecated = getPotentialIssue(session, "Vaccination", "order facility id",
+        "is deprecated", "");
+    VaccinationOrderFacilityIdIsIgnored = getPotentialIssue(session, "Vaccination", "order facility id", "is ignored",
+        "");
+    VaccinationOrderFacilityIdIsInvalid = getPotentialIssue(session, "Vaccination", "order facility id", "is invalid",
+        "");
+    VaccinationOrderFacilityIdIsMissing = getPotentialIssue(session, "Vaccination", "order facility id", "is missing",
+        "");
+    VaccinationOrderFacilityIdIsUnrecognized = getPotentialIssue(session, "Vaccination", "order facility id",
+        "is unrecognized", "");
+    VaccinationOrderFacilityNameIsMissing = getPotentialIssue(session, "Vaccination", "order facility name",
+        "is missing", "");
     VaccinationOrderedByIsDeprecated = getPotentialIssue(session, "Vaccination", "ordered by", "is deprecated", "");
     VaccinationOrderedByIsIgnored = getPotentialIssue(session, "Vaccination", "ordered by", "is ignored", "");
     VaccinationOrderedByIsInvalid = getPotentialIssue(session, "Vaccination", "ordered by", "is invalid", "");
     VaccinationOrderedByIsMissing = getPotentialIssue(session, "Vaccination", "ordered by", "is missing", "");
     VaccinationOrderedByIsUnrecognized = getPotentialIssue(session, "Vaccination", "ordered by", "is unrecognized", "");
-    VaccinationPlacerOrderNumberIsDeprecated = getPotentialIssue(session, "Vaccination", "placer order number", "is deprecated", "");
-    VaccinationPlacerOrderNumberIsIgnored = getPotentialIssue(session, "Vaccination", "placer order number", "is ignored", "");
-    VaccinationPlacerOrderNumberIsInvalid = getPotentialIssue(session, "Vaccination", "placer order number", "is invalid", "");
-    VaccinationPlacerOrderNumberIsMissing = getPotentialIssue(session, "Vaccination", "placer order number", "is missing", "");
-    VaccinationPlacerOrderNumberIsUnrecognized = getPotentialIssue(session, "Vaccination", "placer order number", "is unrecognized", "");
+    VaccinationPlacerOrderNumberIsDeprecated = getPotentialIssue(session, "Vaccination", "placer order number",
+        "is deprecated", "");
+    VaccinationPlacerOrderNumberIsIgnored = getPotentialIssue(session, "Vaccination", "placer order number",
+        "is ignored", "");
+    VaccinationPlacerOrderNumberIsInvalid = getPotentialIssue(session, "Vaccination", "placer order number",
+        "is invalid", "");
+    VaccinationPlacerOrderNumberIsMissing = getPotentialIssue(session, "Vaccination", "placer order number",
+        "is missing", "");
+    VaccinationPlacerOrderNumberIsUnrecognized = getPotentialIssue(session, "Vaccination", "placer order number",
+        "is unrecognized", "");
     VaccinationProductIsDeprecated = getPotentialIssue(session, "Vaccination", "product", "is deprecated", "");
     VaccinationProductIsInvalid = getPotentialIssue(session, "Vaccination", "product", "is invalid", "");
     VaccinationProductIsMissing = getPotentialIssue(session, "Vaccination", "product", "is missing", "");
@@ -1456,16 +1359,23 @@ public class PotentialIssues
     VaccinationRecordedByIsIgnored = getPotentialIssue(session, "Vaccination", "recorded by", "is ignored", "");
     VaccinationRecordedByIsInvalid = getPotentialIssue(session, "Vaccination", "recorded by", "is invalid", "");
     VaccinationRecordedByIsMissing = getPotentialIssue(session, "Vaccination", "recorded by", "is missing", "");
-    VaccinationRecordedByIsUnrecognized = getPotentialIssue(session, "Vaccination", "recorded by", "is unrecognized", "");
-    VaccinationRefusalReasonConflictsCompletionStatus = getPotentialIssue(session, "Vaccination", "refusal reason", "conflicts completion status", "");
-    VaccinationRefusalReasonIsDeprecated = getPotentialIssue(session, "Vaccination", "refusal reason", "is deprecated", "");
+    VaccinationRecordedByIsUnrecognized = getPotentialIssue(session, "Vaccination", "recorded by", "is unrecognized",
+        "");
+    VaccinationRefusalReasonConflictsCompletionStatus = getPotentialIssue(session, "Vaccination", "refusal reason",
+        "conflicts completion status", "");
+    VaccinationRefusalReasonIsDeprecated = getPotentialIssue(session, "Vaccination", "refusal reason", "is deprecated",
+        "");
     VaccinationRefusalReasonIsIgnored = getPotentialIssue(session, "Vaccination", "refusal reason", "is ignored", "");
     VaccinationRefusalReasonIsInvalid = getPotentialIssue(session, "Vaccination", "refusal reason", "is invalid", "");
     VaccinationRefusalReasonIsMissing = getPotentialIssue(session, "Vaccination", "refusal reason", "is missing", "");
-    VaccinationRefusalReasonIsUnrecognized = getPotentialIssue(session, "Vaccination", "refusal reason", "is unrecognized", "");
-    VaccinationSystemEntryTimeIsInFuture = getPotentialIssue(session, "Vaccination", "system entry time", "is in future", "");
-    VaccinationSystemEntryTimeIsInvalid = getPotentialIssue(session, "Vaccination", "system entry time", "is invalid", "");
-    VaccinationSystemEntryTimeIsMissing = getPotentialIssue(session, "Vaccination", "system entry time", "is missing", "");
+    VaccinationRefusalReasonIsUnrecognized = getPotentialIssue(session, "Vaccination", "refusal reason",
+        "is unrecognized", "");
+    VaccinationSystemEntryTimeIsInFuture = getPotentialIssue(session, "Vaccination", "system entry time",
+        "is in future", "");
+    VaccinationSystemEntryTimeIsInvalid = getPotentialIssue(session, "Vaccination", "system entry time", "is invalid",
+        "");
+    VaccinationSystemEntryTimeIsMissing = getPotentialIssue(session, "Vaccination", "system entry time", "is missing",
+        "");
 
     addToFieldIssueMap(Field.GENERAL_AUTHORIZATION, GeneralAuthorizationException);
     addToFieldIssueMap(Field.GENERAL_CONFIGURATION, GeneralConfigurationException);
@@ -1871,9 +1781,11 @@ public class PotentialIssues
     addToFieldIssueMap(Field.VACCINATION_ID_OF_RECEIVER, VaccinationIdOfReceiverIsUnrecognized);
     addToFieldIssueMap(Field.VACCINATION_ID_OF_SENDER, VaccinationIdOfSenderIsMissing);
     addToFieldIssueMap(Field.VACCINATION_ID_OF_SENDER, VaccinationIdOfSenderIsUnrecognized);
-    addToFieldIssueMap(Field.VACCINATION_INFORMATION_SOURCE, VaccinationInformationSourceIsAdministeredButAppearsToHistorical);
+    addToFieldIssueMap(Field.VACCINATION_INFORMATION_SOURCE,
+        VaccinationInformationSourceIsAdministeredButAppearsToHistorical);
     addToFieldIssueMap(Field.VACCINATION_INFORMATION_SOURCE, VaccinationInformationSourceIsDeprecated);
-    addToFieldIssueMap(Field.VACCINATION_INFORMATION_SOURCE, VaccinationInformationSourceIsHistoricalButAppearsToBeAdministered);
+    addToFieldIssueMap(Field.VACCINATION_INFORMATION_SOURCE,
+        VaccinationInformationSourceIsHistoricalButAppearsToBeAdministered);
     addToFieldIssueMap(Field.VACCINATION_INFORMATION_SOURCE, VaccinationInformationSourceIsIgnored);
     addToFieldIssueMap(Field.VACCINATION_INFORMATION_SOURCE, VaccinationInformationSourceIsInvalid);
     addToFieldIssueMap(Field.VACCINATION_INFORMATION_SOURCE, VaccinationInformationSourceIsMissing);
@@ -1929,6 +1841,7 @@ public class PotentialIssues
     addToFieldIssueMap(Field.VACCINATION_SYSTEM_ENTRY_TIME, VaccinationSystemEntryTimeIsInvalid);
     addToFieldIssueMap(Field.VACCINATION_SYSTEM_ENTRY_TIME, VaccinationSystemEntryTimeIsMissing);
 
+    tx.commit();
     session.close();
   }
 

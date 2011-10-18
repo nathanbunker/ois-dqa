@@ -9,7 +9,6 @@
     </id>
     <many-to-one name="messageReceived" column="received_id" class="MessageReceived"/>
     <many-to-one name="issue" column="issue_id" class="PotentialIssue"/>
-    <property name="issueNegate" column="issue_negate" type="yes_no"/>
     <property name="positionId" column="position_id" type="integer"/>
     <many-to-one name="issueAction" column="action_code" class="IssueAction"/>
     <many-to-one name="codeReceived" column="code_id" class="CodeReceived"/>

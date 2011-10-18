@@ -5,8 +5,7 @@ public class BatchIssues
   private int batchIssuesId = 0;
   private MessageBatch messageBatch = null;
   private PotentialIssue issue = null;
-  private int issueCountPos = 0;
-  private int issueCountNeg = 0;
+  private int issueCount = 0;
   
   public BatchIssues()
   {
@@ -15,8 +14,7 @@ public class BatchIssues
   
   public void inc(BatchIssues batchIssues)
   {
-    this.issueCountPos += batchIssues.getIssueCountPos();
-    this.issueCountNeg += batchIssues.getIssueCountNeg();
+    this.issueCount += batchIssues.getIssueCount();
   }
   
   public BatchIssues(PotentialIssue issue, MessageBatch messageBatch)
@@ -49,24 +47,16 @@ public class BatchIssues
   {
     this.issue = issue;
   }
-  public int getIssueCountPos()
+  public int getIssueCount()
   {
-    return issueCountPos;
+    return issueCount;
   }
-  public void incIssueCountPos()
+  public void incIssueCount()
   {
-    issueCountPos++;
+    issueCount++;
   }
-  public void setIssueCountPos(int issueCountPos)
+  public void setIssueCount(int issueCount)
   {
-    this.issueCountPos = issueCountPos;
-  }
-  public int getIssueCountNeg()
-  {
-    return issueCountNeg;
-  }
-  public void setIssueCountNeg(int issueCountNeg)
-  {
-    this.issueCountNeg = issueCountNeg;
+    this.issueCount = issueCount;
   }
 }

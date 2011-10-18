@@ -5,7 +5,6 @@ public class IssueFound
   public int issueFoundId = 0;
   public MessageReceived messageReceived = null;
   public PotentialIssue issue = null;
-  public Boolean issueNegate = new Boolean(false);
   public int positionId = 0;
   public IssueAction issueAction = null;
   public CodeReceived codeReceived = null;
@@ -33,14 +32,6 @@ public class IssueFound
   public void setIssue(PotentialIssue issue)
   {
     this.issue = issue;
-  }
-  public Boolean getIssueNegate()
-  {
-    return issueNegate;
-  }
-  public void setIssueNegate(Boolean issueNegate)
-  {
-    this.issueNegate = issueNegate;
   }
   public int getPositionId()
   {
