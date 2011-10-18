@@ -1,11 +1,9 @@
 package org.openimmunizationsoftware.dqa.validate;
 
-import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
-
-import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Header;
+import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
+import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
-import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 import org.openimmunizationsoftware.dqa.validate.immtrac.PfsSupport;
 
 public class FacilityValidator extends SectionValidator
@@ -33,6 +31,7 @@ public class FacilityValidator extends SectionValidator
         if (!PfsSupport.verifyCorrect(id))
         {
           validator.registerIssue(pi.Hl7MshSendingFacilityIsInvalid);
+          header.setSendingFacility("");
         }
       } else
       {
@@ -57,6 +56,7 @@ public class FacilityValidator extends SectionValidator
         if (!goodId(id, minLen, maxLen, mustBeNumeric))
         {
           validator.registerIssue(pi.Hl7MshSendingFacilityIsInvalid);
+          header.setSendingFacility("");
         }
       }
     }
@@ -76,26 +76,41 @@ public class FacilityValidator extends SectionValidator
             + "is important that this field indicates the receiving location (organization with the VFC refrigerator) "
             + "that matches what is expected from the state registry. ");
     validator.documentValuesFound("Vaccination Facility Id Number", vaccination.getFacility().getId().getNumber());
-    validator.handleCodeReceived(vaccination.getFacility().getId(), PotentialIssues.Field.VACCINATION_FACILITY_ID,
-        vaccination.isAdministered());
-    if (!vaccination.getFacility().getId().isEmpty())
+    if (validator.notEmpty(vaccination.getFacility().getIdNumber(), pi.VaccinationFacilityIdIsMissing, vaccination.isAdministered()))
     {
       String id = vaccination.getFacility().getId().getNumber();
       boolean mustBePfs = validator.ksm.getKeyedValueBoolean(KeyedSetting.VALIDATE_VACCINATION_FACILITY_PFS, false);
       if (mustBePfs && !PfsSupport.verifyCorrect(id))
       {
-        validator.registerIssue(pi.Hl7MshSendingFacilityIsInvalid);
+        validator.documentParagraph("Vaccination facility id must be a valid ImmTrac PFS number. "
+            + "Please contact ImmTrac to obtain a correct and valid PFS number.");
+        validator.registerIssue(pi.VaccinationFacilityIdIsInvalid);
+        vaccination.getFacility().setIdNumber("");
       } else
       {
         int minLen = validator.ksm.getKeyedValueInt(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MIN_LEN, 0);
         int maxLen = validator.ksm.getKeyedValueInt(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MAX_LEN, 30);
         boolean mustBeNumeric = validator.ksm.getKeyedValueBoolean(KeyedSetting.VALIDATE_VACCINATION_FACILITY_NUMERIC,
             false);
+        if (validator.isDocument())
+        {
+          if (minLen == maxLen)
+          {
+            validator.documentParagraph("A valid facility id must be" + (mustBeNumeric ? " numeric and " : " ")
+                + minLen + " characters long. ");
 
+          } else
+          {
+            validator.documentParagraph("A valid facility id must be" + (mustBeNumeric ? " numeric and " : " ")
+                + "between " + minLen + " and " + maxLen + " characters long. ");
+
+          }
+        }
         if (!goodId(id, minLen, maxLen, mustBeNumeric))
         {
           validator.registerIssue(pi.VaccinationFacilityIdIsInvalid);
         }
+        vaccination.getFacility().setIdNumber("");
       }
     }
   }

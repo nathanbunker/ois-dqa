@@ -9,6 +9,7 @@ import java.util.Map;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.db.model.CodeMaster;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeStatus;
@@ -152,6 +153,7 @@ public class CodesReceived
     {
       SessionFactory factory = OrganizationManager.getSessionFactory();
       Session session = factory.openSession();
+      Transaction tx = session.beginTransaction();
 
       Query query = session.createQuery("from CodeTable");
       List<CodeTable> codeTableList = query.list();
@@ -178,6 +180,7 @@ public class CodesReceived
           addMastersToCodeTableMaps(codeTable, query.list(), (SubmitterProfile) session.get(SubmitterProfile.class, 1));
         }
       }
+      tx.commit();
       session.close();
     }
   }

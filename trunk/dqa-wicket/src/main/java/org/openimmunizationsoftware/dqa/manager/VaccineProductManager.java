@@ -8,6 +8,7 @@ import java.util.Map;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineMvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineProduct;
@@ -31,14 +32,16 @@ public class VaccineProductManager
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     Query query = session.createQuery("from VaccineProduct");
     List<VaccineProduct> vaccineProductsList = query.list();
-    session.close();
     for (VaccineProduct vp : vaccineProductsList)
     {
       vaccineProducts.put(vp.getCvx().getCvxCode() + "-" + vp.getMvx().getMvxCode(), vp);
     }
+    tx.commit();
+    session.close();
   }
   
   public VaccineProduct getVaccineProduct(VaccineCvx cvxCode, VaccineMvx mvxCode)
