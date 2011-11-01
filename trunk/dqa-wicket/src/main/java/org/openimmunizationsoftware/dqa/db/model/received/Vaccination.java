@@ -1,6 +1,8 @@
 package org.openimmunizationsoftware.dqa.db.model.received;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
@@ -47,6 +49,7 @@ public class Vaccination implements Skippable
   private String lotNumber = "";
   private CodedEntity manufacturer = new CodedEntity(CodeTable.Type.VACCINATION_MANUFACTURER_CODE);
   private MessageReceived messageReceived = null;
+  private List<Observation> observations = new ArrayList<Observation>();
   private CodedEntity orderControl = new CodedEntity(CodeTable.Type.VACCINATION_ORDER_CONTROL_CODE);
   private Id orderedBy = new Id(CodeTable.Type.PHYSICIAN_NUMBER);
   private int positionId = 0;
@@ -88,13 +91,6 @@ public class Vaccination implements Skippable
     return adminCpt.getCode();
   }
 
-  // public static final String ACTION_CODE_ADD = "A";
-  // public static final String ACTION_CODE_DELETE = "D";
-  // public static final String ACTION_CODE_UPDATE = "U";
-  //
-  // public static final String INFO_SOURCE_ADMIN = "00";
-  // public static final String INFO_SOURCE_HIST = "01";
-
   public CodedEntity getAdminCvx()
   {
     return adminCvx;
@@ -104,6 +100,13 @@ public class Vaccination implements Skippable
   {
     return adminCvx.getCode();
   }
+
+  // public static final String ACTION_CODE_ADD = "A";
+  // public static final String ACTION_CODE_DELETE = "D";
+  // public static final String ACTION_CODE_UPDATE = "U";
+  //
+  // public static final String INFO_SOURCE_ADMIN = "00";
+  // public static final String INFO_SOURCE_HIST = "01";
 
   public Date getAdminDate()
   {
@@ -278,6 +281,11 @@ public class Vaccination implements Skippable
   public MessageReceived getMessageReceived()
   {
     return messageReceived;
+  }
+
+  public List<Observation> getObservations()
+  {
+    return observations;
   }
 
   public CodedEntity getOrderControl()
@@ -548,6 +556,11 @@ public class Vaccination implements Skippable
   public void setMessageReceived(MessageReceived messageReceived)
   {
     this.messageReceived = messageReceived;
+  }
+
+  public void setObservations(List<Observation> observations)
+  {
+    this.observations = observations;
   }
 
   public void setOrderControlCode(String code)

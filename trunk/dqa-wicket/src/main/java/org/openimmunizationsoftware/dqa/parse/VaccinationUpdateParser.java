@@ -2,6 +2,7 @@ package org.openimmunizationsoftware.dqa.parse;
 
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
+import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 import org.openimmunizationsoftware.dqa.validate.ValidateMessage;
 
 

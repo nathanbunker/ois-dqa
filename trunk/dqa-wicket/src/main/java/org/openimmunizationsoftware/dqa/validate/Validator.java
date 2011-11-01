@@ -20,6 +20,7 @@ import org.openimmunizationsoftware.dqa.db.model.VaccineCvxGroup;
 import org.openimmunizationsoftware.dqa.db.model.VaccineMvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineProduct;
 import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
+import org.openimmunizationsoftware.dqa.db.model.received.Observation;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Address;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
@@ -31,6 +32,7 @@ import org.openimmunizationsoftware.dqa.manager.KeyedSettingManager;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 import org.openimmunizationsoftware.dqa.manager.VaccineGroupManager;
 import org.openimmunizationsoftware.dqa.manager.VaccineProductManager;
+import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 
 public class Validator extends ValidateMessage
 {
@@ -99,11 +101,15 @@ public class Validator extends ValidateMessage
     ksm = KeyedSettingManager.getKeyedSettingManager();
     init();
   }
-
   public void validateVaccinationUpdateMessage(MessageReceived message)
+  {
+    validateVaccinationUpdateMessage(message, null);
+  }
+  public void validateVaccinationUpdateMessage(MessageReceived message, QualityCollector qualityCollector)
   {
     this.message = message;
     this.patient = message.getPatient();
+    this.qualityCollector = qualityCollector;
     positionId = 1;
     skippableItem = patient;
     this.issuesFound = message.getIssuesFound();
@@ -417,19 +423,41 @@ public class Validator extends ValidateMessage
           && !vaccineCvx.getCvxCode().equals("")
           && (vaccination.getManufacturer().isValid() || vaccination.getManufacturer().isDeprecated()))
       {
-        VaccineProduct vaccineProduct = VaccineProductManager.getVaccineProductManager().getVaccineProduct(vaccineCvx,
-            vaccineMvx);
-        if (vaccineProduct == null)
+        List<VaccineProduct> vaccineProducts = VaccineProductManager.getVaccineProductManager().getVaccineProducts(
+            vaccineCvx, vaccineMvx);
+        if (vaccineProducts == null)
         {
           registerIssue(pi.VaccinationProductIsUnrecognized);
-        } else if (vaccineProduct.getValidStartDate().after(vaccination.getAdminDate())
-            || vaccination.getAdminDate().after(vaccineProduct.getValidEndDate()))
+        } else
         {
-          registerIssue(pi.VaccinationProductIsInvalid);
-        } else if (vaccineProduct.getUseStartDate().after(vaccination.getAdminDate())
-            || vaccination.getAdminDate().after(vaccineProduct.getUseEndDate()))
-        {
-          registerIssue(pi.VaccinationProductIsDeprecated);
+          VaccineProduct useVp = null;
+          VaccineProduct valVp = null;
+          for (VaccineProduct vp : vaccineProducts)
+          {
+            if (!vp.getValidStartDate().after(vaccination.getAdminDate())
+                && !vaccination.getAdminDate().after(vp.getValidEndDate()))
+            {
+              valVp = vp;
+              if (!vp.getUseStartDate().after(vaccination.getAdminDate())
+                  && !vaccination.getAdminDate().after(vp.getUseEndDate()))
+              {
+                useVp = vp;
+                break;
+              }
+            }
+          }
+          if (valVp != null)
+          {
+            // valid product
+            if (useVp == null)
+            {
+              // shouldn't be used at this point
+              registerIssue(pi.VaccinationProductIsDeprecated);
+            }
+          } else
+          {
+            registerIssue(pi.VaccinationProductIsInvalid);
+          }
         }
       } else
       {
@@ -583,6 +611,29 @@ public class Validator extends ValidateMessage
         registerIssue(pi.VaccinationSystemEntryTimeIsInFuture);
       }
     }
+    String financialEligibilityCode = null;
+    for (Observation observation : vaccination.getObservations())
+    {
+      handleCodeReceived(observation.getValueType(), PotentialIssues.Field.OBSERVATION_VALUE_TYPE);
+      handleCodeReceived(observation.getObservationIdentifier(),
+          PotentialIssues.Field.OBSERVATION_OBSERVATION_IDENTIFIER_CODE);
+      if (financialEligibilityCode != null && !observation.isSkipped())
+      {
+        if (observation.getObservationIdentifierCode().equals("64994-7"))
+        {
+          if (notEmpty(observation.getObservationValue(), pi.ObservationObservationValueIsMissing))
+          {
+            financialEligibilityCode = observation.getObservationValue();
+          }
+        }
+      }
+    }
+    if (financialEligibilityCode != null)
+    {
+      vaccination.setFinancialEligibilityCode(financialEligibilityCode);
+      handleCodeReceived(vaccination.getFinancialEligibility(),
+          PotentialIssues.Field.VACCINATION_FINANCIAL_ELIGIBILITY_CODE, vaccination.isAdministered());
+    }
   }
 
   private boolean checkGroupMatch(VaccineCvx vaccineCvx, VaccineCpt vaccineCpt)
@@ -650,11 +701,14 @@ public class Validator extends ValidateMessage
         {
           registerIssue(pi.Hl7MshMessageTriggerIsUnrecognized);
         }
-        if (notEmpty(header.getMessageStructure(), pi.Hl7MshMessageStructureIsMissing))
+        if (!header.getVersionId().equals("2.3.1") && !header.getVersionId().equals("2.4"))
         {
-          if (!header.getMessageStructure().equals("VXU_V04"))
+          if (notEmpty(header.getMessageStructure(), pi.Hl7MshMessageStructureIsMissing))
           {
-            registerIssue(pi.Hl7MshMessageStructureIsUnrecognized);
+            if (!header.getMessageStructure().equals("VXU_V04"))
+            {
+              registerIssue(pi.Hl7MshMessageStructureIsUnrecognized);
+            }
           }
         }
         // TODO
@@ -735,7 +789,7 @@ public class Validator extends ValidateMessage
         }
       } else if (patient.getBirthMultiple().equals("N"))
       {
-        if (!patient.getBirthOrder().isEmpty())
+        if (!patient.getBirthOrder().isEmpty() && !patient.getBirthOrderCode().equals("1"))
         {
           registerIssue(pi.PatientBirthOrderIsInvalid);
         }
@@ -1192,6 +1246,7 @@ public class Validator extends ValidateMessage
         }
       }
       codedEntity.setCode(cr.getCodeValue());
+
     }
     codedEntity.setCodeReceived(cr);
   }
@@ -1228,6 +1283,11 @@ public class Validator extends ValidateMessage
       profile.registerCodeReceived(cr, session);
       session.saveOrUpdate(cr);
       // first time code was received
+    }
+
+    if (qualityCollector != null)
+    {
+      qualityCollector.registerCodeReceived(cr);
     }
 
     return cr;

@@ -5,46 +5,12 @@ import java.util.List;
 
 public class ModelSection
 {
+  private int days = 0;
   private String name = "";
   private List<ModelScore> scores = new ArrayList<ModelScore>();
   private List<ModelSection> sections = new ArrayList<ModelSection>();
   private float weight = 0;
 
-  public String getName()
-  {
-    return name;
-  }
-
-  public List<ModelScore> getScores()
-  {
-    return scores;
-  }
-
-  public List<ModelSection> getSections()
-  {
-    return sections;
-  }
-
-  public float getWeight()
-  {
-    return weight;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-
-  public void setWeight(float weight)
-  {
-    this.weight = weight;
-  }
-  
-  public float getWeight(String path)
-  {
-    return getModelSection(path).getWeight();
-  }
-  
   public float getAbsoluteWeight(String path)
   {
     String firstPart = path;
@@ -74,7 +40,14 @@ public class ModelSection
     }
     throw new IllegalArgumentException("Unable to find section named " + firstPart);
   }
+
+  public int getDays()
+  {
+    return days;
+  }
   
+  
+
   public ModelSection getModelSection(String path)
   {
     String firstPart = path;
@@ -103,5 +76,45 @@ public class ModelSection
       }
     }
     throw new IllegalArgumentException("Unable to find section named " + firstPart);
+  }
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public List<ModelScore> getScores()
+  {
+    return scores;
+  }
+
+  public List<ModelSection> getSections()
+  {
+    return sections;
+  }
+
+  public float getWeight()
+  {
+    return weight;
+  }
+
+  public float getWeight(String path)
+  {
+    return getModelSection(path).getWeight();
+  }
+  
+  public void setDays(int days)
+  {
+    this.days = days;
+  }
+  
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+  
+  public void setWeight(float weight)
+  {
+    this.weight = weight;
   }
 }

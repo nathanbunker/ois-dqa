@@ -13,5 +13,6 @@
     <property name="changePriority" column="change_priority" type="string"/>
     <property name="reportDenominator" column="report_denominator" type="string"/>
     <property name="issueDescription" column="issue_description" type="string"/>
+    <many-to-one name="table" column="table_id" class="CodeTable" lazy="false"/>
   </class>
 </hibernate-mapping>

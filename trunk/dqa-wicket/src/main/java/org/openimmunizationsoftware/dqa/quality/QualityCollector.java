@@ -10,15 +10,16 @@ import java.util.Set;
 
 import org.openimmunizationsoftware.dqa.db.model.BatchCodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.BatchIssues;
+import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.BatchType;
 import org.openimmunizationsoftware.dqa.db.model.BatchVaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
+import org.openimmunizationsoftware.dqa.db.model.Header;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssueStatus;
-import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.VaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.VaccineGroup;
@@ -43,6 +44,12 @@ public class QualityCollector
   private int numeratorVaccinationAdminDateAge = 0;
   private QualityScoring scoring = null;
   private ModelForm modelForm = null;
+  private Header exampleHeader = null;
+  
+  public Header getExampleHeader()
+  {
+    return exampleHeader;
+  }
 
   public ModelForm getModelForm()
   {
@@ -65,9 +72,6 @@ public class QualityCollector
   }
 
   private static final long AS_THE_DAY_IS_LONG = 24 * 60 * 60 * 1000;
-  private static final long DAYS_2 = 2 * 24 * 60 * 60 * 1000;
-  private static final long DAYS_7 = 7 * 24 * 60 * 60 * 1000;
-  private static final long DAYS_30 = 30l * 24 * 60 * 60 * 1000;
 
   public MessageBatch getMessageBatch()
   {
@@ -84,10 +88,20 @@ public class QualityCollector
     this.profile = profile;
     modelForm = ModelFactory.getModelFormDefault();
     report = messageBatch.getBatchReport();
+
+  }
+
+  public void registerCodeReceived(CodeReceived codeReceived)
+  {
+    messageBatch.getBatchCodeReceived(codeReceived).incReceivedCount();
   }
 
   public void registerProcessedMessage(MessageReceived messageReceived)
   {
+    if (exampleHeader == null)
+    {
+      exampleHeader = messageReceived.getHeader();
+    }
     report.incMessageCount();
     String patientId = messageReceived.getPatient().getIdSubmitter().getNumber();
     if (patientId == null || patientId.equals(""))
@@ -114,11 +128,6 @@ public class QualityCollector
     for (IssueFound issueFound : messageReceived.getIssuesFound())
     {
       messageBatch.incBatchIssueCount(issueFound.getIssue());
-      if (issueFound.getCodeReceived() != null)
-      {
-        CodeReceived codeReceived = issueFound.getCodeReceived();
-        messageBatch.getBatchCodeReceived(codeReceived).incReceivedCount();
-      }
     }
     report.incNextOfKinCount(messageReceived.getNextOfKins().size());
     int vacPos = 0;
@@ -177,19 +186,7 @@ public class QualityCollector
         report.incVaccinationHistoricalCount();
       }
     }
-    if (timelinessGap < DAYS_2)
-    {
-      report.incTimelinessCount2Days();
-      report.incTimelinessCount7Days();
-      report.incTimelinessCount30Days();
-    } else if (timelinessGap < DAYS_7)
-    {
-      report.incTimelinessCount7Days();
-      report.incTimelinessCount30Days();
-    } else if (timelinessGap < DAYS_30)
-    {
-      report.incTimelinessCount30Days();
-    }
+
     if (hadAdmin)
     {
       report.incMessageWithAdminCount();
@@ -207,6 +204,26 @@ public class QualityCollector
         {
           vaccinationAdminDateLatest = latestAdmin;
         }
+      }
+      int dayEarly = modelForm.getModelSection("timeliness.early").getDays();
+      int dayOnTime = modelForm.getModelSection("timeliness.onTime").getDays();
+      int dayLate = modelForm.getModelSection("timeliness.late").getDays();
+      int dayVeryLate = modelForm.getModelSection("timeliness.veryLate").getDays();
+      if (timelinessGap < (AS_THE_DAY_IS_LONG * dayEarly))
+      {
+        report.incTimelinessCountEarly();
+      } else if (timelinessGap < (AS_THE_DAY_IS_LONG * dayOnTime))
+      {
+        report.incTimelinessCountOnTime();
+      } else if (timelinessGap < (AS_THE_DAY_IS_LONG * dayLate))
+      {
+        report.incTimelinessCountLate();
+      } else if (timelinessGap < (AS_THE_DAY_IS_LONG * dayVeryLate))
+      {
+        report.incTimelinessCountVeryLate();
+      } else
+      {
+        report.incTimelinessCountOldData();
       }
     }
   }
@@ -272,18 +289,11 @@ public class QualityCollector
   {
     VaccineGroupManager vaccineGroupManager = VaccineGroupManager.getVaccineGroupManager();
     double score = 0.0;
-    ModelSection vgsection = modelForm.getModelSection("completeness.vaccineGroup.expected");
-    int overallDenominator = 0;
-    int denominator = vgsection.getSections().size();
-    overallDenominator += denominator;
-    score = scoreVaccineGroup(vaccineGroupManager, vgsection, denominator);
-    vgsection = modelForm.getModelSection("completeness.vaccineGroup.recommended");
-    denominator = vgsection.getSections().size();
-    overallDenominator += denominator;
-    score = score + scoreVaccineGroup(vaccineGroupManager, vgsection, denominator);
-    vgsection = modelForm.getModelSection("completeness.vaccineGroup.recommended");
-    Double demeritScore = scoreVaccineGroup(vaccineGroupManager, vgsection, overallDenominator);
-    score = score - demeritScore;
+    score = scoreVaccineGroup(vaccineGroupManager, modelForm.getModelSection("completeness.vaccineGroup.expected"));
+    score = score
+        + scoreVaccineGroup(vaccineGroupManager, modelForm.getModelSection("completeness.vaccineGroup.recommended"));
+    score = score
+        + scoreVaccineGroup(vaccineGroupManager, modelForm.getModelSection("completeness.vaccineGroup.unexpected"));
     if (score < 0)
     {
       score = 0;
@@ -291,11 +301,13 @@ public class QualityCollector
     return score;
   }
 
-  private double scoreVaccineGroup(VaccineGroupManager vaccineGroupManager, ModelSection vgsection, int denominator)
+  private double scoreVaccineGroup(VaccineGroupManager vaccineGroupManager, ModelSection vgsection)
   {
-    int count = 0;
+    float score = 0;
+    float denominator = 0;
     for (ModelSection section : vgsection.getSections())
     {
+      denominator += section.getWeight();
       VaccineGroup vaccineGroup = vaccineGroupManager.getVaccineGroup(section.getName());
       if (vaccineGroup == null)
       {
@@ -305,14 +317,12 @@ public class QualityCollector
       {
         if (getVaccineCvxCount(vaccineCvx) > 0)
         {
-          count++;
+          score += section.getWeight();
           break;
         }
       }
     }
-    double addScore = denominator > 0 ? count / denominator : 0;
-    addScore = addScore * vgsection.getWeight();
-    return addScore;
+    return (denominator > 0 ? score / denominator : 0) * vgsection.getWeight();
   }
 
   private void score(Map<PotentialIssue, BatchIssues> batchIssuesMap, ScoringSet scoringSet)
@@ -469,20 +479,23 @@ public class QualityCollector
 
   private void scoreTimeliness()
   {
-    double score2days = 0;
-    double score7days = 0;
-    double score30days = 0;
+    double scoreEarly = 0;
+    double scoreOnTime = 0;
+    double scoreLate = 0;
+    double scoreVeryLate = 0;
     double timelinessAverage = 0;
     if (report.getMessageWithAdminCount() > 0)
     {
-      score2days = report.getTimelinessCount2Days() / report.getMessageWithAdminCount();
-      score7days = report.getTimelinessCount7Days() / report.getMessageWithAdminCount();
-      score30days = report.getTimelinessCount30Days() / report.getMessageWithAdminCount();
+      scoreEarly = report.getTimelinessCountEarly() / report.getMessageWithAdminCount();
+      scoreOnTime = report.getTimelinessCountOnTime() / report.getMessageWithAdminCount();
+      scoreLate = report.getTimelinessCountLate() / report.getMessageWithAdminCount();
+      scoreVeryLate = report.getTimelinessCountVeryLate() / report.getMessageWithAdminCount();
       timelinessAverage = numeratorVaccinationAdminDateAge / (double) report.getMessageWithAdminCount();
     }
 
-    int timeliness = (int) (100 * (modelForm.getWeight("timeliness.30days") * score30days
-        + modelForm.getWeight("timeliness.7days") * score7days + modelForm.getWeight("timeliness.2days") * score2days) + 0.5);
+    int timeliness = (int) (100.0 * (modelForm.getWeight("timeliness.early") * scoreEarly
+        + modelForm.getWeight("timeliness.onTime") * scoreOnTime + modelForm.getWeight("timeliness.late") * scoreLate + modelForm
+        .getWeight("timeliness.veryLate") * scoreVeryLate) + 0.5);
     if (timeliness > 100)
     {
       timeliness = 100;
@@ -492,9 +505,10 @@ public class QualityCollector
       timeliness = 0;
     }
     report.setTimelinessScore(timeliness);
-    report.setTimelinessScore2Days((int) (100 * score2days + 0.5));
-    report.setTimelinessScore7Days((int) (100 * score7days + 0.5));
-    report.setTimelinessScore30Days((int) (100 * score30days + 0.5));
+    report.setTimelinessScoreEarly((int) (100.0 * scoreEarly + 0.5));
+    report.setTimelinessScoreOnTime((int) (100.0 * scoreOnTime + 0.5));
+    report.setTimelinessScoreLate((int) (100.0 * scoreLate + 0.5));
+    report.setTimelinessScoreVeryLate((int) (100.0 * scoreVeryLate + 0.5));
     // Set values if they have not already been set
     if (report.getTimelinessAverage() == 0.0)
     {

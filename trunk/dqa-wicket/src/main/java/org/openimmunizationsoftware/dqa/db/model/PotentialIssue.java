@@ -1,8 +1,6 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-import org.openimmunizationsoftware.dqa.quality.ReportDenominator;
 import org.openimmunizationsoftware.dqa.quality.ToolTip;
-import org.openimmunizationsoftware.dqa.quality.model.ModelScore;
 
 public class PotentialIssue
 {
@@ -34,6 +32,7 @@ public class PotentialIssue
   private String targetField = "";
   private String targetObject = "";
   private ToolTip toolTip = null;
+  private CodeTable table = null;
 
   public ToolTip getToolTip()
   {
@@ -42,6 +41,15 @@ public class PotentialIssue
       toolTip = new ToolTip(getDisplayText(), issueDescription);
     }
     return toolTip;
+  }
+  
+  public CodeTable getTable()
+  {
+    return table;
+  }
+  public void setTable(CodeTable table)
+  {
+    this.table = table;
   }
 
   public PotentialIssue() {

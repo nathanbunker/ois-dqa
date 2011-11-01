@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.quality;
 
+import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 
 public class CompletenessRow
@@ -15,6 +16,11 @@ public class CompletenessRow
   private double score = 0;
   private float scoreWeight = 0;
   private ToolTip toolTip;
+  
+  public CodeTable getTable()
+  {
+    return potentialIssue.getTable();
+  }
 
   /**
    * 

@@ -71,7 +71,7 @@ public class ValidationDocumentationServlet extends HttpServlet
     Application app = KeyedSettingManager.getApplication();
     out.println("    <h1>DQA Validation for " + app.getApplicationLabel() + " " + app.getApplicationType() + "</h1>");
     out.println("    <form action=\"validationDocumentation\" method=\"GET\">");
-    out.println("      <textarea name=\"messageText\" cols=\"120\" rows=\"15\">" + messageText + "</textarea>");
+    out.println("      <textarea name=\"messageText\" cols=\"120\" rows=\"15\" wrap=\"off\">" + messageText + "</textarea>");
     out.println("      <input type=\"submit\" name=\"submit\" value=\"validate\">");
     out.println("    </form>");
     SessionFactory factory = OrganizationManager.getSessionFactory();
@@ -94,7 +94,7 @@ public class ValidationDocumentationServlet extends HttpServlet
         setupShowHidDiv(out, "Validating", "validating");
         Validator validator = new Validator(profile, session);
         validator.setDocumentOut(out);
-        validator.validateVaccinationUpdateMessage(messageReceived);
+        validator.validateVaccinationUpdateMessage(messageReceived, null);
         out.println("</div>");
         printIsssuesIdentified(out, messageReceived, "2");
       }
@@ -197,7 +197,7 @@ public class ValidationDocumentationServlet extends HttpServlet
   private void setupShowHidDiv(PrintWriter out, String sectionLabel, String sectionName)
   {
     out.println("<h3><a href=\"javascript:toggleLayer('" + sectionName + "');\" title=\"Show/Hide\">" + sectionLabel + " +/-</a></h3>");
-    out.println("<div id=\"" + sectionName + "\">");
+    out.println("<div id=\"" + sectionName + "\" style=\"display:none\">");
   }
 
   private void printIssueFound(IssueFound issueFound, PrintWriter out)

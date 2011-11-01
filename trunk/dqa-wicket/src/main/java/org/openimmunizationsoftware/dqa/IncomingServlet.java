@@ -422,7 +422,7 @@ public class IncomingServlet extends HttpServlet
       if (!messageReceived.hasErrors())
       {
         Validator validator = new Validator(profile, session);
-        validator.validateVaccinationUpdateMessage(messageReceived);
+        validator.validateVaccinationUpdateMessage(messageReceived, null);
       }
       messageBatchManager.registerProcessedMessage(messageReceived);
 

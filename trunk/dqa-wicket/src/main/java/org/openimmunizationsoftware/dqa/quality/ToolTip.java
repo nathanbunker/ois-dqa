@@ -9,7 +9,7 @@ public class ToolTip
   private String tip = "";
   private boolean emphasize = false;
   private String link = "#";
-  
+
   public ToolTip setLink(String link)
   {
     this.link = link;
@@ -43,6 +43,9 @@ public class ToolTip
     if (tip != null && !tip.equals(""))
     {
       return "<a class=\"tooltip\" href=\"" + link + "\">" + indent + label + "<span>" + tip + "</span></a>";
+    } else if (link != null && !link.equals("") && !link.equals("#"))
+    {
+      return "<a class=\"tooltip\" href=\"" + link + "\">" + indent + label + "</a>";
     } else
     {
       return indent + label;
@@ -53,7 +56,7 @@ public class ToolTip
   {
     return indent;
   }
-  
+
   public boolean hasIndent()
   {
     return indent != null && !indent.equals("");
@@ -63,6 +66,7 @@ public class ToolTip
   {
     return label;
   }
+
   public String getTip()
   {
     return tip;
