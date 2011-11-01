@@ -32,6 +32,7 @@ public class BatchReport
     }
     return d2;
   }
+  private int batchReportId = 0;
   private int completenessPatientScore = 0;
   private int completenessScore = 0;
   private int completenessVaccinationScore = 0;
@@ -46,17 +47,19 @@ public class BatchReport
   private int qualityErrorScore = 0;
   private int qualityScore = 0;
   private int qualityWarnScore = 0;
-  private int batchReportId = 0;
   private double timelinessAverage = 0.0;
-  private int timelinessCount2Days = 0;
-  private int timelinessCount30Days = 0;
-  private int timelinessCount7Days = 0;
+  private int timelinessCountEarly = 0;
+  private int timelinessCountLate = 0;
+  private int timelinessCountOldData = 0;
+  private int timelinessCountOnTime = 0;
+  private int timelinessCountVeryLate = 0;
   private Date timelinessDateFirst = null;
   private Date timelinessDateLast = null;
   private int timelinessScore = 0;
-  private int timelinessScore2Days = 0;
-  private int timelinessScore30Days = 0;
-  private int timelinessScore7Days = 0;
+  private int timelinessScoreEarly = 0;
+  private int timelinessScoreLate = 0;
+  private int timelinessScoreOnTime = 0;
+  private int timelinessScoreVeryLate = 0;
   private int vaccinationAdministeredCount = 0;
   private int vaccinationDeleteCount = 0;
   private int vaccinationHistoricalCount = 0;
@@ -86,15 +89,22 @@ public class BatchReport
     {
       timelinessAverage = (a1 * s1 + s2 * a2) / (a1 + a2);
     }
-    timelinessCount2Days += report.getTimelinessCount2Days();
-    timelinessCount30Days += report.getTimelinessCount30Days();
-    timelinessCount7Days += report.getTimelinessCount7Days();
+    timelinessCountEarly += report.getTimelinessCountEarly();
+    timelinessCountOnTime += report.getTimelinessCountOnTime();
+    timelinessCountLate += report.getTimelinessCountLate();
+    timelinessCountVeryLate += report.getTimelinessCountVeryLate();
+    timelinessCountOldData += report.getTimelinessCountOldData();
     timelinessDateFirst = min(timelinessDateFirst, report.getTimelinessDateFirst());
     timelinessDateLast = max(timelinessDateLast, report.getTimelinessDateLast());
     vaccinationAdministeredCount += report.getVaccinationAdministeredCount();
     vaccinationDeleteCount += report.getVaccinationDeleteCount();
     vaccinationHistoricalCount += report.getVaccinationHistoricalCount();
     vaccinationNotAdministeredCount += report.getVaccinationNotAdministeredCount();
+  }
+
+  public int getBatchReportId()
+  {
+    return batchReportId;
   }
 
   public int getCompletenessPatientScore()
@@ -167,29 +177,34 @@ public class BatchReport
     return qualityWarnScore;
   }
 
-  public int getBatchReportId()
-  {
-    return batchReportId;
-  }
-
   public double getTimelinessAverage()
   {
     return timelinessAverage;
   }
 
-  public int getTimelinessCount2Days()
+  public int getTimelinessCountEarly()
   {
-    return timelinessCount2Days;
+    return timelinessCountEarly;
   }
 
-  public int getTimelinessCount30Days()
+  public int getTimelinessCountLate()
   {
-    return timelinessCount30Days;
+    return timelinessCountLate;
   }
 
-  public int getTimelinessCount7Days()
+  public int getTimelinessCountOldData()
   {
-    return timelinessCount7Days;
+    return timelinessCountOldData;
+  }
+
+  public int getTimelinessCountOnTime()
+  {
+    return timelinessCountOnTime;
+  }
+
+  public int getTimelinessCountVeryLate()
+  {
+    return timelinessCountVeryLate;
   }
 
   public Date getTimelinessDateFirst()
@@ -207,19 +222,24 @@ public class BatchReport
     return timelinessScore;
   }
 
-  public int getTimelinessScore2Days()
+  public int getTimelinessScoreEarly()
   {
-    return timelinessScore2Days;
+    return timelinessScoreEarly;
   }
 
-  public int getTimelinessScore30Days()
+  public int getTimelinessScoreLate()
   {
-    return timelinessScore30Days;
+    return timelinessScoreLate;
   }
 
-  public int getTimelinessScore7Days()
+  public int getTimelinessScoreOnTime()
   {
-    return timelinessScore7Days;
+    return timelinessScoreOnTime;
+  }
+
+  public int getTimelinessScoreVeryLate()
+  {
+    return timelinessScoreVeryLate;
   }
 
   public int getVaccinationAdministeredCount()
@@ -278,19 +298,29 @@ public class BatchReport
     this.patientUnderageCount++;
   }
 
-  public void incTimelinessCount2Days()
+  public void incTimelinessCountEarly()
   {
-    this.timelinessCount2Days++;
+    this.timelinessCountEarly++;
   }
 
-  public void incTimelinessCount30Days()
+  public void incTimelinessCountLate()
   {
-    this.timelinessCount30Days++;
+    this.timelinessCountLate++;
   }
 
-  public void incTimelinessCount7Days()
+  public void incTimelinessCountOldData()
   {
-    this.timelinessCount7Days++;
+    this.timelinessCountOldData++;
+  }
+
+  public void incTimelinessCountOnTime()
+  {
+    this.timelinessCountOnTime++;
+  }
+
+  public void incTimelinessCountVeryLate()
+  {
+    this.timelinessCountVeryLate++;
   }
 
   public void incVaccinationAdministeredCount()
@@ -311,6 +341,11 @@ public class BatchReport
   public void incVaccinationNotAdministeredCount()
   {
     this.vaccinationNotAdministeredCount++;
+  }
+
+  public void setBatchReportId(int reportId)
+  {
+    this.batchReportId = reportId;
   }
 
   public void setCompletenessPatientScore(int completenessPatientScore)
@@ -383,29 +418,34 @@ public class BatchReport
     this.qualityWarnScore = qualityWarnScore;
   }
 
-  public void setBatchReportId(int reportId)
-  {
-    this.batchReportId = reportId;
-  }
-
   public void setTimelinessAverage(double timelinessAverage)
   {
     this.timelinessAverage = timelinessAverage;
   }
 
-  public void setTimelinessCount2Days(int timelinessCount2Days)
+  public void setTimelinessCountEarly(int timelinessCountEarly)
   {
-    this.timelinessCount2Days = timelinessCount2Days;
+    this.timelinessCountEarly = timelinessCountEarly;
   }
 
-  public void setTimelinessCount30Days(int timelinessCount30Days)
+  public void setTimelinessCountLate(int timelinessCountLate)
   {
-    this.timelinessCount30Days = timelinessCount30Days;
+    this.timelinessCountLate = timelinessCountLate;
   }
 
-  public void setTimelinessCount7Days(int timelinessCount7Days)
+  public void setTimelinessCountOldData(int timelinessCountOldData)
   {
-    this.timelinessCount7Days = timelinessCount7Days;
+    this.timelinessCountOldData = timelinessCountOldData;
+  }
+
+  public void setTimelinessCountOnTime(int timelinessCountOnTime)
+  {
+    this.timelinessCountOnTime = timelinessCountOnTime;
+  }
+
+  public void setTimelinessCountVeryLate(int timelinessCountVeryLate)
+  {
+    this.timelinessCountVeryLate = timelinessCountVeryLate;
   }
 
   public void setTimelinessDateFirst(Date timelinessDateFirst)
@@ -423,40 +463,41 @@ public class BatchReport
     this.timelinessScore = timelinessScore;
   }
 
-  public void setTimelinessScore2Days(int timelinessScore2Days)
+  public void setTimelinessScoreEarly(int timelinessScoreEarly)
   {
-    this.timelinessScore2Days = timelinessScore2Days;
+    this.timelinessScoreEarly = timelinessScoreEarly;
   }
 
-  public void setTimelinessScore30Days(int timelinessScore30Days)
+  public void setTimelinessScoreLate(int timelinessScoreLate)
   {
-    this.timelinessScore30Days = timelinessScore30Days;
+    this.timelinessScoreLate = timelinessScoreLate;
   }
 
-  public void setTimelinessScore7Days(int timelinessScore7Days)
+  public void setTimelinessScoreOnTime(int timelinessScoreOnTime)
   {
-    this.timelinessScore7Days = timelinessScore7Days;
+    this.timelinessScoreOnTime = timelinessScoreOnTime;
+  }
+
+  public void setTimelinessScoreVeryLate(int timelinessScoreVeryLate)
+  {
+    this.timelinessScoreVeryLate = timelinessScoreVeryLate;
   }
 
   public void setVaccinationAdministeredCount(int vaccinationAdministeredCount)
   {
     this.vaccinationAdministeredCount = vaccinationAdministeredCount;
   }
-
   public void setVaccinationDeleteCount(int vaccinationDeleteCount)
   {
     this.vaccinationDeleteCount = vaccinationDeleteCount;
   }
-
   public void setVaccinationHistoricalCount(int vaccinationHistoricalCount)
   {
     this.vaccinationHistoricalCount = vaccinationHistoricalCount;
   }
-
   public void setVaccinationNotAdministeredCount(int vaccinationNotAdministeredCount)
   {
     this.vaccinationNotAdministeredCount = vaccinationNotAdministeredCount;
   }
-
 
 }

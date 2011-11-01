@@ -21,13 +21,16 @@
     <property name="qualityErrorScore" column="qual_error_score" type="integer"/>
     <property name="qualityScore" column="qual_score" type="integer"/>
     <property name="qualityWarnScore" column="qual_warn_score" type="integer"/>
-    <property name="timelinessCount2Days" column="time_count_2_days" type="integer"/>
-    <property name="timelinessCount30Days" column="time_count_30_days" type="integer"/>
-    <property name="timelinessCount7Days" column="time_count_7_days" type="integer"/>
+    <property name="timelinessCountEarly" column="time_count_early" type="integer"/>
+    <property name="timelinessCountOnTime" column="time_count_on_time" type="integer"/>
+    <property name="timelinessCountLate" column="time_count_late" type="integer"/>
+    <property name="timelinessCountVeryLate" column="time_count_very_late" type="integer"/>
+    <property name="timelinessCountOldData" column="time_count_old_data" type="integer"/>
     <property name="timelinessScore" column="time_score" type="integer"/>
-    <property name="timelinessScore2Days" column="time_score_2_days" type="integer"/>
-    <property name="timelinessScore30Days" column="time_score_30_days" type="integer"/>
-    <property name="timelinessScore7Days" column="time_score_7_days" type="integer"/>
+    <property name="timelinessScoreEarly" column="time_score_early" type="integer"/>
+    <property name="timelinessScoreOnTime" column="time_score_on_time" type="integer"/>
+    <property name="timelinessScoreLate" column="time_score_late" type="integer"/>
+    <property name="timelinessScoreVeryLate" column="time_score_very_late" type="integer"/>
     <property name="vaccinationAdministeredCount" column="vacc_admin_count" type="integer"/>
     <property name="vaccinationDeleteCount" column="vacc_delete_count" type="integer"/>
     <property name="vaccinationHistoricalCount" column="vacc_historical_count" type="integer"/>

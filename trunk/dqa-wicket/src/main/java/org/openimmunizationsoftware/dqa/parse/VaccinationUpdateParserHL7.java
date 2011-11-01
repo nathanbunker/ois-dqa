@@ -13,6 +13,7 @@ import org.openimmunizationsoftware.dqa.db.model.Header;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
+import org.openimmunizationsoftware.dqa.db.model.received.Observation;
 import org.openimmunizationsoftware.dqa.db.model.received.Patient;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Address;
@@ -168,8 +169,16 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
           continue;
         }
         populateRXR(message);
-        vaccination = null;
+      } else if (segmentName.equals("OBX"))
+      {
+        if (vaccination == null)
+        {
+          registerIssue(pi.Hl7RxaSegmentIsMissing);
+          continue;
+        }
+        populateOBX(message);
       }
+      
     }
     positionId = 0;
     assertPIDFound(foundPID);
@@ -315,6 +324,16 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     readCodeEntity(1, vaccination.getBodyRoute());
     readCodeEntity(2, vaccination.getBodySite());
   }
+  
+  private void populateOBX(MessageReceived message)
+  {
+    Observation obs = new Observation();
+    vaccination.getObservations().add(obs);
+    readCodeEntity(2, obs.getValueType());
+    readCodeEntity(3, obs.getObservationIdentifier());
+    obs.setObservationValue(getValue(5));
+  }
+  
 
   private void readCptCvxCodes(CodedEntity admin)
   {
@@ -455,12 +474,12 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
   private void readLocationWithAddress(int fieldNumber, OrganizationName orgName)
   {
     String[] field = getValues(fieldNumber);
-    orgName.getId().setNumber(field.length > 4 ? field[3] : "");
+    orgName.getId().setNumber(field.length >= 4 ? field[3] : "");
     if (orgName.getId().getNumber().isEmpty())
     {
-      orgName.getId().setNumber(field.length > 1 ? field[0] : "");
+      orgName.getId().setNumber(field.length >= 1 ? field[0] : "");
     }
-    orgName.setName(field.length > 4 ? field[3] : "");
+    orgName.setName(field.length >= 4 ? field[3] : "");
   }
 
   private void readName(int fieldNumber, Name name)
@@ -487,7 +506,12 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         currentSegment.add(messageText.substring(startField, i));
         segments.add(currentSegment);
         currentSegment = new ArrayList<String>();
-        startField = i + 1;
+        while (c < ' ' && i < (totalLength - 1))
+        {
+          i++;
+          c = messageText.charAt(i);
+        }
+        startField = i;
       } else if (c == separators[BAR])
       {
         String fieldValue = messageText.substring(startField, i);

@@ -14,11 +14,13 @@ import org.openimmunizationsoftware.dqa.db.model.received.Patient;
 import org.openimmunizationsoftware.dqa.db.model.received.Skippable;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
+import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 
 public abstract class ValidateMessage
 {
 
   protected MessageReceived message = null;
+  protected QualityCollector qualityCollector = null;
   protected SubmitterProfile profile = null;
   protected Patient patient = null;
   protected Vaccination vaccination = null;

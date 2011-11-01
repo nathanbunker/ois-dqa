@@ -57,6 +57,7 @@ public class ModelFactory
   {
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     float totalWeight = 0.0f;
+    float firstWeight = 0.0f;
     for (int i = 0; i < nodes.getLength(); i++)
     {
       Node node = nodes.item(i);
@@ -68,9 +69,14 @@ public class ModelFactory
           ModelSection section = new ModelSection();
           section.setName(safe(map.getNamedItem("name")));
           section.setWeight(safeFloat(map.getNamedItem("weight")));
+          section.setDays(safeInt(map.getNamedItem("days")));
           if (section.getWeight() > 0)
           {
             totalWeight += section.getWeight();
+          }
+          if (firstWeight == 0.0f)
+          {
+            firstWeight = section.getWeight();
           }
           rootSection.getSections().add(section);
           addSections(section, node.getChildNodes());
@@ -115,6 +121,10 @@ public class ModelFactory
           totalWeight += addSubScores(node, map, score.getScores());
         }
       }
+    }
+    if (rootSection.getName().equals("timeliness"))
+    {
+      totalWeight = firstWeight;
     }
     if (totalWeight > 0)
     {
@@ -230,6 +240,26 @@ public class ModelFactory
     } catch (NumberFormatException nf)
     {
       return 0.0f;
+    }
+  }
+  
+  private static int safeInt(Node n)
+  {
+    if (n == null)
+    {
+      return 0;
+    }
+    String s = n.getNodeValue();
+    if (s == null || s.equals(""))
+    {
+      return 0;
+    }
+    try
+    {
+      return Integer.parseInt(s.trim());
+    } catch (NumberFormatException nf)
+    {
+      return 0;
     }
   }
 }

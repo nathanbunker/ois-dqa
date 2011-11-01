@@ -464,7 +464,7 @@ public class FileImportProcessor extends ManagerThread
       if (!messageReceived.hasErrors())
       {
         Validator validator = new Validator(profile, session);
-        validator.validateVaccinationUpdateMessage(messageReceived);
+        validator.validateVaccinationUpdateMessage(messageReceived, qualityCollector);
       }
       IssueAction issueAction = determineIssueAction(messageReceived);
       messageReceived.setIssueAction(issueAction);

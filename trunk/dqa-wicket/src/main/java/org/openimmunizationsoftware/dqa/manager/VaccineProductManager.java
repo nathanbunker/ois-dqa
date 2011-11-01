@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.manager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class VaccineProductManager
     return singleton;
   }
   
-  private Map<String, VaccineProduct> vaccineProducts = new HashMap<String, VaccineProduct>();
+  private Map<String, List<VaccineProduct>> vaccineProducts = new HashMap<String, List<VaccineProduct>>();
   
   private VaccineProductManager()
   {
@@ -38,13 +39,20 @@ public class VaccineProductManager
     List<VaccineProduct> vaccineProductsList = query.list();
     for (VaccineProduct vp : vaccineProductsList)
     {
-      vaccineProducts.put(vp.getCvx().getCvxCode() + "-" + vp.getMvx().getMvxCode(), vp);
+      String key = vp.getCvx().getCvxCode() + "-" + vp.getMvx().getMvxCode();
+      List<VaccineProduct> vpList = vaccineProducts.get(key);
+      if (vpList == null)
+      {
+        vpList = new ArrayList<VaccineProduct>();
+        vaccineProducts.put(key, vpList);
+      }
+      vpList.add(vp);
     }
     tx.commit();
     session.close();
   }
   
-  public VaccineProduct getVaccineProduct(VaccineCvx cvxCode, VaccineMvx mvxCode)
+  public List<VaccineProduct> getVaccineProducts(VaccineCvx cvxCode, VaccineMvx mvxCode)
   {
     return vaccineProducts.get(cvxCode.getCvxCode() + "-" + mvxCode.getMvxCode());
   }
