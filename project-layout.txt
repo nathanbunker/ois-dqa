@@ -1,0 +1,41 @@
+Project layout
+
+ois-dqa  # root project
+      |_ database  # holds all db related files and is independent of the interface
+            |_mysql  # mysql specific configuration mgmt
+                 |_trunk
+                 |-branches
+                 |-tags
+            |_oracle  # oracle specific configuration mgmt
+                 |_trunk
+                      |_data  # holds DML scripts for static tables
+                      |_schema # holds DDL scripts for schema modifications
+                      |_build  # holds special scripts to execute an entire build
+                 |-branches
+                      |_data
+                      |_schema
+                      |_build
+                 |-tags
+                      |_data
+                      |_schema
+                      |_build
+      |_ interface  # holds all interface related files used to create the front end and middle tier support
+            |_ wicket  # wicket framework specific support
+                 |_trunk
+                     |_hsql  # hsql in-memory database (run ant)
+                     |_src
+                     |_target
+                 |-branches
+                     |_src
+                     |_target
+                 |-tags
+                     |_src
+                     |_target
+            |_ dotnet   # dotnet framework specific support (future)
+                 |_trunk
+                 |-branches
+                 |-tags
+            |_ struts  # struts framework specific support (future)
+                 |_trunk
+                 |-branches
+                 |-tags                                  
