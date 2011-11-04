@@ -1,7 +1,7 @@
 <project name="dqa" default="db" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 	<property name="source.root" value="src/main/java"/>
 	<property name="class.root" value="classes"/>
-	<property name="data.dir" value="hsql"/>
+	<property name="data.dir" value="data"/>
 	
 	<artifact:dependencies pathId="dependency.classpath">
 		<dependency groupId="hsqldb" artifactId="hsqldb" version="1.8.0.7"/>
