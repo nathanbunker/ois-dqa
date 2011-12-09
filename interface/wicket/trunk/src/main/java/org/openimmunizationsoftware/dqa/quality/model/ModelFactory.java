@@ -87,6 +87,8 @@ public class ModelFactory
           String num = safe(map.getNamedItem("numerator"));
           score.setNumerator(num);
           String den = safe(map.getNamedItem("denominator"));
+          String invert = safe(map.getNamedItem("invert")).toUpperCase();
+          score.setInvert(invert.startsWith("Y") || invert.startsWith("T"));
           try
           {
             score.setDenominator(ReportDenominator.valueOf(den.toUpperCase().trim().replace(' ', '_')));
@@ -102,6 +104,7 @@ public class ModelFactory
             potentialIssue = pi.getPotentialIssueByDisplayText(num, PotentialIssue.ISSUE_TYPE_IS_MISSING);
             if (potentialIssue != null)
             {
+              score.setInvert(true);
               addDemerit(pi, score, PotentialIssue.ISSUE_TYPE_IS_DEPRECATE, "Deprecated");
               addDemerit(pi, score, PotentialIssue.ISSUE_TYPE_IS_INVALID, "Invalid");
               addDemerit(pi, score, PotentialIssue.ISSUE_TYPE_IS_UNRECOGNIZED, "Unrecognized");
@@ -196,6 +199,7 @@ public class ModelFactory
               throw new IllegalArgumentException("Score numerator '" + score.getNumerator()
                   + "' is not recognized where label = '" + score.getLabel() + "'");
             }
+            score.setInvert(true);
           }
           score.setPotentialIssue(potentialIssue);
           if (score.getWeight() > 0)

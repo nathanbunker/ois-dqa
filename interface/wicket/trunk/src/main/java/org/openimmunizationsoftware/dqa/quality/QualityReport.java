@@ -487,20 +487,24 @@ public class QualityReport
       out.println("        <th width=\"70\" align=\"center\">Weight</th>");
     }
     out.println("      </tr>");
-    boolean sectionSkipped = false;
+    boolean firstSectionFound = false;
+    boolean firstSectionSkipped = false;
     for (CompletenessRow completenessRow : completenessRowList)
     {
-      if (sectionSkipped && completenessRow.getToolTip().hasIndent())
+      if (firstSectionSkipped && completenessRow.getToolTip().hasIndent())
       {
         continue;
       }
       if (completenessRow.getScoreWeight() > 0 || completenessRow.getCount() > 0)
       {
         print(completenessRow, scoringSet.getOverallWeight(), weightFactor, type);
-        sectionSkipped = false;
+        firstSectionFound = true;
       } else
       {
-        sectionSkipped = true;
+        if (!firstSectionFound)
+        {
+          firstSectionSkipped = true;
+        }
       }
     }
     out.println("    </table>");
@@ -542,7 +546,20 @@ public class QualityReport
     // out.println("      Completeness measures if fields necessary for registry functions ");
     // out.println("      been valued. ");
     // out.println("    </p>");
-    out.println("    <h3>Scoring Summary</h3>");
+
+    QualityScoring scoring = qualityCollector.getCompletenessScoring();
+
+    if (scoring.getScoringSet(QualityScoring.PATIENT_REQUIRED).getScore() >= 0.99
+        && scoring.getScoringSet(QualityScoring.VACCINATION_REQUIRED).getScore() >= 0.99)
+    {
+      out.println("    <h3>Ready for Production</h3>");
+      out.println("    <p>All required fields are present, interface is ready for production.</p>");
+    } else
+    {
+      out.println("    <h3>Not Ready for Production</h3>");
+      out.println("    <p>Required fields are not all present, interface is not ready for production.</p>");
+    }
+    out.println("    <h2>Scoring Summary</h2>");
     printScoringSummary("DQA", report.getOverallScore());
     out.println("    <table width=\"400\">");
     out.println("      <tr>");
@@ -751,7 +768,9 @@ public class QualityReport
     for (CodeReceived codeReceived : codeReceivedMap.keySet())
     {
       List<BatchCodeReceived> batchCodeReceivedList = codeTableMap.get(codeReceived.getTable());
-      // System.out.println("--> codeReceived = " + codeReceived.getTable().getTableLabel() + ": " + codeReceived.getReceivedValue() );
+      // System.out.println("--> codeReceived = " +
+      // codeReceived.getTable().getTableLabel() + ": " +
+      // codeReceived.getReceivedValue() );
       if (batchCodeReceivedList == null)
       {
         batchCodeReceivedList = new ArrayList<BatchCodeReceived>();

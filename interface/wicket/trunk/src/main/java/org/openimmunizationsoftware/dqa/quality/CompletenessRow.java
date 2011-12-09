@@ -43,11 +43,12 @@ public class CompletenessRow
    * @param reportDenominator
    * @param scoreWeight
    */
-  public CompletenessRow(String label, PotentialIssue potentialIssue, ReportDenominator reportDenominator, float scoreWeight) {
+  public CompletenessRow(String label, PotentialIssue potentialIssue, ReportDenominator reportDenominator, float scoreWeight, boolean invert) {
     this.potentialIssue = potentialIssue;
     this.reportDenominator = reportDenominator;
     this.scoreWeight = scoreWeight;
     this.toolTip = new ToolTip(label, "");
+    this.invert = invert;
   }
   
 
