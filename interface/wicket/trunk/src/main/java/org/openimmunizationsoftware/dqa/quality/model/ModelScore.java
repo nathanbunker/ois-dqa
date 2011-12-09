@@ -13,6 +13,7 @@ public class ModelScore
   private String numerator = "";
   private float weight = 0;
   private PotentialIssue potentialIssue = null;
+  private boolean invert = false;
   private List<ModelScore> scores = new ArrayList<ModelScore>();
 
   public List<ModelScore> getScores()
@@ -68,6 +69,16 @@ public class ModelScore
   public void setPotentialIssue(PotentialIssue potentialIssue)
   {
     this.potentialIssue = potentialIssue;
+  }
+
+  public boolean isInvert()
+  {
+    return invert;
+  }
+
+  public void setInvert(boolean invert)
+  {
+    this.invert = invert;
   }
 
 }

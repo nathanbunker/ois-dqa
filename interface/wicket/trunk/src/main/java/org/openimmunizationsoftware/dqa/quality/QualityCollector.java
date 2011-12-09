@@ -45,7 +45,7 @@ public class QualityCollector
   private QualityScoring scoring = null;
   private ModelForm modelForm = null;
   private Header exampleHeader = null;
-  
+
   public Header getExampleHeader()
   {
     return exampleHeader;
@@ -338,7 +338,10 @@ public class QualityCollector
       int denominator = getDenominator(completenessRow);
       if (denominator > 0)
       {
-        numerator = invertNumerator(completenessRow, numerator, denominator);
+        if (completenessRow.isInvert())
+        {
+          numerator = invertNumerator(completenessRow, numerator, denominator);
+        }
         double score = completenessRow.getScoreWeight() * numerator / (double) denominator;
         completenessRow.setScore(score);
         completenessRow.setCount(numerator);

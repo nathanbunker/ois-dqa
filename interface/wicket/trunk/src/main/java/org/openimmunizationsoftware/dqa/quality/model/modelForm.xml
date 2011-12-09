@@ -1,7 +1,7 @@
 <dqa-scoring>
   <section name="completeness" weight="50">
-    <section name="patient" weight="20">
-      <section name="required" weight="12">
+    <section name="patient" weight="45">
+      <section name="required" weight="14">
         <score label="Patient Id" denominator="patient count" numerator="Patient submitter id" weight="10" />
         <score label="First Name" denominator="patient count" numerator="Patient name first" weight="5" />
         <score label="Last Name" denominator="patient count" numerator="Patient name last" weight="5" />
@@ -16,10 +16,14 @@
           <score label="Zip" denominator="patient count" numerator="Patient address zip" weight="1" />
         </score>
       </section>
-      <section name="expected" weight="6">
+      <section name="expected" weight="4">
         <score label="Middle Name" denominator="patient count" numerator="Patient middle name" weight="10" />
         <score label="Phone" denominator="patient count" numerator="Patient phone" weight="10" />
         <score label="Mother's Maiden" denominator="patient count" numerator="Patient mother's maiden name" weight="10" />
+      </section>
+      <section name="recommended" weight="2">
+        <score label="Ethnicity" denominator="patient count" numerator="Patient ethnicity" weight="10" />
+        <score label="Race" denominator="patient count" numerator="Patient race" weight="10" />
         <score label="Responsible Party" denominator="patient count" numerator="Patient guardian party" weight="1">
           <score label="First Name" denominator="patient count" numerator="Patient guardian name first" weight="4" />
           <score label="Last Name" denominator="patient count" numerator="Patient guardian name last" weight="4" />
@@ -27,12 +31,8 @@
           <score label="Relationship" denominator="patient count" numerator="Patient guardian relationship" weight="1" />
         </score>
       </section>
-      <section name="recommended" weight="2">
-        <score label="Birth Indicator" denominator="patient count" numerator="Patient birth indicator" weight="10" />
-        <score label="Ethnicity" denominator="patient count" numerator="Patient ethnicity" weight="10" />
-        <score label="Race" denominator="patient count" numerator="Patient race" weight="10" />
-      </section>
       <section name="optional" weight="0">
+        <score label="Birth Indicator" denominator="patient count" numerator="Patient birth indicator" weight="0" />
         <score label="Medicaid Id" denominator="patient count" numerator="Patient Medicaid number" weight="0" />
         <score label="SSN" denominator="patient count" numerator="Patient SSN" weight="0" />
         <score label="Alias" denominator="patient count" numerator="Patient alias" weight="0" />
@@ -58,8 +58,8 @@
         <score label="Publicity Indicator" denominator="patient count" numerator="Patient publicity code" weight="0" />
       </section>
     </section>
-    <section name="vaccination" weight="20">
-      <section name="required" weight="50">
+    <section name="vaccination" weight="45">
+      <section name="required" weight="14">
         <score label="Vaccination Date" denominator="vaccination count" numerator="Vaccination admin date" weight="40" />
         <score label="Vaccination Code" denominator="vaccination count" numerator="Vaccination admin code" weight="40">
           <score label="Not Specific" denominator="vaccination admin count" numerator="Vaccination admin code is not specific" weight="-10" />
@@ -73,20 +73,20 @@
             weight="-10" />
         </score>
       </section>
-      <section name="expected" weight="40">
+      <section name="expected" weight="4">
         <score label="CVX Code" denominator="vaccination count" numerator="Vaccination CVX code" weight="20" />
         <score label="Lot Number" denominator="vaccination admin count" numerator="Vaccination lot number" weight="20" />
         <score label="Manufacturer" denominator="vaccination admin count" numerator="Vaccination manufacturer code" weight="20" />
         <score label="VFC Status" denominator="vaccination admin count" numerator="Vaccination financial eligibility code" weight="20" />
-        <score label="Facility Id" denominator="vaccination admin count" numerator="Vaccination facility id" weight="20" />
       </section>
-      <section name="recommended" weight="10">
-        <score label="Admin Amount" denominator="vaccination admin count" numerator="Vaccination administered amount" weight="10">
-          <score label="Missing Units" denominator="vaccination admin count" numerator="Vaccination administered unit is missing" weight="-2" />
+      <section name="recommended" weight="2">
+        <score label="Admin Amount" denominator="vaccination admin count" numerator="Vaccination administered amount" weight="14">
+          <score label="Missing Units" denominator="vaccination admin count" numerator="Vaccination administered unit is missing" weight="-3" />
         </score>
-        <score label="Completion Status" denominator="vaccination admin count" numerator="Vaccination completion status" weight="5" />
+        <score label="Completion Status" denominator="vaccination admin count" numerator="Vaccination completion status" weight="6" />
       </section>
       <section name="optional" weight="0">
+        <score label="Facility Id" denominator="vaccination admin count" numerator="Vaccination facility id" weight="0" />
         <score label="Given By Id" denominator="vaccination admin count" numerator="Vaccination given by" weight="0" />
         <score label="Action Code" denominator="vaccination count" numerator="Vaccination action code" weight="0" />
         <score label="Ordered By" denominator="vaccination admin count" numerator="Vaccination ordered by" weight="0" />
@@ -126,9 +126,9 @@
     </section>
   </section>
   <section name="quality" weight="40">
-    <section name="errors" weight="20">
+    <section name="errors" weight="28">
     </section>
-    <section name="warnings" weight="20">
+    <section name="warnings" weight="12">
     </section>
   </section>
   <section name="timeliness" weight="10">

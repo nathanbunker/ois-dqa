@@ -65,16 +65,9 @@ public class ScoringSet
       {
         cr.setDemerit();
       }
-      else
-      {
-        boolean invert = score.getPotentialIssue().getIssueType().equals(PotentialIssue.ISSUE_TYPE_IS_MISSING);
-        cr.setInvert(invert);
-      }
       for (ModelScore subScore : score.getScores())
       {
         cr = add(subScore).setIndent(true);
-        boolean invert = subScore.getPotentialIssue().getIssueType().equals(PotentialIssue.ISSUE_TYPE_IS_MISSING);
-        cr.setInvert(invert);
       }
     }
   }
@@ -82,13 +75,13 @@ public class ScoringSet
   private CompletenessRow add(ModelScore score)
   {
     return add(score.getLabel(), score.getPotentialIssue(), score.getDenominator(),
-        score.getWeight());
+        score.getWeight(), score.isInvert());
   }
 
   private CompletenessRow add(String label, PotentialIssue potentialIssue, ReportDenominator reportDenominator,
-      float scoreWeight)
+      float scoreWeight, boolean invert)
   {
-    CompletenessRow row = new CompletenessRow(label, potentialIssue, reportDenominator, scoreWeight);
+    CompletenessRow row = new CompletenessRow(label, potentialIssue, reportDenominator, scoreWeight, invert);
     completenessRow.add(row);
     return row;
   }
