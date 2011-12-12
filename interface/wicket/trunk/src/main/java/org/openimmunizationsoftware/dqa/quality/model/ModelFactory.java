@@ -1,14 +1,19 @@
 package org.openimmunizationsoftware.dqa.quality.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringBufferInputStream;
+import java.io.StringReader;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.hsqldb.lib.StringInputStream;
 import org.openimmunizationsoftware.dqa.InitializationException;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
+import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 import org.openimmunizationsoftware.dqa.quality.ReportDenominator;
 import org.w3c.dom.Document;
@@ -35,6 +40,28 @@ public class ModelFactory
       }
     }
     return modelFormDefault;
+  }
+
+  public static ModelForm createModelForm(SubmitterProfile profile)
+  {
+    try
+    {
+      ModelForm modelForm = new ModelForm();
+      DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+      String text = profile.getReportTemplate().getReportDefinition();
+      Document doc = docBuilder.parse(new ByteArrayInputStream(text.getBytes()));
+      doc.getDocumentElement().normalize();
+      NodeList nodes = doc.getChildNodes();
+      if (nodes.getLength() == 1)
+      {
+        addSections(modelForm, nodes.item(0).getChildNodes());
+      }
+      return modelForm;
+    } catch (Exception e)
+    {
+      throw new IllegalArgumentException("Unable to create data quality model definition", e);
+    }
   }
 
   public static ModelForm createModelForm(String resourceName) throws SAXException, IOException,
@@ -246,7 +273,7 @@ public class ModelFactory
       return 0.0f;
     }
   }
-  
+
   private static int safeInt(Node n)
   {
     if (n == null)

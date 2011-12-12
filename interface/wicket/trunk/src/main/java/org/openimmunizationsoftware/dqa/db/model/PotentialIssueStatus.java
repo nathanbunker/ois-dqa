@@ -22,6 +22,15 @@ public class PotentialIssueStatus
     expectMin = 0;
     expectMax = 100;
   }
+  
+  public PotentialIssueStatus(PotentialIssueStatus templatePis, SubmitterProfile profile)
+  {
+    this.issue = templatePis.issue;
+    this.profile = profile;
+    action = templatePis.action;
+    expectMin = templatePis.expectMin;
+    expectMax = templatePis.expectMax;
+  }
 
   public int getPotentialIssueStatusId()
   {

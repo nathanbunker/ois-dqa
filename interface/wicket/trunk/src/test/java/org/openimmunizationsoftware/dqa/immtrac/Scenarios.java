@@ -82,7 +82,13 @@ public class Scenarios extends TestCase
    */
   public void testScenario3() throws Exception
   {
+    SessionFactory factory = OrganizationManager.getSessionFactory();
+    Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
+
     SubmitterProfile profile = new SubmitterProfile();
+    profile.initPotentialIssueStatus(session);
+
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
@@ -121,21 +127,24 @@ public class Scenarios extends TestCase
     parser.createVaccinationUpdateMessage(messageReceived);
     assertTrue(messageReceived.hasErrors());
     assertTrue(hasError(messageReceived, pi.Hl7MshEncodingCharacterIsInvalid));
+    tx.rollback();
+    session.close();
   }
 
   public void testScenario4() throws Exception
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
 
-    Transaction tx = session.beginTransaction();
     messageReceived = new MessageReceived();
     messageReceived.setRequestText(NO_PROBLEMS);
     messageReceived.setProfile(profile);
@@ -206,15 +215,16 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
 
-    Transaction tx = session.beginTransaction();
     messageReceived = new MessageReceived();
     messageReceived.setRequestText(SCENARIO_5_A);
     messageReceived.setProfile(profile);
@@ -246,14 +256,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -290,14 +301,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -330,14 +342,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -370,14 +383,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -410,14 +424,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -450,14 +465,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -494,14 +510,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -534,14 +551,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -574,14 +592,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -614,14 +633,15 @@ public class Scenarios extends TestCase
   {
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
     SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     MessageReceived messageReceived;
     PotentialIssues pi = PotentialIssues.getPotentialIssues();
     Validator validator = new Validator(profile, session);
-    Transaction tx = null;
 
     tx = session.beginTransaction();
     messageReceived = new MessageReceived();
@@ -645,44 +665,45 @@ public class Scenarios extends TestCase
   }
 
   private static final String SCENARIO_31_A = "MSH|^~\\&|ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
-    + "PID|||100755502^^^^PI~122112219^^^^MA~123123124^^^^SS||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
-    + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
-    + "PV1||R|\r"
-    + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^BADID^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "PID|||100755502^^^^PI~122112219^^^^MA~123123124^^^^SS||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
+      + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
+      + "PV1||R|\r"
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^BADID^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
-public void testScenario31() throws Exception
-{
-  SessionFactory factory = OrganizationManager.getSessionFactory();
-  Session session = factory.openSession();
+  public void testScenario31() throws Exception
+  {
+    SessionFactory factory = OrganizationManager.getSessionFactory();
+    Session session = factory.openSession();
+    Transaction tx = session.beginTransaction();
 
-  SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
-  profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
-  VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
-  MessageReceived messageReceived;
-  PotentialIssues pi = PotentialIssues.getPotentialIssues();
-  Validator validator = new Validator(profile, session);
-  Transaction tx = null;
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    profile.initPotentialIssueStatus(session);
+    profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
+    VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
+    MessageReceived messageReceived;
+    PotentialIssues pi = PotentialIssues.getPotentialIssues();
+    Validator validator = new Validator(profile, session);
 
-  tx = session.beginTransaction();
-  messageReceived = new MessageReceived();
-  messageReceived.setRequestText(NO_PROBLEMS);
-  messageReceived.setProfile(profile);
-  parser.createVaccinationUpdateMessage(messageReceived);
-  validator.validateVaccinationUpdateMessage(messageReceived);
-  assertFalse(hasIssue(messageReceived, pi.VaccinationFacilityIdIsInvalid));
-  tx.rollback();
+    tx = session.beginTransaction();
+    messageReceived = new MessageReceived();
+    messageReceived.setRequestText(NO_PROBLEMS);
+    messageReceived.setProfile(profile);
+    parser.createVaccinationUpdateMessage(messageReceived);
+    validator.validateVaccinationUpdateMessage(messageReceived);
+    assertFalse(hasIssue(messageReceived, pi.VaccinationFacilityIdIsInvalid));
+    tx.rollback();
 
-  tx = session.beginTransaction();
-  messageReceived = new MessageReceived();
-  messageReceived.setRequestText(SCENARIO_31_A);
-  messageReceived.setProfile(profile);
-  parser.createVaccinationUpdateMessage(messageReceived);
-  validator.validateVaccinationUpdateMessage(messageReceived);
-  assertTrue(hasIssue(messageReceived, pi.VaccinationFacilityIdIsUnrecognized));
-  tx.rollback();
+    tx = session.beginTransaction();
+    messageReceived = new MessageReceived();
+    messageReceived.setRequestText(SCENARIO_31_A);
+    messageReceived.setProfile(profile);
+    parser.createVaccinationUpdateMessage(messageReceived);
+    validator.validateVaccinationUpdateMessage(messageReceived);
+    assertTrue(hasIssue(messageReceived, pi.VaccinationFacilityIdIsUnrecognized));
+    tx.rollback();
 
-  session.close();
-}
+    session.close();
+  }
 
   private void printErrors(MessageReceived messageReceived)
   {

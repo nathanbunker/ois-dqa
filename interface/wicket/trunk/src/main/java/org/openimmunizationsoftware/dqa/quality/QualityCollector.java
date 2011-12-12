@@ -86,7 +86,7 @@ public class QualityCollector
     messageBatch.setBatchType(batchType);
     messageBatch.setProfile(profile);
     this.profile = profile;
-    modelForm = ModelFactory.getModelFormDefault();
+    modelForm = ModelFactory.createModelForm(profile);
     report = messageBatch.getBatchReport();
 
   }
