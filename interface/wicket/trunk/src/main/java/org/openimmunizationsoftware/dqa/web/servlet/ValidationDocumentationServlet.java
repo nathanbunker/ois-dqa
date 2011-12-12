@@ -80,6 +80,7 @@ public class ValidationDocumentationServlet extends HttpServlet
     try
     {
       SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, SubmitterProfile.TEST_HL7);
+      profile.initPotentialIssueStatus(session);
       VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
       MessageReceived messageReceived = new MessageReceived();
       messageReceived.setProfile(profile);

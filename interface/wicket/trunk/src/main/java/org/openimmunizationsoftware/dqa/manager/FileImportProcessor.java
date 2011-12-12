@@ -84,6 +84,9 @@ public class FileImportProcessor extends ManagerThread
       SessionFactory factory = OrganizationManager.getSessionFactory();
       Session session = factory.openSession();
       findProfile(profileCode, session);
+      Transaction tx = session.beginTransaction();
+      profile.initPotentialIssueStatus(session);
+      tx.commit();
       String[] filesToProcess = submitDir.list(new FilenameFilter() {
         public boolean accept(java.io.File dir, String name)
         {

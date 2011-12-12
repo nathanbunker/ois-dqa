@@ -411,6 +411,7 @@ public class IncomingServlet extends HttpServlet
     {
       Transaction tx = session.beginTransaction();
 
+      profile.initPotentialIssueStatus(session);
       MessageReceived messageReceived = new MessageReceived();
       messageReceived.setProfile(profile);
       messageReceived.setRequestText(sb.toString());

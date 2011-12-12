@@ -14,5 +14,6 @@
     <property name="dataFormat" column="data_format" type="string"/>
     <property name="transferPriority" column="transfer_priority" type="string"/>
     <property name="accessKey" column="access_key" type="string"/>
+    <many-to-one name="reportTemplate" column="template_id" class="ReportTemplate"/>
   </class>
 </hibernate-mapping>

@@ -1,17 +1,19 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
-
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
+import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 
 public class SubmitterProfile
 {
   public static final int MASTER_HL7 = 1;
   public static final int TEST_HL7 = 101;
-  
+
   public static final String DATA_FORMAT_HL7V2 = "HL7v2";
 
   public static final String PROFILE_STATUS_CLOSED = "Closed";
@@ -21,13 +23,13 @@ public class SubmitterProfile
   public static final String PROFILE_STATUS_TEMPLATE = "Template";
   public static final String PROFILE_STATUS_VALIDATE = "Validate";
   public static final String PROFILE_STATUS_TEST = "Test";
-  
+
   public static final String TRANSFER_PRIORITY_HIGH = "High";
   public static final String TRANSFER_PRIORITY_HIGHEST = "Highest";
   public static final String TRANSFER_PRIORITY_LOW = "Low";
   public static final String TRANSFER_PRIORITY_LOWEST = "Lowest";
   public static final String TRANSFER_PRIORITY_NORMAL = "Normal";
-  
+
   private String accessKey = "";
   private CodesReceived codesReceived = null;
   private String dataFormat = "";
@@ -38,13 +40,24 @@ public class SubmitterProfile
   private String profileLabel = "";
   private String profileStatus = "";
   private String transferPriority = "";
-  
+  private ReportTemplate reportTemplate = null;
+
+  public ReportTemplate getReportTemplate()
+  {
+    return reportTemplate;
+  }
+
+  public void setReportTemplate(ReportTemplate reportTemplate)
+  {
+    this.reportTemplate = reportTemplate;
+  }
+
   @Override
   public boolean equals(Object obj)
   {
     if (obj instanceof SubmitterProfile)
     {
-      return ((SubmitterProfile) obj).getProfileId() == profileId; 
+      return ((SubmitterProfile) obj).getProfileId() == profileId;
     }
     return super.equals(obj);
   }
@@ -62,7 +75,7 @@ public class SubmitterProfile
     }
     return codesReceived;
   }
-  
+
   public void saveCodesReceived(Session session)
   {
     if (codesReceived != null)
@@ -70,138 +83,177 @@ public class SubmitterProfile
       codesReceived.saveCodesReceived(session);
     }
   }
-  
+
   public void registerCodeReceived(CodeReceived codeReceived, Session session)
   {
     getCodesReceived(session).registerCodeReceived(codeReceived);
   }
-  
+
   public String getDataFormat()
   {
     return dataFormat;
   }
+
   public Organization getOrganization()
   {
     return organization;
   }
-  
-  public PotentialIssueStatus getPotentialIssueStatus(PotentialIssue potentialIssue)
+
+  public void initPotentialIssueStatus(Session session)
   {
     if (potentialIssueStatusMap == null)
     {
       potentialIssueStatusMap = new HashMap<PotentialIssue, PotentialIssueStatus>();
+      Query query = session.createQuery("from PotentialIssueStatus where profile = ?");
+      query.setParameter(0, this);
+      List<PotentialIssueStatus> potentialIssueStatusList = query.list();
+      for (PotentialIssueStatus pis : potentialIssueStatusList)
+      {
+        potentialIssueStatusMap.put(pis.getIssue(), pis);
+      }
+
+      for (PotentialIssue potentialIssue : PotentialIssues.getPotentialIssues().getAllPotentialIssues())
+      {
+        PotentialIssueStatus pis = potentialIssueStatusMap.get(potentialIssue);
+        if (pis == null)
+        {
+          query = session.createQuery("from PotentialIssueStatus where profile = ? and issue_id = ?");
+          query.setParameter(0, reportTemplate.getBaseProfile());
+          query.setParameter(1, potentialIssue);
+          List<PotentialIssueStatus> templatePisList = query.list();
+          if (templatePisList.size() > 0)
+          {
+            pis = new PotentialIssueStatus(templatePisList.get(0), this);
+            session.saveOrUpdate(pis);
+            potentialIssueStatusMap.put(potentialIssue, pis);
+          }
+        }
+
+      }
     }
-    PotentialIssueStatus potentialIssueStatus = potentialIssueStatusMap.get(potentialIssue);
-    if (potentialIssueStatus == null)
-    {
-      potentialIssueStatus = new PotentialIssueStatus(potentialIssue, this);
-      potentialIssueStatusMap.put(potentialIssue, potentialIssueStatus);
-    }
-    return potentialIssueStatus;
+
   }
-  
+
+  public PotentialIssueStatus getPotentialIssueStatus(PotentialIssue potentialIssue)
+  {
+    return potentialIssueStatusMap.get(potentialIssue);
+  }
+
   public HashMap<PotentialIssue, PotentialIssueStatus> getPotentialIssueStatusMap()
   {
     return potentialIssueStatusMap;
   }
+
   public String getProfileCode()
   {
     return profileCode;
   }
+
   public int getProfileId()
   {
     return profileId;
   }
+
   public String getProfileLabel()
   {
     return profileLabel;
   }
+
   public String getProfileStatus()
   {
     return profileStatus;
   }
+
   public String getTransferPriority()
   {
     return transferPriority;
   }
+
   @Override
   public int hashCode()
   {
     return profileId;
   }
+
   public boolean isProfileStatusClosed()
   {
     return PROFILE_STATUS_CLOSED.equals(profileStatus);
   }
+
   public boolean isProfileStatusHold()
   {
     return PROFILE_STATUS_HOLD.equals(profileStatus);
   }
+
   public boolean isProfileStatusProd()
   {
     return PROFILE_STATUS_PROD.equals(profileStatus);
   }
+
   public boolean isProfileStatusSetup()
   {
     return PROFILE_STATUS_SETUP.equals(profileStatus);
   }
+
   public boolean isProfileStatusTemplate()
   {
     return PROFILE_STATUS_TEMPLATE.equals(profileStatus);
   }
+
   public boolean isProfileStatusTest()
   {
     return PROFILE_STATUS_TEST.equals(profileStatus);
   }
+
   public void setAccessKey(String accessKey)
   {
     this.accessKey = accessKey;
   }
-  
+
   public void setDataFormat(String dataFormat)
   {
     this.dataFormat = dataFormat;
   }
-  
+
   public void setOrganization(Organization organization)
   {
     this.organization = organization;
   }
-  
+
   public void setPotentialIssueStatusMap(HashMap<PotentialIssue, PotentialIssueStatus> potentialIssueStatusMap)
   {
     this.potentialIssueStatusMap = potentialIssueStatusMap;
   }
-  
+
   public void setProfileCode(String profileCode)
   {
     this.profileCode = profileCode;
   }
-  
+
   public void setProfileId(int profileId)
   {
     this.profileId = profileId;
   }
-  
+
   public void setProfileLabel(String profileLabel)
   {
     this.profileLabel = profileLabel;
   }
-  
+
   public void setProfileStatus(String profileStatus)
   {
     this.profileStatus = profileStatus;
   }
-  
+
   public void setTransferPriority(String transferPriority)
   {
     this.transferPriority = transferPriority;
   }
 
   private static Random random;
-  
+
   private static char[] randomCharacters = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789".toCharArray();
-  
+
   public void generateAccessKey()
   {
     if (random == null)

@@ -136,10 +136,7 @@ public class WeeklyBatchManager extends ManagerThread
   {
     Query query;
     Transaction tx = session.beginTransaction();
-    for (PotentialIssue pi : PotentialIssues.getPotentialIssues().getAllPotentialIssues())
-    {
-      profile.getPotentialIssueStatus(pi);
-    }
+    profile.initPotentialIssueStatus(session);
     QualityCollector messageBatchManager = new QualityCollector("Weekly DQA", BatchType.WEEKLY, profile);
     MessageBatch messageBatch = messageBatchManager.getMessageBatch();
     messageBatch.setStartDate(startOfWeek.getTime());
