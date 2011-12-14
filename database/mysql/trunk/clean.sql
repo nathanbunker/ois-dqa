@@ -19,6 +19,7 @@ truncate table dqa_batch_actions;
 truncate table dqa_batch_vaccine_cvx;
 truncate table dqa_batch_code_received;
 truncate table dqa_receive_queue;
+truncate table dqa_batch_report;
 truncate table dqa_message_batch;
 truncate table dqa_vaccination;
 truncate table dqa_next_of_kin;
@@ -26,7 +27,8 @@ truncate table dqa_patient;
 truncate table dqa_issue_found;
 truncate table dqa_code_received;
 truncate table dqa_message_received;
-truncate table dqa_potential_issue_status;
+
+delete from dqa_potential_issue_status where profile_id >= 1200;
 
 ALTER TABLE dqa_issue_found ADD CONSTRAINT dqa_fk_issue_found4 FOREIGN KEY(code_id) REFERENCES dqa_code_received(code_id);
 ALTER TABLE dqa_code_received ADD CONSTRAINT dqa_fk_code_received1 FOREIGN KEY(profile_id) REFERENCES dqa_submitter_profile(profile_id);
