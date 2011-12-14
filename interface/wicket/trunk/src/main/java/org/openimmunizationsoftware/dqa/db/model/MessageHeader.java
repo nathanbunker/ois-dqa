@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
 
-public class Header
+public class MessageHeader
 {
 
   public static String PROCESSING_ID_DEBUGGING = "D";
@@ -14,23 +14,35 @@ public class Header
   public static String VERSION_ID_2_3_1 = "2.3.1";
   public static String VERSION_ID_2_4 = "2.4";
 
+  private MessageReceived messageReceived = null;
+  private int headerId = 0;
   private CodedEntity ackTypeAccept = new CodedEntity(CodeTable.Type.ACKNOWLEDGEMENT_TYPE);
   private CodedEntity ackTypeApplication = new CodedEntity(CodeTable.Type.ACKNOWLEDGEMENT_TYPE);
   private CodedEntity characterSet = new CodedEntity(CodeTable.Type.CHARACTER_SET);
   private CodedEntity characterSetAlt = new CodedEntity(CodeTable.Type.CHARACTER_SET);
   private CodedEntity country = new CodedEntity(CodeTable.Type.ADDRESS_COUNTRY);
-  private String messageControlId = "";
+  private String messageControl = "";
   private Date messageDate = null;
-  private String messageProfileId = "";
+  private String messageProfile = "";
   private String messageStructure = "";
   private String messageTrigger = "";
   private String messageType = "";
-  private CodedEntity processingId = new CodedEntity(CodeTable.Type.MESSAGE_PROCESSING_ID);
+  private CodedEntity processingStatus = new CodedEntity(CodeTable.Type.MESSAGE_PROCESSING_ID);
   private String receivingApplication = "";
   private String receivingFacility = "";
   private String sendingApplication = "";
   private String sendingFacility = "";
-  private String versionId = "";
+  private String messageVersion = "";
+
+  public int getHeaderId()
+  {
+    return headerId;
+  }
+
+  public void setHeaderId(int headerId)
+  {
+    this.headerId = headerId;
+  }
 
   public CodedEntity getAckTypeAccept()
   {
@@ -56,12 +68,12 @@ public class Header
   {
     return characterSet;
   }
-  
+
   public CodedEntity getCharacterSetAlt()
   {
     return characterSetAlt;
   }
-  
+
   public String getCharacterSetCode()
   {
     return characterSet.getCode();
@@ -76,15 +88,15 @@ public class Header
   {
     return country;
   }
-  
+
   public String getCountryCode()
   {
     return country.getCode();
   }
 
-  public String getMessageControlId()
+  public String getMessageControl()
   {
-    return messageControlId;
+    return messageControl;
   }
 
   public Date getMessageDate()
@@ -92,9 +104,9 @@ public class Header
     return messageDate;
   }
 
-  public String getMessageProfileId()
+  public String getMessageProfile()
   {
-    return messageProfileId;
+    return messageProfile;
   }
 
   public String getMessageStructure()
@@ -112,14 +124,19 @@ public class Header
     return messageType;
   }
 
-  public CodedEntity getProcessingId()
+  public CodedEntity getProcessingStatus()
   {
-    return processingId;
+    return processingStatus;
   }
 
-  public String getProcessingIdCode()
+  public String getProcessingStatusCode()
   {
-    return processingId.getCode();
+    return processingStatus.getCode();
+  }
+  
+  public void setProcessingStatusCode(String code)
+  {
+    processingStatus.setCode(code);
   }
 
   public String getReceivingApplication()
@@ -142,24 +159,24 @@ public class Header
     return sendingFacility;
   }
 
-  public String getVersionId()
+  public String getMessageVersion()
   {
-    return versionId;
+    return messageVersion;
   }
 
-  public boolean isProcessingIdDebugging()
+  public boolean isProcessingStatusDebugging()
   {
-    return processingId.getCode().equals(PROCESSING_ID_DEBUGGING);
+    return processingStatus.getCode().equals(PROCESSING_ID_DEBUGGING);
   }
 
-  public boolean isProcessingIdProduction()
+  public boolean isProcessingStatusProduction()
   {
-    return processingId.getCode().equals(PROCESSING_ID_PRODUCTION);
+    return processingStatus.getCode().equals(PROCESSING_ID_PRODUCTION);
   }
 
-  public boolean isProcessingIdTraining()
+  public boolean isProcessingStatusTraining()
   {
-    return processingId.getCode().equals(PROCESSING_ID_DEBUGGING);
+    return processingStatus.getCode().equals(PROCESSING_ID_DEBUGGING);
   }
 
   public void setAckTypeAcceptCode(String ackTypeAccept)
@@ -176,20 +193,20 @@ public class Header
   {
     this.characterSet.setCode(characterSet);
   }
-  
+
   public void setCharacterSetAltCode(String characterSetAlt)
   {
     this.characterSetAlt.setCode(characterSetAlt);
   }
-  
+
   public void setCountryCode(String countryCode)
   {
     this.country.setCode(countryCode);
   }
 
-  public void setMessageControlId(String messageControlId)
+  public void setMessageControl(String messageControl)
   {
-    this.messageControlId = messageControlId;
+    this.messageControl = messageControl;
   }
 
   public void setMessageDate(Date messageDate)
@@ -197,9 +214,9 @@ public class Header
     this.messageDate = messageDate;
   }
 
-  public void setMessageProfileId(String messageProfileId)
+  public void setMessageProfile(String messageProfileId)
   {
-    this.messageProfileId = messageProfileId;
+    this.messageProfile = messageProfileId;
   }
 
   public void setMessageStructure(String messageStructure)
@@ -219,7 +236,7 @@ public class Header
 
   public void setProcessingIdCode(String processingId)
   {
-    this.processingId.setCode(processingId);
+    this.processingStatus.setCode(processingId);
   }
 
   public void setReceivingApplication(String receivingApplication)
@@ -242,9 +259,19 @@ public class Header
     this.sendingFacility = sendingFacility;
   }
 
-  public void setVersionId(String versionId)
+  public void setMessageVersion(String versionId)
   {
-    this.versionId = versionId;
+    this.messageVersion = versionId;
+  }
+
+  public MessageReceived getMessageReceived()
+  {
+    return messageReceived;
+  }
+
+  public void setMessageReceived(MessageReceived messageReceived)
+  {
+    this.messageReceived = messageReceived;
   }
 
 }

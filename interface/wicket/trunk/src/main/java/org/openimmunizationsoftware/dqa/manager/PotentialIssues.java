@@ -232,7 +232,7 @@ public class PotentialIssues implements Reload
   public PotentialIssue PatientGuardianNameIsSameAsUnderagePatient = null;
   public PotentialIssue PatientGuardianNameFirstIsMissing = null;
   public PotentialIssue PatientGuardianNameLastIsMissing = null;
-  public PotentialIssue PatientGuardianPartyIsMissing = null;
+  public PotentialIssue PatientGuardianResponsiblePartyIsMissing = null;
   public PotentialIssue PatientGuardianPhoneIsMissing = null;
   public PotentialIssue PatientGuardianRelationshipIsMissing = null;
   public PotentialIssue PatientImmunizationRegistryStatusIsDeprecated = null;
@@ -1275,7 +1275,7 @@ public class PotentialIssues implements Reload
     PatientGuardianNameIsSameAsUnderagePatient = getPotentialIssue(session, "Patient", "guardian name", "is same as underage patient", "");
     PatientGuardianNameFirstIsMissing = getPotentialIssue(session, "Patient", "guardian name first", "is missing", "");
     PatientGuardianNameLastIsMissing = getPotentialIssue(session, "Patient", "guardian name last", "is missing", "");
-    PatientGuardianPartyIsMissing = getPotentialIssue(session, "Patient", "guardian party", "is missing", "");
+    PatientGuardianResponsiblePartyIsMissing = getPotentialIssue(session, "Patient", "guardian responsible party", "is missing", "");
     PatientGuardianPhoneIsMissing = getPotentialIssue(session, "Patient", "guardian phone", "is missing", "");
     PatientGuardianRelationshipIsMissing = getPotentialIssue(session, "Patient", "guardian relationship", "is missing", "");
     PatientImmunizationRegistryStatusIsDeprecated = getPotentialIssue(session, "Patient", "immunization registry status", "is deprecated", "");
@@ -1755,7 +1755,7 @@ public class PotentialIssues implements Reload
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_NAME, PatientGuardianNameIsSameAsUnderagePatient);
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_NAME_FIRST, PatientGuardianNameFirstIsMissing);
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_NAME_LAST, PatientGuardianNameLastIsMissing);
-    addToFieldIssueMap(Field.PATIENT_GUARDIAN_PARTY, PatientGuardianPartyIsMissing);
+    addToFieldIssueMap(Field.PATIENT_GUARDIAN_PARTY, PatientGuardianResponsiblePartyIsMissing);
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_PHONE, PatientGuardianPhoneIsMissing);
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_RELATIONSHIP, PatientGuardianRelationshipIsMissing);
     addToFieldIssueMap(Field.PATIENT_IMMUNIZATION_REGISTRY_STATUS, PatientImmunizationRegistryStatusIsDeprecated);

@@ -24,11 +24,16 @@ public class MessageReceived
   private SubmitStatus submitStatus = null;
   private Map<String, Vaccination> vaccinationMap = new HashMap<String, Vaccination>();
   private List<Vaccination> vaccinations = new ArrayList<Vaccination>();
-  private Header header = new Header();
+  private MessageHeader messageHeader = new MessageHeader();
 
-  public Header getHeader()
+  public void setMessageHeader(MessageHeader header)
   {
-    return header;
+    this.messageHeader = header;
+  }
+
+  public MessageHeader getMessageHeader()
+  {
+    return messageHeader;
   }
 
   public IssueAction getIssueAction()

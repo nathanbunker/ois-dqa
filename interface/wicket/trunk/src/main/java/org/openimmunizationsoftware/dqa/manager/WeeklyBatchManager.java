@@ -16,18 +16,16 @@ import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.db.model.BatchActions;
 import org.openimmunizationsoftware.dqa.db.model.BatchCodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.BatchIssues;
+import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.BatchType;
 import org.openimmunizationsoftware.dqa.db.model.BatchVaccineCvx;
-import org.openimmunizationsoftware.dqa.db.model.IssueAction;
 import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
+import org.openimmunizationsoftware.dqa.db.model.MessageHeader;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
-import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.ReceiveQueue;
-import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.SubmitStatus;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
-import org.openimmunizationsoftware.dqa.db.model.received.Patient;
 import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 import org.openimmunizationsoftware.dqa.quality.QualityReport;
 
@@ -137,8 +135,8 @@ public class WeeklyBatchManager extends ManagerThread
     Query query;
     Transaction tx = session.beginTransaction();
     profile.initPotentialIssueStatus(session);
-    QualityCollector messageBatchManager = new QualityCollector("Weekly DQA", BatchType.WEEKLY, profile);
-    MessageBatch messageBatch = messageBatchManager.getMessageBatch();
+    QualityCollector qualityCollector = new QualityCollector("Weekly DQA", BatchType.WEEKLY, profile);
+    MessageBatch messageBatch = qualityCollector.getMessageBatch();
     messageBatch.setStartDate(startOfWeek.getTime());
     messageBatch.setEndDate(endOfWeek.getTime());
     session.save(messageBatch);
@@ -196,6 +194,17 @@ public class WeeklyBatchManager extends ManagerThread
           ReceiveQueue newReceiveQueue = new ReceiveQueue();
           newReceiveQueue.setMessageBatch(messageBatch);
           MessageReceived messageReceived = receiveQueue.getMessageReceived();
+          if (qualityCollector.getExampleHeader() == null)
+          {
+            query = session.createQuery("from MessageHeader where messageReceived = ?");
+            query.setParameter(0, messageReceived);
+            List<MessageHeader> messageHeaderList = query.list();
+            if (messageHeaderList.size() > 0)
+            {
+              qualityCollector.setExampleHeader(messageHeaderList.get(0));
+            }
+          }
+          
           newReceiveQueue.setMessageReceived(messageReceived);
           if (receiveQueue.getSubmitStatus().isQueued())
           {
@@ -215,7 +224,7 @@ public class WeeklyBatchManager extends ManagerThread
         }
       }
     }
-    messageBatchManager.score();
+    qualityCollector.score();
     KeyedSettingManager ksm = KeyedSettingManager.getKeyedSettingManager();
     if (ksm.getKeyedValueBoolean(KeyedSetting.IN_FILE_ENABLE, false))
     {
@@ -231,7 +240,7 @@ public class WeeklyBatchManager extends ManagerThread
         try
         {
           PrintWriter reportOut = new PrintWriter(new FileWriter(new File(dqaDir, filename)));
-          QualityReport qualityReport = new QualityReport(messageBatchManager, profile, reportOut);
+          QualityReport qualityReport = new QualityReport(qualityCollector, profile, reportOut);
           qualityReport.printReport();
           reportOut.close();
         } catch (IOException ioe)
@@ -240,7 +249,7 @@ public class WeeklyBatchManager extends ManagerThread
         }
       }
     }
-    saveMessageBatch(session, profile, messageBatchManager, messageBatch);
+    saveMessageBatch(session, profile, qualityCollector, messageBatch);
     tx.commit();
   }
 
@@ -280,23 +289,6 @@ public class WeeklyBatchManager extends ManagerThread
     return dqaDir;
   }
 
-  private void determineSubmitStatus(SubmitterProfile profile, MessageReceived messageReceived)
-  {
-    if (messageReceived.getIssueAction().equals(IssueAction.ERROR)
-        || messageReceived.getIssueAction().equals(IssueAction.SKIP))
-    {
-      messageReceived.setSubmitStatus(SubmitStatus.EXCLUDED);
-    } else
-    {
-      if (profile.isProfileStatusProd())
-      {
-        messageReceived.setSubmitStatus(SubmitStatus.PREPARED);
-      } else
-      {
-        messageReceived.setSubmitStatus(SubmitStatus.HOLD);
-      }
-    }
-  }
 
   private void determineStartAndEndOfWeek(Date now)
   {
@@ -331,27 +323,6 @@ public class WeeklyBatchManager extends ManagerThread
     internalLog.append("Weekly batch day = " + weekStartDay + "\r");
     internalLog.append("Processing start time = " + processingStartTime + "\r");
     internalLog.append("Processing end time = " + processingEndTime + "\r");
-  }
-
-  private void populateMessageReceived(Session session, MessageReceived messageReceived)
-  {
-    Query query;
-    query = session.createQuery("from IssueFound where messageReceived = ?");
-    query.setParameter(0, messageReceived);
-    messageReceived.setIssuesFound(query.list());
-    query = session.createQuery("from Patient where messageReceived = ?");
-    query.setParameter(0, messageReceived);
-    List<Patient> patientList = query.list();
-    if (patientList.size() > 0)
-    {
-      messageReceived.setPatient(patientList.get(0));
-    }
-    query = session.createQuery("from Vaccination where messageReceived = ? order by positionId");
-    query.setParameter(0, messageReceived);
-    messageReceived.setVaccinations(query.list());
-    query = session.createQuery("from NextOfKin where messageReceived = ? order by positionId");
-    query.setParameter(0, messageReceived);
-    messageReceived.setNextOfKins(query.list());
   }
 
   private String getScoreDescription(int score)

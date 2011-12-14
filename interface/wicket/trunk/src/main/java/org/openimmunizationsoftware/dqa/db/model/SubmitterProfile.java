@@ -127,6 +127,12 @@ public class SubmitterProfile
             session.saveOrUpdate(pis);
             potentialIssueStatusMap.put(potentialIssue, pis);
           }
+          else
+          {
+            pis = new PotentialIssueStatus(potentialIssue, this);
+            session.saveOrUpdate(pis);
+            potentialIssueStatusMap.put(potentialIssue, pis);            
+          }
         }
 
       }

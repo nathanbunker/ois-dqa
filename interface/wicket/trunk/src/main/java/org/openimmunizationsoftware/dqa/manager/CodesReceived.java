@@ -55,7 +55,18 @@ public class CodesReceived
   {
     getCodesReceived();
     CodesReceived codesReceived = new CodesReceived(false);
-    codesReceived.parent = singleton;
+
+    if (profile.getReportTemplate() != null)
+    {
+      if (!profile.getReportTemplate().getBaseProfile().equals(profile))
+      {
+        codesReceived.parent = getCodesReceived(profile.getReportTemplate().getBaseProfile(), session);
+      }
+    }
+    if (codesReceived.parent == null)
+    {
+      codesReceived.parent = singleton;
+    }
 
     for (CodeTable codeTable : codeTables.values())
     {
@@ -64,7 +75,6 @@ public class CodesReceived
       query.setParameter(0, profile);
       query.setParameter(1, codeTable);
       codesReceived.addToCodeTableMaps(codeTable, query.list());
-
     }
     return codesReceived;
   }
@@ -81,7 +91,7 @@ public class CodesReceived
     // private Map<CodeTable, Map<String, CodeReceived>> codeTableMaps = new
     // HashMap<CodeTable, Map<String, CodeReceived>>();
   }
-  
+
   public void registerCodeReceived(CodeReceived codeReceived)
   {
     Map<String, CodeReceived> codesReceived = codeTableMaps.get(codeReceived.getTable());
