@@ -16,63 +16,63 @@ import org.openimmunizationsoftware.dqa.validate.Validator;
 
 public class Scenarios extends TestCase
 {
-  private static final String NO_PROBLEMS = "MSH|^~\\&|ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String NO_PROBLEMS = "MSH|^~\\&|ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI~122112219^^^^MA~123123124^^^^SS||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
-  private static final String SCENARIO_3_B = "MSH|ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String SCENARIO_3_B = "MSH|ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
-  private static final String SCENARIO_3_C = "MSH|^~\\||ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String SCENARIO_3_C = "MSH|^~\\||ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
-  private static final String SCENARIO_3_D = "MSH|^~\\&-ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String SCENARIO_3_D = "MSH|^~\\&-ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
-  private static final String SCENARIO_3_E = "MSH|^~&|ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String SCENARIO_3_E = "MSH|^~&|ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   private static final String SCENARIO_4_A = "MSH|^~\\&|ABC||||20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   private static final String SCENARIO_4_B = "MSH|^~\\&|ABC||||20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   private static final String SCENARIO_4_C = "MSH|^~\\&||ABC|||20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
   private static final String SCENARIO_4_D = "MSH|^~\\&|||ABC||20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
   private static final String SCENARIO_4_E = "MSH|^~\\&||||ABC|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   /**
    * Tests to make sure parser can pickup when there are issues with the MSH
@@ -86,7 +86,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = new SubmitterProfile();
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
 
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
@@ -137,7 +137,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -209,7 +209,7 @@ public class Scenarios extends TestCase
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario5() throws Exception
   {
@@ -217,7 +217,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -250,7 +250,7 @@ public class Scenarios extends TestCase
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario6() throws Exception
   {
@@ -258,7 +258,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -295,7 +295,7 @@ public class Scenarios extends TestCase
       + "PID|||100755502^^^^PI~12345678^^^^MA||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario9() throws Exception
   {
@@ -303,7 +303,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -336,7 +336,7 @@ public class Scenarios extends TestCase
       + "PID|||100755502^^^^PI~12345678^^^^SS||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario10() throws Exception
   {
@@ -344,7 +344,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -377,7 +377,7 @@ public class Scenarios extends TestCase
       + "PID|||100755502^^^^PI||Lastname^Firstname|||U||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario13() throws Exception
   {
@@ -385,7 +385,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -418,7 +418,7 @@ public class Scenarios extends TestCase
       + "PID|||100755502^^^^PI||Lastname^Firstname||20111301|U||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario14() throws Exception
   {
@@ -426,7 +426,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -459,7 +459,7 @@ public class Scenarios extends TestCase
       + "PID|||100755502^^^^PI||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1||^Mother^HL70063|\r"
       + "PV1||R||||||||||||||||||V00|\r"
-      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario21() throws Exception
   {
@@ -467,7 +467,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -500,11 +500,11 @@ public class Scenarios extends TestCase
     session.close();
   }
 
-  private static final String SCENARIO_25_A = "MSH|^~\\&|ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String SCENARIO_25_A = "MSH|^~\\&|ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI~122112219^^^^MA~123123124^^^^SS||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20101133|20101133|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20101133|20101133|21^varicella^CVX^90716^Varicella^C4|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario25() throws Exception
   {
@@ -512,7 +512,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -541,11 +541,11 @@ public class Scenarios extends TestCase
     session.close();
   }
 
-  private static final String SCENARIO_27_A = "MSH|^~\\&|ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String SCENARIO_27_A = "MSH|^~\\&|ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI~122112219^^^^MA~123123124^^^^SS||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214||999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214||999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario27() throws Exception
   {
@@ -553,7 +553,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -582,11 +582,11 @@ public class Scenarios extends TestCase
     session.close();
   }
 
-  private static final String SCENARIO_28_A = "MSH|^~\\&|ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String SCENARIO_28_A = "MSH|^~\\&|ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI~122112219^^^^MA~123123124^^^^SS||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
-      + "RXA|0|999|20021214|20021214|405^Bad Code^CVX|999|||00^New immunization record^NIP001||^^^0123456789^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
+      + "RXA|0|999|20021214|20021214|405^Bad Code^CVX|999|||00^New immunization record^NIP001||^^^1124800189^^^^^3131 Briarpark Dr., Ste 108^^Dallas^TX^77042^US|\r";
 
   public void testScenario28() throws Exception
   {
@@ -594,7 +594,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -623,7 +623,7 @@ public class Scenarios extends TestCase
     session.close();
   }
 
-  private static final String SCENARIO_30_A = "MSH|^~\\&|ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String SCENARIO_30_A = "MSH|^~\\&|ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI~122112219^^^^MA~123123124^^^^SS||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
@@ -635,7 +635,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -664,7 +664,7 @@ public class Scenarios extends TestCase
     session.close();
   }
 
-  private static final String SCENARIO_31_A = "MSH|^~\\&|ABC|3333333333|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
+  private static final String SCENARIO_31_A = "MSH|^~\\&|ABC|1124800189|TxImmTrac|TxDSHS|20110801092154||VXU^V04|1312208514674.1002|P|2.4|\r"
       + "PID|||100755502^^^^PI~122112219^^^^MA~123123124^^^^SS||Lastname^Firstname||20011118|F||2131-1^Other Race^HL70005|6118 SAN FELIPE^^DALLAS^TX^77057^US^P^^TX201||^PRN^^^^713^9876543|||||||||||N|\r"
       + "NK1|1|Mom LastNme^Mom Firstname|MTH^Mother^HL70063|\r"
       + "PV1||R|\r"
@@ -676,7 +676,7 @@ public class Scenarios extends TestCase
     Session session = factory.openSession();
     Transaction tx = session.beginTransaction();
 
-    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 300);
+    SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, 253);
     profile.initPotentialIssueStatus(session);
     profile.setDataFormat(SubmitterProfile.DATA_FORMAT_HL7V2);
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
@@ -699,7 +699,7 @@ public class Scenarios extends TestCase
     messageReceived.setProfile(profile);
     parser.createVaccinationUpdateMessage(messageReceived);
     validator.validateVaccinationUpdateMessage(messageReceived);
-    assertTrue(hasIssue(messageReceived, pi.VaccinationFacilityIdIsUnrecognized));
+    assertTrue(hasIssue(messageReceived, pi.VaccinationFacilityIdIsInvalid));
     tx.rollback();
 
     session.close();
