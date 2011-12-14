@@ -775,9 +775,6 @@ public class QualityReport
     for (CodeReceived codeReceived : codeReceivedMap.keySet())
     {
       List<BatchCodeReceived> batchCodeReceivedList = codeTableMap.get(codeReceived.getTable());
-      // System.out.println("--> codeReceived = " +
-      // codeReceived.getTable().getTableLabel() + ": " +
-      // codeReceived.getReceivedValue() );
       if (batchCodeReceivedList == null)
       {
         batchCodeReceivedList = new ArrayList<BatchCodeReceived>();
