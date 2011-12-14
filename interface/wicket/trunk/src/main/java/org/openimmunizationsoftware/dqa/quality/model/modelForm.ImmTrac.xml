@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <dqa-scoring>
   <section name="completeness" weight="50">
     <section name="patient" weight="20">
@@ -21,7 +22,7 @@
         <score label="Phone" denominator="patient count" numerator="Patient phone" weight="10" />
         <score label="Mother's Maiden" denominator="patient count" numerator="Patient mother's maiden name" weight="10" />
         <score label="SSN" denominator="patient count" numerator="Patient SSN" weight="10" />
-        <score label="Responsible Party" denominator="patient count" numerator="Patient guardian party" weight="1">
+        <score label="Responsible Party" denominator="patient count" numerator="Patient guardian responsible party" weight="1">
           <score label="First Name" denominator="patient count" numerator="Patient guardian name first" weight="4" />
           <score label="Last Name" denominator="patient count" numerator="Patient guardian name last" weight="4" />
           <score label="Same as Patient" denominator="patient count" numerator="Patient guardian name is same as underage patient" weight="-8" />
@@ -121,17 +122,21 @@
     </section>
   </section>
   <section name="quality" weight="40">
-    <section name="errors" weight="20">
+    <section name="errors" weight="28">
     </section>
-    <section name="warnings" weight="20">
+    <section name="warnings" weight="12">
     </section>
   </section>
   <section name="timeliness" weight="10">
-    <section name="30days" weight="6">
+    <section name="early" weight="10" days="2">
     </section>
-    <section name="7days" weight="4">
+    <section name="onTime" weight="9" days="7">
     </section>
-    <section name="2days" weight="0">
+    <section name="late" weight="7" days="30">
+    </section>
+    <section name="veryLate" weight="5" days="60">
+    </section>
+    <section name="oldData" weight="0">
     </section>
   </section>
 </dqa-scoring>

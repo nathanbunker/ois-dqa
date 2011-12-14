@@ -18,7 +18,7 @@ import org.openimmunizationsoftware.dqa.db.model.BatchIssues;
 import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
-import org.openimmunizationsoftware.dqa.db.model.Header;
+import org.openimmunizationsoftware.dqa.db.model.MessageHeader;
 import org.openimmunizationsoftware.dqa.db.model.IssueAction;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
@@ -229,7 +229,8 @@ public class QualityReport
 
   private void printFooter()
   {
-    out.println("    <pre>Report generated: " + dateTime.format(new Date()) + "</pre>");
+    out.println("    <pre>Report generated: " + dateTime.format(new Date()));
+    out.println("Report template: " + profile.getReportTemplate().getTemplateLabel() + "</pre>");
   }
 
   private void printCompleteness(MessageBatch messageBatch)
@@ -660,20 +661,26 @@ public class QualityReport
     printPer(STATUS_SKIPPED, messageBatch.getBatchActions(IssueAction.SKIP).getActionCount(), patientCount, 0, 10);
     out.println("    </table>");
     out.println("    <h3>Message Header Details</h3>");
-    out.println("    <table width=\"350\">");
-    out.println("      <tr>");
-    out.println("        <th width=\"60%\" align=\"left\">Field</th>");
-    out.println("        <th width=\"20%\" align=\"center\">Value</th>");
-    out.println("      </tr>");
-    Header exampleHeader = qualityCollector.getExampleHeader();
-    printRow("Sending Application", exampleHeader.getSendingApplication());
-    printRow("Sending Facility", exampleHeader.getSendingFacility());
-    printRow("Receiving Application", exampleHeader.getReceivingApplication());
-    printRow("Receiving Facility", exampleHeader.getReceivingFacility());
-    printRow("Message Type", exampleHeader.getMessageType() + "^" + exampleHeader.getMessageTrigger());
-    printRow("Processing Id", exampleHeader.getProcessingId().getCode());
-    printRow("HL7 Version", exampleHeader.getVersionId());
-    out.println("    </table>");
+    MessageHeader exampleHeader = qualityCollector.getExampleHeader();
+    if (exampleHeader != null)
+    {
+      out.println("    <table width=\"350\">");
+      out.println("      <tr>");
+      out.println("        <th width=\"60%\" align=\"left\">Field</th>");
+      out.println("        <th width=\"20%\" align=\"center\">Value</th>");
+      out.println("      </tr>");
+      printRow("Sending Application", exampleHeader.getSendingApplication());
+      printRow("Sending Facility", exampleHeader.getSendingFacility());
+      printRow("Receiving Application", exampleHeader.getReceivingApplication());
+      printRow("Receiving Facility", exampleHeader.getReceivingFacility());
+      printRow("Message Type", exampleHeader.getMessageType() + "^" + exampleHeader.getMessageTrigger());
+      printRow("Processing Id", exampleHeader.getProcessingStatus().getCode());
+      printRow("HL7 Version", exampleHeader.getMessageVersion());
+      out.println("    </table>");
+    } else
+    {
+      out.println("    <p>No example header to show, none sent.</p>");
+    }
   }
 
   private void printQuality(MessageBatch messageBatch)

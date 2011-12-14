@@ -9,7 +9,7 @@ import java.util.List;
 import org.openimmunizationsoftware.dqa.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
-import org.openimmunizationsoftware.dqa.db.model.Header;
+import org.openimmunizationsoftware.dqa.db.model.MessageHeader;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
@@ -154,8 +154,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
           }
         } else
         {
-          if (!message.getHeader().getVersionId().startsWith("2.3")
-              && !message.getHeader().getVersionId().startsWith("2.4"))
+          if (!message.getMessageHeader().getMessageVersion().startsWith("2.3")
+              && !message.getMessageHeader().getMessageVersion().startsWith("2.4"))
           {
             registerIssue(pi.Hl7OrcSegmentIsMissing);
           }
@@ -232,7 +232,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   private void populateMSH(MessageReceived message)
   {
-    Header header = message.getHeader();
+    MessageHeader header = message.getMessageHeader();
     header.setSendingApplication(getValue(3));
     header.setSendingFacility(getValue(4));
     header.setReceivingApplication(getValue(5));
@@ -242,14 +242,14 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     header.setMessageType(field.length >= 1 ? field[0] : "");
     header.setMessageTrigger(field.length >= 2 ? field[1] : "");
     header.setMessageStructure(field.length >= 3 ? field[2] : "");
-    header.setMessageControlId(getValue(10));
+    header.setMessageControl(getValue(10));
     header.setProcessingIdCode(getValue(11));
-    header.setVersionId(getValue(12));
+    header.setMessageVersion(getValue(12));
     header.setAckTypeAcceptCode(getValue(15));
     header.setAckTypeApplicationCode(getValue(16));
     header.setCharacterSetCode(getValue(18));
     header.setCharacterSetAltCode(getValue(20));
-    header.setMessageProfileId(getValue(21));
+    header.setMessageProfile(getValue(21));
   }
 
   private void populatePID(MessageReceived message)
@@ -716,8 +716,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   public String makeAckMessage(MessageReceived messageReceived)
   {
-    String controlId = messageReceived.getHeader().getMessageControlId();
-    String processingId = message.getHeader().getProcessingIdCode();
+    String controlId = messageReceived.getMessageHeader().getMessageControl();
+    String processingId = message.getMessageHeader().getProcessingStatusCode();
     String ackCode = ACK_ACCEPT;
     int countVaccNotSkipped = 0;
     for (Vaccination vaccination : messageReceived.getVaccinations())
@@ -770,10 +770,10 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       text = text.substring(0, 80);
     }
     StringBuilder ack = new StringBuilder();
-    String receivingApplication = message.getHeader().getSendingApplication();
-    String receivingFacility = message.getHeader().getSendingFacility();
-    String sendingApplication = message.getHeader().getReceivingApplication();
-    String sendingFacility = message.getHeader().getReceivingFacility();
+    String receivingApplication = message.getMessageHeader().getSendingApplication();
+    String receivingFacility = message.getMessageHeader().getSendingFacility();
+    String sendingApplication = message.getMessageHeader().getReceivingApplication();
+    String sendingFacility = message.getMessageHeader().getReceivingFacility();
     if (receivingApplication == null)
     {
       receivingApplication = "";
@@ -800,7 +800,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     ack.append("|" + receivingFacility); // MSH-6 Receiving Facility
     ack.append("|" + messageDate); // MSH-7 Date/Time of Message
     ack.append("|"); // MSH-8 Security
-    ack.append("|ACK^" + message.getHeader().getMessageTrigger()); // MSH-9
+    ack.append("|ACK^" + message.getMessageHeader().getMessageTrigger()); // MSH-9
                                                                    // Message
                                                                    // Type
     ack.append("|" + messageDate + "." + getNextAckCount()); // MSH-10 Message

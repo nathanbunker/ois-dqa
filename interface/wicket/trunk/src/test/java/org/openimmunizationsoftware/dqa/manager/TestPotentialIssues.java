@@ -228,7 +228,7 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.PatientGuardianNameIsSameAsUnderagePatient);
     assertNotNull(pi.PatientGuardianNameFirstIsMissing);
     assertNotNull(pi.PatientGuardianNameLastIsMissing);
-    assertNotNull(pi.PatientGuardianPartyIsMissing);
+    assertNotNull(pi.PatientGuardianResponsiblePartyIsMissing);
     assertNotNull(pi.PatientGuardianPhoneIsMissing);
     assertNotNull(pi.PatientGuardianRelationshipIsMissing);
     assertNotNull(pi.PatientImmunizationRegistryStatusIsDeprecated);

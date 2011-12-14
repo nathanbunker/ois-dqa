@@ -1,6 +1,6 @@
 package org.openimmunizationsoftware.dqa.validate;
 
-import org.openimmunizationsoftware.dqa.db.model.Header;
+import org.openimmunizationsoftware.dqa.db.model.MessageHeader;
 import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
@@ -16,7 +16,7 @@ public class FacilityValidator extends SectionValidator
   public void validateHeader(MessageReceived message, Validator validator)
   {
     super.validateHeader(message, validator);
-    Header header = message.getHeader();
+    MessageHeader header = message.getMessageHeader();
     validator.documentParagraph("Indicates the facility or organization that originated this message. "
         + "This is normally assigned by the receiving system. In HL7 this can be sent in MSH-4. ");
     validator.documentValuesFound("Sending Facility", header.getSendingFacility());
@@ -85,7 +85,6 @@ public class FacilityValidator extends SectionValidator
         validator.documentParagraph("Vaccination facility id must be a valid ImmTrac PFS number. "
             + "Please contact ImmTrac to obtain a correct and valid PFS number.");
         validator.registerIssue(pi.VaccinationFacilityIdIsInvalid);
-        vaccination.getFacility().setIdNumber("");
       } else
       {
         int minLen = validator.ksm.getKeyedValueInt(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MIN_LEN, 0);
@@ -110,7 +109,6 @@ public class FacilityValidator extends SectionValidator
         {
           validator.registerIssue(pi.VaccinationFacilityIdIsInvalid);
         }
-        vaccination.getFacility().setIdNumber("");
       }
     }
   }

@@ -10,7 +10,7 @@ import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeStatus;
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
-import org.openimmunizationsoftware.dqa.db.model.Header;
+import org.openimmunizationsoftware.dqa.db.model.MessageHeader;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
@@ -126,7 +126,7 @@ public class Validator extends ValidateMessage
     }
     if (patient.getResponsibleParty() == null)
     {
-      registerIssue(pi.PatientGuardianPartyIsMissing);
+      registerIssue(pi.PatientGuardianResponsiblePartyIsMissing);
     }
     for (Vaccination vaccination : message.getVaccinations())
     {
@@ -516,6 +516,7 @@ public class Validator extends ValidateMessage
     // TODO
     // registerIssue(pi.VaccinationAdminDateIsBeforeExpectedReportingWindow);
 
+    boolean amountValued = false;
     if (vaccination.getAmount() == null || vaccination.getAmount().equals("") || vaccination.getAmount().equals("999"))
     {
       if (vaccination.isAdministered())
@@ -536,6 +537,10 @@ public class Validator extends ValidateMessage
             registerIssue(pi.VaccinationAdministeredAmountIsValuedAsZero);
           }
         }
+        else 
+        {
+          amountValued = true;
+        }
       } catch (NumberFormatException nfe)
       {
         if (vaccination.isAdministered())
@@ -546,7 +551,7 @@ public class Validator extends ValidateMessage
       }
     }
     handleCodeReceived(vaccination.getAmountUnit(), PotentialIssues.Field.VACCINATION_ADMINISTERED_UNIT,
-        vaccination.isAdministered());
+        vaccination.isAdministered() && amountValued);
     handleCodeReceived(vaccination.getBodyRoute(), PotentialIssues.Field.VACCINATION_BODY_ROUTE,
         vaccination.isAdministered());
     handleCodeReceived(vaccination.getBodySite(), PotentialIssues.Field.VACCINATION_BODY_SITE,
@@ -660,7 +665,7 @@ public class Validator extends ValidateMessage
   private void validateHeader()
   {
     documentHeaderMain("Header");
-    Header header = message.getHeader();
+    MessageHeader header = message.getMessageHeader();
     if (notEmpty(header.getReceivingApplication(), pi.Hl7MshReceivingApplicationIsMissing))
     {
       // TODO
@@ -681,7 +686,7 @@ public class Validator extends ValidateMessage
     handleCodeReceived(header.getAckTypeApplication(), PotentialIssues.Field.HL7_MSH_APP_ACK_TYPE);
     handleCodeReceived(header.getAckTypeAccept(), PotentialIssues.Field.HL7_MSH_ACCEPT_ACK_TYPE);
 
-    if (notEmpty(header.getMessageControlId(), pi.Hl7MshMessageControlIdIsMissing))
+    if (notEmpty(header.getMessageControl(), pi.Hl7MshMessageControlIdIsMissing))
     {
       // TODO
     }
@@ -701,7 +706,7 @@ public class Validator extends ValidateMessage
         {
           registerIssue(pi.Hl7MshMessageTriggerIsUnrecognized);
         }
-        if (!header.getVersionId().equals("2.3.1") && !header.getVersionId().equals("2.4"))
+        if (!header.getMessageVersion().equals("2.3.1") && !header.getMessageVersion().equals("2.4"))
         {
           if (notEmpty(header.getMessageStructure(), pi.Hl7MshMessageStructureIsMissing))
           {
@@ -715,26 +720,26 @@ public class Validator extends ValidateMessage
       }
       // TODO
     }
-    handleCodeReceived(header.getProcessingId(), PotentialIssues.Field.HL7_MSH_PROCESSING_ID);
-    if (header.getProcessingIdCode().equals("T"))
+    handleCodeReceived(header.getProcessingStatus(), PotentialIssues.Field.HL7_MSH_PROCESSING_ID);
+    if (header.getProcessingStatusCode().equals("T"))
     {
       registerIssue(pi.Hl7MshProcessingIdIsValuedAsTraining);
-    } else if (header.getProcessingIdCode().equals("P"))
+    } else if (header.getProcessingStatusCode().equals("P"))
     {
       registerIssue(pi.Hl7MshProcessingIdIsValuedAsProduction);
-    } else if (header.getProcessingIdCode().equals("D"))
+    } else if (header.getProcessingStatusCode().equals("D"))
     {
       registerIssue(pi.Hl7MshProcessingIdIsValuedAsDebug);
     }
-    if (notEmpty(header.getVersionId(), pi.Hl7MshVersionIsMissing))
+    if (notEmpty(header.getMessageVersion(), pi.Hl7MshVersionIsMissing))
     {
-      if (header.getVersionId().equals("2.5.1"))
+      if (header.getMessageVersion().equals("2.5.1"))
       {
         registerIssue(pi.Hl7MshVersionIsValuedAs2_5);
-      } else if (header.getVersionId().equals("2.3.1"))
+      } else if (header.getMessageVersion().equals("2.3.1"))
       {
         registerIssue(pi.Hl7MshVersionIsValuedAs2_3_1);
-      } else if (header.getVersionId().equals("2.4"))
+      } else if (header.getMessageVersion().equals("2.4"))
       {
         registerIssue(pi.Hl7MshVersionIsValuedAs2_4);
       } else

@@ -23,6 +23,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.SoftwareVersion;
+import org.openimmunizationsoftware.dqa.db.model.Application;
 import org.openimmunizationsoftware.dqa.db.model.BatchActions;
 import org.openimmunizationsoftware.dqa.db.model.BatchCodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.BatchIssues;
@@ -35,6 +36,7 @@ import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
 import org.openimmunizationsoftware.dqa.db.model.ReceiveQueue;
+import org.openimmunizationsoftware.dqa.db.model.ReportTemplate;
 import org.openimmunizationsoftware.dqa.db.model.SubmitStatus;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
@@ -169,6 +171,16 @@ public class FileImportProcessor extends ManagerThread
       profile.setTransferPriority(SubmitterProfile.TRANSFER_PRIORITY_NORMAL);
       profile.setProfileCode(profileCode);
       profile.generateAccessKey();
+      query = session.createQuery("from Application where runThis = 'Y'");
+      List<Application> applicationList = query.list();
+      if (applicationList.size() > 0)
+      {
+        Application application = applicationList.get(0);
+        profile.setReportTemplate(application.getPrimaryReportTemplate());
+      } else
+      {
+        profile.setReportTemplate((ReportTemplate) session.get(ReportTemplate.class, 1));
+      }
       session.save(organization);
       session.save(profile);
       organization.setPrimaryProfile(profile);
@@ -214,11 +226,11 @@ public class FileImportProcessor extends ManagerThread
    * Read the file before processing and ensure it looks like what we expect.
    * First non blank line should be file header segment or message header
    * segment. In addition if there is a file header segment then the last non
-   * blank line is expected to be the trailing segment. Otherwise the file
-   * is assumed to contain HL7 messages. It is important to note that this
-   * check does not validate HL7 format, but is built to ensure that the 
-   * entire file has been transmitted when batch header/footers are sent
-   * and that the file doesn't contain obvious non-HL7 content. 
+   * blank line is expected to be the trailing segment. Otherwise the file is
+   * assumed to contain HL7 messages. It is important to note that this check
+   * does not validate HL7 format, but is built to ensure that the entire file
+   * has been transmitted when batch header/footers are sent and that the file
+   * doesn't contain obvious non-HL7 content.
    * 
    * @param inFile
    * @return
@@ -314,12 +326,13 @@ public class FileImportProcessor extends ManagerThread
   private Date determineReceivedDate(String filename)
   {
     Date receivedDate = new Date();
-    int pos = filename.indexOf("!"); 
+    int pos = filename.indexOf("!");
     if (pos != -1)
     {
       procLog("Filename appears to include received date");
       pos++;
-      if (pos < filename.length()) {
+      if (pos < filename.length())
+      {
         String s = filename.substring(pos);
         pos = s.indexOf('.');
         if (pos == -1)
@@ -337,18 +350,15 @@ public class FileImportProcessor extends ManagerThread
             {
               procLog("Unable to set received date in the future, using today's date");
               receivedDate = new Date();
-            }
-            else
+            } else
             {
               procLog("Setting received date for file to " + sdf.format(receivedDate));
             }
-          }
-          catch (ParseException pe)
+          } catch (ParseException pe)
           {
             procLog("Tried to set received date from file name but unable to parse date in YYYYMMDD format");
           }
-        }
-        else
+        } else
         {
           procLog("Expected received date in file but was not available");
         }
@@ -363,7 +373,8 @@ public class FileImportProcessor extends ManagerThread
     Transaction tx = session.beginTransaction();
     MessageBatch messageBatch = qualityCollector.getMessageBatch();
     messageBatch.setSubmitStatus(SubmitStatus.QUEUED);
-    session.save(messageBatch);
+    session.saveOrUpdate(messageBatch);
+    session.saveOrUpdate(messageBatch.getBatchReport());
     for (BatchIssues batchIssues : messageBatch.getBatchIssuesMap().values())
     {
       session.save(batchIssues);
@@ -444,7 +455,8 @@ public class FileImportProcessor extends ManagerThread
     logOut.println("Message/Second:   " + ((float) progressCount) / ((progressEnd - progressStart) / 1000.0));
     logOut.println("Software Label:   " + KeyedSettingManager.getApplication().getApplicationLabel());
     logOut.println("Software Type:    " + KeyedSettingManager.getApplication().getApplicationType());
-    logOut.println("Software Version: " + SoftwareVersion.VENDOR + " " + SoftwareVersion.PRODUCT + " " + SoftwareVersion.VERSION + " " + SoftwareVersion.BINARY_ID);
+    logOut.println("Software Version: " + SoftwareVersion.VENDOR + " " + SoftwareVersion.PRODUCT + " "
+        + SoftwareVersion.VERSION + " " + SoftwareVersion.BINARY_ID);
     acceptedOut.close();
     ackOut.close();
     logOut.close();

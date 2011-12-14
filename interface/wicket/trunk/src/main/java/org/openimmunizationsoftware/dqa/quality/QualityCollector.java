@@ -14,7 +14,7 @@ import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.BatchType;
 import org.openimmunizationsoftware.dqa.db.model.BatchVaccineCvx;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
-import org.openimmunizationsoftware.dqa.db.model.Header;
+import org.openimmunizationsoftware.dqa.db.model.MessageHeader;
 import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
@@ -44,9 +44,14 @@ public class QualityCollector
   private int numeratorVaccinationAdminDateAge = 0;
   private QualityScoring scoring = null;
   private ModelForm modelForm = null;
-  private Header exampleHeader = null;
+  private MessageHeader exampleHeader = null;
 
-  public Header getExampleHeader()
+  public void setExampleHeader(MessageHeader exampleHeader)
+  {
+    this.exampleHeader = exampleHeader;
+  }
+
+  public MessageHeader getExampleHeader()
   {
     return exampleHeader;
   }
@@ -100,7 +105,7 @@ public class QualityCollector
   {
     if (exampleHeader == null)
     {
-      exampleHeader = messageReceived.getHeader();
+      exampleHeader = messageReceived.getMessageHeader();
     }
     report.incMessageCount();
     String patientId = messageReceived.getPatient().getIdSubmitter().getNumber();

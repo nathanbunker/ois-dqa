@@ -23,6 +23,7 @@ import org.openimmunizationsoftware.dqa.construct.ConstructFactory;
 import org.openimmunizationsoftware.dqa.construct.ConstructerInterface;
 import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
+import org.openimmunizationsoftware.dqa.db.model.MessageHeader;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.ReceiveQueue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitStatus;
@@ -61,6 +62,7 @@ public class WeeklyExportManager extends ManagerThread
   private File exportDir = null;
 
   private PrintWriter out = null;
+  private File file = null;
 
   private SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
 
@@ -174,17 +176,15 @@ public class WeeklyExportManager extends ManagerThread
       internalLog.append(" +  Exporting batch for week ending " + sdf.format(messageBatch.getEndDate()) + " \n");
       openOutputFile(profile, messageBatch.getEndDate());
       MessageReceived currMr = null;
-      SQLQuery sqlQuery = session
-          .createSQLQuery("select rq.receive_queue_id " +
-          		"from dqa_receive_queue rq, dqa_patient pat, dqa_message_received mr " +
-          		"where rq.received_id = pat.received_id " +
-          		"  and rq.submit_code = 'P' " +
-          		"  and batch_id = ? " +
-          		"  and rq.received_id = mr.received_id " +
-          		"order by pat.name_last, pat.name_first, pat.name_middle, pat.id_submitter_number, mr.received_date");
+      SQLQuery sqlQuery = session.createSQLQuery("select rq.receive_queue_id "
+          + "from dqa_receive_queue rq, dqa_patient pat, dqa_message_received mr "
+          + "where rq.received_id = pat.received_id " + "  and rq.submit_code = 'P' " + "  and batch_id = ? "
+          + "  and rq.received_id = mr.received_id "
+          + "order by pat.name_last, pat.name_first, pat.name_middle, pat.id_submitter_number, mr.received_date");
       sqlQuery.setParameter(0, messageBatch.getBatchId());
       List<BigDecimal> receiveQueueIds = sqlQuery.list();
       ReceiveQueue receiveQueue = null;
+      boolean nothingExported = true;
       for (BigDecimal receiveQueueId : receiveQueueIds)
       {
         receiveQueue = (ReceiveQueue) session.get(ReceiveQueue.class, receiveQueueId.intValue());
@@ -200,6 +200,7 @@ public class WeeklyExportManager extends ManagerThread
           if (nextPatient.getIdSubmitterNumber().equals(currPatient.getIdSubmitterNumber()))
           {
             currMr.setPatient(nextPatient);
+            currMr.setMessageHeader(nextMr.getMessageHeader());
             currMr.setNextOfKins(nextMr.getNextOfKins());
             for (String id : nextMr.getVaccinationMap().keySet())
             {
@@ -207,6 +208,11 @@ public class WeeklyExportManager extends ManagerThread
             }
           } else
           {
+            if (nothingExported)
+            {
+              out.print(constructor.makeHeader(currMr));
+              nothingExported = false;
+            }
             currMr.setVaccinations(getAndSortVaccinations(currMr));
             out.print(constructor.constructMessage(currMr));
             currMr = nextMr;
@@ -219,12 +225,38 @@ public class WeeklyExportManager extends ManagerThread
       {
         if (!receiveQueue.getSubmitStatus().isExcluded())
         {
+          if (nothingExported)
+          {
+            out.print(constructor.makeHeader(currMr));
+            nothingExported = false;
+          }
           currMr.setVaccinations(getAndSortVaccinations(currMr));
           out.print(constructor.constructMessage(currMr));
         }
       }
-      out.close();
+      if (!nothingExported && currMr != null)
+      {
+        out.print(constructor.makeFooter(currMr));
+      }
+      closeOutput(nothingExported);
     }
+  }
+
+  private void closeOutput(boolean nothingExported)
+  {
+    out.close();
+    out = null;
+    if (nothingExported && file != null && file.exists())
+    {
+      try
+      {
+        file.delete();
+      } catch (Exception e)
+      {
+        // ignore, if unable to delete
+      }
+    }
+    file = null;
   }
 
   private List<Vaccination> getAndSortVaccinations(MessageReceived currMr)
@@ -292,6 +324,7 @@ public class WeeklyExportManager extends ManagerThread
   private void populate(Session session, ReceiveQueue receiveQueue, MessageReceived messageReceived)
   {
     Query query;
+    // Patient
     query = session.createQuery("from Patient where messageReceived = ?");
     query.setParameter(0, messageReceived);
     List<Patient> patients = query.list();
@@ -302,6 +335,14 @@ public class WeeklyExportManager extends ManagerThread
       messageReceived.setSubmitStatus(SubmitStatus.EXCLUDED);
     }
     messageReceived.setPatient(patients.get(0));
+    // Message Header
+    query = session.createQuery("from MessageHeader where messageReceived = ?");
+    query.setParameter(0, messageReceived);
+    List<MessageHeader> messageHeaders = query.list();
+    if (messageHeaders.size() > 0)
+    {
+      messageReceived.setMessageHeader(messageHeaders.get(0));
+    }
     query = session.createQuery("from NextOfKin where messageReceived = ? order by positionId");
     query.setParameter(0, messageReceived);
     List<NextOfKin> nextOfKins = query.list();
@@ -358,7 +399,7 @@ public class WeeklyExportManager extends ManagerThread
     Calendar cal = Calendar.getInstance();
     cal.setTime(generateDate);
     String filename = createFilename(cal, profile);
-    File file = new File(exportDir, filename);
+    file = new File(exportDir, filename);
     try
     {
       out = new PrintWriter(new FileWriter(file));

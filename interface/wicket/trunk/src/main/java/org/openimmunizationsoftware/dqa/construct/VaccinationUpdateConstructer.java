@@ -42,7 +42,7 @@ public class VaccinationUpdateConstructer implements ConstructerInterface
       }
     }
   }
-
+  
   public String constructMessage(MessageReceived messageReceived)
   {
     out = new StringBuilder();
@@ -163,12 +163,42 @@ public class VaccinationUpdateConstructer implements ConstructerInterface
     }
     printFields();
   }
+  
+  public String makeHeader(MessageReceived messageReceived)
+  {
+    out = new StringBuilder();
+    makeSegment("FHS");
+    fields[3] = makeField(ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_SENDING_APPLICATION, "DQA"));
+    fields[4] = makeField(messageReceived.getMessageHeader().getSendingFacility());
+    fields[5] = ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "TxImmTrac");
+    fields[6] = ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "TxDSHS");
+    fields[7] = dateTimezoneFormat.format(messageReceived.getReceivedDate());
+    printFields();
+    makeSegment("BHS");
+    fields[3] = makeField(ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_SENDING_APPLICATION, "DQA"));
+    fields[4] = makeField(messageReceived.getMessageHeader().getSendingFacility());
+    fields[5] = ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "TxImmTrac");
+    fields[6] = ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "TxDSHS");
+    fields[7] = dateTimezoneFormat.format(messageReceived.getReceivedDate());
+    printFields();
+    return out.toString();
+  }
+
+  public String makeFooter(MessageReceived messageReceived)
+  {
+    out = new StringBuilder();
+    makeSegment("BTS");
+    printFields();
+    makeSegment("FTS");
+    printFields();
+    return out.toString();
+  }
 
   private void makeMSH(MessageReceived messageReceived)
   {
     makeSegment("MSH");
     fields[3] = makeField(ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_SENDING_APPLICATION, "DQA"));
-    fields[4] = makeField(orgLocalCode);
+    fields[4] = makeField(messageReceived.getMessageHeader().getSendingFacility());
     fields[5] = ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "TxImmTrac");
     fields[6] = ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "TxDSHS");
     fields[7] = dateTimezoneFormat.format(messageReceived.getReceivedDate());
@@ -195,7 +225,7 @@ public class VaccinationUpdateConstructer implements ConstructerInterface
     out.append(fields[0]);
     out.append("|");
     int pos = 1;
-    if (fields[0].equals("MSH"))
+    if (fields[0].equals("MSH") || fields[0].equals("BHS") || fields[0].equals("FHS"))
     {
       out.append("^~\\&|");
       pos = 3;

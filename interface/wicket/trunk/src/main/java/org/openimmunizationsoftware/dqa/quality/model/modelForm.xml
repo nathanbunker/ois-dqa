@@ -25,7 +25,7 @@
       <section name="recommended" weight="2">
         <score label="Ethnicity" denominator="patient count" numerator="Patient ethnicity" weight="10" />
         <score label="Race" denominator="patient count" numerator="Patient race" weight="10" />
-        <score label="Responsible Party" denominator="patient count" numerator="Patient guardian party" weight="1">
+        <score label="Responsible Party" denominator="patient count" numerator="Patient guardian responsible party" weight="1">
           <score label="First Name" denominator="patient count" numerator="Patient guardian name first" weight="4" />
           <score label="Last Name" denominator="patient count" numerator="Patient guardian name last" weight="4" />
           <score label="Same as Patient" denominator="patient count" numerator="Patient guardian name is same as underage patient" weight="-8" />
@@ -38,7 +38,7 @@
         <score label="SSN" denominator="patient count" numerator="Patient SSN" weight="0" />
         <score label="Alias" denominator="patient count" numerator="Patient alias" weight="0" />
         <score label="Primary Language" denominator="patient count" numerator="Patient primary language" weight="0" />
-        <score label="Resp Party Address" denominator="patient count" numerator="Patient guardian address is missing" weight="0">
+        <score label="Resp Party Address" denominator="patient count" numerator="Patient guardian address" weight="0">
           <score label="Street" denominator="patient count" numerator="Patient guardian address street" weight="0" />
           <score label="City" denominator="patient count" numerator="Patient guardian address city" weight="0" />
           <score label="State" denominator="patient count" numerator="Patient guardian address state" weight="0" />
