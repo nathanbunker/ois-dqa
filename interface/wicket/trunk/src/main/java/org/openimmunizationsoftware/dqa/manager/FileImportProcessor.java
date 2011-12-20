@@ -22,6 +22,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.openimmunizationsoftware.dqa.ProcessLocker;
 import org.openimmunizationsoftware.dqa.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.db.model.Application;
 import org.openimmunizationsoftware.dqa.db.model.BatchActions;
@@ -208,7 +209,15 @@ public class FileImportProcessor extends ManagerThread
         {
           procLog("Processing file " + filename);
           internalLog.append("  + processing file... ");
-          processFile(session, filename, inFile);
+          try
+          {
+            ProcessLocker.lock(profile);
+
+            processFile(session, filename, inFile);
+          } finally
+          {
+            ProcessLocker.unlock(profile);
+          }
         }
       } else
       {

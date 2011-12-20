@@ -182,12 +182,18 @@ public class WeeklyExportManager extends ManagerThread
           + "  and rq.received_id = mr.received_id "
           + "order by pat.name_last, pat.name_first, pat.name_middle, pat.id_submitter_number, mr.received_date");
       sqlQuery.setParameter(0, messageBatch.getBatchId());
-      List<BigDecimal> receiveQueueIds = sqlQuery.list();
+      List receiveQueueIds = sqlQuery.list();
       ReceiveQueue receiveQueue = null;
       boolean nothingExported = true;
-      for (BigDecimal receiveQueueId : receiveQueueIds)
+      for (Object receiveQueueId : receiveQueueIds)
       {
-        receiveQueue = (ReceiveQueue) session.get(ReceiveQueue.class, receiveQueueId.intValue());
+        if (receiveQueueId instanceof BigDecimal)
+        {
+          receiveQueue = (ReceiveQueue) session.get(ReceiveQueue.class, ((BigDecimal) receiveQueueId).intValue());
+        } else
+        {
+          receiveQueue = (ReceiveQueue) session.get(ReceiveQueue.class, (Integer) receiveQueueId);
+        }
         MessageReceived nextMr = receiveQueue.getMessageReceived();
         populate(session, receiveQueue, nextMr);
         if (currMr == null)

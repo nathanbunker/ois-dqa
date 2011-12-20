@@ -1,5 +1,10 @@
 package org.openimmunizationsoftware.dqa.validate;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
+
 import junit.framework.TestCase;
 
 public class TestValidator extends TestCase
@@ -14,4 +19,6 @@ public class TestValidator extends TestCase
     assertTrue(Validator.validNameChars("J"));
     assertFalse(Validator.validNameChars("J()"));
   }
+  
+
 }

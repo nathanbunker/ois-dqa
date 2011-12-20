@@ -69,6 +69,9 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     pi = PotentialIssues.getPotentialIssues();
   }
 
+  private static final String[] RECOGNIZED_SEGMENTS = { "MSH", "SFT", "PID", "PD1", "NK1", "PV1", "IN1", "IN3", "IN4",
+      "PD2", "RXA", "ORC", "OBX", "BTS", "FTS", "FHS", "BHS", "RXR", "GT1" };
+
   @Override
   public void createVaccinationUpdateMessage(MessageReceived messageReceived)
   {
@@ -177,8 +180,25 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
           continue;
         }
         populateOBX(message);
+      } else
+      {
+        if (segmentName.length() > 0 && segmentName.charAt(0) > ' ')
+        {
+          boolean recognized = false;
+          for (String recognizedSegment : RECOGNIZED_SEGMENTS)
+          {
+            if (recognizedSegment.equals(segmentName))
+            {
+              recognized = true;
+              continue;
+            }
+          }
+          if (!recognized)
+          {
+            registerIssue(pi.Hl7SegmentIsUnrecognized);
+          }
+        }
       }
-      
     }
     positionId = 0;
     assertPIDFound(foundPID);
@@ -247,6 +267,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     header.setMessageVersion(getValue(12));
     header.setAckTypeAcceptCode(getValue(15));
     header.setAckTypeApplicationCode(getValue(16));
+    header.setCountryCode(getValue(17));
     header.setCharacterSetCode(getValue(18));
     header.setCharacterSetAltCode(getValue(20));
     header.setMessageProfile(getValue(21));
@@ -302,6 +323,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     registerIssueIfEmpty(1, pi.Hl7RxaGiveSubIdIsMissing);
     registerIssueIfEmpty(2, pi.Hl7RxaAdminSubIdCounterIsMissing);
     vaccination.setAdminDate(getValueDate(3, pi.VaccinationAdminDateIsInvalid));
+    vaccination.setAdminDateEnd(getValueDate(4, null));
     readCodeEntity(5, vaccination.getAdmin());
     CodedEntity admin = vaccination.getAdmin();
     readCptCvxCodes(admin);
@@ -324,7 +346,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     readCodeEntity(1, vaccination.getBodyRoute());
     readCodeEntity(2, vaccination.getBodySite());
   }
-  
+
   private void populateOBX(MessageReceived message)
   {
     Observation obs = new Observation();
@@ -333,7 +355,6 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     readCodeEntity(3, obs.getObservationIdentifier());
     obs.setObservationValue(getValue(5));
   }
-  
 
   private void readCptCvxCodes(CodedEntity admin)
   {
@@ -390,12 +411,21 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     readCodeEntity(1, vaccination.getOrderControl());
     vaccination.setIdPlacer(getValue(2));
     vaccination.setIdSubmitter(getValue(3));
+    readCodeEntity(28, vaccination.getConfidentiality());
   }
 
   private void populatePV1(MessageReceived message)
   {
     patient.setPatientClassCode(getValue(2));
-    patient.setFinancialEligibilityCode(getValue(20));
+    String[] field = getValues(20);
+    if (field.length > 0)
+    {
+      patient.setFinancialEligibilityCode(field[0]);
+      if (field.length > 1)
+      {
+        patient.setFinancialEligibilityDate(createDate(pi.PatientVfcEffectiveDateIsInvalid, field[1]));
+      }
+    }
   }
 
   private void readPhoneNumber(int fieldNumber, PhoneNumber phoneNumber)
@@ -425,7 +455,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     address.setZip(field.length >= 5 ? field[4] : "");
     address.setCountryCode(field.length >= 6 ? field[5] : "");
     address.setTypeCode(field.length >= 7 ? field[6] : "");
-    address.setCountyParishCode(field.length >= 8 ? field[7] : "");
+    address.setCountyParishCode(field.length >= 9 ? field[8] : "");
   }
 
   private void readPatientId(Patient patient)
@@ -543,8 +573,21 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
   private Date getValueDate(int fieldNumber, PotentialIssue pi)
   {
     String fieldValue = getValue(fieldNumber);
-    if (fieldValue.equals("") || fieldValue.length() < 8)
+    return createDate(pi, fieldValue);
+  }
+
+  private Date createDate(PotentialIssue pi, String fieldValue)
+  {
+    if (fieldValue.equals(""))
     {
+      return null;
+    }
+    if (fieldValue.length() < 8)
+    {
+      if (pi != null)
+      {
+        registerIssue(pi);
+      }
       return null;
     }
     if (fieldValue.length() < 14)
@@ -556,7 +599,10 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
         return sdf.parse(fieldValue.substring(0, 8));
       } catch (java.text.ParseException e)
       {
-        registerIssue(pi);
+        if (pi != null)
+        {
+          registerIssue(pi);
+        }
         return null;
       }
     }
@@ -567,7 +613,10 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       return sdf.parse(fieldValue.substring(0, 14));
     } catch (java.text.ParseException e)
     {
-      registerIssue(pi);
+      if (pi != null)
+      {
+        registerIssue(pi);
+      }
       return null;
     }
   }
@@ -801,8 +850,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     ack.append("|" + messageDate); // MSH-7 Date/Time of Message
     ack.append("|"); // MSH-8 Security
     ack.append("|ACK^" + message.getMessageHeader().getMessageTrigger()); // MSH-9
-                                                                   // Message
-                                                                   // Type
+    // Message
+    // Type
     ack.append("|" + messageDate + "." + getNextAckCount()); // MSH-10 Message
                                                              // Control ID
     ack.append("|P"); // MSH-11 Processing ID
