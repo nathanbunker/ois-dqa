@@ -36,7 +36,8 @@ import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 
 public class Validator extends ValidateMessage
 {
-  private static final long AVERAGE_AGE_18_IN_MS = (long) (1000.0 * 60.0 * 60.0 * 24.0 * 365.25);
+  private static final long ABOUT_ONE_YEAR = (long) (1000.0 * 60.0 * 60.0 * 24.0 * 365.25);
+  private static final long ABOUT_ONE_MONTH = (long) (1000.0 * 60.0 * 60.0 * 24.0 * 31);
 
   private static String[] INVALID_NAMES = { "X", "U", "UN", "UK", "UNK", "UKN", "UNKN", "NONE" };
   private static String[] VALID_SUFFIX = { "SR", "JR", "II", "III", "IV" };
@@ -101,10 +102,12 @@ public class Validator extends ValidateMessage
     ksm = KeyedSettingManager.getKeyedSettingManager();
     init();
   }
+
   public void validateVaccinationUpdateMessage(MessageReceived message)
   {
     validateVaccinationUpdateMessage(message, null);
   }
+
   public void validateVaccinationUpdateMessage(MessageReceived message, QualityCollector qualityCollector)
   {
     this.message = message;
@@ -160,15 +163,10 @@ public class Validator extends ValidateMessage
         registerIssue(pi.NextOfKinAddressIsDifferentFromPatientAddress);
       }
     }
-    boolean patientUnderAge = false;
-    if (patient.getBirthDate() != null)
-    {
-      long age = now.getTime() - patient.getBirthDate().getTime();
-      patientUnderAge = age < AVERAGE_AGE_18_IN_MS;
-    }
+    boolean patientUnderAged = patient.isUnderAged();
     boolean isResponsibleParty = false;
     handleCodeReceived(nextOfKin.getRelationship(), PotentialIssues.Field.NEXT_OF_KIN_RELATIONSHIP);
-    if (patientUnderAge && !nextOfKin.getRelationship().isEmpty())
+    if (patientUnderAged && !nextOfKin.getRelationship().isEmpty())
     {
 
       String relationshipCode = nextOfKin.getRelationshipCode();
@@ -183,7 +181,7 @@ public class Validator extends ValidateMessage
         }
       }
     }
-    if (patientUnderAge && !isResponsibleParty)
+    if (patientUnderAged && !isResponsibleParty)
     {
       registerIssue(pi.NextOfKinRelationshipIsNotResponsibleParty);
     }
@@ -194,7 +192,7 @@ public class Validator extends ValidateMessage
     {
       registerIssue(pi.NextOfKinNameIsMissing);
     }
-    if (notEmptyFirst && notEmptyLast && patientUnderAge && isResponsibleParty)
+    if (notEmptyFirst && notEmptyLast && patientUnderAged && isResponsibleParty)
     {
       if (areEqual(nextOfKin.getNameLast(), patient.getNameLast())
           && areEqual(nextOfKin.getNameFirst(), patient.getNameFirst())
@@ -206,15 +204,17 @@ public class Validator extends ValidateMessage
       }
     }
     validatePhone(nextOfKin.getPhone(), PotentialIssues.Field.NEXT_OF_KIN_PHONE_NUMBER);
-    if ((isResponsibleParty && patientUnderAge && (notEmptyFirst || notEmptyLast)) || !patientUnderAge)
+    if ((isResponsibleParty && patientUnderAged && (notEmptyFirst || notEmptyLast)))
     {
       if (patient.getResponsibleParty() == null)
       {
+        // Patient does not yet have an assigned responsible party, so assigning
+        // one now
         patient.setResponsibleParty(nextOfKin);
-        notEmpty(patient.getAddressCity(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
-        notEmpty(patient.getAddressStateCode(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_STATE);
-        notEmpty(patient.getAddressCity(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
-        notEmpty(patient.getAddressZip(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_ZIP);
+        notEmpty(nextOfKin.getAddressCity(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
+        notEmpty(nextOfKin.getAddressStateCode(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_STATE);
+        notEmpty(nextOfKin.getAddressCity(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_CITY);
+        notEmpty(nextOfKin.getAddressZip(), PotentialIssues.Field.PATIENT_GUARDIAN_ADDRESS_ZIP);
 
         boolean firstNotEmpty = notEmpty(nextOfKin.getNameFirst(), pi.PatientGuardianNameFirstIsMissing);
         boolean lastNotEmpty = notEmpty(nextOfKin.getNameLast(), pi.PatientGuardianNameLastIsMissing);
@@ -268,8 +268,6 @@ public class Validator extends ValidateMessage
         registerIssue(pi.VaccinationInformationSourceIsValuedAsHistorical);
       }
     }
-    // TODO VaccinationInformationSourceIsAdministeredButAppearsToHistorical
-    // TODO VaccinationInformationSourceIsHistoricalButAppearsToBeAdministered
 
     handleCodeReceived(vaccination.getAdminCpt(), PotentialIssues.Field.VACCINATION_CPT_CODE);
     String cptCode = vaccination.getAdminCptCode();
@@ -385,6 +383,9 @@ public class Validator extends ValidateMessage
       } else if (vaccineCvx.getCvxCode().equals(VaccineCvx.NO_VACCINE_ADMINISTERED))
       {
         registerIssue(pi.VaccinationAdminCodeIsValuedAsNotAdministered, vaccineCr);
+      } else if (vaccineCvx.getCvxCode().equals(VaccineCvx.UNKNOWN))
+      {
+        registerIssue(pi.VaccinationAdminCodeIsValuedAsUnknown, vaccineCr);
       } else if (vaccineCvx.getCvxCode().equals(VaccineCvx.CONCEPT_TYPE_NON_VACCINE))
       {
         registerIssue(pi.VaccinationAdminCodeIsNotVaccine, vaccineCr);
@@ -420,7 +421,8 @@ public class Validator extends ValidateMessage
     if (vaccination.isAdministered())
     {
       if (vaccineMvx != null && !vaccineMvx.getMvxCode().equals("") && vaccineCvx != null
-          && !vaccineCvx.getCvxCode().equals("")
+          && !vaccineCvx.getCvxCode().equals("") && !vaccineCvx.getCvxCode().equals("998")
+          && !vaccineCvx.getCvxCode().equals("999")
           && (vaccination.getManufacturer().isValid() || vaccination.getManufacturer().isDeprecated()))
       {
         List<VaccineProduct> vaccineProducts = VaccineProductManager.getVaccineProductManager().getVaccineProducts(
@@ -432,31 +434,34 @@ public class Validator extends ValidateMessage
         {
           VaccineProduct useVp = null;
           VaccineProduct valVp = null;
-          for (VaccineProduct vp : vaccineProducts)
+          if (vaccination.getAdminDate() != null)
           {
-            if (!vp.getValidStartDate().after(vaccination.getAdminDate())
-                && !vaccination.getAdminDate().after(vp.getValidEndDate()))
+            for (VaccineProduct vp : vaccineProducts)
             {
-              valVp = vp;
-              if (!vp.getUseStartDate().after(vaccination.getAdminDate())
-                  && !vaccination.getAdminDate().after(vp.getUseEndDate()))
+              if (!vp.getValidStartDate().after(vaccination.getAdminDate())
+                  && !vaccination.getAdminDate().after(vp.getValidEndDate()))
               {
-                useVp = vp;
-                break;
+                valVp = vp;
+                if (!vp.getUseStartDate().after(vaccination.getAdminDate())
+                    && !vaccination.getAdminDate().after(vp.getUseEndDate()))
+                {
+                  useVp = vp;
+                  break;
+                }
               }
             }
-          }
-          if (valVp != null)
-          {
-            // valid product
-            if (useVp == null)
+            if (valVp != null)
             {
-              // shouldn't be used at this point
-              registerIssue(pi.VaccinationProductIsDeprecated);
+              // valid product
+              if (useVp == null)
+              {
+                // shouldn't be used at this point
+                registerIssue(pi.VaccinationProductIsDeprecated);
+              }
+            } else
+            {
+              registerIssue(pi.VaccinationProductIsInvalid);
             }
-          } else
-          {
-            registerIssue(pi.VaccinationProductIsInvalid);
           }
         }
       } else
@@ -536,8 +541,7 @@ public class Validator extends ValidateMessage
           {
             registerIssue(pi.VaccinationAdministeredAmountIsValuedAsZero);
           }
-        }
-        else 
+        } else
         {
           amountValued = true;
         }
@@ -575,6 +579,11 @@ public class Validator extends ValidateMessage
     }
     handleCodeReceived(vaccination.getConfidentiality(), PotentialIssues.Field.VACCINATION_CONFIDENTIALITY_CODE);
 
+    if (vaccination.getConfidentialityCode().equals("R") || vaccination.getConfidentialityCode().equals("V"))
+    {
+      registerIssue(pi.VaccinationConfidentialityCodeIsValuedAsRestricted);
+    }
+
     if (vaccineCpt != null && vaccineCpt.getCvx() != null && vaccineCvx != null)
     {
       if (!checkGroupMatch(vaccineCvx, vaccineCpt))
@@ -603,8 +612,19 @@ public class Validator extends ValidateMessage
       notEmpty(vaccination.getExpirationDate(), pi.VaccinationLotExpirationDateIsMissing);
       if (notEmpty(vaccination.getLotNumber(), pi.VaccinationLotNumberIsMissing))
       {
-        // TODO VaccinationLotNumberIsInvalid
+        String lotNumber = vaccination.getLotNumber();
+        if (lotNumber.startsWith("LOT") || lotNumber.length() <= 5)
+        {
+          registerIssue(pi.VaccinationLotNumberIsInvalid);
+        }
       }
+    }
+    if (vaccination.isCompletionCompleted() && !vaccination.getRefusalCode().equals(""))
+    {
+      registerIssue(pi.VaccinationRefusalReasonConflictsCompletionStatus);
+    } else if (vaccination.isCompletionRefused() && vaccination.getRefusalCode().equals(""))
+    {
+      registerIssue(pi.VaccinationRefusalReasonIsMissing);
     }
     handleCodeReceived(vaccination.getRefusal(), PotentialIssues.Field.VACCINATION_REFUSAL_REASON,
         vaccination.isCompletionRefused());
@@ -639,6 +659,73 @@ public class Validator extends ValidateMessage
       handleCodeReceived(vaccination.getFinancialEligibility(),
           PotentialIssues.Field.VACCINATION_FINANCIAL_ELIGIBILITY_CODE, vaccination.isAdministered());
     }
+
+    {
+      // Created rough scoring system that gives a point to other attributes
+      // that suggest a vaccination
+      // was administered or not. The idea is that if the sender knows a lot
+      // about the vaccination and it
+      // was given recently then it is probably administered. Otherwise it must
+      // be historical.
+      int administeredScore = 0;
+      if (vaccination.getAdminDate() != null)
+      {
+        long elapsed = vaccination.getAdminDate().getTime() - message.getReceivedDate().getTime();
+        if (elapsed < ABOUT_ONE_MONTH)
+        {
+          administeredScore += 5;
+        }
+      }
+      if (!vaccination.getLotNumber().equals(""))
+      {
+        administeredScore += 2;
+      }
+      if (vaccination.getExpirationDate() != null)
+      {
+        administeredScore += 2;
+      }
+      if (!vaccination.getManufacturerCode().equals(""))
+      {
+        administeredScore += 2;
+      }
+      if (!vaccination.getFinancialEligibilityCode().equals(""))
+      {
+        administeredScore += 2;
+      }
+      if (!vaccination.getBodyRouteCode().equals(""))
+      {
+        administeredScore += 1;
+      }
+      if (!vaccination.getBodySiteCode().equals(""))
+      {
+        administeredScore += 1;
+      }
+      if (!vaccination.getAmount().equals("") && !vaccination.getAmount().equals("999")
+          && !vaccination.getAmount().equals("0"))
+      {
+        administeredScore += 3;
+      }
+      if (!vaccination.getFacilityIdNumber().equals("") || !vaccination.getFacilityName().equals(""))
+      {
+        administeredScore += 4;
+      }
+      if (!vaccination.getGivenBy().equals("") || !vaccination.getGivenByNameFirst().equals("")
+          || !vaccination.getGivenByNameLast().equals(""))
+      {
+        administeredScore += 4;
+      }
+
+      if (vaccination.isAdministered() && administeredScore < 10)
+      {
+        registerIssue(pi.VaccinationInformationSourceIsAdministeredButAppearsToHistorical);
+      }
+      if (!vaccination.isAdministered() && administeredScore >= 10)
+      {
+        registerIssue(pi.VaccinationInformationSourceIsHistoricalButAppearsToBeAdministered);
+      }
+
+    }
+
   }
 
   private boolean checkGroupMatch(VaccineCvx vaccineCvx, VaccineCpt vaccineCpt)
@@ -692,7 +779,10 @@ public class Validator extends ValidateMessage
     }
     if (notEmpty(header.getMessageDate(), pi.Hl7MshMessageDateIsMissing))
     {
-      // TODO
+      if (message.getReceivedDate().before(header.getMessageDate()))
+      {
+        registerIssue(pi.Hl7MshMessageDateIsInFuture);
+      }
     }
     if (notEmpty(header.getMessageType(), pi.Hl7MshMessageTypeIsMissing))
     {
@@ -733,13 +823,13 @@ public class Validator extends ValidateMessage
     }
     if (notEmpty(header.getMessageVersion(), pi.Hl7MshVersionIsMissing))
     {
-      if (header.getMessageVersion().equals("2.5.1"))
+      if (header.getMessageVersion().startsWith("2.5"))
       {
         registerIssue(pi.Hl7MshVersionIsValuedAs2_5);
-      } else if (header.getMessageVersion().equals("2.3.1"))
+      } else if (header.getMessageVersion().startsWith("2.3"))
       {
         registerIssue(pi.Hl7MshVersionIsValuedAs2_3_1);
-      } else if (header.getMessageVersion().equals("2.4"))
+      } else if (header.getMessageVersion().startsWith("2.4"))
       {
         registerIssue(pi.Hl7MshVersionIsValuedAs2_4);
       } else
@@ -747,6 +837,7 @@ public class Validator extends ValidateMessage
         registerIssue(pi.Hl7MshVersionIsUnrecognized);
       }
     }
+
     handleCodeReceived(header.getCountry(), PotentialIssues.Field.HL7_MSH_COUNTRY_CODE);
     handleCodeReceived(header.getCharacterSet(), PotentialIssues.Field.HL7_MSH_CHARACTER_SET);
     handleCodeReceived(header.getCharacterSetAlt(), PotentialIssues.Field.HL7_MSH_ALT_CHARACTER_SET);
@@ -806,21 +897,10 @@ public class Validator extends ValidateMessage
     {
       if (!patient.getBirthOrder().isEmpty())
       {
-        registerIssue(pi.PatientBirthOrderIsInvalid);
+        registerIssue(pi.PatientBirthIndicatorIsMissing);
       }
     }
     notEmpty(patient.getBirthPlace(), pi.PatientBirthPlaceIsMissing);
-    if (notEmpty(patient.getDeathDate(), pi.PatientDeathDateIsMissing))
-    {
-      if (patient.getBirthDate() != null && patient.getDeathDate().before(patient.getBirthDate()))
-      {
-        registerIssue(pi.PatientDeathDateIsBeforeBirth);
-      }
-      if (message.getReceivedDate().before(patient.getDeathDate()))
-      {
-        registerIssue(pi.PatientDeathDateIsInFuture);
-      }
-    }
     handleCodeReceived(patient.getEthnicity(), PotentialIssues.Field.PATIENT_ETHNICITY);
     specialNameHandling1(patient.getName());
     specialNameHandling2(patient.getName());
@@ -950,7 +1030,17 @@ public class Validator extends ValidateMessage
     handleCodeReceived(patient.getPrimaryLanguage(), PotentialIssues.Field.PATIENT_PRIMARY_LANGUAGE);
     handleCodeReceived(patient.getPhysician(), PotentialIssues.Field.PATIENT_PRIMARY_PHYSICIAN_ID);
     notEmpty(patient.getPhysician().getName(), pi.PatientPrimaryPhysicianNameIsMissing);
-    handleCodeReceived(patient.getProtection(), PotentialIssues.Field.PATIENT_PROTECTION_INDICATOR);
+    if (notEmpty(patient.getProtectionCode(), PotentialIssues.Field.PATIENT_PROTECTION_INDICATOR))
+    {
+      handleCodeReceived(patient.getProtection(), PotentialIssues.Field.PATIENT_PROTECTION_INDICATOR);
+      if (patient.getProtectionCode().equals("Y"))
+      {
+        registerIssue(pi.PatientProtectionIndicatorIsValuedAsYes);
+      } else if (patient.getProtectionCode().equals("N"))
+      {
+        registerIssue(pi.PatientProtectionIndicatorIsValuedAsNo);
+      }
+    }
     handleCodeReceived(patient.getPublicity(), PotentialIssues.Field.PATIENT_PUBLICITY_CODE);
     handleCodeReceived(patient.getRace(), PotentialIssues.Field.PATIENT_RACE);
     notEmpty(patient.getIdRegistry(), pi.PatientRegistryIdIsMissing);
@@ -976,16 +1066,60 @@ public class Validator extends ValidateMessage
     // TODO PatientVfcEffectiveDateIsInvalid
     // TODO PatientVfcEffectiveDateIsMissing
     handleCodeReceived(patient.getFinancialEligibility(), PotentialIssues.Field.PATIENT_VFC_STATUS);
-    if (notEmpty(patient.getDeathIndicator(), pi.PatientDeathIndicatorIsMissing))
+    if (patient.getFinancialEligibilityDate() != null)
     {
-      if (patient.getDeathIndicator().equals("Y") && patient.getDeathDate() == null)
+      if (patient.getBirthDate() != null && patient.getFinancialEligibilityDate().before(patient.getBirthDate()))
       {
-        registerIssue(pi.PatientDeathIndicatorIsInconsistent);
-      } else if (patient.getDeathDate() == null)
+        registerIssue(pi.PatientVfcEffectiveDateIsBeforeBirth);
+      }
+      if (message.getReceivedDate().before(patient.getFinancialEligibilityDate()))
       {
-        registerIssue(pi.PatientDeathIndicatorIsInconsistent);
+        registerIssue(pi.PatientVfcEffectiveDateIsInFuture);
       }
     }
+    if (notEmpty(patient.getDeathIndicator(), pi.PatientDeathIndicatorIsMissing))
+    {
+      if (patient.getDeathIndicator().equals("Y"))
+      {
+        if (patient.getDeathDate() == null)
+        {
+          registerIssue(pi.PatientDeathIndicatorIsInconsistent);
+        } else
+        {
+          if (notEmpty(patient.getDeathDate(), pi.PatientDeathDateIsMissing))
+          {
+            if (patient.getBirthDate() != null && patient.getDeathDate().before(patient.getBirthDate()))
+            {
+              registerIssue(pi.PatientDeathDateIsBeforeBirth);
+            }
+            if (message.getReceivedDate().before(patient.getDeathDate()))
+            {
+              registerIssue(pi.PatientDeathDateIsInFuture);
+            }
+          }
+        }
+      } else
+      {
+        if (patient.getDeathDate() != null)
+        {
+          registerIssue(pi.PatientDeathIndicatorIsInconsistent);
+        }
+      }
+    }
+
+    boolean patientUnderAged = false;
+    if (patient.getBirthDate() != null)
+    {
+      long age = now.getTime() - patient.getBirthDate().getTime();
+      patientUnderAged = age < (ABOUT_ONE_YEAR * 18);
+
+      if (age > (ABOUT_ONE_YEAR * 99))
+      {
+        // patient is over 99 years old, flag record. May be a bad birth date
+        registerIssue(pi.PatientBirthDateIsVeryLongAgo);
+      }
+    }
+    patient.setUnderAged(patientUnderAged);
 
     for (SectionValidator sectionValidator : patientValidators)
     {
@@ -1063,7 +1197,7 @@ public class Validator extends ValidateMessage
     }
     if (address.getState().getCode().equalsIgnoreCase("us"))
     {
-      address.getState().setCode("TX");
+      address.getState().setCode("");
       address.getCountry().setCode("USA");
     } else if (address.getState().getCode().equalsIgnoreCase("mx")
         || address.getState().getCode().equalsIgnoreCase("mex")
@@ -1079,11 +1213,41 @@ public class Validator extends ValidateMessage
     notEmpty(address.getStreet2(), piAddressStreet2);
     if (notEmpty(address.getZip(), piAddressZip))
     {
-      String zip = address.getZip();
-      int dash = zip.indexOf('-');
-      if (dash != 5 && dash != -1 && zip.length() != 5)
+      if (address.getCountryCode().equals("") || address.getCountryCode().equals("USA"))
       {
-        address.setZip("");
+        String zip = address.getZip();
+        int dash = zip.indexOf('-');
+        boolean valid = true;
+        if (dash == -1)
+        {
+          if (zip.length() != 5)
+          {
+            valid = false;
+          }
+        } else if (dash != 5)
+        {
+          valid = false;
+        }
+        if (valid && zip.length() >= 5)
+        {
+          for (int i = 0; i < zip.length(); i++)
+          {
+            if (i == 5)
+            {
+              continue;
+            }
+            char c = zip.charAt(i);
+            if (c < '0' || c > '9')
+            {
+              valid = false;
+              break;
+            }
+          }
+        }
+        if (!valid)
+        {
+          registerIssue(pi.getIssue(piAddressZip, PotentialIssue.ISSUE_TYPE_IS_INVALID));
+        }
       }
     }
     if (piAddressType != null)

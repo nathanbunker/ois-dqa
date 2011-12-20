@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -47,9 +49,6 @@ public class IncomingServlet extends HttpServlet
   protected static WeeklyBatchManager weeklyBatchManager = null;
   protected static WeeklyExportManager weeklyExportManager = null;
 
-  private PrintWriter out = null;
-  private QualityCollector messageBatchManager = null;
-
   @Override
   public void init() throws ServletException
   {
@@ -61,7 +60,7 @@ public class IncomingServlet extends HttpServlet
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
-    out = new PrintWriter(resp.getOutputStream());
+    PrintWriter out = new PrintWriter(resp.getOutputStream());
     out.println("<html>");
     out.println("  <head>");
     out.println("    <title>DQA Incoming Interface</title>");
@@ -96,9 +95,9 @@ public class IncomingServlet extends HttpServlet
     out.println("    </form>");
     out.println("    ");
 
-    printManagerThread(fileImportManager);
-    printManagerThread(weeklyBatchManager);
-    printManagerThread(weeklyExportManager);
+    printManagerThread(fileImportManager, out);
+    printManagerThread(weeklyBatchManager, out);
+    printManagerThread(weeklyExportManager, out);
     out.println("    <hr>");
     out.println("    <p>Version " + SoftwareVersion.VERSION + "</p>");
     out.println("  </body>");
@@ -107,7 +106,7 @@ public class IncomingServlet extends HttpServlet
     out = null;
   }
 
-  private void printManagerThread(ManagerThread mt)
+  private void printManagerThread(ManagerThread mt, PrintWriter out)
   {
     if (mt.isKeepRunning())
     {
@@ -140,7 +139,7 @@ public class IncomingServlet extends HttpServlet
       ManagerThreadMulti mtm = (ManagerThreadMulti) mt;
       for (ManagerThread mtChild : mtm.getManagerThreads())
       {
-        printManagerThread(mtChild);
+        printManagerThread(mtChild, out);
       }
     }
   }
@@ -153,7 +152,7 @@ public class IncomingServlet extends HttpServlet
     String facilityId = req.getParameter("FACILITYID");
     boolean debug = req.getParameter("DEBUG") != null;
     resp.setContentType("text/plain");
-    out = new PrintWriter(resp.getOutputStream());
+    PrintWriter out = new PrintWriter(resp.getOutputStream());
 
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
@@ -271,17 +270,29 @@ public class IncomingServlet extends HttpServlet
       }
     }
     tx.commit();
+    QualityCollector qualityCollector = null;
     if (accessDenied == null)
     {
-      String messageData = req.getParameter("MESSAGEDATA");
-      debug = processStream(debug, session, profile, messageData);
+      try
+      {
+        ProcessLocker.lock(profile);
+        qualityCollector = new QualityCollector("Realtime HTTPS", BatchType.SUBMISSION, profile);
+        String messageData = req.getParameter("MESSAGEDATA");
+        debug = processStream(debug, session, profile, messageData, out, qualityCollector);
+      } finally
+      {
+        ProcessLocker.unlock(profile);
+      }
     } else
     {
       out.println(accessDenied);
     }
     if (debug)
     {
-      printMessageBatch();
+      if (qualityCollector != null)
+      {
+        printMessageBatch(out, qualityCollector);
+      }
       out.print("\r");
       out.print("\r");
       CodesReceived cr = CodesReceived.getCodesReceived(profile, session);
@@ -350,9 +361,9 @@ public class IncomingServlet extends HttpServlet
     session.close();
   }
 
-  private void printMessageBatch()
+  private void printMessageBatch(PrintWriter out, QualityCollector qualityCollector)
   {
-    MessageBatch mb = messageBatchManager.getMessageBatch();
+    MessageBatch mb = qualityCollector.getMessageBatch();
     BatchReport r = mb.getBatchReport();
     out.print("\r");
     out.print("\r");
@@ -366,15 +377,14 @@ public class IncomingServlet extends HttpServlet
     out.print(" + Deleted:          " + r.getVaccinationDeleteCount() + "\r");
   }
 
-  public boolean processStream(boolean debug, Session session, SubmitterProfile profile, String messageData)
-      throws IOException
+  public boolean processStream(boolean debug, Session session, SubmitterProfile profile, String messageData,
+      PrintWriter out, QualityCollector qualityCollector) throws IOException
   {
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     StringReader stringReader = new StringReader(messageData);
     BufferedReader in = new BufferedReader(stringReader);
     String line = null;
     StringBuilder sb = new StringBuilder();
-    messageBatchManager = new QualityCollector("Realtime HTTPS", BatchType.SUBMISSION, profile);
 
     while ((line = in.readLine()) != null)
     {
@@ -382,7 +392,7 @@ public class IncomingServlet extends HttpServlet
       {
         if (sb.length() > 0)
         {
-          debug = processMessage(parser, sb, debug, profile, session);
+          debug = processMessage(parser, sb, debug, profile, session, out, qualityCollector);
         }
         sb.setLength(0);
       } else if (line.startsWith("FHS") || line.startsWith("BHS") || line.startsWith("BTS") || line.startsWith("FTS"))
@@ -394,29 +404,31 @@ public class IncomingServlet extends HttpServlet
     }
     if (sb.length() > 0)
     {
-      debug = processMessage(parser, sb, debug, profile, session);
+      debug = processMessage(parser, sb, debug, profile, session, out, qualityCollector);
     }
     Transaction tx = session.beginTransaction();
-    messageBatchManager.close();
-    session.save(messageBatchManager.getMessageBatch());
-    session.save(messageBatchManager.getMessageBatch().getBatchReport());
+    qualityCollector.close();
+    session.save(qualityCollector.getMessageBatch());
+    session.save(qualityCollector.getMessageBatch().getBatchReport());
     tx.commit();
     return debug;
   }
 
   private boolean processMessage(VaccinationUpdateParserHL7 parser, StringBuilder sb, boolean debug,
-      SubmitterProfile profile, Session session)
+      SubmitterProfile profile, Session session, PrintWriter out, QualityCollector qualityCollector)
   {
+    Transaction tx = session.beginTransaction();
     try
     {
-      Transaction tx = session.beginTransaction();
 
       profile.initPotentialIssueStatus(session);
       MessageReceived messageReceived = new MessageReceived();
       messageReceived.setProfile(profile);
       messageReceived.setRequestText(sb.toString());
       parser.createVaccinationUpdateMessage(messageReceived);
-      if (profile.isProfileStatusTest() && messageReceived.getMessageHeader().getProcessingStatusCode().equals(org.openimmunizationsoftware.dqa.db.model.MessageHeader.PROCESSING_ID_DEBUGGING))
+      if (profile.isProfileStatusTest()
+          && messageReceived.getMessageHeader().getProcessingStatusCode()
+              .equals(org.openimmunizationsoftware.dqa.db.model.MessageHeader.PROCESSING_ID_DEBUGGING))
       {
         debug = true;
       }
@@ -425,7 +437,7 @@ public class IncomingServlet extends HttpServlet
         Validator validator = new Validator(profile, session);
         validator.validateVaccinationUpdateMessage(messageReceived, null);
       }
-      messageBatchManager.registerProcessedMessage(messageReceived);
+      qualityCollector.registerProcessedMessage(messageReceived);
 
       String ackMessage = parser.makeAckMessage(messageReceived);
       messageReceived.setResponseText(ackMessage);
@@ -437,7 +449,8 @@ public class IncomingServlet extends HttpServlet
         try
         {
           out.print("-- DEBUG START -------------------------------------------------------\r");
-          out.print("Processed message: " + messageBatchManager.getMessageBatch().getBatchReport().getMessageCount() + "\r");
+          out.print("Processed message: " + qualityCollector.getMessageBatch().getBatchReport().getMessageCount()
+              + "\r");
           List<IssueFound> issuesFound = messageReceived.getIssuesFound();
           boolean first = true;
           for (IssueFound issueFound : issuesFound)
@@ -449,7 +462,7 @@ public class IncomingServlet extends HttpServlet
                 out.print("Errors:\r");
                 first = false;
               }
-              printIssueFound(issueFound);
+              printIssueFound(issueFound, out);
             }
           }
           first = true;
@@ -462,7 +475,7 @@ public class IncomingServlet extends HttpServlet
                 out.print("Warnings:\r");
                 first = false;
               }
-              printIssueFound(issueFound);
+              printIssueFound(issueFound, out);
             }
           }
           first = true;
@@ -475,7 +488,7 @@ public class IncomingServlet extends HttpServlet
                 out.print("Skip:\r");
                 first = false;
               }
-              printIssueFound(issueFound);
+              printIssueFound(issueFound, out);
             }
           }
           out.print("Message Data: \r");
@@ -491,17 +504,24 @@ public class IncomingServlet extends HttpServlet
     {
       String ackMessage = "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r"
           + "MSA|AE|TODO|Exception occurred: " + exception.getMessage() + "|\r";
-      out.print(ackMessage);
+      if (out != null)
+      {
+        out.print(ackMessage);
+      } else
+      {
+        exception.printStackTrace();
+      }
       if (debug)
       {
         exception.printStackTrace(out);
       }
       exception.printStackTrace();
+      tx.rollback();
     }
     return debug;
   }
 
-  private void printIssueFound(IssueFound issueFound)
+  private void printIssueFound(IssueFound issueFound, PrintWriter out)
   {
     out.print("  + ");
     out.print(issueFound.getDisplayText());
@@ -523,4 +543,5 @@ public class IncomingServlet extends HttpServlet
     s += PAD_SLASH;
     return s.substring(0, size - 1) + "-";
   }
+
 }

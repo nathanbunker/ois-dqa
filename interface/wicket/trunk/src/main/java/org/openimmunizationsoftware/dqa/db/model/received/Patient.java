@@ -24,6 +24,7 @@ public class Patient implements Skippable
   private CodedEntity ethnicity = new CodedEntity(CodeTable.Type.PATIENT_ETHNICITY);
   private OrganizationName facility = new OrganizationName();
   private CodedEntity financialEligibility = new CodedEntity(CodeTable.Type.FINANCIAL_STATUS_CODE);
+  private Date financialEligibilityDate = null;
   private Id idMedicaid = new Id(CodeTable.Type.PATIENT_ID);
   private Id idRegistry = new Id(CodeTable.Type.PATIENT_ID);
   private Id idSsn = new Id(CodeTable.Type.PATIENT_ID);
@@ -42,6 +43,7 @@ public class Patient implements Skippable
   private CodedEntity patientClass = new CodedEntity(CodeTable.Type.PATIENT_CLASS);
   private NextOfKin responsibleParty = null;
   private CodedEntity sex = new CodedEntity(CodeTable.Type.PATIENT_SEX);
+  private boolean isUnderAged = false;
   private boolean skipped = false;
 
   public Address getAddress()
@@ -648,19 +650,41 @@ public class Patient implements Skippable
   {
     this.skipped = skipped;
   }
-  
+
   public String getPatientClassCode()
   {
     return patientClass.getCode();
   }
-  
+
   public void setPatientClassCode(String code)
   {
     patientClass.setCode(code);
   }
-  
+
   public CodedEntity getPatientClass()
   {
     return patientClass;
   }
+
+  public Date getFinancialEligibilityDate()
+  {
+    return financialEligibilityDate;
+  }
+
+  public void setFinancialEligibilityDate(Date financialEligibilityDate)
+  {
+    this.financialEligibilityDate = financialEligibilityDate;
+  }
+
+  public boolean isUnderAged()
+  {
+    return isUnderAged;
+  }
+
+  public void setUnderAged(boolean isUnderAged)
+  {
+    this.isUnderAged = isUnderAged;
+  }
+
+
 }
