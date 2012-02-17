@@ -3411,10 +3411,4 @@ UPDATE dqa_vaccine_cvx SET cvx_label='VZIG', valid_start_date=TO_DATE('1970-01-0
 UPDATE dqa_vaccine_cvx SET cvx_label='VZIG (IND)', valid_start_date=TO_DATE('1970-01-01', 'YYYY-MM-DD'), use_start_date=TO_DATE('1970-01-01', 'YYYY-MM-DD'), use_end_date=TO_DATE('2010-05-28', 'YYYY-MM-DD'), valid_end_date=TO_DATE('2010-05-28', 'YYYY-MM-DD'), use_month_start=1, use_month_end=1440, concept_type='vaccine' WHERE cvx_id=117;
 UPDATE dqa_vaccine_cvx SET cvx_label='yellow fever', valid_start_date=TO_DATE('1970-01-01', 'YYYY-MM-DD'), use_start_date=TO_DATE('1970-01-01', 'YYYY-MM-DD'), use_end_date=TO_DATE('2100-01-01', 'YYYY-MM-DD'), valid_end_date=TO_DATE('2100-01-01', 'YYYY-MM-DD'), use_month_start=1, use_month_end=1440, concept_type='vaccine' WHERE cvx_id=37;
 UPDATE dqa_vaccine_cvx SET cvx_label='zoster', valid_start_date=TO_DATE('1970-01-01', 'YYYY-MM-DD'), use_start_date=TO_DATE('1970-01-01', 'YYYY-MM-DD'), use_end_date=TO_DATE('2100-01-01', 'YYYY-MM-DD'), valid_end_date=TO_DATE('2100-01-01', 'YYYY-MM-DD'), use_month_start=1, use_month_end=1440, concept_type='vaccine' WHERE cvx_id=121;
-
-
-INSERT INTO dqa_keyed_setting (keyed_id, keyed_code, object_code, object_id, keyed_value) VALUES (dqa_keyed_id_sequence.NEXTVAL, 'in.file.enabled', 'Application', 4, 'Y');
-INSERT INTO dqa_keyed_setting (keyed_id, keyed_code, object_code, object_id, keyed_value) VALUES (dqa_keyed_id_sequence.NEXTVAL, 'in.file.dir', 'Application', 4, 'C:/data/My Box Files/MCIR/in');
-INSERT INTO dqa_keyed_setting (keyed_id, keyed_code, object_code, object_id, keyed_value) VALUES (dqa_keyed_id_sequence.NEXTVAL, 'in.file.wait', 'Application', 4, '15');
-
 commit;
