@@ -30,7 +30,7 @@ ALTER TABLE dqa_application ADD
 );
 
 
-ALTER TABLE dqa_submitter_profile ADD late_id
+ALTER TABLE dqa_submitter_profile ADD 
 (
   template_id              INTEGER NOT NULL
 );
@@ -850,7 +850,6 @@ INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_st
 INSERT INTO dqa_code_master(table_id, code_value, code_label, use_value, code_status) VALUES  (27, 'V', 'Very restricted', 'V', 'V');
 
 UPDATE dqa_potential_issue set target_field = 'guardian responsible party' where issue_id = 157; 
-
 
 UPDATE dqa_vaccine_cvx SET cvx_label='no vaccine administered', valid_start_date='1970-01-01', use_start_date='1970-01-01', use_end_date='2100-01-01', valid_end_date='2100-01-01', use_month_start=1, use_month_end=1440, concept_type='non vaccine' WHERE cvx_id=998;
 UPDATE dqa_vaccine_cvx SET cvx_label='RESERVED - do not use', valid_start_date='1970-01-01', use_start_date='1970-01-01', use_end_date='2010-05-28', valid_end_date='2010-05-28', use_month_start=1, use_month_end=1440, concept_type='non vaccine' WHERE cvx_id=99;

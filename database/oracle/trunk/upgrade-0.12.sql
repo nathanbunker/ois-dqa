@@ -2983,7 +2983,7 @@ INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, us
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'AL', 'Always', 'AL', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'NE', 'Never', 'NE', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'ER', 'Error only', 'ER', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'SU', '', 'SU', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'SU', ' ', 'SU', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'PRN', 'Primary residence number', 'PRN', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'ORN', 'Other residence number', 'ORN', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'WPN', 'Work number', 'WPN', 'V');
@@ -3209,7 +3209,7 @@ INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, us
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, '2186-5', 'not Hispanic or Latino', '2186-5', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, 'H', 'Hispanic or Latino', '2135-2', 'D');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, 'N', 'not Hispanic or Latino', '2186-5', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, 'U', 'Unknown', '', 'D');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, 'U', 'Unknown', ' ', 'D');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 6, 'ML', 'Milliliter', 'ML', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 6, 'ml', 'Milliliter', 'ML', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 6, 'mL', 'Milliliter', 'ML', 'V');
