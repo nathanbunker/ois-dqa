@@ -10,7 +10,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hsqldb.lib.StringInputStream;
 import org.openimmunizationsoftware.dqa.InitializationException;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
