@@ -15,7 +15,7 @@ import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
 public class KeyedSettingManager implements Reload
 {
   private static KeyedSettingManager singleton = null;
-  private static String INIT_BLOCK = "";
+  private static final String INIT_BLOCK = "init";
 
   public static KeyedSettingManager getKeyedSettingManager()
   {
