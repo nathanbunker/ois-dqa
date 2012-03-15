@@ -642,7 +642,7 @@ public class Validator extends ValidateMessage
       handleCodeReceived(observation.getValueType(), PotentialIssues.Field.OBSERVATION_VALUE_TYPE);
       handleCodeReceived(observation.getObservationIdentifier(),
           PotentialIssues.Field.OBSERVATION_OBSERVATION_IDENTIFIER_CODE);
-      if (financialEligibilityCode != null && !observation.isSkipped())
+      if (financialEligibilityCode == null && !observation.isSkipped())
       {
         if (observation.getObservationIdentifierCode().equals("64994-7"))
         {
@@ -653,7 +653,14 @@ public class Validator extends ValidateMessage
         }
       }
     }
-    if (financialEligibilityCode != null)
+    if (financialEligibilityCode == null)
+    {
+      if (vaccination.isAdministered())
+      {
+        registerIssue(pi.VaccinationFinancialEligibilityCodeIsMissing);
+      }
+    }
+    else
     {
       vaccination.setFinancialEligibilityCode(financialEligibilityCode);
       handleCodeReceived(vaccination.getFinancialEligibility(),
