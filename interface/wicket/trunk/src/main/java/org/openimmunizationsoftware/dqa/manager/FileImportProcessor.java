@@ -51,7 +51,7 @@ public class FileImportProcessor extends ManagerThread
   private FileImportManager fileImportManager = null;
   private File dir;
 
-  private SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+  private SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
   private File processingFile = null;
   private PrintWriter processingOut = null;
   private File acceptedDir = null;
@@ -203,7 +203,7 @@ public class FileImportProcessor extends ManagerThread
     if (inFile.exists() && inFile.canRead() && inFile.length() > 0)
     {
       long timeSinceLastChange = System.currentTimeMillis() - inFile.lastModified();
-      if (timeSinceLastChange > 60 * 1000)
+      if (timeSinceLastChange > (60 * 1000))
       {
         if (fileContainsHL7(inFile))
         {
@@ -212,7 +212,6 @@ public class FileImportProcessor extends ManagerThread
           try
           {
             ProcessLocker.lock(profile);
-
             processFile(session, filename, inFile);
           } finally
           {
@@ -221,7 +220,9 @@ public class FileImportProcessor extends ManagerThread
         }
       } else
       {
-        procLog("Postponing processing, file recently changed");
+        procLog("Postponing processing, file changed " + (timeSinceLastChange / 1000) + " seconds ago");
+        procLog(" + current time: " + sdf.format(new Date()));
+        procLog(" + changed time: " + sdf.format(inFile.lastModified()));
         internalLog.append(" + postponing processing, file recently changed");
       }
     } else

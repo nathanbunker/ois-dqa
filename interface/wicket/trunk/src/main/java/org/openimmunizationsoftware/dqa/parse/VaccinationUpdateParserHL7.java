@@ -358,18 +358,43 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
 
   private void readCptCvxCodes(CodedEntity admin)
   {
-    if (admin.getTable().equals("CVX"))
+    boolean codeFound = false;
+    if (admin.getTable().equals("CVX") || admin.getTable().equals("HL70292"))
     {
       vaccination.getAdminCvx().setCode(admin.getCode());
       vaccination.getAdminCvx().setText(admin.getText());
       vaccination.getAdminCvx().setTable(admin.getTable());
-    } else if (admin.getAltTable().equals("CVX"))
+      codeFound = true;
+    } else if (admin.getAltTable().equals("CVX") || admin.getAltTable().equals("HL70292"))
     {
       vaccination.getAdminCvx().setCode(admin.getAltCode());
       vaccination.getAdminCvx().setText(admin.getAltText());
       vaccination.getAdminCvx().setTable(admin.getAltTable());
-    } else if (admin.getTable().equals(""))
+      codeFound = true;
+    } 
+    if (admin.getTable().equals("CPT") || admin.getTable().equals("C4"))
     {
+      vaccination.getAdminCpt().setCode(admin.getCode());
+      vaccination.getAdminCpt().setText(admin.getText());
+      vaccination.getAdminCpt().setTable(admin.getTable());
+      codeFound = true;
+    } else if (admin.getAltTable().equals("CPT") || admin.getAltTable().equals("C4"))
+    {
+      vaccination.getAdminCpt().setCode(admin.getAltCode());
+      vaccination.getAdminCpt().setText(admin.getAltText());
+      vaccination.getAdminCpt().setTable(admin.getAltTable());
+      codeFound = true;
+    }
+    if (!codeFound)
+    {
+      if (admin.getCode().equals(""))
+      {
+        registerIssue(pi.VaccinationAdminCodeTableIsMissing);
+      }
+      else
+      {
+        registerIssue(pi.VaccinationAdminCodeTableIsInvalid);
+      }
       String possible = admin.getCode();
       if (possible != null)
       {
@@ -392,18 +417,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
           // not CVX
         }
       }
-    }
-    if (admin.getTable().equals("CPT") || admin.getTable().equals("C4"))
-    {
-      vaccination.getAdminCpt().setCode(admin.getCode());
-      vaccination.getAdminCpt().setText(admin.getText());
-      vaccination.getAdminCpt().setTable(admin.getTable());
-    } else if (admin.getAltTable().equals("CPT") || admin.getAltTable().equals("C4"))
-    {
-      vaccination.getAdminCpt().setCode(admin.getAltCode());
-      vaccination.getAdminCpt().setText(admin.getAltText());
-      vaccination.getAdminCpt().setTable(admin.getAltTable());
-    }
+    } 
+    
   }
 
   private void populateORC(MessageReceived message)

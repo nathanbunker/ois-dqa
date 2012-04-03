@@ -22,10 +22,10 @@
 		<servlet-class>org.openimmunizationsoftware.dqa.IncomingServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
-	
 	<servlet>
-		<servlet-name>TestServlet</servlet-name>
-		<servlet-class>org.openimmunizationsoftware.dqa.TestServlet</servlet-class>
+		<servlet-name>ConfigServlet</servlet-name>
+		<servlet-class>org.openimmunizationsoftware.dqa.ConfigServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
   <servlet>
     <servlet-name>ValidationDocumentationServlet</servlet-name>
@@ -98,8 +98,8 @@
 		<url-pattern>/in</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>TestServlet</servlet-name>
-		<url-pattern>/test</url-pattern>
+		<servlet-name>ConfigServlet</servlet-name>
+		<url-pattern>/config</url-pattern>
 	</servlet-mapping>
   <servlet-mapping>
     <servlet-name>ValidationDocumentationServlet</servlet-name>

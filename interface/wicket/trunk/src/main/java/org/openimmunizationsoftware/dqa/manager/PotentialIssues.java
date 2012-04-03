@@ -345,6 +345,8 @@ public class PotentialIssues implements Reload
   public PotentialIssue VaccinationAdminCodeIsUnrecognized = null;
   public PotentialIssue VaccinationAdminCodeIsValuedAsNotAdministered = null;
   public PotentialIssue VaccinationAdminCodeIsValuedAsUnknown = null;
+  public PotentialIssue VaccinationAdminCodeTableIsMissing = null;
+  public PotentialIssue VaccinationAdminCodeTableIsInvalid = null;
   public PotentialIssue VaccinationAdminCodeMayBeVariationOfPreviouslyReportedCodes = null;
   public PotentialIssue VaccinationAdminDateIsAfterLotExpirationDate = null;
   public PotentialIssue VaccinationAdminDateIsAfterMessageSubmitted = null;
@@ -713,7 +715,7 @@ public class PotentialIssues implements Reload
 
     PATIENT_GUARDIAN_NAME_FIRST,
     PATIENT_GUARDIAN_NAME_LAST,
-    PATIENT_GUARDIAN_PARTY,
+    PATIENT_GUARDIAN_RESPONSIBLE_PARTY,
     PATIENT_GUARDIAN_PHONE,
     PATIENT_GUARDIAN_RELATIONSHIP,
     PATIENT_IMMUNIZATION_REGISTRY_STATUS,
@@ -825,6 +827,8 @@ public class PotentialIssues implements Reload
 
 
 
+
+    VACCINATION_ADMIN_CODE_TABLE,
 
 
     VACCINATION_ADMIN_DATE,
@@ -1388,6 +1392,8 @@ public class PotentialIssues implements Reload
     VaccinationAdminCodeIsUnrecognized = getPotentialIssue(session, "Vaccination", "admin code", "is unrecognized", "");
     VaccinationAdminCodeIsValuedAsNotAdministered = getPotentialIssue(session, "Vaccination", "admin code", "is valued as", "not administered");
     VaccinationAdminCodeIsValuedAsUnknown = getPotentialIssue(session, "Vaccination", "admin code", "is valued as", "unknown");
+    VaccinationAdminCodeTableIsMissing = getPotentialIssue(session, "Vaccination", "admin code table", "is missing", "");
+    VaccinationAdminCodeTableIsInvalid = getPotentialIssue(session, "Vaccination", "admin code table", "is invalid", "");
     VaccinationAdminCodeMayBeVariationOfPreviouslyReportedCodes = getPotentialIssue(session, "Vaccination", "admin code", "may be variation of previously reported codes", "");
     VaccinationAdminDateIsAfterLotExpirationDate = getPotentialIssue(session, "Vaccination", "admin date", "is after lot expiration date", "");
     VaccinationAdminDateIsAfterMessageSubmitted = getPotentialIssue(session, "Vaccination", "admin date", "is after message submitted", "");
@@ -1755,7 +1761,7 @@ public class PotentialIssues implements Reload
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_NAME, PatientGuardianNameIsSameAsUnderagePatient);
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_NAME_FIRST, PatientGuardianNameFirstIsMissing);
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_NAME_LAST, PatientGuardianNameLastIsMissing);
-    addToFieldIssueMap(Field.PATIENT_GUARDIAN_PARTY, PatientGuardianResponsiblePartyIsMissing);
+    addToFieldIssueMap(Field.PATIENT_GUARDIAN_RESPONSIBLE_PARTY, PatientGuardianResponsiblePartyIsMissing);
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_PHONE, PatientGuardianPhoneIsMissing);
     addToFieldIssueMap(Field.PATIENT_GUARDIAN_RELATIONSHIP, PatientGuardianRelationshipIsMissing);
     addToFieldIssueMap(Field.PATIENT_IMMUNIZATION_REGISTRY_STATUS, PatientImmunizationRegistryStatusIsDeprecated);
@@ -1868,6 +1874,8 @@ public class PotentialIssues implements Reload
     addToFieldIssueMap(Field.VACCINATION_ADMIN_CODE, VaccinationAdminCodeIsUnrecognized);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_CODE, VaccinationAdminCodeIsValuedAsNotAdministered);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_CODE, VaccinationAdminCodeIsValuedAsUnknown);
+    addToFieldIssueMap(Field.VACCINATION_ADMIN_CODE_TABLE, VaccinationAdminCodeTableIsMissing);
+    addToFieldIssueMap(Field.VACCINATION_ADMIN_CODE_TABLE, VaccinationAdminCodeTableIsInvalid);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_CODE, VaccinationAdminCodeMayBeVariationOfPreviouslyReportedCodes);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsAfterLotExpirationDate);
     addToFieldIssueMap(Field.VACCINATION_ADMIN_DATE, VaccinationAdminDateIsAfterMessageSubmitted);

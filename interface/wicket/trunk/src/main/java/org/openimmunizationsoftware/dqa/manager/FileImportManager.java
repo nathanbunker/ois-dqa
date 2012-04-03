@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.wicket.util.file.File;
 import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
@@ -35,12 +36,12 @@ public class FileImportManager extends ManagerThreadMulti
   public void run()
   {
     internalLog.append("Starting file import manager, loading settings\r");
-    KeyedSettingManager ksm = KeyedSettingManager.getKeyedSettingManager();
     while (keepRunning)
     {
-      internalLog.append("Looking to import\r");
+      internalLog.append("Looking to import at " + sdf.format(new Date()) + "\r");
       try
       {
+        KeyedSettingManager ksm = KeyedSettingManager.getKeyedSettingManager();
         if (ksm.getKeyedValueBoolean(KeyedSetting.IN_FILE_ENABLE, false))
         {
           internalLog.append("Import enabled\r");
@@ -71,6 +72,7 @@ public class FileImportManager extends ManagerThreadMulti
       {
         synchronized (sdf)
         {
+          KeyedSettingManager ksm = KeyedSettingManager.getKeyedSettingManager();
           sdf.wait(ksm.getKeyedValueInt(KeyedSetting.IN_FILE_WAIT, 15) * 1000);
         }
       } catch (InterruptedException ie)

@@ -15,6 +15,7 @@ public class CompletenessRow
   private ReportDenominator reportDenominator;
   private double score = 0;
   private float scoreWeight = 0;
+  private String hl7Reference = "";
   private ToolTip toolTip;
   
   public CodeTable getTable()
@@ -43,12 +44,13 @@ public class CompletenessRow
    * @param reportDenominator
    * @param scoreWeight
    */
-  public CompletenessRow(String label, PotentialIssue potentialIssue, ReportDenominator reportDenominator, float scoreWeight, boolean invert) {
+  public CompletenessRow(String label, PotentialIssue potentialIssue, ReportDenominator reportDenominator, float scoreWeight, boolean invert, String hl7Reference) {
     this.potentialIssue = potentialIssue;
     this.reportDenominator = reportDenominator;
     this.scoreWeight = scoreWeight;
     this.toolTip = new ToolTip(label, "");
     this.invert = invert;
+    this.hl7Reference = hl7Reference;
   }
   
 
@@ -170,6 +172,16 @@ public class CompletenessRow
   public boolean isDemerit()
   {
     return demerit;
+  }
+
+  public String getHl7Reference()
+  {
+    return hl7Reference;
+  }
+
+  public void setHl7Reference(String hl7Reference)
+  {
+    this.hl7Reference = hl7Reference;
   }
 
 }

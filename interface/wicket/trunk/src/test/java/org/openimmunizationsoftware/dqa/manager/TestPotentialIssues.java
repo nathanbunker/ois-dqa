@@ -341,6 +341,8 @@ public class TestPotentialIssues extends TestCase
     assertNotNull(pi.VaccinationAdminCodeIsUnrecognized);
     assertNotNull(pi.VaccinationAdminCodeIsValuedAsNotAdministered);
     assertNotNull(pi.VaccinationAdminCodeIsValuedAsUnknown);
+    assertNotNull(pi.VaccinationAdminCodeTableIsMissing);
+    assertNotNull(pi.VaccinationAdminCodeTableIsInvalid);
     assertNotNull(pi.VaccinationAdminCodeMayBeVariationOfPreviouslyReportedCodes);
     assertNotNull(pi.VaccinationAdminDateIsAfterLotExpirationDate);
     assertNotNull(pi.VaccinationAdminDateIsAfterMessageSubmitted);

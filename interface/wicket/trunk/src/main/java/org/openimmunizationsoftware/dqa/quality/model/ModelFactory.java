@@ -2,15 +2,12 @@ package org.openimmunizationsoftware.dqa.quality.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringBufferInputStream;
-import java.io.StringReader;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.hsqldb.lib.StringInputStream;
 import org.openimmunizationsoftware.dqa.InitializationException;
 import org.openimmunizationsoftware.dqa.db.model.PotentialIssue;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
@@ -111,6 +108,7 @@ public class ModelFactory
         {
           ModelScore score = new ModelScore();
           score.setLabel(safe(map.getNamedItem("label")));
+          score.setHl7Reference(safe(map.getNamedItem("hl7Reference")));
           String num = safe(map.getNamedItem("numerator"));
           score.setNumerator(num);
           String den = safe(map.getNamedItem("denominator"));
@@ -205,6 +203,7 @@ public class ModelFactory
         {
           ModelScore score = new ModelScore();
           score.setLabel(safe(childMap.getNamedItem("label")));
+          score.setHl7Reference(safe(map.getNamedItem("hl7Reference")));
           score.setNumerator(safe(childMap.getNamedItem("numerator")));
           String den = safe(map.getNamedItem("denominator"));
           try

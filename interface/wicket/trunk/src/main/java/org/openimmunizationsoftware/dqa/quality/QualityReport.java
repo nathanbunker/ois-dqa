@@ -31,86 +31,74 @@ import org.openimmunizationsoftware.dqa.quality.model.ModelSection;
 
 public class QualityReport
 {
-  private static final ToolTip RECEIVED_PATIENTS = new ToolTip("Patients",
-      "The number of patients sent, one per message").setEmphasize(true);
-  private static final ToolTip RECEIVED_NEXT_OF_KINS = new ToolTip("Next-of-Kins",
-      "The number of responsible and associate parties sent").setEmphasize(true);
-  private static final ToolTip RECEIVED_VACCINATIONS = new ToolTip("Vaccinations", "The number of vaccinations sent")
-      .setEmphasize(true).setLink("completeness.vaccinations");
-  private static final ToolTip RECEIVED_VACCINATIONS_ADMININISTERED = new ToolTip("Administered",
-      "Number of vaccinations indicated as administered", true).setLink("completeness.vaccineGroup");
-  private static final ToolTip RECEIVED_VACCINATIONS_HISTORICAL = new ToolTip("Historical",
-      "Number of vaccinations not indicated as administered", true);
-  private static final ToolTip RECEIVED_VACCINATIONS_DELETED = new ToolTip("Deleted",
-      "Number of vaccinations indicated as deleted", true);
+  private static final ToolTip RECEIVED_PATIENTS = new ToolTip("Patients", "The number of patients sent, one per message").setEmphasize(true);
+  private static final ToolTip RECEIVED_NEXT_OF_KINS = new ToolTip("Next-of-Kins", "The number of responsible and associate parties sent")
+      .setEmphasize(true);
+  private static final ToolTip RECEIVED_VACCINATIONS = new ToolTip("Vaccinations", "The number of vaccinations sent").setEmphasize(true).setLink(
+      "completeness.vaccinations");
+  private static final ToolTip RECEIVED_VACCINATIONS_ADMININISTERED = new ToolTip("Administered", "Number of vaccinations indicated as administered",
+      true).setLink("completeness.vaccineGroup");
+  private static final ToolTip RECEIVED_VACCINATIONS_HISTORICAL = new ToolTip("Historical", "Number of vaccinations not indicated as administered",
+      true);
+  private static final ToolTip RECEIVED_VACCINATIONS_DELETED = new ToolTip("Deleted", "Number of vaccinations indicated as deleted", true);
   private static final ToolTip RECEIVED_VACCINATIONS_NOT_ADMINISTERED = new ToolTip("Not Administered",
       "Number of vaccinations that are indicated as not administered.", true);
-  private static final ToolTip STATUS_ACCEPTED = new ToolTip("Accepted",
-      "Number of messages that were accepted without warnings or errors");
-  private static final ToolTip STATUS_ERRORED = new ToolTip("Rejected with Errors",
-      "Number of messages that were rejected because of errors").setLink("quality.errors");
-  private static final ToolTip STATUS_WARNED = new ToolTip("Accepted with Warnings",
-      "Number of messages that were accepted but had warnings").setLink("quality.warnings");
+  private static final ToolTip STATUS_ACCEPTED = new ToolTip("Accepted", "Number of messages that were accepted without warnings or errors");
+  private static final ToolTip STATUS_ERRORED = new ToolTip("Rejected with Errors", "Number of messages that were rejected because of errors")
+      .setLink("quality.errors");
+  private static final ToolTip STATUS_WARNED = new ToolTip("Accepted with Warnings", "Number of messages that were accepted but had warnings")
+      .setLink("quality.warnings");
   private static final ToolTip STATUS_SKIPPED = new ToolTip("Skipped",
       "Number of messages that are accepted without errors but will not be processed").setLink("quality.skips");
 
   private static final ToolTip SCORE_COMPLETENESS = new ToolTip("Completeness",
-      "Indicates how consistently required, expected, and recommended fields are valued").setEmphasize(true).setLink(
-      "#completeness");
-  private static final ToolTip SCORE_COMPLETENESS_SCORE_PATIENT = new ToolTip("Patient",
-      "Indicates the completeness of patient related fields", true).setLink("#completeness.patient");
+      "Indicates how consistently required, expected, and recommended fields are valued").setEmphasize(true).setLink("#completeness");
+  private static final ToolTip SCORE_COMPLETENESS_SCORE_PATIENT = new ToolTip("Patient", "Indicates the completeness of patient related fields", true)
+      .setLink("#completeness.patient");
   private static final ToolTip SCORE_COMPLETENESS_SCORE_VACCINATION = new ToolTip("Vaccination",
       "Indicates the completeness of vaccination related fields", true).setLink("#completeness.vaccination");
   private static final ToolTip SCORE_COMPLETENESS_SCORE_VACCINE_GROUP = new ToolTip("Vaccine Group",
       "Indicates the completess of the type of vaccines reported", true).setLink("#completeness.vaccineGroup");
-  private static final ToolTip SCORE_QUALITY = new ToolTip("Quality",
-      "Indicates the level of errors and warnings generated").setEmphasize(true).setLink("#quality");
+  private static final ToolTip SCORE_QUALITY = new ToolTip("Quality", "Indicates the level of errors and warnings generated").setEmphasize(true)
+      .setLink("#quality");
   private static final ToolTip SCORE_QUALITY_SCORE_ERRORS = new ToolTip("No Errors",
-      "Indicates the level of errors found, message are expected to generate less than one percent error rate", true)
-      .setLink("#quality.errors");
+      "Indicates the level of errors found, message are expected to generate less than one percent error rate", true).setLink("#quality.errors");
   private static final ToolTip SCORE_QUALITY_SCORE_WARNINGS = new ToolTip("No Warnings",
-      "Indicates the level of warnings found, message are expected to generate less than ten percent warning rate",
-      true).setLink("#quality.warnings");
+      "Indicates the level of warnings found, message are expected to generate less than ten percent warning rate", true)
+      .setLink("#quality.warnings");
   private static final ToolTip SCORE_TIMELINESS = new ToolTip("Timeliness",
-      "Indicates the amount of time between administration of vaccinations and reporting them").setEmphasize(true)
-      .setLink("#timeliness");
-  private static final ToolTip SCORE_TIMELINESS_SCORE_EARLY = new ToolTip("Early",
-      "Indicates the score for messages received earlier than required", true).setLink("#timeliness");
-  private static final ToolTip SCORE_TIMELINESS_SCORE_ON_TIME = new ToolTip("On Time",
-      "Indicates the score for messages received when required", true).setLink("#timeliness");
-  private static final ToolTip SCORE_TIMELINESS_SCORE_LATE = new ToolTip("Late",
-      "Indicates the score for messages received later than required", true).setLink("#timeliness");
+      "Indicates the amount of time between administration of vaccinations and reporting them").setEmphasize(true).setLink("#timeliness");
+  private static final ToolTip SCORE_TIMELINESS_SCORE_EARLY = new ToolTip("Early", "Indicates the score for messages received earlier than required",
+      true).setLink("#timeliness");
+  private static final ToolTip SCORE_TIMELINESS_SCORE_ON_TIME = new ToolTip("On Time", "Indicates the score for messages received when required",
+      true).setLink("#timeliness");
+  private static final ToolTip SCORE_TIMELINESS_SCORE_LATE = new ToolTip("Late", "Indicates the score for messages received later than required",
+      true).setLink("#timeliness");
   private static final ToolTip SCORE_TIMELINESS_SCORE_VERY_LATE = new ToolTip("Very Late",
       "Indicates the score for messages received much later than required", true).setLink("#timeliness");
 
-  private static final ToolTip COMPLETENESS_SCORE_PATIENT = new ToolTip("Patient",
-      "Indicates the completeness of patient related fields").setLink("#completeness.patient");
-  private static final ToolTip COMPLETENESS_SCORE_VACCINATION = new ToolTip("Vaccination",
-      "Indicates the completeness of vaccination related fields").setLink("#completeness.vaccination");
+  private static final ToolTip COMPLETENESS_SCORE_PATIENT = new ToolTip("Patient", "Indicates the completeness of patient related fields")
+      .setLink("#completeness.patient");
+  private static final ToolTip COMPLETENESS_SCORE_VACCINATION = new ToolTip("Vaccination", "Indicates the completeness of vaccination related fields")
+      .setLink("#completeness.vaccination");
   private static final ToolTip COMPLETENESS_SCORE_VACCINE_GROUP = new ToolTip("Vaccine Group",
       "Indicates the completess of the type of vaccines reported").setLink("#completeness.vaccineGroup");
 
   private static final ToolTip QUALITY_SCORE_NO_ERRORS = new ToolTip("No Errors",
-      "Indicates the level of errors found, message are expected to generate less than one percent error rate")
-      .setLink("#quality.errors");
+      "Indicates the level of errors found, message are expected to generate less than one percent error rate").setLink("#quality.errors");
   private static final ToolTip QUALITY_SCORE_NO_WARNINGS = new ToolTip("No Warnings",
-      "Indicates the level of warnings found, message are expected to generate less than ten percent warning rate")
-      .setLink("#quality.warnings");
+      "Indicates the level of warnings found, message are expected to generate less than ten percent warning rate").setLink("#quality.warnings");
 
   private static final ToolTip QUALITY_SCORE_INVALID = new ToolTip("Invalid Codes",
       "Codes were received that were not acceptable, must use standard codes").setLink("#quality.invalidCodes");
   private static final ToolTip QUALITY_SCORE_UNRECOGNIZED = new ToolTip("Unrecognized Codes",
-      "Codes were received that were not recognized, standard codes are recommended")
-      .setLink("#quality.unrecognizedCodes");
-  private static final ToolTip QUALITY_SCORE_DEPRECATED = new ToolTip("Deprecated Codes",
-      "Codes were recognized but standard codes are recommended").setLink("#quality.deprecatedCodes");
+      "Codes were received that were not recognized, standard codes are recommended").setLink("#quality.unrecognizedCodes");
+  private static final ToolTip QUALITY_SCORE_DEPRECATED = new ToolTip("Deprecated Codes", "Codes were recognized but standard codes are recommended")
+      .setLink("#quality.deprecatedCodes");
 
-  private static final ToolTip TIMELINESS_SCORE_EARLY = new ToolTip("Early",
-      "Indicates the score for messages received earlier than required");
-  private static final ToolTip TIMELINESS_SCORE_ON_TIME = new ToolTip("On Time",
-      "Indicates the score for messages received when required");
-  private static final ToolTip TIMELINESS_SCORE_LATE = new ToolTip("Late",
-      "Indicates the score for messages received later than required");
+  private static final ToolTip TIMELINESS_SCORE_EARLY = new ToolTip("Early", "Indicates the score for messages received earlier than required");
+  private static final ToolTip TIMELINESS_SCORE_ON_TIME = new ToolTip("On Time", "Indicates the score for messages received when required");
+  private static final ToolTip TIMELINESS_SCORE_LATE = new ToolTip("Late", "Indicates the score for messages received later than required");
   private static final ToolTip TIMELINESS_SCORE_VERY_LATE = new ToolTip("Very Late",
       "Indicates the score for messages received much later than required");
 
@@ -260,35 +248,33 @@ public class QualityReport
     out.println("        <th align=\"center\">Description</th>");
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
-    printScore(COMPLETENESS_SCORE_PATIENT, report.getCompletenessPatientScore(),
-        per(modelForm.getWeight("completeness.patient")), REQUIRED);
-    printScore(COMPLETENESS_SCORE_VACCINATION, report.getCompletenessVaccinationScore(),
-        per(modelForm.getWeight("completeness.vaccination")), REQUIRED);
-    printScore(COMPLETENESS_SCORE_VACCINE_GROUP, report.getCompletenessVaccineGroupScore(),
-        per(modelForm.getWeight("completeness.vaccineGroup")), REQUIRED);
+    printScore(COMPLETENESS_SCORE_PATIENT, report.getCompletenessPatientScore(), per(modelForm.getWeight("completeness.patient")), REQUIRED);
+    printScore(COMPLETENESS_SCORE_VACCINATION, report.getCompletenessVaccinationScore(), per(modelForm.getWeight("completeness.vaccination")),
+        REQUIRED);
+    printScore(COMPLETENESS_SCORE_VACCINE_GROUP, report.getCompletenessVaccineGroupScore(), per(modelForm.getWeight("completeness.vaccineGroup")),
+        REQUIRED);
     out.println("    </table>");
 
     out.println("    <h3><a name=\"completeness.patient\">Patient</h3>");
     printCompletenessScoring("Patient", "#completeness.patient", patientRequired, patientExpected, patientRecommended,
         report.getCompletenessPatientScore(), modelForm.getAbsoluteWeight("completeness.patient"));
     out.println("    <br/>");
-    printCompleteness(patientRequired, "completeness.patient.required", "Required",
-        modelForm.getAbsoluteWeight("completeness.patient.required"), REQUIRED);
+    printCompleteness(patientRequired, "completeness.patient.required", "Required", modelForm.getAbsoluteWeight("completeness.patient.required"),
+        REQUIRED);
     out.println("    <br/>");
-    printCompleteness(patientExpected, "completeness.patient.expected", "Expected",
-        modelForm.getAbsoluteWeight("completeness.patient.expected"), REQUIRED);
+    printCompleteness(patientExpected, "completeness.patient.expected", "Expected", modelForm.getAbsoluteWeight("completeness.patient.expected"),
+        REQUIRED);
     out.println("    <br/>");
     printCompleteness(patientRecommended, "completeness.patient.recommended", "Recommended",
         modelForm.getAbsoluteWeight("completeness.patient.recommended"), REQUIRED);
     out.println("    <br/>");
-    printCompleteness(patientOptional, "completeness.patient.optional", "Optional",
-        modelForm.getAbsoluteWeight("completeness.patient.optional"), OPTIONAL);
+    printCompleteness(patientOptional, "completeness.patient.optional", "Optional", modelForm.getAbsoluteWeight("completeness.patient.optional"),
+        OPTIONAL);
     out.println("    <br/>");
 
     out.println("    <h3><a name=\"completeness.vaccination\">Vaccination</h3>");
-    printCompletenessScoring("Vaccination", "#completeness.vaccination", vaccinationRequired, vaccinationExpected,
-        vaccinationRecommended, report.getCompletenessVaccinationScore(),
-        modelForm.getAbsoluteWeight("completeness.vaccination"));
+    printCompletenessScoring("Vaccination", "#completeness.vaccination", vaccinationRequired, vaccinationExpected, vaccinationRecommended,
+        report.getCompletenessVaccinationScore(), modelForm.getAbsoluteWeight("completeness.vaccination"));
     out.println("    <br/>");
     printCompleteness(vaccinationRequired, "completeness.vaccination.required", "Required",
         modelForm.getAbsoluteWeight("completeness.vaccination.required"), REQUIRED);
@@ -305,17 +291,13 @@ public class QualityReport
     out.println("    <h3><a name=\"completeness.vaccineGroup\">Vaccine Group</h3>");
     Set<VaccineCvx> vaccinesNotYetPrinted = new HashSet<VaccineCvx>(messageBatch.getBatchVaccineCvxMap().keySet());
 
-    printVaccines("Expected", messageBatch, vaccinesNotYetPrinted,
-        modelForm.getModelSection("completeness.vaccineGroup.expected"), false);
+    printVaccines("Expected", messageBatch, vaccinesNotYetPrinted, modelForm.getModelSection("completeness.vaccineGroup.expected"), false);
     out.println("    <br/>");
-    printVaccines("Recommended", messageBatch, vaccinesNotYetPrinted,
-        modelForm.getModelSection("completeness.vaccineGroup.recommended"), true);
+    printVaccines("Recommended", messageBatch, vaccinesNotYetPrinted, modelForm.getModelSection("completeness.vaccineGroup.recommended"), true);
     out.println("    <br/>");
-    printVaccines("Optional", messageBatch, vaccinesNotYetPrinted,
-        modelForm.getModelSection("completeness.vaccineGroup.optional"), true);
+    printVaccines("Optional", messageBatch, vaccinesNotYetPrinted, modelForm.getModelSection("completeness.vaccineGroup.optional"), true);
     out.println("    <br/>");
-    printVaccines("Unexpected", messageBatch, vaccinesNotYetPrinted,
-        modelForm.getModelSection("completeness.vaccineGroup.unexpected"), true);
+    printVaccines("Unexpected", messageBatch, vaccinesNotYetPrinted, modelForm.getModelSection("completeness.vaccineGroup.unexpected"), true);
     if (vaccinesNotYetPrinted.size() > 0)
     {
       out.println("    <br/>");
@@ -323,8 +305,7 @@ public class QualityReport
     }
   }
 
-  private void printVaccines(String label, MessageBatch messageBatch, Set<VaccineCvx> vaccinesNotPrinted,
-      ModelSection vgsection, boolean skipZeroSize)
+  private void printVaccines(String label, MessageBatch messageBatch, Set<VaccineCvx> vaccinesNotPrinted, ModelSection vgsection, boolean skipZeroSize)
   {
     VaccineGroupManager vaccineGroupManager = VaccineGroupManager.getVaccineGroupManager();
     out.println("    <table width=\"650\">");
@@ -389,14 +370,13 @@ public class QualityReport
     out.println("    </table>");
   }
 
-  private void printVaccinesRow(MessageBatch messageBatch, Set<VaccineCvx> vaccinesNotPrinted,
-      List<VaccineCvx> vaccinesToPrint, int size, ToolTip toolTip, boolean outOfRange)
+  private void printVaccinesRow(MessageBatch messageBatch, Set<VaccineCvx> vaccinesNotPrinted, List<VaccineCvx> vaccinesToPrint, int size,
+      ToolTip toolTip, boolean outOfRange)
   {
     BatchReport report = messageBatch.getBatchReport();
 
     out.println("      <tr>");
-    out.println("        <td align=\"left\"" + (outOfRange ? " class=\"alert\"" : "") + " rowspan=\"" + size + "\">"
-        + toolTip.getHtml());
+    out.println("        <td align=\"left\"" + (outOfRange ? " class=\"alert\"" : "") + " rowspan=\"" + size + "\">" + toolTip.getHtml());
     out.println("        </td>");
     boolean nextRow = false;
     for (VaccineCvx vaccineCvx : vaccinesToPrint)
@@ -423,8 +403,7 @@ public class QualityReport
       for (int i = 0; i < fields.length; i++)
       {
         String align = i == 1 ? "left" : "center";
-        out.println("        <td align=\"" + align + "\"" + (outOfRange ? " class=\"alert\"" : "") + ">" + fields[i]
-            + "</td>");
+        out.println("        <td align=\"" + align + "\"" + (outOfRange ? " class=\"alert\"" : "") + ">" + fields[i] + "</td>");
       }
       vaccinesNotPrinted.remove(vaccineCvx);
       nextRow = true;
@@ -436,8 +415,8 @@ public class QualityReport
     out.println("      </tr>");
   }
 
-  private void printCompletenessScoring(String label, String link, ScoringSet required, ScoringSet expected,
-      ScoringSet recommended, int score, double weightFactor)
+  private void printCompletenessScoring(String label, String link, ScoringSet required, ScoringSet expected, ScoringSet recommended, int score,
+      double weightFactor)
   {
     out.println("    <table width=\"350\">");
     out.println("      <tr>");
@@ -463,23 +442,20 @@ public class QualityReport
     int score = (int) (100 * ss.getScore() + 0.5);
     boolean showRed = score < 70;
     out.println("      <tr>");
-    out.println("        <td align=\"left\"" + (showRed ? " class=\"alert\"" : "") + "><a href=\"" + link + "\">"
-        + label + "</a></td>");
+    out.println("        <td align=\"left\"" + (showRed ? " class=\"alert\"" : "") + "><a href=\"" + link + "\">" + label + "</a></td>");
     out.println("        <td align=\"center\"" + (showRed ? " class=\"alert\"" : "") + ">" + score + "</td>");
-    out.println("        <td align=\"center\"" + (showRed ? " class=\"alert\"" : "") + ">"
-        + getScoreDescription(score, REQUIRED) + "</td>");
-    out.println("        <td align=\"center\"" + (showRed ? " class=\"alert\"" : "") + ">"
-        + per(weightFactor * ss.getWeight()) + "</td>");
+    out.println("        <td align=\"center\"" + (showRed ? " class=\"alert\"" : "") + ">" + getScoreDescription(score, REQUIRED) + "</td>");
+    out.println("        <td align=\"center\"" + (showRed ? " class=\"alert\"" : "") + ">" + per(weightFactor * ss.getWeight()) + "</td>");
     out.println("      </tr>");
   }
 
-  private void printCompleteness(ScoringSet scoringSet, String objectLabel, String typeLabel, double weightFactor,
-      char type)
+  private void printCompleteness(ScoringSet scoringSet, String objectLabel, String typeLabel, double weightFactor, char type)
   {
     List<CompletenessRow> completenessRowList = scoringSet.getCompletenessRow();
-    out.println("    <table width=\"" + (scoringSet.getWeight() > 0 ? "480" : "320") + "\">");
+    out.println("    <table width=\"" + (scoringSet.getWeight() > 0 ? "550" : "390") + "\">");
     out.println("      <tr>");
     out.println("        <th width=\"180\" align=\"left\"><a name=\"" + objectLabel + "\"/>" + typeLabel + "</th>");
+    out.println("        <th width=\"70\" align=\"left\">HL7</th>");
     out.println("        <th width=\"70\" align=\"center\">Count</th>");
     out.println("        <th width=\"70\" align=\"center\">Percent</th>");
     if (scoringSet.getWeight() > 0)
@@ -528,8 +504,8 @@ public class QualityReport
     out.println("      </tr>");
     if (filename != null && !filename.equals(""))
     {
-      printRow(messageBatch.getBatchTitle(), messageBatch.getBatchType().getTypeLabel(), profile.getProfileLabel(),
-          filename, makeDateTimeRange(messageBatch.getStartDate(), messageBatch.getEndDate()));
+      printRow(messageBatch.getBatchTitle(), messageBatch.getBatchType().getTypeLabel(), profile.getProfileLabel(), filename,
+          makeDateTimeRange(messageBatch.getStartDate(), messageBatch.getEndDate()));
     } else
     {
       printRow(messageBatch.getBatchTitle(), messageBatch.getBatchType().getTypeLabel(), profile.getProfileLabel(),
@@ -569,8 +545,7 @@ public class QualityReport
     out.println("        <th align=\"center\">Description</th>");
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
-    printScoreOverall(SCORE_COMPLETENESS, report.getCompletenessScore(),
-        per(modelForm.getAbsoluteWeight("completeness")), REQUIRED);
+    printScoreOverall(SCORE_COMPLETENESS, report.getCompletenessScore(), per(modelForm.getAbsoluteWeight("completeness")), REQUIRED);
     printScoreOverall(SCORE_COMPLETENESS_SCORE_PATIENT, report.getCompletenessPatientScore(),
         per(modelForm.getAbsoluteWeight("completeness.patient")), REQUIRED);
     printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINATION, report.getCompletenessVaccinationScore(),
@@ -578,26 +553,22 @@ public class QualityReport
     printScoreOverall(SCORE_COMPLETENESS_SCORE_VACCINE_GROUP, report.getCompletenessVaccineGroupScore(),
         per(modelForm.getAbsoluteWeight("completeness.vaccineGroup")), REQUIRED);
     printScoreOverall(SCORE_QUALITY, report.getQualityScore(), per(modelForm.getAbsoluteWeight("quality")), REQUIRED);
-    printScoreOverall(SCORE_QUALITY_SCORE_ERRORS, report.getQualityErrorScore(),
-        per(modelForm.getAbsoluteWeight("quality.errors")), REQUIRED);
-    printScoreOverall(SCORE_QUALITY_SCORE_WARNINGS, report.getQualityWarnScore(),
-        per(modelForm.getAbsoluteWeight("quality.warnings")), REQUIRED);
-    printScoreOverall(SCORE_TIMELINESS, report.getTimelinessScore(), per(modelForm.getAbsoluteWeight("timeliness")),
-        REQUIRED);
+    printScoreOverall(SCORE_QUALITY_SCORE_ERRORS, report.getQualityErrorScore(), per(modelForm.getAbsoluteWeight("quality.errors")), REQUIRED);
+    printScoreOverall(SCORE_QUALITY_SCORE_WARNINGS, report.getQualityWarnScore(), per(modelForm.getAbsoluteWeight("quality.warnings")), REQUIRED);
+    printScoreOverall(SCORE_TIMELINESS, report.getTimelinessScore(), per(modelForm.getAbsoluteWeight("timeliness")), REQUIRED);
     if (modelForm.getWeight("timeliness.early") > 0 && report.getTimelinessScoreEarly() > 0)
     {
-      printScoreOverall(SCORE_TIMELINESS_SCORE_EARLY, report.getTimelinessScoreEarly(),
-          per(modelForm.getAbsoluteWeight("timeliness.early")), EXTRA_CREDIT);
+      printScoreOverall(SCORE_TIMELINESS_SCORE_EARLY, report.getTimelinessScoreEarly(), per(modelForm.getAbsoluteWeight("timeliness.early")),
+          EXTRA_CREDIT);
     }
     if (modelForm.getWeight("timeliness.onTime") > 0 && report.getTimelinessScoreOnTime() > 0)
     {
-      printScoreOverall(SCORE_TIMELINESS_SCORE_ON_TIME, report.getTimelinessScoreOnTime(),
-          per(modelForm.getAbsoluteWeight("timeliness.onTime")), REQUIRED);
+      printScoreOverall(SCORE_TIMELINESS_SCORE_ON_TIME, report.getTimelinessScoreOnTime(), per(modelForm.getAbsoluteWeight("timeliness.onTime")),
+          REQUIRED);
     }
     if (modelForm.getWeight("timeliness.late") > 0 && report.getTimelinessScoreLate() > 0)
     {
-      printScoreOverall(SCORE_TIMELINESS_SCORE_LATE, report.getTimelinessScoreLate(),
-          per(modelForm.getAbsoluteWeight("timeliness.late")), DEMERIT);
+      printScoreOverall(SCORE_TIMELINESS_SCORE_LATE, report.getTimelinessScoreLate(), per(modelForm.getAbsoluteWeight("timeliness.late")), DEMERIT);
     }
     if (modelForm.getWeight("timeliness.veryLate") > 0 && report.getTimelinessScoreVeryLate() > 0)
     {
@@ -616,8 +587,7 @@ public class QualityReport
     out.println("      </tr>");
     out.println("      <tr>");
     out.println("        <td align=\"center\"><span class=\"score\">" + score + "</span></th>");
-    out.println("        <td align=\"center\"><span class=\"score\">" + getScoreDescription(score, REQUIRED)
-        + "</span></th>");
+    out.println("        <td align=\"center\"><span class=\"score\">" + getScoreDescription(score, REQUIRED) + "</span></th>");
     out.println("      </tr>");
     out.println("    </table>");
     out.println("    <br/>");
@@ -704,10 +674,8 @@ public class QualityReport
     out.println("        <th align=\"center\">Description</th>");
     out.println("        <th align=\"center\">Weight</th>");
     out.println("      </tr>");
-    printScore(QUALITY_SCORE_NO_ERRORS, report.getQualityErrorScore(),
-        per(modelForm.getAbsoluteWeight("quality.errors")), REQUIRED);
-    printScore(QUALITY_SCORE_NO_WARNINGS, report.getQualityWarnScore(),
-        per(modelForm.getAbsoluteWeight("quality.warnings")), REQUIRED);
+    printScore(QUALITY_SCORE_NO_ERRORS, report.getQualityErrorScore(), per(modelForm.getAbsoluteWeight("quality.errors")), REQUIRED);
+    printScore(QUALITY_SCORE_NO_WARNINGS, report.getQualityWarnScore(), per(modelForm.getAbsoluteWeight("quality.warnings")), REQUIRED);
     out.println("    </table>");
     out.println("    <br/>");
     if (qualityCollector.getInvalidCodes().size() > 0 || qualityCollector.getUnrecognizedCodes().size() > 0
@@ -792,8 +760,7 @@ public class QualityReport
 
     for (CodeTable codeTable : codeTableList)
     {
-      out.println("    <h3><a name=\"codesReceived." + codeTable.getTableId() + "\">" + codeTable.getTableLabel()
-          + "</h3>");
+      out.println("    <h3><a name=\"codesReceived." + codeTable.getTableId() + "\">" + codeTable.getTableLabel() + "</h3>");
       printCodeReceived(codeTableMap.get(codeTable));
     }
   }
@@ -820,23 +787,19 @@ public class QualityReport
     out.println("      </tr>");
     if (modelForm.getWeight("timeliness.early") > 0 && report.getTimelinessScoreEarly() > 0)
     {
-      printScore(TIMELINESS_SCORE_EARLY, report.getTimelinessScoreEarly(),
-          per(modelForm.getAbsoluteWeight("timeliness.early")), EXTRA_CREDIT);
+      printScore(TIMELINESS_SCORE_EARLY, report.getTimelinessScoreEarly(), per(modelForm.getAbsoluteWeight("timeliness.early")), EXTRA_CREDIT);
     }
     if (modelForm.getWeight("timeliness.onTime") > 0 && report.getTimelinessScoreOnTime() > 0)
     {
-      printScore(TIMELINESS_SCORE_ON_TIME, report.getTimelinessScoreOnTime(),
-          per(modelForm.getAbsoluteWeight("timeliness.onTime")), REQUIRED);
+      printScore(TIMELINESS_SCORE_ON_TIME, report.getTimelinessScoreOnTime(), per(modelForm.getAbsoluteWeight("timeliness.onTime")), REQUIRED);
     }
     if (modelForm.getWeight("timeliness.late") > 0 && report.getTimelinessScoreLate() > 0)
     {
-      printScore(TIMELINESS_SCORE_LATE, report.getTimelinessScoreLate(),
-          per(modelForm.getAbsoluteWeight("timeliness.late")), DEMERIT);
+      printScore(TIMELINESS_SCORE_LATE, report.getTimelinessScoreLate(), per(modelForm.getAbsoluteWeight("timeliness.late")), DEMERIT);
     }
     if (modelForm.getWeight("timeliness.veryLate") > 0 && report.getTimelinessScoreVeryLate() > 0)
     {
-      printScore(TIMELINESS_SCORE_VERY_LATE, report.getTimelinessScoreVeryLate(),
-          per(modelForm.getAbsoluteWeight("timeliness.veryLate")), DEMERIT);
+      printScore(TIMELINESS_SCORE_VERY_LATE, report.getTimelinessScoreVeryLate(), per(modelForm.getAbsoluteWeight("timeliness.veryLate")), DEMERIT);
     }
     out.println("    </table>");
     out.println("    <br/>");
@@ -876,8 +839,7 @@ public class QualityReport
     {
       out.println("      <tr>");
       out.println("        <th align=\"left\">Vaccination Admininistered</th>");
-      out.println("        <td>" + makeDateRange(report.getTimelinessDateFirst(), report.getTimelinessDateLast())
-          + "</th>");
+      out.println("        <td>" + makeDateRange(report.getTimelinessDateFirst(), report.getTimelinessDateLast()) + "</th>");
       out.println("      </tr>");
     }
     out.println("      <tr>");
@@ -949,8 +911,8 @@ public class QualityReport
     out.println("      </tr>");
     for (BatchCodeReceived bcr : batchCodeReceivedList)
     {
-      printRow(bcr.getCodeReceived().getReceivedValue(), bcr.getCodeReceived().getCodeLabel(), bcr.getCodeReceived()
-          .getCodeValue(), bcr.getCodeReceived().getCodeStatus().getCodeLabel(), "" + bcr.getReceivedCount());
+      printRow(bcr.getCodeReceived().getReceivedValue(), bcr.getCodeReceived().getCodeLabel(), bcr.getCodeReceived().getCodeValue(), bcr
+          .getCodeReceived().getCodeStatus().getCodeLabel(), "" + bcr.getReceivedCount());
     }
     out.println("    </table>");
   }
@@ -975,8 +937,7 @@ public class QualityReport
     {
       PotentialIssue issue = batchIssues.getIssue();
       int denominator = 0;
-      ReportDenominator reportDenominator = ReportDenominator.valueOf(issue.getReportDenominator().toUpperCase().trim()
-          .replace(' ', '_'));
+      ReportDenominator reportDenominator = ReportDenominator.valueOf(issue.getReportDenominator().toUpperCase().trim().replace(' ', '_'));
       if (reportDenominator == ReportDenominator.MESSAGE_COUNT)
       {
         denominator = messageCount;
@@ -1070,7 +1031,7 @@ public class QualityReport
     }
     if (row.getScoreWeight() == 0)
     {
-      printRow(toolTip, outOfRange, num(value), percent);
+      printRowCompleteness(toolTip, outOfRange, row.getHl7Reference(), num(value), percent);
     } else
     {
       String scorePercent = "&nbsp;";
@@ -1093,7 +1054,7 @@ public class QualityReport
       {
         outOfRange = true;
       }
-      printRow(toolTip, outOfRange, num(value), percent, description, scorePercent);
+      printRowCompleteness(toolTip, outOfRange, row.getHl7Reference(), num(value), percent, description, scorePercent);
     }
   }
 
@@ -1126,6 +1087,29 @@ public class QualityReport
     out.println("      </tr>");
   }
 
+  private void printRowCompleteness(ToolTip tip, boolean showRed, String... fields)
+  {
+    String cssClass = showRed ? " class=\"alert\"" : "";
+    if (tip.isEmphasize())
+    {
+      cssClass = " class=\"highlight\"";
+    }
+    out.println("      <tr>");
+    out.println("        <td align=\"left\"" + cssClass + ">" + tip.getHtml());
+    out.println("        </td>");
+    for (int i = 0; i < fields.length; i++)
+    {
+      if (i == 0)
+      {
+        out.println("        <td align=\"left\"" + cssClass + ">" + fields[i] + "</td>");
+      } else
+      {
+        out.println("        <td align=\"center\"" + cssClass + ">" + fields[i] + "</td>");
+      }
+    }
+    out.println("      </tr>");
+  }
+
   // Steel
   private static final String VERY_LIGHT = "#FFFFFF";
   private static final String LIGHT = "#CCDDDD";
@@ -1145,12 +1129,9 @@ public class QualityReport
     out.println("      h1 {color:" + BLACK + "; font-size:2.0em;}");
     out.println("      h2 {color:" + BLACK + "; font-size:2.0em; page-break-before:always;}");
     out.println("      h3 {color:" + BLACK + "; font-size:1.2em;}");
-    out.println("      table {background:" + LIGHT + "; border-style:solid; border-width:1; border-color:" + MEDIUM
-        + "; border-collapse:collapse}");
-    out.println("      th {background:" + MEDIUM + "; font-size:0.8em; color:" + BLACK
-        + "; border-style:none; padding-left:5px; padding-right:5px;}");
-    out.println("      td {border-style:solid; border-width:1; border-color:" + MEDIUM
-        + ";margin:0px; padding-left:5px; padding-right:5px;}");
+    out.println("      table {background:" + LIGHT + "; border-style:solid; border-width:1; border-color:" + MEDIUM + "; border-collapse:collapse}");
+    out.println("      th {background:" + MEDIUM + "; font-size:0.8em; color:" + BLACK + "; border-style:none; padding-left:5px; padding-right:5px;}");
+    out.println("      td {border-style:solid; border-width:1; border-color:" + MEDIUM + ";margin:0px; padding-left:5px; padding-right:5px;}");
     out.println("      .score {font-size:1.5em;}");
     out.println("      .alert {}");
     out.println("      .highlight {background: " + MEDIUM_LIGHT + ";}");
@@ -1163,8 +1144,8 @@ public class QualityReport
     out.println("      a:hover {text-decoration:none; color:" + BLACK + "} ");
     out.println("      a:active {text-decoration:none; color:" + BLACK + "} ");
     out.println("      a.tooltip span {display:none; padding:2px 3px; margin-left:8px; width:130px;}");
-    out.println("      a.tooltip:hover span{display:inline; position:absolute; background:" + LIGHT
-        + "; border:1px solid " + DARK + "; color:" + DARK + "}");
+    out.println("      a.tooltip:hover span{display:inline; position:absolute; background:" + LIGHT + "; border:1px solid " + DARK + "; color:"
+        + DARK + "}");
     out.println("    --></style>");
   }
 
