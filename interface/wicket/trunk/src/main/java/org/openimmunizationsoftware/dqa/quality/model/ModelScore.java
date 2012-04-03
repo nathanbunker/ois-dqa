@@ -14,6 +14,7 @@ public class ModelScore
   private float weight = 0;
   private PotentialIssue potentialIssue = null;
   private boolean invert = false;
+  private String hl7Reference = "";
   private List<ModelScore> scores = new ArrayList<ModelScore>();
 
   public List<ModelScore> getScores()
@@ -79,6 +80,16 @@ public class ModelScore
   public void setInvert(boolean invert)
   {
     this.invert = invert;
+  }
+
+  public String getHl7Reference()
+  {
+    return hl7Reference;
+  }
+
+  public void setHl7Reference(String hl7Reference)
+  {
+    this.hl7Reference = hl7Reference;
   }
 
 }

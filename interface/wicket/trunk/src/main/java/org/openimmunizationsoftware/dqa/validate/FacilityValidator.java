@@ -31,7 +31,6 @@ public class FacilityValidator extends SectionValidator
         if (!PfsSupport.verifyCorrect(id))
         {
           validator.registerIssue(pi.Hl7MshSendingFacilityIsInvalid);
-          header.setSendingFacility("");
         }
       } else
       {
@@ -56,7 +55,6 @@ public class FacilityValidator extends SectionValidator
         if (!goodId(id, minLen, maxLen, mustBeNumeric))
         {
           validator.registerIssue(pi.Hl7MshSendingFacilityIsInvalid);
-          header.setSendingFacility("");
         }
       }
     }

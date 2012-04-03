@@ -75,13 +75,13 @@ public class ScoringSet
   private CompletenessRow add(ModelScore score)
   {
     return add(score.getLabel(), score.getPotentialIssue(), score.getDenominator(),
-        score.getWeight(), score.isInvert());
+        score.getWeight(), score.isInvert(), score.getHl7Reference());
   }
 
   private CompletenessRow add(String label, PotentialIssue potentialIssue, ReportDenominator reportDenominator,
-      float scoreWeight, boolean invert)
+      float scoreWeight, boolean invert, String hl7Reference)
   {
-    CompletenessRow row = new CompletenessRow(label, potentialIssue, reportDenominator, scoreWeight, invert);
+    CompletenessRow row = new CompletenessRow(label, potentialIssue, reportDenominator, scoreWeight, invert, hl7Reference);
     completenessRow.add(row);
     return row;
   }

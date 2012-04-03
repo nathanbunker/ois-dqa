@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +16,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.BatchType;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
@@ -26,7 +25,6 @@ import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
-import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.UserAccount;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
@@ -95,53 +93,12 @@ public class IncomingServlet extends HttpServlet
     out.println("    </form>");
     out.println("    ");
 
-    printManagerThread(fileImportManager, out);
-    printManagerThread(weeklyBatchManager, out);
-    printManagerThread(weeklyExportManager, out);
     out.println("    <hr>");
     out.println("    <p>Version " + SoftwareVersion.VERSION + "</p>");
     out.println("  </body>");
     out.println("</html>");
     out.close();
     out = null;
-  }
-
-  private void printManagerThread(ManagerThread mt, PrintWriter out)
-  {
-    if (mt.isKeepRunning())
-    {
-      out.println("      <h3>Process Deamon '" + mt.getLabel() + "' is running.</h3>");
-    }
-    if (mt.getLastException() != null)
-    {
-      out.println("      <h4>Last Exception</h4>");
-      out.println("<pre>");
-      mt.getLastException().printStackTrace(out);
-      out.println("</pre>");
-    }
-    out.println("      <h4>Internal Log</h4>");
-    out.println("<pre>");
-    out.print(mt.getInternalLog());
-    out.println("</pre>");
-    out.println("      <h4>Progress Update</h4>");
-    if (mt.getProgressStart() > 0)
-    {
-      out.println("<pre>");
-      SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-      out.println("  + Started: " + sdf.format(mt.getProgressStart()));
-      out.println("  + Count:   " + mt.getProgressCount());
-      out.println("  + Rate:    " + ((float) mt.getProgressCount())
-          / ((System.currentTimeMillis() - mt.getProgressStart()) / 1000.0));
-      out.println("</pre>");
-    }
-    if (mt instanceof ManagerThreadMulti)
-    {
-      ManagerThreadMulti mtm = (ManagerThreadMulti) mt;
-      for (ManagerThread mtChild : mtm.getManagerThreads())
-      {
-        printManagerThread(mtChild, out);
-      }
-    }
   }
 
   @Override
