@@ -1,10 +1,3 @@
--- password reydegatos
-
-
-CREATE USER dqa_web IDENTIFIED BY SharkBaitHooHaHa;
-GRANT connect to dqa_web;
-GRANT dba TO dqa_web;
-
 -- Sequence
 CREATE SEQUENCE dqa_cvx_group_id_sequence INCREMENT BY 1 START WITH 1;
 CREATE SEQUENCE dqa_batch_action_sequence INCREMENT BY 1 START WITH 1;
