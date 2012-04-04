@@ -21,6 +21,7 @@ import org.openimmunizationsoftware.dqa.db.model.Application;
 import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
 import org.openimmunizationsoftware.dqa.db.model.ReportTemplate;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
+import org.openimmunizationsoftware.dqa.db.model.UserAccount;
 import org.openimmunizationsoftware.dqa.manager.ManagerThread;
 import org.openimmunizationsoftware.dqa.manager.ManagerThreadMulti;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
@@ -72,7 +73,12 @@ public class ConfigServlet extends HttpServlet
       {
         username = req.getParameter("username");
         String password = req.getParameter("password");
-        if (username.equals(CONFIG_USERNAME) && password.equals(CONFIG_PASSWORD))
+        Query query = session.createQuery("from UserAccount where username = ? and password = ?");
+        query.setString(0, username);
+        query.setString(1, password);
+        List<UserAccount> userAccountList = query.list();
+        // dqa_admin/changeme
+        if (userAccountList.size() > 0)
         {
           httpSession.setAttribute("username", username);
           menu = MENU_APPLICATION;
@@ -120,8 +126,8 @@ public class ConfigServlet extends HttpServlet
 
         } catch (ParseException pe)
         {
-          out.println("<p class=\"fail\">Unable to generate weekly batch, invalid date '" + req.getParameter("generatedDate") + "': "
-              + pe.getMessage() + "</p>");
+          out.println("<p class=\"fail\">Unable to generate weekly batch, invalid date '"
+              + req.getParameter("generatedDate") + "': " + pe.getMessage() + "</p>");
         }
       } else if (action.equals("Export Weekly Batch"))
       {
@@ -130,7 +136,8 @@ public class ConfigServlet extends HttpServlet
           WeeklyExportManager.getWeeklyExportManager().runNow(sdf.parse(req.getParameter("exportDate")));
         } catch (ParseException pe)
         {
-          out.println("<p class=\"fail\">Unable to export batch, invalid date '" + req.getParameter("exportDate") + "': " + pe.getMessage() + "</p>");
+          out.println("<p class=\"fail\">Unable to export batch, invalid date '" + req.getParameter("exportDate")
+              + "': " + pe.getMessage() + "</p>");
           throw new ServletException(pe);
         }
       } else if (action.equals("Reload"))
@@ -159,7 +166,8 @@ public class ConfigServlet extends HttpServlet
           String value = req.getParameter(configKeyedSetting.keyedCode);
           if (value != null)
           {
-            Query query = session.createQuery("from KeyedSetting where objectCode = ? and objectId = ? and keyedCode = ?");
+            Query query = session
+                .createQuery("from KeyedSetting where objectCode = ? and objectId = ? and keyedCode = ?");
             query.setString(0, "Application");
             query.setInteger(1, applicationId);
             query.setString(2, configKeyedSetting.keyedCode);
@@ -168,8 +176,14 @@ public class ConfigServlet extends HttpServlet
             if (keyedSettingsList.size() > 0)
             {
               keyedSetting = keyedSettingsList.get(0);
-              keyedSetting.setKeyedValue(value);
-            } else
+              if (value == null || value.equals(""))
+              {
+                session.delete(keyedSetting);
+              } else
+              {
+                keyedSetting.setKeyedValue(value);
+              }
+            } else if (value != null && !value.equals(""))
             {
               keyedSetting = new KeyedSetting();
               keyedSetting.setKeyedCode(configKeyedSetting.keyedCode);
@@ -242,8 +256,8 @@ public class ConfigServlet extends HttpServlet
         out.println("          <td>" + application.getApplicationLabel() + "</td>");
         out.println("          <td>" + application.getApplicationType() + "</td>");
         ReportTemplate reportTemplate = application.getPrimaryReportTemplate();
-        out.println("          <td><a href=\"config?menu=" + MENU_REPORT_TEMPLATE + "&templateId=" + reportTemplate.getTemplateId() + "\">"
-            + reportTemplate.getTemplateLabel() + "</a></td>");
+        out.println("          <td><a href=\"config?menu=" + MENU_REPORT_TEMPLATE + "&templateId="
+            + reportTemplate.getTemplateId() + "\">" + reportTemplate.getTemplateLabel() + "</a></td>");
         out.println("          <td>" + (application.getRunThis() ? "running" : "") + "</td>");
         out.println("        </tr>");
       }
@@ -252,7 +266,8 @@ public class ConfigServlet extends HttpServlet
       out.println("    <p>Current running application <select name=\"applicationId\">");
       for (Application application : applicationList)
       {
-        out.println("<option value=\"" + application.getApplicationId() + "\"" + (application.getRunThis() ? " selected=\"true\"" : "") + ">");
+        out.println("<option value=\"" + application.getApplicationId() + "\""
+            + (application.getRunThis() ? " selected=\"true\"" : "") + ">");
         out.println(application.getApplicationLabel() + " (" + application.getApplicationType() + ")");
         out.println("</option>");
       }
@@ -268,7 +283,8 @@ public class ConfigServlet extends HttpServlet
     } else if (menu.equals(MENU_REPORT_TEMPLATE))
     {
 
-      ReportTemplate reportTemplate = (ReportTemplate) session.get(ReportTemplate.class, Integer.parseInt(req.getParameter("templateId")));
+      ReportTemplate reportTemplate = (ReportTemplate) session.get(ReportTemplate.class,
+          Integer.parseInt(req.getParameter("templateId")));
       SubmitterProfile baseProfile = reportTemplate.getBaseProfile();
       out.println("      <h2>Report Template</h2>");
       out.println("    <form action=\"config\" method=\"POST\">");
@@ -292,8 +308,8 @@ public class ConfigServlet extends HttpServlet
       out.println("        </tr>");
       out.println("        <tr>");
       out.println("          <th>Report Definition</th>");
-      out.println("          <td><textarea name=\"reportDefinition\" cols=\"50\" rows=\"10\">" + reportTemplate.getReportDefinition()
-          + "</textarea></td>");
+      out.println("          <td><textarea name=\"reportDefinition\" cols=\"50\" rows=\"10\">"
+          + reportTemplate.getReportDefinition() + "</textarea></td>");
       out.println("        </tr>");
       out.println("        <tr>");
       out.println("          <td colspan=\"2\" align=\"right\"><input type=\"submit\" name=\"action\" value=\"update report template\"/></td>");
@@ -350,10 +366,12 @@ public class ConfigServlet extends HttpServlet
       if (applicationList.size() > 0)
       {
         Application application = applicationList.get(0);
-        out.println("    <h2>Settings for " + application.getApplicationLabel() + " (" + application.getApplicationType() + ")</h2>");
+        out.println("    <h2>Settings for " + application.getApplicationLabel() + " ("
+            + application.getApplicationType() + ")</h2>");
         out.println("    <form action=\"config\">");
         out.println("      <table>");
-        out.println("      <input type=\"hidden\" name=\"applicationId\" value=\"" + application.getApplicationId() + "\"/>");
+        out.println("      <input type=\"hidden\" name=\"applicationId\" value=\"" + application.getApplicationId()
+            + "\"/>");
 
         for (ConfigKeyedSetting configKeyedSetting : configKeyedSettingsList)
         {
@@ -386,15 +404,16 @@ public class ConfigServlet extends HttpServlet
             out.println("            <select name=\"" + configKeyedSetting.keyedCode + "\">");
             for (String option : configKeyedSetting.validValues)
             {
-              out.println("              <option value=\"" + option + "\"" + (value.equals(option) ? " selected=\"true\"" : "") + ">" + option
-                  + "</option>");
+              out.println("              <option value=\"" + option + "\""
+                  + (value.equals(option) ? " selected=\"true\"" : "") + ">" + option + "</option>");
             }
             out.println("          </td>");
           } else
           {
             if (configKeyedSetting.keyedCode != null)
             {
-              out.println("          <td><input type=\"text\" name=\"" + configKeyedSetting.keyedCode + "\" value=\"" + value + "\"</td>");
+              out.println("          <td><input type=\"text\" name=\"" + configKeyedSetting.keyedCode + "\" value=\""
+                  + value + "\"</td>");
             } else
             {
               out.println("          <td>&nbsp;</td>");
@@ -446,7 +465,8 @@ public class ConfigServlet extends HttpServlet
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
       out.println("  + Started: " + sdf.format(mt.getProgressStart()));
       out.println("  + Count:   " + mt.getProgressCount());
-      out.println("  + Rate:    " + ((float) mt.getProgressCount()) / ((System.currentTimeMillis() - mt.getProgressStart()) / 1000.0));
+      out.println("  + Rate:    " + ((float) mt.getProgressCount())
+          / ((System.currentTimeMillis() - mt.getProgressStart()) / 1000.0));
       out.println("</pre>");
     }
     if (mt instanceof ManagerThreadMulti)
@@ -489,63 +509,85 @@ public class ConfigServlet extends HttpServlet
   private static List<ConfigKeyedSetting> configKeyedSettingsList = new ArrayList<ConfigServlet.ConfigKeyedSetting>();
   static
   {
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_ENABLE, "Read in file enabled", "").setValidValues(new String[] { "",
-        "Y", "N" }));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_DIR, "Base directory path", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_ACCEPTED_DIR_NAME, "Accepted directory name", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_DQA_DIR_NAME, "DQA directory name", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_RECEIVE_DIR_NAME, "Receive directory name", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_SUBMIT_DIR_NAME, "Submit directory name", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_THREAD_COUNT_MAX, "Processing thread count", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_WAIT, "Wait after last update (secs)", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_ENABLE, "Read in file enabled", "")
+        .setValidValues(new String[] { "", "Y", "N" }));
+    configKeyedSettingsList
+        .add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_DIR, "Base directory path", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_ACCEPTED_DIR_NAME,
+        "Accepted directory name", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_DQA_DIR_NAME, "DQA directory name", "")
+        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_RECEIVE_DIR_NAME, "Receive directory name",
+        "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_SUBMIT_DIR_NAME, "Submit directory name",
+        "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_THREAD_COUNT_MAX,
+        "Processing thread count", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_WAIT, "Wait after last update (secs)", "")
+        .setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Export batches enabled", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_FILE_DIR, "Base directory path", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_PROCESSING_ID, "MSH Processing Id", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "MSH Receiving Application", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_RECEIVING_FACILITY, "MSH Receiving Facility", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_SENDING_APPLICATION, "MSH Sending Application", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_VERSION_ID, "MSH Version Id", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_FILE_DIR, "Base directory path", "")
+        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_PROCESSING_ID, "MSH Processing Id", "")
+        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION,
+        "MSH Receiving Application", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_RECEIVING_FACILITY,
+        "MSH Receiving Facility", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_SENDING_APPLICATION,
+        "MSH Sending Application", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_VERSION_ID, "MSH Version Id", "")
+        .setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Validate header", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MAX_LEN, "Sending facility max length", "")
-        .setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MIN_LEN, "Sending facility min length", "")
-        .setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_NUMERIC, "Sending facility is numeric", "")
-        .setValidValues(new String[] { "", "Y", "N" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_PFS, "Sending facility is PFS", "")
-        .setValidValues(new String[] { "", "Y", "N" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MAX_LEN,
+        "Sending facility max length", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MIN_LEN,
+        "Sending facility min length", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_NUMERIC,
+        "Sending facility is numeric", "").setValidValues(new String[] { "", "Y", "N" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_PFS,
+        "Sending facility is PFS", "").setValidValues(new String[] { "", "Y", "N" }).setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Validate vaccination", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MAX_LEN, "Vaccination facility max length", "")
-        .setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MIN_LEN, "Vaccination facility min length", "")
-        .setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_NUMERIC, "Vaccination facility is numeric", "")
-        .setValidValues(new String[] { "", "Y", "N" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_PFS, "Vaccination facility is PFS", "")
-        .setValidValues(new String[] { "", "Y", "N" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MAX_LEN,
+        "Vaccination facility max length", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MIN_LEN,
+        "Vaccination facility min length", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_NUMERIC,
+        "Vaccination facility is numeric", "").setValidValues(new String[] { "", "Y", "N" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_PFS,
+        "Vaccination facility is PFS", "").setValidValues(new String[] { "", "Y", "N" }).setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Weekly batch", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_DAY, "Batch day (1=Sunday)", "").setValidValues(
-        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_START_TIME, "Batch after (HH:MM)", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_END_TIME, "Batch before (HH:MM)", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_DAY, "Batch day (1=Sunday)", "")
+        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_START_TIME, "Batch after (HH:MM)", "")
+        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_END_TIME, "Batch before (HH:MM)", "")
+        .setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Weekly export", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_HIGHEST, "Export day for highest priority (2=Monday)", "")
-        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_HIGH, "Export day for high priority (2=Monday)", "")
-        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_NORMAL, "Export day for normal priority (2=Monday)", "")
-        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_LOW, "Export day for low priority (2=Monday)", "")
-        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_LOWEST, "Export day for lowest priority (2=Monday)", "")
-        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_START_TIME, "Export time after (HH:MM)", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_END_TIME, "Export time before (HH:MM)", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_HIGHEST,
+        "Export day for highest priority (2=Monday)", "").setValidValues(
+        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_HIGH,
+        "Export day for high priority (2=Monday)", "").setValidValues(
+        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_NORMAL,
+        "Export day for normal priority (2=Monday)", "").setValidValues(
+        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_LOW,
+        "Export day for low priority (2=Monday)", "").setValidValues(
+        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_LOWEST,
+        "Export day for lowest priority (2=Monday)", "").setValidValues(
+        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_START_TIME,
+        "Export time after (HH:MM)", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_END_TIME,
+        "Export time before (HH:MM)", "").setIndent());
   }
 
 }
