@@ -25,15 +25,15 @@ public class VaccinationUpdateConstructorTest extends TestCase
     SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyMMddHHmmssZ");
     SimpleDateFormat sdf2 = new SimpleDateFormat("yyMMddHHmmss");
     assertEquals(
-        message,
-        "MSH|^~\\&|DQA||TxImmTrac|TxDSHS|"
+        
+        "MSH|^~\\&|||||"
             + sdf1.format(messageReceived.getReceivedDate())
             + "||VXU^V04|1-"
             + sdf2.format(vuc.getGenerationDate())
-            + "|P|2.5|\r"
+            + "|\r"
             + "PID|||MRN~SSN~MEDICAID||Last^First^M^Jr^Dr^^L|Maiden|20010210|M||Race|123 E Main^Apt A^Anytown^TX^85844^USA^M^^County||(108)555-1533^^^^^108^5551533|||||||||Ethnicity||Y|2|\r"
             + "NK1|1|Mother Last^Mother First|MTH|\r" + "PV1||R||||||||||||||||||V01|\r" + "ORC|RE|Submitter Id|\r"
-            + "RXA|0|999|20110718||90703^^C4|0.5|ML||01|Given By|^^^Facility ID||||Lot Number||Manufacturer|\r");
+            + "RXA|0|999|20110718||90703^^C4|0.5|ML||01|Given By|^^^Facility ID||||Lot Number||Manufacturer|\r", message);
   }
 
   private void populateMessage(MessageReceived messageReceived)
