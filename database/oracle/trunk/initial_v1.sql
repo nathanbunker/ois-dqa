@@ -1336,7 +1336,7 @@ INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, us
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'AL', 'Always', 'AL', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'NE', 'Never', 'NE', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'ER', 'Error only', 'ER', 'V');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'SU', '', 'SU', 'V');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 40, 'SU', 'SU', 'SU', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'PRN', 'Primary residence number', 'PRN', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'ORN', 'Other residence number', 'ORN', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 41, 'WPN', 'Work number', 'WPN', 'V');
@@ -1562,7 +1562,7 @@ INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, us
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, '2186-5', 'not Hispanic or Latino', '2186-5', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, 'H', 'Hispanic or Latino', '2135-2', 'D');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, 'N', 'not Hispanic or Latino', '2186-5', 'D');
-INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, 'U', 'Unknown', '', 'D');
+INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 14, 'U', 'Unknown', 'U', 'D');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 6, 'ML', 'Milliliter', 'ML', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 6, 'ml', 'Milliliter', 'ML', 'V');
 INSERT INTO dqa_code_master(code_master_id, table_id, code_value, code_label, use_value, code_status) VALUES  (dqa_code_master_id_sequence.NEXTVAL, 6, 'mL', 'Milliliter', 'ML', 'V');
@@ -1929,6 +1929,8 @@ CREATE TABLE dqa_report_vaccine_group
   group_status             VARCHAR2(30) NOT NULL
 );
 
+COMMIT;
+
 -- Constraints and Indexes
 CREATE INDEX dqa_in_cm_table_id  ON dqa_code_master(table_id);
 CREATE INDEX dqa_in_cr_profile_table ON dqa_code_received(profile_id, table_id);
@@ -1941,7 +1943,7 @@ CREATE INDEX dqa_code_received_key ON dqa_code_received (profile_id, table_id, r
 CREATE INDEX dqa_batch_issues_key ON dqa_batch_issues (batch_id, issue_id);
 CREATE INDEX dqa_batch_actions_key ON dqa_batch_actions (batch_id, action_code);
 
-
+COMMIT;
 
 ALTER TABLE dqa_organization ADD CONSTRAINT dqa_fk_organization1 FOREIGN KEY(org_parent_id) REFERENCES dqa_organization(org_id);
 ALTER TABLE dqa_organization ADD CONSTRAINT dqa_fk_organization2 FOREIGN KEY(primary_profile_id) REFERENCES dqa_submitter_profile(profile_id);
