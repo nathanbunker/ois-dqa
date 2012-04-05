@@ -163,6 +163,10 @@ public class ConfigServlet extends HttpServlet
         Transaction tx = session.beginTransaction();
         for (ConfigKeyedSetting configKeyedSetting : configKeyedSettingsList)
         {
+          if (configKeyedSetting.keyedCode == null)
+          {
+            continue;
+          }
           String value = req.getParameter(configKeyedSetting.keyedCode);
           if (value != null)
           {
