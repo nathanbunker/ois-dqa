@@ -33,6 +33,17 @@ public class PotentialIssue
   private String targetObject = "";
   private ToolTip toolTip = null;
   private CodeTable table = null;
+  private String hl7Reference = null;
+
+  public String getHl7Reference()
+  {
+    return hl7Reference;
+  }
+
+  public void setHl7Reference(String hl7Reference)
+  {
+    this.hl7Reference = hl7Reference;
+  }
 
   public ToolTip getToolTip()
   {
