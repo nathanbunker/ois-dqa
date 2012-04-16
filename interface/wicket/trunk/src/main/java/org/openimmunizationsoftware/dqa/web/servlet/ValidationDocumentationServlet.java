@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -79,33 +80,41 @@ public class ValidationDocumentationServlet extends HttpServlet
     Transaction tx = session.beginTransaction();
     try
     {
-      SubmitterProfile profile = (SubmitterProfile) session.get(SubmitterProfile.class, SubmitterProfile.TEST_HL7);
-      profile.initPotentialIssueStatus(session);
-      VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
-      MessageReceived messageReceived = new MessageReceived();
-      messageReceived.setProfile(profile);
-      messageReceived.setRequestText(messageText);
-      out.println("<h2>Step 1: Parse Message</h2>");
-      parser.createVaccinationUpdateMessage(messageReceived);
-      printIsssuesIdentified(out, messageReceived, "1");
-
-      if (!messageReceived.hasErrors())
+      SubmitterProfile profile = null;
+      Query query = session.createQuery("from Application where runThis = 'Y'");
+      List<Application> applicationList = query.list();
+      if (applicationList.size() > 0)
       {
-        out.println("<h2>Step 2: Validate Message</h2>");
-        setupShowHidDiv(out, "Validating", "validating");
-        Validator validator = new Validator(profile, session);
-        validator.setDocumentOut(out);
-        validator.validateVaccinationUpdateMessage(messageReceived, null);
-        out.println("</div>");
-        printIsssuesIdentified(out, messageReceived, "2");
+        Application application = applicationList.get(0);
+        profile = application.getPrimaryReportTemplate().getBaseProfile();
       }
-      out.println("<h2>Step 3: Create Ack Message</h2>");
-      String ackMessage = parser.makeAckMessage(messageReceived);
-      setupShowHidDiv(out, "Ack Message", "ackMessage");
-      out.println("<pre>" + ackMessage + "</pre>");
-      out.println("</div>");
-      
+      if (profile != null)
+      {
+        profile.initPotentialIssueStatus(session);
+        VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
+        MessageReceived messageReceived = new MessageReceived();
+        messageReceived.setProfile(profile);
+        messageReceived.setRequestText(messageText);
+        out.println("<h2>Step 1: Parse Message</h2>");
+        parser.createVaccinationUpdateMessage(messageReceived);
+        printIsssuesIdentified(out, messageReceived, "1");
 
+        if (!messageReceived.hasErrors())
+        {
+          out.println("<h2>Step 2: Validate Message</h2>");
+          setupShowHidDiv(out, "Validating", "validating");
+          Validator validator = new Validator(profile, session);
+          validator.setDocumentOut(out);
+          validator.validateVaccinationUpdateMessage(messageReceived, null);
+          out.println("</div>");
+          printIsssuesIdentified(out, messageReceived, "2");
+        }
+        out.println("<h2>Step 3: Create Ack Message</h2>");
+        String ackMessage = parser.makeAckMessage(messageReceived);
+        setupShowHidDiv(out, "Ack Message", "ackMessage");
+        out.println("<pre>" + ackMessage + "</pre>");
+        out.println("</div>");
+      }
     } finally
     {
       tx.rollback();
@@ -226,12 +235,9 @@ public class ValidationDocumentationServlet extends HttpServlet
     out.println("      h1 {color:" + BLACK + "; font-size:2.0em;}");
     out.println("      h2 {color:" + BLACK + "; font-size:2.0em; page-break-before:always;}");
     out.println("      h3 {color:" + BLACK + "; font-size:1.2em;}");
-    out.println("      table {background:" + LIGHT + "; border-style:solid; border-width:1; border-color:" + MEDIUM
-        + "; border-collapse:collapse}");
-    out.println("      th {background:" + MEDIUM + "; font-size:0.8em; color:" + BLACK
-        + "; border-style:none; padding-left:5px; padding-right:5px;}");
-    out.println("      td {border-style:solid; border-width:1; border-color:" + MEDIUM
-        + ";margin:0px; padding-left:5px; padding-right:5px;}");
+    out.println("      table {background:" + LIGHT + "; border-style:solid; border-width:1; border-color:" + MEDIUM + "; border-collapse:collapse}");
+    out.println("      th {background:" + MEDIUM + "; font-size:0.8em; color:" + BLACK + "; border-style:none; padding-left:5px; padding-right:5px;}");
+    out.println("      td {border-style:solid; border-width:1; border-color:" + MEDIUM + ";margin:0px; padding-left:5px; padding-right:5px;}");
     out.println("      .score {font-size:1.5em;}");
     out.println("      .alert {}");
     out.println("      .highlight {background: " + MEDIUM_LIGHT + ";}");
@@ -244,10 +250,9 @@ public class ValidationDocumentationServlet extends HttpServlet
     out.println("      a:hover {text-decoration:none; color:" + BLACK + "} ");
     out.println("      a:active {text-decoration:none; color:" + BLACK + "} ");
     out.println("      a.tooltip span {display:none; padding:2px 3px; margin-left:8px; width:130px;}");
-    out.println("      a.tooltip:hover span{display:inline; position:absolute; background:" + LIGHT
-        + "; border:1px solid " + DARK + "; color:" + DARK + "}");
+    out.println("      a.tooltip:hover span{display:inline; position:absolute; background:" + LIGHT + "; border:1px solid " + DARK + "; color:"
+        + DARK + "}");
     out.println("    --></style>");
   }
-
 
 }

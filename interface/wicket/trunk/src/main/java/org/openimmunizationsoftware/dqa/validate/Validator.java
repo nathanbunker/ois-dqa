@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.validate;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -157,8 +158,8 @@ public class Validator extends ValidateMessage
     {
       Address p = patient.getAddress();
       Address n = nextOfKin.getAddress();
-      if (!p.getCity().equals(n.getCity()) || !p.getState().equals(n.getState())
-          || !p.getStreet().equals(n.getStreet()) || !p.getStreet2().equals(p.getStreet2()))
+      if (!p.getCity().equals(n.getCity()) || !p.getState().equals(n.getState()) || !p.getStreet().equals(n.getStreet())
+          || !p.getStreet2().equals(p.getStreet2()))
       {
         registerIssue(pi.NextOfKinAddressIsDifferentFromPatientAddress);
       }
@@ -170,8 +171,8 @@ public class Validator extends ValidateMessage
     {
 
       String relationshipCode = nextOfKin.getRelationshipCode();
-      String[] responsibleParties = { NextOfKin.RELATIONSHIP_CARE_GIVER, NextOfKin.RELATIONSHIP_FATHER,
-          NextOfKin.RELATIONSHIP_GARNDPARENT, NextOfKin.RELATIONSHIP_MOTHER, NextOfKin.RELATIONSHIP_PARENT };
+      String[] responsibleParties = { NextOfKin.RELATIONSHIP_CARE_GIVER, NextOfKin.RELATIONSHIP_FATHER, NextOfKin.RELATIONSHIP_GARNDPARENT,
+          NextOfKin.RELATIONSHIP_MOTHER, NextOfKin.RELATIONSHIP_PARENT };
       for (String compare : responsibleParties)
       {
         if (compare.equals(relationshipCode))
@@ -194,10 +195,8 @@ public class Validator extends ValidateMessage
     }
     if (notEmptyFirst && notEmptyLast && patientUnderAged && isResponsibleParty)
     {
-      if (areEqual(nextOfKin.getNameLast(), patient.getNameLast())
-          && areEqual(nextOfKin.getNameFirst(), patient.getNameFirst())
-          && areEqual(nextOfKin.getNameMiddle(), patient.getNameMiddle())
-          && areEqual(nextOfKin.getNameSuffix(), patient.getNameMiddle())
+      if (areEqual(nextOfKin.getNameLast(), patient.getNameLast()) && areEqual(nextOfKin.getNameFirst(), patient.getNameFirst())
+          && areEqual(nextOfKin.getNameMiddle(), patient.getNameMiddle()) && areEqual(nextOfKin.getNameSuffix(), patient.getNameMiddle())
           && areEqual(nextOfKin.getNameSuffix(), patient.getNameSuffix()))
       {
         registerIssue(pi.PatientGuardianNameIsSameAsUnderagePatient);
@@ -294,8 +293,7 @@ public class Validator extends ValidateMessage
     VaccineCpt vaccineCpt = null;
     if (cptCode != null && !cptCode.equals(""))
     {
-      Query query = session
-          .createQuery("from VaccineCpt where cptCode = ? and validStartDate <= ? and validEndDate > ?");
+      Query query = session.createQuery("from VaccineCpt where cptCode = ? and validStartDate <= ? and validEndDate > ?");
       query.setString(0, cptCode);
       query.setDate(1, vaccination.getAdminDate());
       query.setDate(2, vaccination.getAdminDate());
@@ -316,7 +314,8 @@ public class Validator extends ValidateMessage
         // ignore
       }
     }
-    boolean useCptInsteadOfCvx = vaccineCvx == null && vaccineCpt != null;
+    boolean useCptInsteadOfCvx = (vaccineCvx == null || vaccination.getAdminCvx().isInvalid() || vaccination.getAdminCvx().isIgnored())
+        && vaccineCpt != null;
 
     if (useCptInsteadOfCvx)
     {
@@ -392,12 +391,10 @@ public class Validator extends ValidateMessage
       }
       if (vaccination.getAdminDate() != null)
       {
-        if (vaccineCvx.getValidStartDate().after(vaccination.getAdminDate())
-            || vaccination.getAdminDate().after(vaccineCvx.getValidEndDate()))
+        if (vaccineCvx.getValidStartDate().after(vaccination.getAdminDate()) || vaccination.getAdminDate().after(vaccineCvx.getValidEndDate()))
         {
           registerIssue(pi.VaccinationAdminCodeIsInvalid, vaccineCr);
-        } else if (vaccineCvx.getUseStartDate().after(vaccination.getAdminDate())
-            || vaccination.getAdminDate().after(vaccineCvx.getUseEndDate()))
+        } else if (vaccineCvx.getUseStartDate().after(vaccination.getAdminDate()) || vaccination.getAdminDate().after(vaccineCvx.getUseEndDate()))
         {
           registerIssue(pi.VaccinationAdminCodeIsDeprecated, vaccineCr);
         }
@@ -411,8 +408,7 @@ public class Validator extends ValidateMessage
         }
       }
     }
-    handleCodeReceived(vaccination.getManufacturer(), PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE,
-        vaccination.isAdministered());
+    handleCodeReceived(vaccination.getManufacturer(), PotentialIssues.Field.VACCINATION_MANUFACTURER_CODE, vaccination.isAdministered());
     VaccineMvx vaccineMvx = null;
     if (vaccination.getManufacturerCode() != null && !vaccination.getManufacturerCode().equals(""))
     {
@@ -420,33 +416,39 @@ public class Validator extends ValidateMessage
     }
     if (vaccination.isAdministered())
     {
-      if (vaccineMvx != null && !vaccineMvx.getMvxCode().equals("") && vaccineCvx != null
-          && !vaccineCvx.getCvxCode().equals("") && !vaccineCvx.getCvxCode().equals("998")
-          && !vaccineCvx.getCvxCode().equals("999")
+      if (vaccineMvx != null && !vaccineMvx.getMvxCode().equals("") && vaccineCvx != null && !vaccineCvx.getCvxCode().equals("")
+          && !vaccineCvx.getCvxCode().equals("998") && !vaccineCvx.getCvxCode().equals("999")
           && (vaccination.getManufacturer().isValid() || vaccination.getManufacturer().isDeprecated()))
       {
-        List<VaccineProduct> vaccineProducts = VaccineProductManager.getVaccineProductManager().getVaccineProducts(
-            vaccineCvx, vaccineMvx);
+        List<VaccineProduct> vaccineProducts = VaccineProductManager.getVaccineProductManager().getVaccineProducts(vaccineCvx, vaccineMvx);
         if (vaccineProducts == null)
         {
           registerIssue(pi.VaccinationProductIsUnrecognized);
         } else
         {
+
           VaccineProduct useVp = null;
           VaccineProduct valVp = null;
           if (vaccination.getAdminDate() != null)
           {
+            documentParagraph("Vaccination product is recognized and the vaccination date is given. Verifying that vaccination product is valid for the date administered. ");
             for (VaccineProduct vp : vaccineProducts)
             {
-              if (!vp.getValidStartDate().after(vaccination.getAdminDate())
-                  && !vaccination.getAdminDate().after(vp.getValidEndDate()))
+              if (!vp.getValidStartDate().after(vaccination.getAdminDate()) && !vaccination.getAdminDate().after(vp.getValidEndDate()))
               {
                 valVp = vp;
-                if (!vp.getUseStartDate().after(vaccination.getAdminDate())
-                    && !vaccination.getAdminDate().after(vp.getUseEndDate()))
+                if (!vp.getUseStartDate().after(vaccination.getAdminDate()) && !vaccination.getAdminDate().after(vp.getUseEndDate()))
                 {
                   useVp = vp;
                   break;
+                }
+              } else
+              {
+                if (isDocument())
+                {
+                  SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                  documentParagraph("Vaccination product administered " + sdf.format(vaccination.getAdminDate()) + " before "
+                      + sdf.format(vp.getValidStartDate()) + " or after " + sdf.format(vp.getValidEndDate()) + " valid range.");
                 }
               }
             }
@@ -554,12 +556,9 @@ public class Validator extends ValidateMessage
         vaccination.setAmount("");
       }
     }
-    handleCodeReceived(vaccination.getAmountUnit(), PotentialIssues.Field.VACCINATION_ADMINISTERED_UNIT,
-        vaccination.isAdministered() && amountValued);
-    handleCodeReceived(vaccination.getBodyRoute(), PotentialIssues.Field.VACCINATION_BODY_ROUTE,
-        vaccination.isAdministered());
-    handleCodeReceived(vaccination.getBodySite(), PotentialIssues.Field.VACCINATION_BODY_SITE,
-        vaccination.isAdministered());
+    handleCodeReceived(vaccination.getAmountUnit(), PotentialIssues.Field.VACCINATION_ADMINISTERED_UNIT, vaccination.isAdministered() && amountValued);
+    handleCodeReceived(vaccination.getBodyRoute(), PotentialIssues.Field.VACCINATION_BODY_ROUTE, vaccination.isAdministered());
+    handleCodeReceived(vaccination.getBodySite(), PotentialIssues.Field.VACCINATION_BODY_SITE, vaccination.isAdministered());
 
     // TODO VaccinationBodyRouteIsInvalidForVaccineIndicated
     // TODO VaccinationBodySiteIsInvalidForVaccineIndicated
@@ -597,8 +596,7 @@ public class Validator extends ValidateMessage
       sectionValidator.validateVaccination(vaccination, this);
     }
 
-    handleCodeReceived(vaccination.getOrderedBy(), PotentialIssues.Field.VACCINATION_ORDERED_BY,
-        vaccination.isAdministered());
+    handleCodeReceived(vaccination.getOrderedBy(), PotentialIssues.Field.VACCINATION_ORDERED_BY, vaccination.isAdministered());
     handleCodeReceived(vaccination.getEnteredBy(), PotentialIssues.Field.VACCINATION_RECORDED_BY);
 
     // TODO VaccinationIdOfReceiverIsMissing
@@ -626,8 +624,7 @@ public class Validator extends ValidateMessage
     {
       registerIssue(pi.VaccinationRefusalReasonIsMissing);
     }
-    handleCodeReceived(vaccination.getRefusal(), PotentialIssues.Field.VACCINATION_REFUSAL_REASON,
-        vaccination.isCompletionRefused());
+    handleCodeReceived(vaccination.getRefusal(), PotentialIssues.Field.VACCINATION_REFUSAL_REASON, vaccination.isCompletionRefused());
 
     if (notEmpty(vaccination.getSystemEntryDate(), pi.VaccinationSystemEntryTimeIsMissing))
     {
@@ -640,8 +637,7 @@ public class Validator extends ValidateMessage
     for (Observation observation : vaccination.getObservations())
     {
       handleCodeReceived(observation.getValueType(), PotentialIssues.Field.OBSERVATION_VALUE_TYPE);
-      handleCodeReceived(observation.getObservationIdentifier(),
-          PotentialIssues.Field.OBSERVATION_OBSERVATION_IDENTIFIER_CODE);
+      handleCodeReceived(observation.getObservationIdentifier(), PotentialIssues.Field.OBSERVATION_OBSERVATION_IDENTIFIER_CODE);
       if (financialEligibilityCode == null && !observation.isSkipped())
       {
         if (observation.getObservationIdentifierCode().equals("64994-7"))
@@ -659,12 +655,11 @@ public class Validator extends ValidateMessage
       {
         registerIssue(pi.VaccinationFinancialEligibilityCodeIsMissing);
       }
-    }
-    else
+    } else
     {
       vaccination.setFinancialEligibilityCode(financialEligibilityCode);
-      handleCodeReceived(vaccination.getFinancialEligibility(),
-          PotentialIssues.Field.VACCINATION_FINANCIAL_ELIGIBILITY_CODE, vaccination.isAdministered());
+      handleCodeReceived(vaccination.getFinancialEligibility(), PotentialIssues.Field.VACCINATION_FINANCIAL_ELIGIBILITY_CODE,
+          vaccination.isAdministered());
     }
 
     {
@@ -707,8 +702,7 @@ public class Validator extends ValidateMessage
       {
         administeredScore += 1;
       }
-      if (!vaccination.getAmount().equals("") && !vaccination.getAmount().equals("999")
-          && !vaccination.getAmount().equals("0"))
+      if (!vaccination.getAmount().equals("") && !vaccination.getAmount().equals("999") && !vaccination.getAmount().equals("0"))
       {
         administeredScore += 3;
       }
@@ -716,8 +710,7 @@ public class Validator extends ValidateMessage
       {
         administeredScore += 4;
       }
-      if (!vaccination.getGivenBy().equals("") || !vaccination.getGivenByNameFirst().equals("")
-          || !vaccination.getGivenByNameLast().equals(""))
+      if (!vaccination.getGivenBy().equals("") || !vaccination.getGivenByNameFirst().equals("") || !vaccination.getGivenByNameLast().equals(""))
       {
         administeredScore += 4;
       }
@@ -1029,8 +1022,8 @@ public class Validator extends ValidateMessage
     // TODO PatientNameMayBeTemporaryNewbornName
     // TODO PatientNameMayBeTestName
 
-    validatePhone(patient.getPhone(), PotentialIssues.Field.PATIENT_PHONE,
-        PotentialIssues.Field.PATIENT_PHONE_TEL_USE_CODE, PotentialIssues.Field.PATIENT_PHONE_TEL_EQUIP_CODE);
+    validatePhone(patient.getPhone(), PotentialIssues.Field.PATIENT_PHONE, PotentialIssues.Field.PATIENT_PHONE_TEL_USE_CODE,
+        PotentialIssues.Field.PATIENT_PHONE_TEL_EQUIP_CODE);
 
     notEmpty(patient.getFacilityName(), pi.PatientPrimaryFacilityNameIsMissing);
     handleCodeReceived(patient.getFacility().getId(), PotentialIssues.Field.PATIENT_PRIMARY_FACILITY_ID);
@@ -1206,8 +1199,7 @@ public class Validator extends ValidateMessage
     {
       address.getState().setCode("");
       address.getCountry().setCode("USA");
-    } else if (address.getState().getCode().equalsIgnoreCase("mx")
-        || address.getState().getCode().equalsIgnoreCase("mex")
+    } else if (address.getState().getCode().equalsIgnoreCase("mx") || address.getState().getCode().equalsIgnoreCase("mex")
         || address.getState().getCode().equalsIgnoreCase("mexico"))
     {
       address.getCountry().setCode(address.getState().getCode());

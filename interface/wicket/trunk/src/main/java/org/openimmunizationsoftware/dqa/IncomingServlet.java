@@ -58,6 +58,7 @@ public class IncomingServlet extends HttpServlet
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
+    resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     out.println("<html>");
     out.println("  <head>");

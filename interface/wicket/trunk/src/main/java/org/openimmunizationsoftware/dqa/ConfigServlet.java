@@ -18,7 +18,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.db.model.Application;
+import org.openimmunizationsoftware.dqa.db.model.IssueAction;
 import org.openimmunizationsoftware.dqa.db.model.KeyedSetting;
+import org.openimmunizationsoftware.dqa.db.model.PotentialIssueStatus;
 import org.openimmunizationsoftware.dqa.db.model.ReportTemplate;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.UserAccount;
@@ -32,9 +34,6 @@ import org.openimmunizationsoftware.dqa.quality.model.ModelFactory;
 
 public class ConfigServlet extends HttpServlet
 {
-
-  private static final String CONFIG_USERNAME = "test";
-  private static final String CONFIG_PASSWORD = "test";
 
   private static final String MENU_APPLICATION = "application";
   private static final String MENU_REPORT_TEMPLATE = "reportTemplate";
@@ -126,8 +125,8 @@ public class ConfigServlet extends HttpServlet
 
         } catch (ParseException pe)
         {
-          out.println("<p class=\"fail\">Unable to generate weekly batch, invalid date '"
-              + req.getParameter("generatedDate") + "': " + pe.getMessage() + "</p>");
+          out.println("<p class=\"fail\">Unable to generate weekly batch, invalid date '" + req.getParameter("generatedDate") + "': "
+              + pe.getMessage() + "</p>");
         }
       } else if (action.equals("Export Weekly Batch"))
       {
@@ -136,8 +135,7 @@ public class ConfigServlet extends HttpServlet
           WeeklyExportManager.getWeeklyExportManager().runNow(sdf.parse(req.getParameter("exportDate")));
         } catch (ParseException pe)
         {
-          out.println("<p class=\"fail\">Unable to export batch, invalid date '" + req.getParameter("exportDate")
-              + "': " + pe.getMessage() + "</p>");
+          out.println("<p class=\"fail\">Unable to export batch, invalid date '" + req.getParameter("exportDate") + "': " + pe.getMessage() + "</p>");
           throw new ServletException(pe);
         }
       } else if (action.equals("Reload"))
@@ -163,11 +161,14 @@ public class ConfigServlet extends HttpServlet
         Transaction tx = session.beginTransaction();
         for (ConfigKeyedSetting configKeyedSetting : configKeyedSettingsList)
         {
+          if (configKeyedSetting.keyedCode == null)
+          {
+            continue;
+          }
           String value = req.getParameter(configKeyedSetting.keyedCode);
           if (value != null)
           {
-            Query query = session
-                .createQuery("from KeyedSetting where objectCode = ? and objectId = ? and keyedCode = ?");
+            Query query = session.createQuery("from KeyedSetting where objectCode = ? and objectId = ? and keyedCode = ?");
             query.setString(0, "Application");
             query.setInteger(1, applicationId);
             query.setString(2, configKeyedSetting.keyedCode);
@@ -247,7 +248,7 @@ public class ConfigServlet extends HttpServlet
       out.println("          <th>Report Template</th>");
       out.println("          <th>Status</th>");
       out.println("        </tr>");
-      Query query = session.createQuery("from Application");
+      Query query = session.createQuery("from Application order by applicationLabel, applicationType");
       List<Application> applicationList = query.list();
       for (Application application : applicationList)
       {
@@ -256,8 +257,8 @@ public class ConfigServlet extends HttpServlet
         out.println("          <td>" + application.getApplicationLabel() + "</td>");
         out.println("          <td>" + application.getApplicationType() + "</td>");
         ReportTemplate reportTemplate = application.getPrimaryReportTemplate();
-        out.println("          <td><a href=\"config?menu=" + MENU_REPORT_TEMPLATE + "&templateId="
-            + reportTemplate.getTemplateId() + "\">" + reportTemplate.getTemplateLabel() + "</a></td>");
+        out.println("          <td><a href=\"config?menu=" + MENU_REPORT_TEMPLATE + "&templateId=" + reportTemplate.getTemplateId() + "\">"
+            + reportTemplate.getTemplateLabel() + "</a></td>");
         out.println("          <td>" + (application.getRunThis() ? "running" : "") + "</td>");
         out.println("        </tr>");
       }
@@ -266,8 +267,7 @@ public class ConfigServlet extends HttpServlet
       out.println("    <p>Current running application <select name=\"applicationId\">");
       for (Application application : applicationList)
       {
-        out.println("<option value=\"" + application.getApplicationId() + "\""
-            + (application.getRunThis() ? " selected=\"true\"" : "") + ">");
+        out.println("<option value=\"" + application.getApplicationId() + "\"" + (application.getRunThis() ? " selected=\"true\"" : "") + ">");
         out.println(application.getApplicationLabel() + " (" + application.getApplicationType() + ")");
         out.println("</option>");
       }
@@ -283,8 +283,7 @@ public class ConfigServlet extends HttpServlet
     } else if (menu.equals(MENU_REPORT_TEMPLATE))
     {
 
-      ReportTemplate reportTemplate = (ReportTemplate) session.get(ReportTemplate.class,
-          Integer.parseInt(req.getParameter("templateId")));
+      ReportTemplate reportTemplate = (ReportTemplate) session.get(ReportTemplate.class, Integer.parseInt(req.getParameter("templateId")));
       SubmitterProfile baseProfile = reportTemplate.getBaseProfile();
       out.println("      <h2>Report Template</h2>");
       out.println("    <form action=\"config\" method=\"POST\">");
@@ -308,13 +307,102 @@ public class ConfigServlet extends HttpServlet
       out.println("        </tr>");
       out.println("        <tr>");
       out.println("          <th>Report Definition</th>");
-      out.println("          <td><textarea name=\"reportDefinition\" cols=\"50\" rows=\"10\">"
-          + reportTemplate.getReportDefinition() + "</textarea></td>");
+      out.println("          <td><textarea name=\"reportDefinition\" cols=\"50\" rows=\"10\">" + reportTemplate.getReportDefinition()
+          + "</textarea></td>");
       out.println("        </tr>");
       out.println("        <tr>");
       out.println("          <td colspan=\"2\" align=\"right\"><input type=\"submit\" name=\"action\" value=\"update report template\"/></td>");
       out.println("        </tr>");
       out.println("      </table>");
+      out.println("    </form>");
+
+      Query query = session
+          .createQuery("from PotentialIssueStatus where profile = ? order by issue.targetObject, issue.targetField, issue.issueType, issue.fieldValue");
+      query.setParameter(0, reportTemplate.getBaseProfile());
+      List<PotentialIssueStatus> potentialIssueStatusList = query.list();
+      PotentialIssueStatus lastPotentialIssueStatus = null;
+      out.println("    <form action=\"config\" method=\"POST\">");
+      out.println("      <input type=\"hidden\" name=\"templateId\" value=\"" + reportTemplate.getTemplateId() + "\"/>");
+
+      for (PotentialIssueStatus potentialIssueStatus : potentialIssueStatusList)
+      {
+
+        if (lastPotentialIssueStatus == null
+            || !lastPotentialIssueStatus.getIssue().getTargetObject().equals(potentialIssueStatus.getIssue().getTargetObject()))
+
+        {
+          if (lastPotentialIssueStatus != null)
+          {
+            out.println("    </table>");
+          }
+          out.println("<h4>" + potentialIssueStatus.getIssue().getTargetObject() + "</h4>");
+          out.println("    <table width=\"600\">");
+          out.println("<tr><td width=\"40%\" bgcolor=\"#DDDDDD\">"
+              + potentialIssueStatus.getIssue().getTargetObject()
+              + " "
+              + potentialIssueStatus.getIssue().getTargetField()
+              + "</td><td width=\"15%\" bgcolor=\"#DDDDDD\">&nbsp;</td><td width=\"15%\" bgcolor=\"#DDDDDD\">&nbsp;</td><td width=\"15%\" bgcolor=\"#DDDDDD\">&nbsp;</td><td width=\"15%\" bgcolor=\"#DDDDDD\">&nbsp;</td></tr>");
+        } else if (!lastPotentialIssueStatus.getIssue().getTargetField().equals(potentialIssueStatus.getIssue().getTargetField()))
+        {
+          out.println("<tr><td width=\"40%\" bgcolor=\"#DDDDDD\">"
+              + potentialIssueStatus.getIssue().getTargetObject()
+              + " "
+              + potentialIssueStatus.getIssue().getTargetField()
+              + "</td><td width=\"15%\" bgcolor=\"#DDDDDD\">&nbsp;</td><td width=\"15%\" bgcolor=\"#DDDDDD\">&nbsp;</td><td width=\"15%\" bgcolor=\"#DDDDDD\">&nbsp;</td><td width=\"15%\" bgcolor=\"#DDDDDD\">&nbsp;</td></tr>");
+        }
+        out.println("<tr><td width=\"40%\">&nbsp;&nbsp;- " + potentialIssueStatus.getIssue().getIssueType() + " "
+            + potentialIssueStatus.getIssue().getFieldValue() + "</td>");
+        if (potentialIssueStatus.getAction().isError())
+        {
+          out.println("<td width=\"15%\" bgcolor=\"#FFFF33\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId()
+              + "\" value=\"" + IssueAction.ERROR.getActionCode() + "\" checked=\"true\"/> " + potentialIssueStatus.getAction().getActionLabel()
+              + "</td>");
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.WARN.getActionCode() + "\"/> " + IssueAction.WARN.getActionLabel() + "</td>");
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.SKIP.getActionCode() + "\"/> " + IssueAction.SKIP.getActionLabel() + "</td>");
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.ACCEPT.getActionCode() + "\"/> " + IssueAction.ACCEPT.getActionLabel() + "</td>");
+        } else if (potentialIssueStatus.getAction().isWarn())
+        {
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.ERROR.getActionCode() + "\"/> " + IssueAction.ERROR.getActionLabel() + "</td>");
+          out.println("<td width=\"15%\" bgcolor=\"#FFFF33\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId()
+              + "\" value=\"" + IssueAction.WARN.getActionCode() + "\" checked=\"true\"/> " + potentialIssueStatus.getAction().getActionLabel()
+              + "</td>");
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.SKIP.getActionCode() + "\"/> " + IssueAction.SKIP.getActionLabel() + "</td>");
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.ACCEPT.getActionCode() + "\"/> " + IssueAction.ACCEPT.getActionLabel() + "</td>");
+        } else if (potentialIssueStatus.getAction().isSkip())
+        {
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.ERROR.getActionCode() + "\"/> " + IssueAction.ERROR.getActionLabel() + "</td>");
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.WARN.getActionCode() + "\"/> " + IssueAction.WARN.getActionLabel() + "</td>");
+          out.println("<td width=\"15%\" bgcolor=\"#FFFF33\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId()
+              + "\" value=\"" + IssueAction.SKIP.getActionCode() + "\" checked=\"true\"/> " + potentialIssueStatus.getAction().getActionLabel()
+              + "</td>");
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.ACCEPT.getActionCode() + "\"/> " + IssueAction.ACCEPT.getActionLabel() + "</td>");
+        } else if (potentialIssueStatus.getAction().isAccept())
+        {
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.ERROR.getActionCode() + "\"/> " + IssueAction.ERROR.getActionLabel() + "</td>");
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.WARN.getActionCode() + "\"/> " + IssueAction.WARN.getActionLabel() + "</td>");
+          out.println("<td width=\"15%\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId() + "\" value=\""
+              + IssueAction.SKIP.getActionCode() + "\"/> " + IssueAction.SKIP.getActionLabel() + "</td>");
+          out.println("<td width=\"15%\" bgcolor=\"#FFFF33\"><input type=\"radio\" name=\"" + potentialIssueStatus.getPotentialIssueStatusId()
+              + "\" value=\"" + IssueAction.ACCEPT.getActionCode() + "\" checked=\"true\"/> " + potentialIssueStatus.getAction().getActionLabel()
+              + "</td>");
+        }
+        out.println("</tr>");
+
+        lastPotentialIssueStatus = potentialIssueStatus;
+      }
+      out.println("    </table>");
+      out.println("          <input type=\"submit\" name=\"action\" value=\"update template profile\"/></td>");
       out.println("    </form>");
 
     } else if (menu.equals(MENU_TEST))
@@ -366,12 +454,10 @@ public class ConfigServlet extends HttpServlet
       if (applicationList.size() > 0)
       {
         Application application = applicationList.get(0);
-        out.println("    <h2>Settings for " + application.getApplicationLabel() + " ("
-            + application.getApplicationType() + ")</h2>");
+        out.println("    <h2>Settings for " + application.getApplicationLabel() + " (" + application.getApplicationType() + ")</h2>");
         out.println("    <form action=\"config\">");
         out.println("      <table>");
-        out.println("      <input type=\"hidden\" name=\"applicationId\" value=\"" + application.getApplicationId()
-            + "\"/>");
+        out.println("      <input type=\"hidden\" name=\"applicationId\" value=\"" + application.getApplicationId() + "\"/>");
 
         for (ConfigKeyedSetting configKeyedSetting : configKeyedSettingsList)
         {
@@ -404,16 +490,15 @@ public class ConfigServlet extends HttpServlet
             out.println("            <select name=\"" + configKeyedSetting.keyedCode + "\">");
             for (String option : configKeyedSetting.validValues)
             {
-              out.println("              <option value=\"" + option + "\""
-                  + (value.equals(option) ? " selected=\"true\"" : "") + ">" + option + "</option>");
+              out.println("              <option value=\"" + option + "\"" + (value.equals(option) ? " selected=\"true\"" : "") + ">" + option
+                  + "</option>");
             }
             out.println("          </td>");
           } else
           {
             if (configKeyedSetting.keyedCode != null)
             {
-              out.println("          <td><input type=\"text\" name=\"" + configKeyedSetting.keyedCode + "\" value=\""
-                  + value + "\"</td>");
+              out.println("          <td><input type=\"text\" name=\"" + configKeyedSetting.keyedCode + "\" value=\"" + value + "\"</td>");
             } else
             {
               out.println("          <td>&nbsp;</td>");
@@ -465,8 +550,7 @@ public class ConfigServlet extends HttpServlet
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
       out.println("  + Started: " + sdf.format(mt.getProgressStart()));
       out.println("  + Count:   " + mt.getProgressCount());
-      out.println("  + Rate:    " + ((float) mt.getProgressCount())
-          / ((System.currentTimeMillis() - mt.getProgressStart()) / 1000.0));
+      out.println("  + Rate:    " + ((float) mt.getProgressCount()) / ((System.currentTimeMillis() - mt.getProgressStart()) / 1000.0));
       out.println("</pre>");
     }
     if (mt instanceof ManagerThreadMulti)
@@ -509,85 +593,63 @@ public class ConfigServlet extends HttpServlet
   private static List<ConfigKeyedSetting> configKeyedSettingsList = new ArrayList<ConfigServlet.ConfigKeyedSetting>();
   static
   {
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_ENABLE, "Read in file enabled", "")
-        .setValidValues(new String[] { "", "Y", "N" }));
-    configKeyedSettingsList
-        .add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_DIR, "Base directory path", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_ACCEPTED_DIR_NAME,
-        "Accepted directory name", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_DQA_DIR_NAME, "DQA directory name", "")
-        .setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_RECEIVE_DIR_NAME, "Receive directory name",
-        "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_SUBMIT_DIR_NAME, "Submit directory name",
-        "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_THREAD_COUNT_MAX,
-        "Processing thread count", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_WAIT, "Wait after last update (secs)", "")
-        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_ENABLE, "Read in file enabled", "").setValidValues(new String[] { "",
+        "Y", "N" }));
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_DIR, "Base directory path", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_ACCEPTED_DIR_NAME, "Accepted directory name", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_DQA_DIR_NAME, "DQA directory name", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_RECEIVE_DIR_NAME, "Receive directory name", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_SUBMIT_DIR_NAME, "Submit directory name", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_THREAD_COUNT_MAX, "Processing thread count", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_WAIT, "Wait after last update (secs)", "").setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Export batches enabled", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_FILE_DIR, "Base directory path", "")
-        .setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_PROCESSING_ID, "MSH Processing Id", "")
-        .setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION,
-        "MSH Receiving Application", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_RECEIVING_FACILITY,
-        "MSH Receiving Facility", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_SENDING_APPLICATION,
-        "MSH Sending Application", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_VERSION_ID, "MSH Version Id", "")
-        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_FILE_DIR, "Base directory path", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_PROCESSING_ID, "MSH Processing Id", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "MSH Receiving Application", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_RECEIVING_FACILITY, "MSH Receiving Facility", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_SENDING_APPLICATION, "MSH Sending Application", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_HL7_MSH_VERSION_ID, "MSH Version Id", "").setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Validate header", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MAX_LEN,
-        "Sending facility max length", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MIN_LEN,
-        "Sending facility min length", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_NUMERIC,
-        "Sending facility is numeric", "").setValidValues(new String[] { "", "Y", "N" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_PFS,
-        "Sending facility is PFS", "").setValidValues(new String[] { "", "Y", "N" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MAX_LEN, "Sending facility max length", "")
+        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_MIN_LEN, "Sending facility min length", "")
+        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_NUMERIC, "Sending facility is numeric", "")
+        .setValidValues(new String[] { "", "Y", "N" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_HEADER_SENDING_FACILITY_PFS, "Sending facility is PFS", "")
+        .setValidValues(new String[] { "", "Y", "N" }).setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Validate vaccination", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MAX_LEN,
-        "Vaccination facility max length", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MIN_LEN,
-        "Vaccination facility min length", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_NUMERIC,
-        "Vaccination facility is numeric", "").setValidValues(new String[] { "", "Y", "N" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_PFS,
-        "Vaccination facility is PFS", "").setValidValues(new String[] { "", "Y", "N" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MAX_LEN, "Vaccination facility max length", "")
+        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_MIN_LEN, "Vaccination facility min length", "")
+        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_NUMERIC, "Vaccination facility is numeric", "")
+        .setValidValues(new String[] { "", "Y", "N" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.VALIDATE_VACCINATION_FACILITY_PFS, "Vaccination facility is PFS", "")
+        .setValidValues(new String[] { "", "Y", "N" }).setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Weekly batch", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_DAY, "Batch day (1=Sunday)", "")
-        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_START_TIME, "Batch after (HH:MM)", "")
-        .setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_END_TIME, "Batch before (HH:MM)", "")
-        .setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_DAY, "Batch day (1=Sunday)", "").setValidValues(
+        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_START_TIME, "Batch after (HH:MM)", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_BATCH_END_TIME, "Batch before (HH:MM)", "").setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Weekly export", ""));
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_HIGHEST,
-        "Export day for highest priority (2=Monday)", "").setValidValues(
-        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_HIGH,
-        "Export day for high priority (2=Monday)", "").setValidValues(
-        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_NORMAL,
-        "Export day for normal priority (2=Monday)", "").setValidValues(
-        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_LOW,
-        "Export day for low priority (2=Monday)", "").setValidValues(
-        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_LOWEST,
-        "Export day for lowest priority (2=Monday)", "").setValidValues(
-        new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_START_TIME,
-        "Export time after (HH:MM)", "").setIndent());
-    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_END_TIME,
-        "Export time before (HH:MM)", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_HIGHEST, "Export day for highest priority (2=Monday)", "")
+        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_HIGH, "Export day for high priority (2=Monday)", "")
+        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_NORMAL, "Export day for normal priority (2=Monday)", "")
+        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_LOW, "Export day for low priority (2=Monday)", "")
+        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_DAY_LOWEST, "Export day for lowest priority (2=Monday)", "")
+        .setValidValues(new String[] { "", "1", "2", "3", "4", "5", "6", "7" }).setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_START_TIME, "Export time after (HH:MM)", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.WEEKLY_EXPORT_END_TIME, "Export time before (HH:MM)", "").setIndent());
   }
 
 }

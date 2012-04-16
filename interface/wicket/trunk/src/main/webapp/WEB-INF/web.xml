@@ -25,8 +25,11 @@
 	<servlet>
 		<servlet-name>ConfigServlet</servlet-name>
 		<servlet-class>org.openimmunizationsoftware.dqa.ConfigServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
 	</servlet>
+  <servlet>
+    <servlet-name>ReportTemplateServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.ReportTemplateServlet</servlet-class>
+  </servlet>
   <servlet>
     <servlet-name>ValidationDocumentationServlet</servlet-name>
     <servlet-class>org.openimmunizationsoftware.dqa.web.servlet.ValidationDocumentationServlet</servlet-class>
@@ -101,6 +104,10 @@
 		<servlet-name>ConfigServlet</servlet-name>
 		<url-pattern>/config</url-pattern>
 	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ReportTemplateServlet</servlet-name>
+    <url-pattern>/reportTemplate</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>ValidationDocumentationServlet</servlet-name>
     <url-pattern>/validationDocumentation</url-pattern>

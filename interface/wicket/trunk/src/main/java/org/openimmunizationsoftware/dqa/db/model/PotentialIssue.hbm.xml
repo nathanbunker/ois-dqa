@@ -14,5 +14,6 @@
     <property name="reportDenominator" column="report_denominator" type="string"/>
     <property name="issueDescription" column="issue_description" type="string"/>
     <many-to-one name="table" column="table_id" class="CodeTable" lazy="false"/>
+    <property name="hl7Reference" column="hl7_reference" type="string"/>
   </class>
 </hibernate-mapping>
