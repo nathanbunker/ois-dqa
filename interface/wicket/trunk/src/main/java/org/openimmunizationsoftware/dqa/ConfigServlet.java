@@ -109,9 +109,11 @@ public class ConfigServlet extends HttpServlet
         }
         if (goodToGo)
         {
+          String testCaseScript = req.getParameter("testCaseScript");
           Transaction tx = session.beginTransaction();
           reportTemplate = (ReportTemplate) session.get(ReportTemplate.class, templateId);
           reportTemplate.setReportDefinition(reportDefinition);
+          reportTemplate.setTestCaseScript(testCaseScript);
           tx.commit();
           out.println("<p class=\"pass\">Report Template saved</p>");
         }
@@ -307,8 +309,13 @@ public class ConfigServlet extends HttpServlet
       out.println("        </tr>");
       out.println("        <tr>");
       out.println("          <th>Report Definition</th>");
-      out.println("          <td><textarea name=\"reportDefinition\" cols=\"50\" rows=\"10\">" + reportTemplate.getReportDefinition()
-          + "</textarea></td>");
+      out.println("          <td><textarea name=\"reportDefinition\" cols=\"50\" rows=\"10\">"
+          + (reportTemplate.getReportDefinition() != null ? reportTemplate.getReportDefinition() : "") + "</textarea></td>");
+      out.println("        </tr>");
+      out.println("        <tr>");
+      out.println("          <th>Test Case Script</th>");
+      out.println("          <td><textarea name=\"testCaseScript\" cols=\"50\" rows=\"10\">"
+          + (reportTemplate.getTestCaseScript() != null ? reportTemplate.getTestCaseScript() : "") + "</textarea></td>");
       out.println("        </tr>");
       out.println("        <tr>");
       out.println("          <td colspan=\"2\" align=\"right\"><input type=\"submit\" name=\"action\" value=\"update report template\"/></td>");
@@ -593,6 +600,8 @@ public class ConfigServlet extends HttpServlet
   private static List<ConfigKeyedSetting> configKeyedSettingsList = new ArrayList<ConfigServlet.ConfigKeyedSetting>();
   static
   {
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.APPLICATION_EXTERNAL_URL_BASE, "Application external URL base", ""));
+
     configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_ENABLE, "Read in file enabled", "").setValidValues(new String[] { "",
         "Y", "N" }));
     configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_DIR, "Base directory path", "").setIndent());
@@ -602,6 +611,12 @@ public class ConfigServlet extends HttpServlet
     configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_SUBMIT_DIR_NAME, "Submit directory name", "").setIndent());
     configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_THREAD_COUNT_MAX, "Processing thread count", "").setIndent());
     configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_WAIT, "Wait after last update (secs)", "").setIndent());
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.IN_FILE_EXPORT_CONNECTION_SCRIPT, "Export connection script", "").setValidValues(
+        new String[] { "", "Y", "N" }).setIndent());
+
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.UPLOAD_ENABLED, "Upload enabled", "")
+        .setValidValues(new String[] { "", "Y", "N" }));
+    configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.UPLOAD_DIR, "Uploaded local file directory name", "").setIndent());
 
     configKeyedSettingsList.add(new ConfigKeyedSetting(null, "Export batches enabled", ""));
     configKeyedSettingsList.add(new ConfigKeyedSetting(KeyedSetting.OUT_FILE_DIR, "Base directory path", "").setIndent());

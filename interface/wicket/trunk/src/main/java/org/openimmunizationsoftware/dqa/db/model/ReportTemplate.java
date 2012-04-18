@@ -7,6 +7,17 @@ public class ReportTemplate
   private ReportType reportType = null;
   private String reportDefinition = "";
   private SubmitterProfile baseProfile = null;
+  private String testCaseScript = null;
+
+  public String getTestCaseScript()
+  {
+    return testCaseScript;
+  }
+
+  public void setTestCaseScript(String testCaseScript)
+  {
+    this.testCaseScript = testCaseScript;
+  }
 
   public int getTemplateId()
   {

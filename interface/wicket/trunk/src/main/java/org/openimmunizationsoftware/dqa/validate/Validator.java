@@ -611,7 +611,7 @@ public class Validator extends ValidateMessage
       if (notEmpty(vaccination.getLotNumber(), pi.VaccinationLotNumberIsMissing))
       {
         String lotNumber = vaccination.getLotNumber();
-        if (lotNumber.startsWith("LOT") || lotNumber.length() <= 5)
+        if (lotNumber.startsWith("LOT") || lotNumber.length() <= 4)
         {
           registerIssue(pi.VaccinationLotNumberIsInvalid);
         }

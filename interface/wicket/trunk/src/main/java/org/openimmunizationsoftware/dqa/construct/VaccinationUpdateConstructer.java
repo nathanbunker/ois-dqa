@@ -200,7 +200,7 @@ public class VaccinationUpdateConstructer implements ConstructerInterface
     fields[3] = makeField(ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_SENDING_APPLICATION, "DQA"));
     fields[4] = makeField(messageReceived.getMessageHeader().getSendingFacility());
     fields[5] = ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "TxImmTrac");
-    fields[6] = ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_RECEIVING_APPLICATION, "TxDSHS");
+    fields[6] = ksm.getKeyedValue(KeyedSetting.OUT_HL7_MSH_RECEIVING_FACILITY, "TxDSHS");
     fields[7] = dateTimezoneFormat.format(messageReceived.getReceivedDate());
     fields[9] = makeField("VXU", "V04");
     fields[10] = (++increment) + "-" + dateTimeFormat.format(generationDate);

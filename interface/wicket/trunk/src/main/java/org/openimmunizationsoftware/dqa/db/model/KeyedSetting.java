@@ -2,11 +2,12 @@ package org.openimmunizationsoftware.dqa.db.model;
 
 public class KeyedSetting
 {
-  
+  public static final String APPLICATION_EXTERNAL_URL_BASE = "application.external.url.base";
   public static final String IN_FILE_ACCEPTED_DIR_NAME = "in.file.accepted_dir.name";
   public static final String IN_FILE_DIR = "in.file.dir";
   public static final String IN_FILE_DQA_DIR_NAME = "in.file.dqa_dir.name";
   public static final String IN_FILE_ENABLE = "in.file.enabled";
+  public static final String IN_FILE_EXPORT_CONNECTION_SCRIPT = "in.file.export.connection_script";
   public static final String IN_FILE_RECEIVE_DIR_NAME = "in.file.receive_dir.name";
   public static final String IN_FILE_SUBMIT_DIR_NAME = "in.file.submit_dir.name";
   public static final String IN_FILE_THREAD_COUNT_MAX = "in.file.thread.count.max";
@@ -35,6 +36,8 @@ public class KeyedSetting
   public static final String WEEKLY_EXPORT_DAY_NORMAL = "weekly.export.day.normal";
   public static final String WEEKLY_EXPORT_END_TIME = "weekly.export.end_time";
   public static final String WEEKLY_EXPORT_START_TIME = "weekly.export.start_time";
+  public static final String UPLOAD_ENABLED = "upload.enabled";
+  public static final String UPLOAD_DIR = "upload.dir";
 
   
   
