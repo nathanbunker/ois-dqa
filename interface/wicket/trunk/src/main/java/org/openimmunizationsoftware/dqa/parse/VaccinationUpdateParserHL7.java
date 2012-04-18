@@ -69,8 +69,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     pi = PotentialIssues.getPotentialIssues();
   }
 
-  private static final String[] RECOGNIZED_SEGMENTS = { "MSH", "SFT", "PID", "PD1", "NK1", "PV1", "IN1", "IN3", "IN4",
-      "PD2", "RXA", "ORC", "OBX", "BTS", "FTS", "FHS", "BHS", "RXR", "GT1" };
+  private static final String[] RECOGNIZED_SEGMENTS = { "MSH", "SFT", "PID", "PD1", "NK1", "PV1", "IN1", "IN3", "IN4", "PD2", "RXA", "ORC", "OBX",
+      "BTS", "FTS", "FHS", "BHS", "RXR", "GT1" };
 
   @Override
   public void createVaccinationUpdateMessage(MessageReceived messageReceived)
@@ -157,8 +157,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
           }
         } else
         {
-          if (!message.getMessageHeader().getMessageVersion().startsWith("2.3")
-              && !message.getMessageHeader().getMessageVersion().startsWith("2.4"))
+          if (!message.getMessageHeader().getMessageVersion().startsWith("2.3") && !message.getMessageHeader().getMessageVersion().startsWith("2.4"))
           {
             registerIssue(pi.Hl7OrcSegmentIsMissing);
           }
@@ -371,7 +370,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       vaccination.getAdminCvx().setText(admin.getAltText());
       vaccination.getAdminCvx().setTable(admin.getAltTable());
       codeFound = true;
-    } 
+    }
     if (admin.getTable().equals("CPT") || admin.getTable().equals("C4"))
     {
       vaccination.getAdminCpt().setCode(admin.getCode());
@@ -390,8 +389,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       if (admin.getCode().equals(""))
       {
         registerIssue(pi.VaccinationAdminCodeTableIsMissing);
-      }
-      else
+      } else
       {
         registerIssue(pi.VaccinationAdminCodeTableIsInvalid);
       }
@@ -417,8 +415,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
           // not CVX
         }
       }
-    } 
-    
+    }
+
   }
 
   private void populateORC(MessageReceived message)
@@ -451,13 +449,34 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
       return;
     }
     phoneNumber.setNumber(field.length >= 1 ? field[0] : "");
-    phoneNumber.setTelUseCode(field.length >= 2 ? field[1] : "");
-    phoneNumber.setTelEquipCode(field.length >= 3 ? field[2] : "");
-    phoneNumber.setEmail(field.length >= 4 ? field[3] : "");
-    phoneNumber.setCountryCode(field.length >= 5 ? field[4] : "");
-    phoneNumber.setAreaCode(field.length >= 6 ? field[5] : "");
-    phoneNumber.setLocalNumber(field.length >= 7 ? field[6] : "");
-    phoneNumber.setExtension(field.length >= 8 ? field[7] : "");
+    if (field.length >= 2 && field[1].length() > 0)
+    {
+      phoneNumber.setTelUseCode(field[1]);
+    }
+    if (field.length >= 3 && field[2].length() > 0)
+    {
+      phoneNumber.setTelEquipCode(field[2]);
+    }
+    if (field.length >= 4 && field[3].length() > 0)
+    {
+      phoneNumber.setEmail(field[3]);
+    }
+    if (field.length >= 5 && field[4].length() > 0)
+    {
+      phoneNumber.setCountryCode(field[4]);
+    }
+    if (field.length >= 6 && field[5].length() > 0)
+    {
+      phoneNumber.setAreaCode(field[5]);
+    }
+    if (field.length >= 7 && field[6].length() > 0)
+    {
+      phoneNumber.setLocalNumber(field[6]);
+    }
+    if (field.length >= 8 && field[7].length() > 0)
+    {
+      phoneNumber.setExtension(field[7]);
+    }
   }
 
   private void readAddress(int fieldNumber, Address address)
@@ -747,8 +766,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
           }
         }
       }
-      if (separators[BAR] != '|' || separators[CAR] != '^' || separators[TIL] != '~' || separators[SLA] != '\\'
-          || separators[AMP] != '&')
+      if (separators[BAR] != '|' || separators[CAR] != '^' || separators[TIL] != '~' || separators[SLA] != '\\' || separators[AMP] != '&')
       {
         registerIssue(pi.Hl7MshEncodingCharacterIsNonStandard);
       }
@@ -872,8 +890,8 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     ack.append("|P"); // MSH-11 Processing ID
     ack.append("|2.5.1"); // MSH-12 Version ID
     ack.append("|\r");
-    ack.append("SFT|" + SoftwareVersion.VENDOR + "|" + SoftwareVersion.VERSION + "|" + SoftwareVersion.PRODUCT + "|"
-        + SoftwareVersion.BINARY_ID + "|\r");
+    ack.append("SFT|" + SoftwareVersion.VENDOR + "|" + SoftwareVersion.VERSION + "|" + SoftwareVersion.PRODUCT + "|" + SoftwareVersion.BINARY_ID
+        + "|\r");
     ack.append("MSA|" + ackCode + "|" + controlId + "|" + escapeHL7Chars(text) + "|\r");
     for (IssueFound issueFound : messageReceived.getIssuesFound())
     {
@@ -925,8 +943,7 @@ public class VaccinationUpdateParserHL7 extends VaccinationUpdateParser
     {
       if (c >= ' ')
       {
-        switch (c)
-        {
+        switch (c) {
         case '~':
           sb.append("\\R\\");
           break;

@@ -87,6 +87,20 @@ public class FileImportProcessor extends ManagerThread
       SessionFactory factory = OrganizationManager.getSessionFactory();
       Session session = factory.openSession();
       findProfile(profileCode, session);
+      if (ksm.getKeyedValueBoolean(KeyedSetting.IN_FILE_EXPORT_CONNECTION_SCRIPT, false))
+      {
+        File connectionScriptFile = new File(dir, "connectionScript.txt");
+        PrintWriter out = new PrintWriter(new FileWriter(connectionScriptFile));
+        out.println("-----------------------------------------");
+        out.println("Connection");
+        out.println("Label: " + profile.getProfileLabel());
+        out.println("Type: POST");
+        out.println("URL: " + ksm.getKeyedValue(KeyedSetting.APPLICATION_EXTERNAL_URL_BASE, "http://localhost:8281/") + "in");
+        out.println("User Id: " + profile.getProfileCode());
+        out.println("Password: " + profile.getAccessKey());
+        out.println("Facility Id: " + profile.getProfileId());
+        out.close();
+      }
       Transaction tx = session.beginTransaction();
       profile.initPotentialIssueStatus(session);
       tx.commit();
@@ -212,7 +226,9 @@ public class FileImportProcessor extends ManagerThread
           try
           {
             ProcessLocker.lock(profile);
-            processFile(session, filename, inFile);
+            FileImportProcessorCore fileImportProcessorCore = new FileImportProcessorCore(processingOut, this, profile, parser, acceptedDir,
+                receiveDir);
+            fileImportProcessorCore.processFile(session, filename, inFile);
           } finally
           {
             ProcessLocker.unlock(profile);
@@ -465,8 +481,8 @@ public class FileImportProcessor extends ManagerThread
     logOut.println("Message/Second:   " + ((float) progressCount) / ((progressEnd - progressStart) / 1000.0));
     logOut.println("Software Label:   " + KeyedSettingManager.getApplication().getApplicationLabel());
     logOut.println("Software Type:    " + KeyedSettingManager.getApplication().getApplicationType());
-    logOut.println("Software Version: " + SoftwareVersion.VENDOR + " " + SoftwareVersion.PRODUCT + " "
-        + SoftwareVersion.VERSION + " " + SoftwareVersion.BINARY_ID);
+    logOut.println("Software Version: " + SoftwareVersion.VENDOR + " " + SoftwareVersion.PRODUCT + " " + SoftwareVersion.VERSION + " "
+        + SoftwareVersion.BINARY_ID);
     acceptedOut.close();
     ackOut.close();
     logOut.close();
@@ -510,8 +526,8 @@ public class FileImportProcessor extends ManagerThread
     } catch (Throwable exception)
     {
       tx.rollback();
-      String ackMessage = "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r"
-          + "MSA|AE|TODO|Exception occurred: " + exception.getMessage() + "|\r";
+      String ackMessage = "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r" + "MSA|AE|TODO|Exception occurred: "
+          + exception.getMessage() + "|\r";
       ackOut.print(ackMessage);
       exception.printStackTrace(processingOut);
       exception.printStackTrace(logOut);
@@ -551,8 +567,7 @@ public class FileImportProcessor extends ManagerThread
     session.save(receiveQueue);
   }
 
-  private void printLogDetails(StringBuilder message, MessageReceived messageReceived, PrintWriter out,
-      boolean printDetails)
+  private void printLogDetails(StringBuilder message, MessageReceived messageReceived, PrintWriter out, boolean printDetails)
   {
     try
     {
@@ -603,8 +618,7 @@ public class FileImportProcessor extends ManagerThread
         out.println("Message Data: ");
         printBean(out, messageReceived, "  ");
       }
-      out.println("Current processing speed: " + ((float) progressCount)
-          / ((System.currentTimeMillis() - progressStart) / 1000.0));
+      out.println("Current processing speed: " + ((float) progressCount) / ((System.currentTimeMillis() - progressStart) / 1000.0));
 
       out.println();
       out.println();
@@ -614,8 +628,7 @@ public class FileImportProcessor extends ManagerThread
     }
   }
 
-  private static List<String> printBean(PrintWriter out, Object object, String indent) throws IllegalAccessException,
-      InvocationTargetException
+  private static List<String> printBean(PrintWriter out, Object object, String indent) throws IllegalAccessException, InvocationTargetException
   {
     List<String> thisPrinted = new ArrayList<String>();
     List<String> subPrinted = new ArrayList<String>();
@@ -628,12 +641,10 @@ public class FileImportProcessor extends ManagerThread
     });
     for (Method method : methods)
     {
-      if (method.getName().startsWith("get") && !method.getName().equals("getClass")
-          && !method.getName().equals("getMessageReceived") && !method.getName().equals("getProfile")
-          && !method.getName().equals("getTableType") && !method.getName().equals("getCodeReceived")
-          && !method.getName().equals("getRequestText") && !method.getName().equals("getResponseText")
-          && !method.getName().equals("getIssuesFound") && !method.getReturnType().equals(Void.TYPE)
-          && method.getParameterTypes().length == 0)
+      if (method.getName().startsWith("get") && !method.getName().equals("getClass") && !method.getName().equals("getMessageReceived")
+          && !method.getName().equals("getProfile") && !method.getName().equals("getTableType") && !method.getName().equals("getCodeReceived")
+          && !method.getName().equals("getRequestText") && !method.getName().equals("getResponseText") && !method.getName().equals("getIssuesFound")
+          && !method.getReturnType().equals(Void.TYPE) && method.getParameterTypes().length == 0)
       {
         Object returnValue = method.invoke(object);
         String fieldName = method.getName().substring(3);

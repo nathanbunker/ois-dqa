@@ -17,7 +17,7 @@ input {border-color: #747E80; background-color: #F7F3E8}
 textarea {border-color: #747E80; background-color: #F7F3E8}
 select {border-color: #747E80; background-color: #F7F3E8}
 pre {background:#F7F3E8; padding:4px; margin: 2px; }
-.scrollbox {width: 700px; overflow:auto;}
+.scrollbox {width: 700px; height: 300px; overflow:auto;}
 .pass {background:#77BED2; padding-left:10px; width: 600px;}
 .fail {background:#F2583E; padding-left:10px; width: 600px;}
 .help {width:700px; padding: 10px;}

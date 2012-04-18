@@ -41,6 +41,26 @@ public class ManagerThread extends Thread
   {
     return progressStart;
   }
+  
+  public void setProgressStart(long progressStart)
+  {
+    this.progressStart = progressStart;
+  }
+  
+  public void setProgressEnd(long progressEnd)
+  {
+    this.progressStart = progressEnd;
+  }
+  
+  public void incProgressCount()
+  {
+    progressCount++;
+  }
+  
+  public void setProgressCount(int progressCount)
+  {
+    this.progressCount = progressCount;
+  }
 
   protected Date getTimeToday(String startTimeString)
   {
