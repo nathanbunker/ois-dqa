@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <dqa-scoring>
   <section name="completeness" weight="50">
     <section name="patient" weight="20">
