@@ -860,9 +860,6 @@ public class Validator extends ValidateMessage
     String aliasLast = patient.getAliasLast();
     notEmpty(aliasFirst + aliasLast, PotentialIssues.Field.PATIENT_ALIAS);
 
-    // TODO
-    // public PotentialIssue PatientDateOfBirthIsAfterSubmission = null;
-
     if (patient.getBirthDate() == null)
     {
       registerIssue(pi.PatientBirthDateIsMissing);
@@ -871,6 +868,13 @@ public class Validator extends ValidateMessage
       if (message.getReceivedDate().before(patient.getBirthDate()))
       {
         registerIssue(pi.PatientBirthDateIsInFuture);
+      }
+      if (message.getMessageHeader().getMessageDate() != null)
+      {
+        if (message.getMessageHeader().getMessageDate().before(patient.getBirthDate()))
+        {
+          registerIssue(pi.PatientBirthDateIsAfterSubmission);
+        }
       }
     }
 
