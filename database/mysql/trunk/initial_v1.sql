@@ -1,4 +1,3 @@
-USE dqa;
 
 -- Tables and data
 
