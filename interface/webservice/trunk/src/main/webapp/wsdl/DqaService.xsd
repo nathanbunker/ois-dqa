@@ -1,55 +1,7 @@
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-        xmlns:dqa="http://dqaws.openimmunizationsoftware.org/dqa/schema" 
-	    elementFormDefault="qualified"
-        targetNamespace="http://dqaws.openimmunizationsoftware.org/dqa/schema">
-<!--
-    <element name="SubmitMessageRequest" type="dqa:SubmitMessageType"/>
-    <element name="SubmitMessageResult" type="dqa:SubmitMessageResultType"/>
-    <element name="GetBatchesRequest" type="dqa:GetBatchesType"/>
-    <element name="GetBatchesResult" type="dqa:GetBatchesResultType"/>
-    <element name="GetBatchDqaReportRequest" type="dqa:GetBatchDqaReportType"/>
-    <element name="GetBatchDqaReportResult" type="dqa:GetBatchDqaReportResultType"/>
-    <element name="CreateMessageBatchRequest" type="dqa:CreateMessageBatchType"/>
-    <element name="CreateMessageBatchResult" type="dqa:CreateMessageBatchResultType"/>
-    <element name="UpdateSubmitterProfileRequest" type="dqa:UpdateSubmitterProfileType"/>
-    <element name="UpdateSubmitterProfileResult" type="dqa:UpdateSubmitterProfileResultType"/>
-    <element name="GetSubmitterProfileRequest" type="dqa:GetSubmitterProfileType"/>
-    <element name="GetSubmitterProfileResult" type="dqa:GetSubmitterProfileResultType"/>
-    <element name="GetReportTemplatesRequest" type="dqa:GetReportTemplatesType"/>
-    <element name="GetReportTemplatesResult" type="dqa:GetReportTemplatesResultType"/>
-    <element name="GetCodeReceivedListRequest" type="dqa:GetCodeReceivedListType"/>
-    <element name="GetCodeReceivedListResult" type="dqa:GetCodeReceivedListResultType"/>
-    <element name="UpdateCodeReceivedRequest" type="dqa:UpdateCodeReceivedType"/>
-    <element name="UpdateCodeReceivedResult" type="dqa:UpdateCodeReceivedResultType"/>
-    <element name="GetPotentialIssueStatusListRequest" type="dqa:GetPotentialIssueStatusListType"/>
-    <element name="GetPotentialIssueStatusListResult" type="dqa:GetPotentialIssueStatusListResult"/>
-    <element name="UpdatePotentialIssueStatusRequest" type="dqa:UpdatePotentialIssueStatusType"/>
-    <element name="UpdatePotentialIssueStatusResult" type="dqa:UpdatePotentialStatusIssueResultType"/>
-    <element name="GetBatchRequest" type="dqa:GetBatchType"/>
-    <element name="GetBatchResult" type="dqa:GetBatchResultType"/>
-    <element name="GetBatchIssueListRequest" type="dqa:GetBatchIssueListType"/>
-    <element name="GetBatchIssueListResult" type="dqa:GetBatchIssueListResultType"/>
-    <element name="GetBatchReportRequest" type="dqa:GetBatchReportType"/>
-    <element name="GetBatchReportResult" type="dqa:GetBatchReportResultType"/>
-    <element name="GetBatchActionListRequest" type="dqa:GetBatchActionListType"/>
-    <element name="GetBatchActionListResult" type="dqa:GetBatchActionListResultType"/>
-    <element name="GetBatchVaccineCvxListRequest" type="dqa:GetBatchVaccineCvxListType"/>
-    <element name="GetBatchVaccineCvxListResult" type="dqa:GetBatchVaccineCvxListResultType"/>
-    <element name="GetBatchCodeReceivedListRequest" type="dqa:GetBatchCodeReceivedListType"/>
-    <element name="GetBatchCodeReceivedListResult" type="dqa:GetBatchCodeReceivedListResultType"/>
-    <element name="GetMessageReceivedListRequest" type="dqa:GetMessageReceivedListType"/>
-    <element name="GetMessageReceivedListResult" type="dqa:GetMessageReceivedListResultType"/>
-    <element name="GetMessageReceivedDetailsRequest" type="dqa:GetMessageReceivedDetailsType"/>
-    <element name="GetMessageReceivedDetailsResult" type="dqa:GetMessageReceivedDetailsResultType"/>
-    <element name="GetPatientRequest" type="dqa:GetPatientType"/>
-    <element name="GetPatientResult" type="dqa:GetPatientResultType"/>
-    <element name="GetVaccinationListRequest" type="dqa:GetVaccinationListType"/>
-    <element name="GetVaccinationListResult" type="dqa:GetVaccinationListResultType"/>
-    <element name="GetNextOfKinListRequest" type="dqa:GetNextOfKinListType"/>
-    <element name="GetNextOfKinListResult" type="dqa:GetNextOfKinListResultType"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:dqa="http://dqaws.openimmunizationsoftware.org/dqa/schema" elementFormDefault="qualified" targetNamespace="http://dqaws.openimmunizationsoftware.org/dqa/schema">
+
     <element name="Fault" type="dqa:FaultType"/>
-    <element name="FaultList" type="dqa:FaultListType"/>
--->
 
     <complexType name="SubmitMessageType">
         <sequence>
@@ -82,10 +34,11 @@
     </complexType>
     <complexType name="IssueListType">
         <sequence>
-            <element name="issueList" type="dqa:IssueType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="issueList" type="dqa:IssueType"/>
         </sequence>
     </complexType>
 
+<!--
     <complexType name="GetBatchesType">
         <sequence>
             <element name="profileCode" nillable="false" type="string"/>
@@ -690,6 +643,7 @@
             <element name="relationshipCode" nillable="false" type="string"/>
         </sequence>
     </complexType>
+-->
 
     <complexType name="FaultType">
         <attribute name="errorCode" type="string"/>
@@ -699,7 +653,7 @@
     </complexType>
     <complexType name="FaultListType">
         <sequence>
-            <element name="faults" type="dqa:FaultType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="faults" type="dqa:FaultType"/>
         </sequence>
     </complexType>
 </schema>
