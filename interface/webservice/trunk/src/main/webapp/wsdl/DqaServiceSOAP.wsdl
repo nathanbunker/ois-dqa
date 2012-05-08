@@ -1,513 +1,91 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions
-     name="DqaService"
-     targetNamespace="http://dqaws.openimmunizationsoftware.org/dqa/"
-     xmlns:dsvc="http://dqaws.openimmunizationsoftware.org/dqa/"
-     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-     xmlns:dqa="http://dqaws.openimmunizationsoftware.org/dqa/schema">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:dqa="http://dqaws.openimmunizationsoftware.org/dqa/schema" xmlns:dsvc="http://dqaws.openimmunizationsoftware.org/dqa/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="DqaService" targetNamespace="http://dqaws.openimmunizationsoftware.org/dqa/">
   <wsdl:types>
     <xsd:schema targetNamespace="http://dqaws.openimmunizationsoftware.org/dqa/">
-      <xsd:import schemaLocation="DqaService.xsd" namespace="http://dqaws.openimmunizationsoftware.org/dqa/schema"/>
+      <xsd:import namespace="http://dqaws.openimmunizationsoftware.org/dqa/schema" schemaLocation="DqaService.xsd"/>
       
-      <xsd:element name="submitMessageRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:SubmitMessageType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="submitMessageResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:SubmitMessageResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="submitMessageFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="submitMessageRequest" type="dqa:SubmitMessageType"/>
+      <xsd:element name="submitMessageResponse" type="dqa:SubmitMessageResultType"/>
 
-      <xsd:element name="getBatchesRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetBatchesType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchesResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetBatchesResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchesFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+<!--
+      <xsd:element name="getBatchesRequest" type="dqa:GetBatchesType"/>
+      <xsd:element name="getBatchesResponse" type="dqa:GetBatchesResultType"/>
 
-      <xsd:element name="getBatchDqaReportRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetBatchDqaReportType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchDqaReportResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetBatchDqaReportResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchDqaReportFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getBatchDqaReportRequest" type="dqa:GetBatchDqaReportType"/>
+      <xsd:element name="getBatchDqaReportResponse" type="dqa:GetBatchDqaReportResultType"/>
 
-      <xsd:element name="createMessageBatchRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:CreateMessageBatchType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="createMessageBatchResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:CreateMessageBatchResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="createMessageBatchFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="createMessageBatchRequest" type="dqa:CreateMessageBatchType"/>
+      <xsd:element name="createMessageBatchResponse" type="dqa:CreateMessageBatchResultType"/>
 
-      <xsd:element name="updateSubmitterProfileRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:UpdateSubmitterProfileType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="updateSubmitterProfileResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:UpdateSubmitterProfileResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="updateSubmitterProfileFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="updateSubmitterProfileRequest" type="dqa:UpdateSubmitterProfileType"/>
+      <xsd:element name="updateSubmitterProfileResponse" type="dqa:UpdateSubmitterProfileResultType"/>
 
-      <xsd:element name="getSubmitterProfileRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetSubmitterProfileType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getSubmitterProfileResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetSubmitterProfileResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getSubmitterProfileFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getSubmitterProfileRequest" type="dqa:GetSubmitterProfileType"/>
+      <xsd:element name="getSubmitterProfileResponse" type="dqa:GetSubmitterProfileResultType"/>
 
-      <xsd:element name="getReportTemplatesRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetReportTemplatesType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getReportTemplatesResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetReportTemplatesResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getReportTemplatesFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getReportTemplatesRequest" type="dqa:GetReportTemplatesType"/>
+      <xsd:element name="getReportTemplatesResponse" type="dqa:GetReportTemplatesResultType"/>
 
-      <xsd:element name="getCodeReceivedListRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetCodeReceivedListType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getCodeReceivedListResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetCodeReceivedListResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getCodeReceivedListFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getCodeReceivedListRequest" type="dqa:GetCodeReceivedListType"/>
+      <xsd:element name="getCodeReceivedListResponse" type="dqa:GetCodeReceivedListResultType"/>
 
-      <xsd:element name="updateCodeReceivedRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:UpdateCodeReceivedType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="updateCodeReceivedResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:UpdateCodeReceivedResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="updateCodeReceivedFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="updateCodeReceivedRequest" type="dqa:UpdateCodeReceivedType"/>
+      <xsd:element name="updateCodeReceivedResponse" type="dqa:UpdateCodeReceivedResultType"/>
 
-      <xsd:element name="getPotentialIssueStatusListRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetPotentialIssueStatusListType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getPotentialIssueStatusListResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetPotentialIssueStatusListResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getPotentialIssueStatusListFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getPotentialIssueStatusListRequest" type="dqa:GetPotentialIssueStatusListType"/>
+      <xsd:element name="getPotentialIssueStatusListResponse" type="dqa:GetPotentialIssueStatusListResultType"/>
 
-      <xsd:element name="updatePotentialIssueStatusRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:UpdatePotentialIssueStatusType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="updatePotentialIssueStatusResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:UpdatePotentialIssueStatusResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="updatePotentialIssueStatusFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="updatePotentialIssueStatusRequest" type="dqa:UpdatePotentialIssueStatusType"/>
+      <xsd:element name="updatePotentialIssueStatusResponse" type="dqa:UpdatePotentialIssueStatusResultType"/>
 
-      <xsd:element name="getBatchRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetBatchType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetBatchResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getBatchRequest" type="dqa:GetBatchType"/>
+      <xsd:element name="getBatchResponse" type="dqa:GetBatchResultType"/>
 
-      <xsd:element name="getBatchIssueListRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetBatchIssueListType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchIssueListResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetBatchIssueListResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchIssueListFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getBatchIssueListRequest" type="dqa:GetBatchIssueListType"/>
+      <xsd:element name="getBatchIssueListResponse" type="dqa:GetBatchIssueListResultType"/>
 
-      <xsd:element name="getBatchReportRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetBatchReportType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchReportResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetBatchReportResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchReportFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getBatchReportRequest" type="dqa:GetBatchReportType"/>
+      <xsd:element name="getBatchReportResponse" type="dqa:GetBatchReportResultType"/>
 
-      <xsd:element name="getBatchActionListRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetBatchActionListType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchActionListResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetBatchActionListResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchActionListFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getBatchActionListRequest" type="dqa:GetBatchActionListType"/>
+      <xsd:element name="getBatchActionListResponse" type="dqa:GetBatchActionListResultType"/>
 
-      <xsd:element name="getBatchVaccineCvxListRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetBatchVaccineCvxListType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchVaccineCvxListResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetBatchVaccineCvxListResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchVaccineCvxListFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getBatchVaccineCvxListRequest" type="dqa:GetBatchVaccineCvxListType"/>
+      <xsd:element name="getBatchVaccineCvxListResponse" type="dqa:GetBatchVaccineCvxListResultType"/>
 
-      <xsd:element name="getBatchCodeReceivedListRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetBatchCodeReceivedListType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchCodeReceivedListResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetBatchCodeReceivedListResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getBatchCodeReceivedListFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getBatchCodeReceivedListRequest" type="dqa:GetBatchCodeReceivedListType"/>
+      <xsd:element name="getBatchCodeReceivedListResponse" type="dqa:GetBatchCodeReceivedListResultType"/>
 
-      <xsd:element name="getMessageReceivedListRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetMessageReceivedListType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getMessageReceivedListResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetMessageReceivedListResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getMessageReceivedListFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getMessageReceivedListRequest" type="dqa:GetMessageReceivedListType"/>
+      <xsd:element name="getMessageReceivedListResponse" type="dqa:GetMessageReceivedListResultType"/>
 
-      <xsd:element name="getMessageReceivedDetailsRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetMessageReceivedDetailsType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getMessageReceivedDetailsResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetMessageReceivedDetailsResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getMessageReceivedDetailsFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/> 
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element> 
+      <xsd:element name="getMessageReceivedDetailsRequest" type="dqa:GetMessageReceivedDetailsType"/>
+      <xsd:element name="getMessageReceivedDetailsResponse" type="dqa:GetMessageReceivedDetailsResultType"/>
 
-      <xsd:element name="getPatientRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetPatientType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getPatientResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetPatientResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getPatientFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getPatientRequest" type="dqa:GetPatientType"/>
+      <xsd:element name="getPatientResponse" type="dqa:GetPatientResultType"/>
 
-      <xsd:element name="getVaccinationListRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetVaccinationListType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getVaccinationListResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetVaccinationListResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getVaccinationListFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/> 
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
+      <xsd:element name="getVaccinationListRequest" type="dqa:GetVaccinationListType"/>
+      <xsd:element name="getVaccinationListResponse" type="dqa:GetVaccinationListResultType"/>
 
-      <xsd:element name="getNextOfKinListRequest">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="in" type="dqa:GetNextOfKinListType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getNextOfKinListResponse">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="out" type="dqa:GetNextOfKinListResultType"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="getNextOfKinListFault">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="fault" type="dqa:FaultType"/>  
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>                                                   
+      <xsd:element name="getNextOfKinListRequest" type="dqa:GetNextOfKinListType"/>
+      <xsd:element name="getNextOfKinListResponse" type="dqa:GetNextOfKinListResultType"/>
+-->                                                 
     </xsd:schema>
 
   </wsdl:types>
   
   <wsdl:message name="submitMessageRequest">
-    <wsdl:part name="request" element="dsvc:submitMessageRequest"/>
+    <wsdl:part element="dsvc:submitMessageRequest" name="request"/>
   </wsdl:message>
   <wsdl:message name="submitMessageResponse">
-    <wsdl:part name="result" element="dsvc:submitMessageResponse"/>
+    <wsdl:part element="dsvc:submitMessageResponse" name="result"/>
   </wsdl:message>
   <wsdl:message name="submitMessageFault">
-    <wsdl:part name="fault" element="dsvc:submitMessageFault"/>
+    <wsdl:part element="dqa:Fault" name="fault"/>
   </wsdl:message>
 
+<!--
   <wsdl:message name="getBatchesRequest">
     <wsdl:part name="request" element="dsvc:getBatchesRequest"/>
   </wsdl:message>
@@ -717,13 +295,15 @@
   <wsdl:message name="getNextOfKinListFault">
     <wsdl:part name="fault" element="dsvc:getNextOfKinListFault"/>
   </wsdl:message>
+-->
 
   <wsdl:portType name="DqaService">
     <wsdl:operation name="submitMessage">
       <wsdl:input message="dsvc:submitMessageRequest"/>
       <wsdl:output message="dsvc:submitMessageResponse"/>
-      <wsdl:fault name="fault" message="dsvc:submitMessageFault"/>
+      <wsdl:fault message="dsvc:submitMessageFault" name="fault"/>
     </wsdl:operation>
+<!--
     <wsdl:operation name="getBatches">
       <wsdl:input message="dsvc:getBatchesRequest"/>
       <wsdl:output message="dsvc:getBatchesResponse"/>
@@ -829,6 +409,7 @@
       <wsdl:output message="dsvc:getNextOfKinListResponse"/>
       <wsdl:fault name="fault" message="dsvc:getNextOfKinListFault"/>
     </wsdl:operation>
+-->
   </wsdl:portType>
     
   <wsdl:binding name="DqaServiceSOAP" type="dsvc:DqaService">
@@ -847,6 +428,7 @@
       </wsdl:fault>
     </wsdl:operation>
 
+<!--
     <wsdl:operation name="getBatches">
       <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatches"/>
       <wsdl:input>
@@ -1119,12 +701,13 @@
         <soap:fault name="fault" use="literal"/>
       </wsdl:fault>
     </wsdl:operation>
+-->
 
   </wsdl:binding>
   
   <wsdl:service name="DqaService">
-    <wsdl:port name="DqaServiceSOAP" binding="dsvc:DqaServiceSOAP">
-      <soap:address location="http://dqaws.openimmunizationsoftware.org/dqa/"/>
+    <wsdl:port binding="dsvc:DqaServiceSOAP" name="DqaServiceSOAP">
+      <soap:address location="http://localhost:8080/dqa/services/DqaServiceSOAP"/>
     </wsdl:port>
   </wsdl:service>
   
