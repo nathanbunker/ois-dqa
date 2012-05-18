@@ -1,8 +1,13 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 
-public class Organization
+
+public class Organization implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int orgId = 0;
   private String orgLabel = "";
   private String orgLocalCode = "";

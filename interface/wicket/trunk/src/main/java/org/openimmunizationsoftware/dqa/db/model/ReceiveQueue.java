@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class ReceiveQueue
+import java.io.Serializable;
+
+public class ReceiveQueue implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int receiveQueueId = 0;
   private MessageBatch messageBatch = null;
   private MessageReceived messageReceived = null;

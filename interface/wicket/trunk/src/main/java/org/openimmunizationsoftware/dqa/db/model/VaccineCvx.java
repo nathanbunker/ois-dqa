@@ -1,9 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class VaccineCvx
+public class VaccineCvx implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
   
   public static final String NO_VACCINE_ADMINISTERED = "998";
   public static final String UNKNOWN = "999";

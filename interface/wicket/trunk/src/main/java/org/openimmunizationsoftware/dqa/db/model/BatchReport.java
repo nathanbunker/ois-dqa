@@ -1,9 +1,13 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class BatchReport
+public class BatchReport implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private static Date max(Date d1, Date d2)
   {
     if (d1 == null)

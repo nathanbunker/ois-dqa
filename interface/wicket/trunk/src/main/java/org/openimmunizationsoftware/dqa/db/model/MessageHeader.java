@@ -1,12 +1,15 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
 
-public class MessageHeader
+public class MessageHeader implements Serializable
 {
-
+  
+  private static final long serialVersionUID = 1l;
+  
   public static String PROCESSING_ID_DEBUGGING = "D";
   public static String PROCESSING_ID_PRODUCTION = "P";
   public static String PROCESSING_ID_TRAINING = "T";

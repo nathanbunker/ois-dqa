@@ -1,13 +1,18 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
+
 /**
  * Batch Actions represent an count of the number of actions that 
  * were encountered while processing a batch of messages.
  * @author nathan
  *
  */
-public class BatchActions
+public class BatchActions implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int batchActionsId = 0;
   private MessageBatch messageBatch = null;
   private IssueAction issueAction = null;

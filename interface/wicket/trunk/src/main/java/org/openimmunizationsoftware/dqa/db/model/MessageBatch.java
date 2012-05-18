@@ -1,11 +1,14 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MessageBatch
+public class MessageBatch implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
   
   private Map<IssueAction, BatchActions> batchActionsMap = new HashMap<IssueAction, BatchActions>();
   private Map<CodeReceived, BatchCodeReceived> batchCodeReceivedMap = new HashMap<CodeReceived, BatchCodeReceived>();

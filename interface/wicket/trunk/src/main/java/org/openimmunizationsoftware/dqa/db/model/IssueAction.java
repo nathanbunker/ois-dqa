@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class IssueAction
+import java.io.Serializable;
+
+public class IssueAction implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   public static final IssueAction ERROR = new IssueAction("E", "Error");
   public static final IssueAction WARN = new IssueAction("W", "Warn");
   public static final IssueAction ACCEPT = new IssueAction("A", "Accept");

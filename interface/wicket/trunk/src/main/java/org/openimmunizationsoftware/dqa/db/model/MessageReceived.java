@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,8 +11,11 @@ import org.openimmunizationsoftware.dqa.db.model.received.NextOfKin;
 import org.openimmunizationsoftware.dqa.db.model.received.Patient;
 import org.openimmunizationsoftware.dqa.db.model.received.Vaccination;
 
-public class MessageReceived
+public class MessageReceived implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private IssueAction issueAction = null;
   private List<IssueFound> issuesFound = new ArrayList<IssueFound>();
   private List<NextOfKin> nextOfKins = new ArrayList<NextOfKin>();

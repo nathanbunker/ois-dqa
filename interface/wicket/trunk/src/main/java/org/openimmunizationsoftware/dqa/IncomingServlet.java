@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -16,6 +15,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.openimmunizationsoftware.dqa.db.model.Application;
 import org.openimmunizationsoftware.dqa.db.model.BatchReport;
 import org.openimmunizationsoftware.dqa.db.model.BatchType;
 import org.openimmunizationsoftware.dqa.db.model.CodeReceived;
@@ -25,12 +25,11 @@ import org.openimmunizationsoftware.dqa.db.model.IssueFound;
 import org.openimmunizationsoftware.dqa.db.model.MessageBatch;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
+import org.openimmunizationsoftware.dqa.db.model.ReportTemplate;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.UserAccount;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 import org.openimmunizationsoftware.dqa.manager.FileImportManager;
-import org.openimmunizationsoftware.dqa.manager.ManagerThread;
-import org.openimmunizationsoftware.dqa.manager.ManagerThreadMulti;
 import org.openimmunizationsoftware.dqa.manager.MessageReceivedManager;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
 import org.openimmunizationsoftware.dqa.manager.WeeklyBatchManager;
@@ -38,6 +37,9 @@ import org.openimmunizationsoftware.dqa.manager.WeeklyExportManager;
 import org.openimmunizationsoftware.dqa.parse.PrintBean;
 import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
 import org.openimmunizationsoftware.dqa.quality.QualityCollector;
+import org.openimmunizationsoftware.dqa.service.DqaService;
+import org.openimmunizationsoftware.dqa.service.DqaServiceSupport;
+import org.openimmunizationsoftware.dqa.service.IssueType;
 import org.openimmunizationsoftware.dqa.validate.Validator;
 
 public class IncomingServlet extends HttpServlet
@@ -53,6 +55,7 @@ public class IncomingServlet extends HttpServlet
     fileImportManager = FileImportManager.getFileImportManager();
     weeklyBatchManager = WeeklyBatchManager.getWeeklyBatchManager();
     weeklyExportManager = WeeklyExportManager.getWeeklyExportManager();
+    DqaServiceSupport.setServiceTemplate(new DqaService());
   }
 
   @Override
@@ -202,6 +205,17 @@ public class IncomingServlet extends HttpServlet
           profile.setProfileLabel(facilityId);
           profile.setProfileStatus(SubmitterProfile.PROFILE_STATUS_TEST);
           profile.setTransferPriority(SubmitterProfile.TRANSFER_PRIORITY_NORMAL);
+          query = session.createQuery("from Application where runThis = 'Y'");
+          List<Application> applicationList = query.list();
+          if (applicationList.size() > 0)
+          {
+            Application application = applicationList.get(0);
+            profile.setReportTemplate(application.getPrimaryReportTemplate());
+          } else
+          {
+            profile.setReportTemplate((ReportTemplate) session.get(ReportTemplate.class, 1));
+          }
+
           session.save(profile);
         } else
         {
@@ -236,7 +250,10 @@ public class IncomingServlet extends HttpServlet
         ProcessLocker.lock(profile);
         qualityCollector = new QualityCollector("Realtime HTTPS", BatchType.SUBMISSION, profile);
         String messageData = req.getParameter("MESSAGEDATA");
-        debug = processStream(debug, session, profile, messageData, out, qualityCollector);
+        Results results = new Results();
+        results.setDebug(debug);
+        processStream(debug, session, profile, messageData, out, qualityCollector, results);
+        debug = results.isDebug();
       } finally
       {
         ProcessLocker.unlock(profile);
@@ -247,71 +264,7 @@ public class IncomingServlet extends HttpServlet
     }
     if (debug)
     {
-      if (qualityCollector != null)
-      {
-        printMessageBatch(out, qualityCollector);
-      }
-      out.print("\r");
-      out.print("\r");
-      CodesReceived cr = CodesReceived.getCodesReceived(profile, session);
-      CodesReceived masterCr = CodesReceived.getCodesReceived();
-      for (CodeTable codeTable : cr.getCodeTableList())
-      {
-        List<CodeReceived> codesReceived = cr.getCodesReceived(codeTable);
-        if (codesReceived.size() > 0)
-        {
-          out.print("-- " + padSlash(codeTable.getTableLabel() + " ", 92) + "\r");
-          out.print("\r");
-          out.print("VALUES RECEIVED\r");
-          out.print(pad("value", 20));
-          out.print(pad("label", 30));
-          out.print(pad("use instead", 20));
-          out.print(pad("status", 15));
-          out.print(pad("count", 7));
-          out.print("\r");
-          for (CodeReceived codeReceived : codesReceived)
-          {
-            out.print(pad(codeReceived.getReceivedValue(), 20));
-            out.print(pad(codeReceived.getCodeLabel(), 30));
-            if (codeReceived.getCodeValue() == null
-                || (codeReceived.getCodeValue().equals(codeReceived.getReceivedValue())))
-            {
-              out.print(pad("", 20));
-            } else
-            {
-              out.print(pad(codeReceived.getCodeValue(), 20));
-            }
-            out.print(pad(codeReceived.getCodeStatus().getCodeLabel(), 15));
-            out.print(pad(String.valueOf(codeReceived.getReceivedCount()), 7));
-            out.print("\r");
-          }
-          codesReceived = masterCr.getCodesReceived(codeTable);
-          out.print("\r");
-          out.print("MASTER VALUE LIST\r");
-          out.print(pad("value", 20));
-          out.print(pad("label", 30));
-          out.print(pad("use instead", 20));
-          out.print(pad("status", 15));
-          out.print("\r");
-
-          for (CodeReceived codeReceived : codesReceived)
-          {
-            out.print(pad(codeReceived.getReceivedValue(), 20));
-            out.print(pad(codeReceived.getCodeLabel(), 30));
-            if (codeReceived.getCodeValue() == null
-                || (codeReceived.getCodeValue().equals(codeReceived.getReceivedValue())))
-            {
-              out.print(pad("", 20));
-            } else
-            {
-              out.print(pad(codeReceived.getCodeValue(), 20));
-            }
-            out.print(pad(codeReceived.getCodeStatus().getCodeLabel(), 15));
-            out.print("\r");
-          }
-          out.print("\r");
-        }
-      }
+      printDebugOutput(out, session, profile, qualityCollector);
     }
     out.close();
     out = null;
@@ -319,7 +272,74 @@ public class IncomingServlet extends HttpServlet
     session.close();
   }
 
-  private void printMessageBatch(PrintWriter out, QualityCollector qualityCollector)
+  public static void printDebugOutput(PrintWriter out, Session session, SubmitterProfile profile, QualityCollector qualityCollector)
+  {
+    if (qualityCollector != null)
+    {
+      printMessageBatch(out, qualityCollector);
+    }
+    out.print("\r");
+    out.print("\r");
+    CodesReceived cr = CodesReceived.getCodesReceived(profile, session);
+    CodesReceived masterCr = CodesReceived.getCodesReceived();
+    for (CodeTable codeTable : cr.getCodeTableList())
+    {
+      List<CodeReceived> codesReceived = cr.getCodesReceived(codeTable);
+      if (codesReceived.size() > 0)
+      {
+        out.print("-- " + padSlash(codeTable.getTableLabel() + " ", 92) + "\r");
+        out.print("\r");
+        out.print("VALUES RECEIVED\r");
+        out.print(pad("value", 20));
+        out.print(pad("label", 30));
+        out.print(pad("use instead", 20));
+        out.print(pad("status", 15));
+        out.print(pad("count", 7));
+        out.print("\r");
+        for (CodeReceived codeReceived : codesReceived)
+        {
+          out.print(pad(codeReceived.getReceivedValue(), 20));
+          out.print(pad(codeReceived.getCodeLabel(), 30));
+          if (codeReceived.getCodeValue() == null || (codeReceived.getCodeValue().equals(codeReceived.getReceivedValue())))
+          {
+            out.print(pad("", 20));
+          } else
+          {
+            out.print(pad(codeReceived.getCodeValue(), 20));
+          }
+          out.print(pad(codeReceived.getCodeStatus().getCodeLabel(), 15));
+          out.print(pad(String.valueOf(codeReceived.getReceivedCount()), 7));
+          out.print("\r");
+        }
+        codesReceived = masterCr.getCodesReceived(codeTable);
+        out.print("\r");
+        out.print("MASTER VALUE LIST\r");
+        out.print(pad("value", 20));
+        out.print(pad("label", 30));
+        out.print(pad("use instead", 20));
+        out.print(pad("status", 15));
+        out.print("\r");
+
+        for (CodeReceived codeReceived : codesReceived)
+        {
+          out.print(pad(codeReceived.getReceivedValue(), 20));
+          out.print(pad(codeReceived.getCodeLabel(), 30));
+          if (codeReceived.getCodeValue() == null || (codeReceived.getCodeValue().equals(codeReceived.getReceivedValue())))
+          {
+            out.print(pad("", 20));
+          } else
+          {
+            out.print(pad(codeReceived.getCodeValue(), 20));
+          }
+          out.print(pad(codeReceived.getCodeStatus().getCodeLabel(), 15));
+          out.print("\r");
+        }
+        out.print("\r");
+      }
+    }
+  }
+
+  private static void printMessageBatch(PrintWriter out, QualityCollector qualityCollector)
   {
     MessageBatch mb = qualityCollector.getMessageBatch();
     BatchReport r = mb.getBatchReport();
@@ -335,8 +355,90 @@ public class IncomingServlet extends HttpServlet
     out.print(" + Deleted:          " + r.getVaccinationDeleteCount() + "\r");
   }
 
-  public boolean processStream(boolean debug, Session session, SubmitterProfile profile, String messageData,
-      PrintWriter out, QualityCollector qualityCollector) throws IOException
+  public static class Results
+  {
+    private boolean debug = false;
+    private String responseStatus = "";
+    private String responseText = "";
+    private int batchId = 0;
+    private int receivedId = 0;
+
+    private List<IssueType> errorList = null;
+    private List<IssueType> warningList = null;
+
+    public List<IssueType> getErrorList()
+    {
+      return errorList;
+    }
+
+    public void setErrorList(List<IssueType> errorList)
+    {
+      this.errorList = errorList;
+    }
+
+    public List<IssueType> getWarningList()
+    {
+      return warningList;
+    }
+
+    public void setWarningList(List<IssueType> warningList)
+    {
+      this.warningList = warningList;
+    }
+
+    public boolean isDebug()
+    {
+      return debug;
+    }
+
+    public void setDebug(boolean debug)
+    {
+      this.debug = debug;
+    }
+
+    public String getResponseStatus()
+    {
+      return responseStatus;
+    }
+
+    public void setResponseStatus(String responseStatus)
+    {
+      this.responseStatus = responseStatus;
+    }
+
+    public String getResponseText()
+    {
+      return responseText;
+    }
+
+    public void setResponseText(String responseText)
+    {
+      this.responseText = responseText;
+    }
+
+    public int getBatchId()
+    {
+      return batchId;
+    }
+
+    public void setBatchId(int batchId)
+    {
+      this.batchId = batchId;
+    }
+
+    public int getReceivedId()
+    {
+      return receivedId;
+    }
+
+    public void setReceivedId(int receivedId)
+    {
+      this.receivedId = receivedId;
+    }
+  }
+
+  public static void processStream(boolean debug, Session session, SubmitterProfile profile, String messageData, PrintWriter out,
+      QualityCollector qualityCollector, Results results) throws IOException
   {
     VaccinationUpdateParserHL7 parser = new VaccinationUpdateParserHL7(profile);
     StringReader stringReader = new StringReader(messageData);
@@ -350,7 +452,7 @@ public class IncomingServlet extends HttpServlet
       {
         if (sb.length() > 0)
         {
-          debug = processMessage(parser, sb, debug, profile, session, out, qualityCollector);
+          processMessage(parser, sb, profile, session, out, qualityCollector, results, false);
         }
         sb.setLength(0);
       } else if (line.startsWith("FHS") || line.startsWith("BHS") || line.startsWith("BTS") || line.startsWith("FTS"))
@@ -362,19 +464,20 @@ public class IncomingServlet extends HttpServlet
     }
     if (sb.length() > 0)
     {
-      debug = processMessage(parser, sb, debug, profile, session, out, qualityCollector);
+      processMessage(parser, sb, profile, session, out, qualityCollector, results, true);
     }
     Transaction tx = session.beginTransaction();
     qualityCollector.close();
     session.save(qualityCollector.getMessageBatch());
     session.save(qualityCollector.getMessageBatch().getBatchReport());
     tx.commit();
-    return debug;
+    results.setBatchId(qualityCollector.getMessageBatch().getBatchId());
   }
 
-  private boolean processMessage(VaccinationUpdateParserHL7 parser, StringBuilder sb, boolean debug,
-      SubmitterProfile profile, Session session, PrintWriter out, QualityCollector qualityCollector)
+  private static void processMessage(VaccinationUpdateParserHL7 parser, StringBuilder sb, SubmitterProfile profile, Session session, PrintWriter out,
+      QualityCollector qualityCollector, Results results, boolean last)
   {
+    boolean debug = results.isDebug();
     Transaction tx = session.beginTransaction();
     try
     {
@@ -401,14 +504,17 @@ public class IncomingServlet extends HttpServlet
       messageReceived.setResponseText(ackMessage);
       messageReceived.setIssueAction(IssueAction.ACCEPT);
       MessageReceivedManager.saveMessageReceived(profile, messageReceived, session);
+      if (last)
+      {
+        populateResults(results, messageReceived);
+      }
       out.print(ackMessage);
       if (debug)
       {
         try
         {
           out.print("-- DEBUG START -------------------------------------------------------\r");
-          out.print("Processed message: " + qualityCollector.getMessageBatch().getBatchReport().getMessageCount()
-              + "\r");
+          out.print("Processed message: " + qualityCollector.getMessageBatch().getBatchReport().getMessageCount() + "\r");
           List<IssueFound> issuesFound = messageReceived.getIssuesFound();
           boolean first = true;
           for (IssueFound issueFound : issuesFound)
@@ -460,8 +566,8 @@ public class IncomingServlet extends HttpServlet
       tx.commit();
     } catch (Exception exception)
     {
-      String ackMessage = "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r"
-          + "MSA|AE|TODO|Exception occurred: " + exception.getMessage() + "|\r";
+      String ackMessage = "MSH|^~\\&|||||201105231008000||ACK^|201105231008000|P|2.3.1|\r" + "MSA|AE|TODO|Exception occurred: "
+          + exception.getMessage() + "|\r";
       if (out != null)
       {
         out.print(ackMessage);
@@ -476,10 +582,30 @@ public class IncomingServlet extends HttpServlet
       exception.printStackTrace();
       tx.rollback();
     }
-    return debug;
+    results.setDebug(debug);
   }
 
-  private void printIssueFound(IssueFound issueFound, PrintWriter out)
+  private static void populateResults(Results results, MessageReceived messageReceived)
+  {
+    results.setReceivedId((int) messageReceived.getReceivedId());
+    results.setResponseStatus(messageReceived.getIssueAction().getActionCode());
+    results.setResponseText(messageReceived.getResponseText());
+    if (results.getErrorList() != null && results.getWarningList() != null)
+    {
+      for (IssueFound issueFound : messageReceived.getIssuesFound())
+      {
+        if (issueFound.isError())
+        {
+          results.getErrorList().add(new IssueType(issueFound.getIssue().getIssueId(), issueFound.getIssue().getDisplayText()));
+        } else if (issueFound.isWarn())
+        {
+          results.getWarningList().add(new IssueType(issueFound.getIssue().getIssueId(), issueFound.getIssue().getDisplayText()));
+        }
+      }
+    }
+  }
+
+  private static void printIssueFound(IssueFound issueFound, PrintWriter out)
   {
     out.print("  + ");
     out.print(issueFound.getDisplayText());

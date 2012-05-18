@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class ReportVaccineGroup
+import java.io.Serializable;
+
+public class ReportVaccineGroup implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int reportVaccineGroupId = 0;
   private VaccineGroup vaccineGroup = null;
   private String groupStatus = "";

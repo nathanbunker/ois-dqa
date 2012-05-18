@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -9,9 +10,12 @@ import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.manager.CodesReceived;
 import org.openimmunizationsoftware.dqa.manager.PotentialIssues;
 
-public class SubmitterProfile
+public class SubmitterProfile implements Serializable
 {
-  public static final int MASTER_HL7 = 1;
+  
+  private static final long serialVersionUID = 1l;
+  
+public static final int MASTER_HL7 = 1;
   public static final int TEST_HL7 = 101;
 
   public static final String DATA_FORMAT_HL7V2 = "HL7v2";

@@ -1,6 +1,8 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class CodeTable
+import java.io.Serializable;
+
+public class CodeTable implements Serializable
 {
   public static enum Type {
     ADDRESS_COUNTRY(2), ADDRESS_COUNTY(3), ADDRESS_STATE(4), ADDRESS_TYPE(5), ADMINISTRATION_UNIT(6), BIRTH_ORDER(7),
@@ -25,6 +27,9 @@ public class CodeTable
       return tableId;
     }
   }
+  
+  private static final long serialVersionUID = 1l;
+ 
 
   private int tableId = 0;
   private String tableLabel = "";

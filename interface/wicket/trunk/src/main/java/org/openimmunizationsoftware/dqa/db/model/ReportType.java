@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class ReportType
+import java.io.Serializable;
+
+public class ReportType implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int reportTypeId = 0;
   private String reportTypeLabel = "";
 

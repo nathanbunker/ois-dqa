@@ -1,5 +1,7 @@
 package org.openimmunizationsoftware.dqa.db.model.received;
 
+import java.io.Serializable;
+
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.MessageReceived;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Address;
@@ -8,8 +10,10 @@ import org.openimmunizationsoftware.dqa.db.model.received.types.Name;
 import org.openimmunizationsoftware.dqa.db.model.received.types.PhoneNumber;
 
 
-public class NextOfKin implements Skippable
+public class NextOfKin implements Skippable, Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
   
   public static final String RELATIONSHIP_BROTHER = "BRO";
   public static final String RELATIONSHIP_CARE_GIVER = "CGV";
