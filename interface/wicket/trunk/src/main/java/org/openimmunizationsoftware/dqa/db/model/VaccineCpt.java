@@ -1,9 +1,13 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class VaccineCpt
+public class VaccineCpt implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int cptId = 0;
   private String cptCode = "";
   private String cptLabel = "";

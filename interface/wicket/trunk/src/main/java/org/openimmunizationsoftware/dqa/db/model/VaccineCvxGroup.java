@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class VaccineCvxGroup
+import java.io.Serializable;
+
+public class VaccineCvxGroup implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int cvxGroupId = 0;
   private VaccineCvx vaccineCvx = null;
   private VaccineGroup vaccineGroup = null;

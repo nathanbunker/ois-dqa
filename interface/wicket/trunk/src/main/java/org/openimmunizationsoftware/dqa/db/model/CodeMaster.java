@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class CodeMaster
+import java.io.Serializable;
+
+public class CodeMaster implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int codeMasterId = 0;
   private CodeTable table = null;
   private String codeValue = "";

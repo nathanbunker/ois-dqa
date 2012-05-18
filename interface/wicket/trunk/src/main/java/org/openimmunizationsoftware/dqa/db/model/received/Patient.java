@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.db.model.received;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
@@ -11,8 +12,11 @@ import org.openimmunizationsoftware.dqa.db.model.received.types.Name;
 import org.openimmunizationsoftware.dqa.db.model.received.types.OrganizationName;
 import org.openimmunizationsoftware.dqa.db.model.received.types.PhoneNumber;
 
-public class Patient implements Skippable
+public class Patient implements Skippable, Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private Address address = new Address();
   private Name alias = new Name();
   private Date birthDate = null;

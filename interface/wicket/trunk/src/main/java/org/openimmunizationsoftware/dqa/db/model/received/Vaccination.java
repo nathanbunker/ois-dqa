@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.db.model.received;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,8 +12,11 @@ import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
 import org.openimmunizationsoftware.dqa.db.model.received.types.Id;
 import org.openimmunizationsoftware.dqa.db.model.received.types.OrganizationName;
 
-public class Vaccination implements Skippable
+public class Vaccination implements Skippable, Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   public static final String ACTION_CODE_ADD = "A";
   public static final String ACTION_CODE_DELETE = "D";
   public static final String ACTION_CODE_UPDATE = "U";

@@ -2,7 +2,6 @@ package org.openimmunizationsoftware.dqa.web;
 
 
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -14,10 +13,11 @@ import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
 /**
  * Homepage
  */
-public class Home extends WebPage
+public class HomePage extends DqaBasePage 
 {
 
   private static final long serialVersionUID = 1L;
+ 
 
   // TODO Add any page properties or variables here
 
@@ -27,7 +27,8 @@ public class Home extends WebPage
    * @param parameters
    *          Page parameters
    */
-  public Home(final PageParameters parameters) {
+  public HomePage(final PageParameters parameters) {
+    super(parameters, NavigationPanel.HOME_LOGGED_IN);
 
     SessionFactory factory = OrganizationManager.getSessionFactory();
     Session session = factory.openSession();
@@ -40,4 +41,5 @@ public class Home extends WebPage
     tx.commit();
     session.close();
   }
+  
 }

@@ -1,9 +1,14 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
+
 import org.openimmunizationsoftware.dqa.quality.ToolTip;
 
-public class PotentialIssue
+public class PotentialIssue implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   public static final String CHANGE_PRIORITY_BLOCKED = "Blocked";
   public static final String CHANGE_PRIORITY_CAN = "Can";
   public static final String CHANGE_PRIORITY_MAY = "May";

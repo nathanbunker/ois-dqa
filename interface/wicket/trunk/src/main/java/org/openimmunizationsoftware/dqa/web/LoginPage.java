@@ -1,6 +1,8 @@
 package org.openimmunizationsoftware.dqa.web;
 
 
+import java.util.List;
+
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -9,12 +11,20 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.value.ValueMap;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.openimmunizationsoftware.dqa.db.model.Organization;
+import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.UserAccount;
+import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
+import org.openimmunizationsoftware.dqa.web.profile.ProfilePage;
 
 /**
  * Homepage
  */
-public class Login extends WebPage
+public class LoginPage extends DqaBasePage
 {
 
   private static final long serialVersionUID = 1L;
@@ -27,26 +37,15 @@ public class Login extends WebPage
    * @param parameters
    *          Page parameters
    */
-  public Login(final PageParameters parameters) {
-    
-    add(new LoginForm("loginForm"));
+  public LoginPage(final PageParameters parameters) {
+    super(parameters, NavigationPanel.LOGIN);
 
-    model = new Model<Integer>()
-    {
-      private int counter = 0;
-      public Integer getObject()
-      {
-        return counter++;
-      }
-    };
-    
-    add(new Label("counter", model));
+    add(new LoginForm("loginForm"));
 
   }
   
   public class LoginForm extends Form<ValueMap>
   {
-    
     public LoginForm(final String id)
     {
       super(id, new CompoundPropertyModel<ValueMap>(new ValueMap()));
@@ -76,38 +75,31 @@ public class Login extends WebPage
     @Override
     protected void onSubmit()
     {
+      DqaSession webSession = (DqaSession) getSession();
       ValueMap values = getModelObject();
 
-      UserAccount userAccount = new UserAccount();
-      userAccount.setUsername((String) values.get("username"));
-      userAccount.setPassword((String) values.get("password"));
+      username = (String) values.get("username");
+      password = (String) values.get("password");
 
-//      SessionFactory factory = OrganizationManager.getSessionFactory();
-//      Session session = factory.openSession();
-//      Transaction tx = session.beginTransaction();
-//      Query query = session.createQuery("from userAccount where username = ?");
-//      
-//      Organization organization = (Organization) session.get(Organization.class, 1);
-//      SubmitterProfile submitterProfile = organization.getPrimaryProfile();
-//      // Add the simplest type of label
-      
-//      tx.commit();
-//      session.close();
-
-      if (model != null)
+      Session session = webSession.getDataSession();
+      Transaction tx = session.beginTransaction();
+      Query query = session.createQuery("from UserAccount where username = ?");
+      query.setString(0, username);
+      List<UserAccount> userAccountList = query.list();
+      if (userAccountList.size() > 0 && userAccountList.get(0).getPassword().equalsIgnoreCase(password))
       {
-        model.getObject();
+          webSession.setUsername(username);
+          UserAccount userAccount = userAccountList.get(0);
+          webSession.setAdmin(userAccount.getAccountType().equals(UserAccount.ACCOUNT_TYPE_ADMIN));
       }
-      // Clear out the text component
-      values.put("username", "works!");
-      values.put("password", "");
-
+      else
+      {
+        webSession.setUsername(null);
+      }
+      tx.commit();
+      setResponsePage(new ProfilePage());
     }
     
   }
   
-  private static boolean isNotBlank(String s)
-  {
-    return s != null && s.length() > 0;
-  }
 }

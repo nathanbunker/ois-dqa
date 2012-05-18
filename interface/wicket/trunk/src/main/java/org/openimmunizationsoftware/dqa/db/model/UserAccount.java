@@ -1,8 +1,13 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 
-public class UserAccount
+
+public class UserAccount implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   public static final String ACCOUNT_TYPE_ADMIN = "Admin";
   public static final String ACCOUNT_TYPE_SUBMITTER = "Submitter";
   

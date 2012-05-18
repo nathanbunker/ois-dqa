@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class CodeStatus
+import java.io.Serializable;
+
+public class CodeStatus implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private String codeStatus = "";
   private String codeLabel = "";
   

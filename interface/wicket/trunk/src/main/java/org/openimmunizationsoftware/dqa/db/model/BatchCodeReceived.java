@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class BatchCodeReceived
+import java.io.Serializable;
+
+public class BatchCodeReceived implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int batchCodeReceivedId = 0;
   private MessageBatch messageBatch = null;
   private CodeReceived codeReceived = null;

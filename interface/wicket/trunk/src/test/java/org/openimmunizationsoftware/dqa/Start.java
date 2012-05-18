@@ -22,6 +22,8 @@ public class Start {
 		bb.setContextPath("/");
 		bb.setWar("src/main/webapp");
 		
+		org.openimmunizationsoftware.dqa.service.DqaServiceSOAPSkeleton skeleton = new org.openimmunizationsoftware.dqa.service.DqaServiceSOAPSkeleton();
+		
 		// START JMX SERVER
 		// MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
 		// MBeanContainer mBeanContainer = new MBeanContainer(mBeanServer);

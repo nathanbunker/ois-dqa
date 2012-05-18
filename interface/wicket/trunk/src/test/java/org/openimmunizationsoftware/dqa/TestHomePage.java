@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import org.apache.wicket.util.tester.WicketTester;
 import org.openimmunizationsoftware.dqa.WicketApplication;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
-import org.openimmunizationsoftware.dqa.web.Home;
+import org.openimmunizationsoftware.dqa.web.HomePage;
 
 /**
  * Simple test using the WicketTester
@@ -23,10 +23,10 @@ public class TestHomePage extends TestCase
 	public void testRenderMyPage()
 	{
 		//start and render the test page
-		tester.startPage(Home.class);
+		tester.startPage(HomePage.class);
 
 		//assert rendered page class
-		tester.assertRenderedPage(Home.class);
+		tester.assertRenderedPage(HomePage.class);
 
 		//assert rendered label component
 		tester.assertLabel("messageField", "Hello, primary organization = IIS");

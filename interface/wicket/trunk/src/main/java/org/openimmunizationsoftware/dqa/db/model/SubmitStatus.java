@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class SubmitStatus
+import java.io.Serializable;
+
+public class SubmitStatus implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   public static final SubmitStatus EXCLUDED = new SubmitStatus("E", "Excluded");
   public static final SubmitStatus QUEUED = new SubmitStatus("Q", "Queued");
   public static final SubmitStatus HOLD = new SubmitStatus("H", "Hold");

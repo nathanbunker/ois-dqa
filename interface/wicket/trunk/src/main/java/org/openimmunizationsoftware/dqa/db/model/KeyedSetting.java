@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class KeyedSetting
+import java.io.Serializable;
+
+public class KeyedSetting implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   public static final String APPLICATION_EXTERNAL_URL_BASE = "application.external.url.base";
   public static final String IN_FILE_ACCEPTED_DIR_NAME = "in.file.accepted_dir.name";
   public static final String IN_FILE_DIR = "in.file.dir";

@@ -1,9 +1,13 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class VaccineMvx
+public class VaccineMvx implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private String mvxCode = "";
   private String mvxLabel = "";
   private Date validStartDate = null;

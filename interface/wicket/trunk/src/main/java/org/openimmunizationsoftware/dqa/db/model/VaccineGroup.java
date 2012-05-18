@@ -1,12 +1,16 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.openimmunizationsoftware.dqa.quality.ToolTip;
 
-public class VaccineGroup
+public class VaccineGroup implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   public static final String GROUP_STATUS_EXPECTED = "Expected";
   public static final String GROUP_STATUS_RECCOMMENDED = "Recommended";
   public static final String GROUP_STATUS_NOT_EXPECTED = "Not Expected";

@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class PotentialIssueStatus
+import java.io.Serializable;
+
+public class PotentialIssueStatus implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int potentialIssueStatusId = 0;
   private PotentialIssue issue = null;
   private SubmitterProfile profile = null;

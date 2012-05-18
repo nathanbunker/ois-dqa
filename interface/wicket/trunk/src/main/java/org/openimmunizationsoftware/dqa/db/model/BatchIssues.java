@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class BatchIssues
+import java.io.Serializable;
+
+public class BatchIssues implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int batchIssuesId = 0;
   private MessageBatch messageBatch = null;
   private PotentialIssue issue = null;

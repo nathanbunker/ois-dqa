@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class CodeReceived
+import java.io.Serializable;
+
+public class CodeReceived implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private long codeId = 0l;
   private SubmitterProfile profile = null;
   private CodeTable table = null;

@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class BatchType
+import java.io.Serializable;
+
+public class BatchType implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   public static final BatchType SUBMISSION = new BatchType("S", "Submission");
   public static final BatchType DAILY = new BatchType("D", "Daily");
   public static final BatchType WEEKLY = new BatchType("W", "Weekly");

@@ -1,10 +1,15 @@
 package org.openimmunizationsoftware.dqa.db.model.received;
 
+import java.io.Serializable;
+
 import org.openimmunizationsoftware.dqa.db.model.CodeTable;
 import org.openimmunizationsoftware.dqa.db.model.received.types.CodedEntity;
 
-public class Observation implements Skippable
+public class Observation implements Skippable, Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private CodedEntity observationIdentifier = new CodedEntity(CodeTable.Type.OBSERVATION_IDENTIFIER);
   private String observationValue = "";
   private boolean skipped = false;

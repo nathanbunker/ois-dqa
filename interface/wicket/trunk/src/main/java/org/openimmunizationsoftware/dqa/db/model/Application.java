@@ -1,5 +1,7 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
+import java.io.Serializable;
+
 /**
  * An application represents a single instance of the DQA running in production,
  * test or development in some location. This concept is used to manage the
@@ -10,8 +12,11 @@ package org.openimmunizationsoftware.dqa.db.model;
  * @author nathan
  * 
  */
-public class Application
+public class Application implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   private int applicationId = 0;
   /**
    * The display name of the application

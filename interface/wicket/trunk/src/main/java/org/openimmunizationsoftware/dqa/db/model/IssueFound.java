@@ -1,7 +1,12 @@
 package org.openimmunizationsoftware.dqa.db.model;
 
-public class IssueFound
+import java.io.Serializable;
+
+public class IssueFound implements Serializable
 {
+  
+  private static final long serialVersionUID = 1l;
+  
   public int issueFoundId = 0;
   public MessageReceived messageReceived = null;
   public PotentialIssue issue = null;
