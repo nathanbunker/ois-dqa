@@ -14,7 +14,6 @@
       <xsd:element name="submitMessageRequest" type="dqa:SubmitMessageType"/>
       <xsd:element name="submitMessageResponse" type="dqa:SubmitMessageResultType"/>
 
-<!--
       <xsd:element name="getBatchesRequest" type="dqa:GetBatchesType"/>
       <xsd:element name="getBatchesResponse" type="dqa:GetBatchesResultType"/>
 
@@ -77,7 +76,6 @@
 
       <xsd:element name="getNextOfKinListRequest" type="dqa:GetNextOfKinListType"/>
       <xsd:element name="getNextOfKinListResponse" type="dqa:GetNextOfKinListResultType"/>
--->                                                 
     </xsd:schema>
 
   </wsdl:types>
@@ -92,7 +90,6 @@
     <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
-<!--
   <wsdl:message name="getBatchesRequest">
     <wsdl:part name="request" element="dsvc:getBatchesRequest"/>
   </wsdl:message>
@@ -100,7 +97,7 @@
     <wsdl:part name="result" element="dsvc:getBatchesResponse"/>
   </wsdl:message>
   <wsdl:message name="getBatchesFault">
-    <wsdl:part name="fault" element="dsvc:getBatchesFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
   
   <wsdl:message name="getBatchDqaReportRequest">
@@ -110,7 +107,7 @@
     <wsdl:part name="result" element="dsvc:getBatchDqaReportResponse"/>
   </wsdl:message>
   <wsdl:message name="getBatchDqaReportFault">
-    <wsdl:part name="fault" element="dsvc:getBatchDqaReportFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
   
   <wsdl:message name="createMessageBatchRequest">
@@ -120,7 +117,7 @@
     <wsdl:part name="result" element="dsvc:createMessageBatchResponse"/>
   </wsdl:message>
   <wsdl:message name="createMessageBatchFault">
-    <wsdl:part name="fault" element="dsvc:createMessageBatchFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
   
   <wsdl:message name="updateSubmitterProfileRequest">
@@ -130,7 +127,7 @@
     <wsdl:part name="result" element="dsvc:updateSubmitterProfileResponse"/>
   </wsdl:message>
   <wsdl:message name="updateSubmitterProfileFault">
-    <wsdl:part name="fault" element="dsvc:updateSubmitterProfileFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
   
   <wsdl:message name="getSubmitterProfileRequest">
@@ -140,7 +137,7 @@
     <wsdl:part name="result" element="dsvc:getSubmitterProfileResponse"/>
   </wsdl:message>
   <wsdl:message name="getSubmitterProfileFault">
-    <wsdl:part name="fault" element="dsvc:getSubmitterProfileFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
   
   <wsdl:message name="getReportTemplatesRequest">
@@ -150,7 +147,7 @@
     <wsdl:part name="result" element="dsvc:getReportTemplatesResponse"/>
   </wsdl:message>
   <wsdl:message name="getReportTemplatesFault">
-    <wsdl:part name="fault" element="dsvc:getReportTemplatesFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
   
   <wsdl:message name="getCodeReceivedListRequest">
@@ -160,7 +157,7 @@
     <wsdl:part name="result" element="dsvc:getCodeReceivedListResponse"/>
   </wsdl:message>
   <wsdl:message name="getCodeReceivedListFault">
-    <wsdl:part name="fault" element="dsvc:getCodeReceivedListFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="updateCodeReceivedRequest">
@@ -170,7 +167,7 @@
     <wsdl:part name="result" element="dsvc:updateCodeReceivedResponse"/>
   </wsdl:message>
   <wsdl:message name="updateCodeReceivedFault">
-    <wsdl:part name="fault" element="dsvc:updateCodeReceivedFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getPotentialIssueStatusListRequest">
@@ -180,7 +177,7 @@
     <wsdl:part name="result" element="dsvc:getPotentialIssueStatusListResponse"/>
   </wsdl:message>
   <wsdl:message name="getPotentialIssueStatusListFault">
-    <wsdl:part name="fault" element="dsvc:getPotentialIssueStatusListFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="updatePotentialIssueStatusRequest">
@@ -190,7 +187,7 @@
     <wsdl:part name="result" element="dsvc:updatePotentialIssueStatusResponse"/>
   </wsdl:message>
   <wsdl:message name="updatePotentialIssueStatusFault">
-    <wsdl:part name="fault" element="dsvc:updatePotentialIssueStatusFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getBatchRequest">
@@ -200,7 +197,7 @@
     <wsdl:part name="result" element="dsvc:getBatchResponse"/>
   </wsdl:message>
   <wsdl:message name="getBatchFault">
-    <wsdl:part name="fault" element="dsvc:getBatchFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getBatchIssueListRequest">
@@ -210,7 +207,7 @@
     <wsdl:part name="result" element="dsvc:getBatchIssueListResponse"/>
   </wsdl:message>
   <wsdl:message name="getBatchIssueListFault">
-    <wsdl:part name="fault" element="dsvc:getBatchIssueListFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getBatchReportRequest">
@@ -220,7 +217,7 @@
     <wsdl:part name="result" element="dsvc:getBatchReportResponse"/>
   </wsdl:message>
   <wsdl:message name="getBatchReportFault">
-    <wsdl:part name="fault" element="dsvc:getBatchReportFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
   
   <wsdl:message name="getBatchActionListRequest">
@@ -230,7 +227,7 @@
     <wsdl:part name="result" element="dsvc:getBatchActionListResponse"/>
   </wsdl:message>
   <wsdl:message name="getBatchActionListFault">
-    <wsdl:part name="fault" element="dsvc:getBatchActionListFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getBatchVaccineCvxListRequest">
@@ -240,7 +237,7 @@
     <wsdl:part name="result" element="dsvc:getBatchVaccineCvxListResponse"/>
   </wsdl:message>
   <wsdl:message name="getBatchVaccineCvxListFault">
-    <wsdl:part name="fault" element="dsvc:getBatchVaccineCvxListFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getBatchCodeReceivedListRequest">
@@ -250,7 +247,7 @@
     <wsdl:part name="result" element="dsvc:getBatchCodeReceivedListResponse"/>
   </wsdl:message>
   <wsdl:message name="getBatchCodeReceivedListFault">
-    <wsdl:part name="fault" element="dsvc:getBatchCodeReceivedListFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getMessageReceivedListRequest">
@@ -260,7 +257,7 @@
     <wsdl:part name="result" element="dsvc:getMessageReceivedListResponse"/>
   </wsdl:message>
   <wsdl:message name="getMessageReceivedListFault">
-    <wsdl:part name="fault" element="dsvc:getMessageReceivedListFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getMessageReceivedDetailsRequest">
@@ -270,7 +267,7 @@
     <wsdl:part name="result" element="dsvc:getMessageReceivedDetailsResponse"/>
   </wsdl:message>
   <wsdl:message name="getMessageReceivedDetailsFault">
-    <wsdl:part name="fault" element="dsvc:getMessageReceivedDetailsFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getPatientRequest">
@@ -280,7 +277,7 @@
     <wsdl:part name="result" element="dsvc:getPatientResponse"/>
   </wsdl:message>
   <wsdl:message name="getPatientFault">
-    <wsdl:part name="fault" element="dsvc:getPatientFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
 
   <wsdl:message name="getVaccinationListRequest">
@@ -290,7 +287,7 @@
     <wsdl:part name="result" element="dsvc:getVaccinationListResponse"/>
   </wsdl:message>
   <wsdl:message name="getVaccinationListFault">
-    <wsdl:part name="fault" element="dsvc:getVaccinationListFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
   
   <wsdl:message name="getNextOfKinListRequest">
@@ -300,9 +297,8 @@
     <wsdl:part name="result" element="dsvc:getNextOfKinListResponse"/>
   </wsdl:message>
   <wsdl:message name="getNextOfKinListFault">
-    <wsdl:part name="fault" element="dsvc:getNextOfKinListFault"/>
+    <wsdl:part name="fault" element="dqa:Fault"/>
   </wsdl:message>
--->
 
   <wsdl:portType name="DqaService">
     <wsdl:operation name="submitMessage">
@@ -310,7 +306,6 @@
       <wsdl:output message="dsvc:submitMessageResponse"/>
       <wsdl:fault name="fault" message="dsvc:submitMessageFault"/>
     </wsdl:operation>
-<!--
     <wsdl:operation name="getBatches">
       <wsdl:input message="dsvc:getBatchesRequest"/>
       <wsdl:output message="dsvc:getBatchesResponse"/>
@@ -416,7 +411,6 @@
       <wsdl:output message="dsvc:getNextOfKinListResponse"/>
       <wsdl:fault name="fault" message="dsvc:getNextOfKinListFault"/>
     </wsdl:operation>
--->
   </wsdl:portType>
     
   <wsdl:binding name="DqaServiceSOAP" type="dsvc:DqaService">
@@ -435,7 +429,6 @@
       </wsdl:fault>
     </wsdl:operation>
 
-<!--
     <wsdl:operation name="getBatches">
       <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatches"/>
       <wsdl:input>
@@ -708,7 +701,6 @@
         <soap:fault name="fault" use="literal"/>
       </wsdl:fault>
     </wsdl:operation>
--->
 
   </wsdl:binding>
   

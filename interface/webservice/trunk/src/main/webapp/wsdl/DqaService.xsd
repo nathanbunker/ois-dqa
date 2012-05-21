@@ -1,7 +1,5 @@
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-        xmlns:dqa="http://dqaws.openimmunizationsoftware.org/dqa/schema" 
-	    elementFormDefault="qualified"
-        targetNamespace="http://dqaws.openimmunizationsoftware.org/dqa/schema">
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:dqa="http://dqaws.openimmunizationsoftware.org/dqa/schema" elementFormDefault="qualified" targetNamespace="http://dqaws.openimmunizationsoftware.org/dqa/schema">
 
     <element name="Fault" type="dqa:FaultType"/>
 
@@ -36,7 +34,7 @@
     </complexType>
     <complexType name="IssueListType">
         <sequence>
-            <element name="issueList" type="dqa:IssueType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="issueList" type="dqa:IssueType"/>
         </sequence>
     </complexType>
 
@@ -56,7 +54,7 @@
     </complexType>
     <complexType name="MessageBatchListType">
         <sequence>
-            <element name="messageBatchList" type="dqa:MessageBatchType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="messageBatchList" type="dqa:MessageBatchType"/>
         </sequence>
     </complexType>
     <complexType name="MessageBatchType">
@@ -146,7 +144,7 @@
     </complexType>
     <complexType name="ReportTemplatesListType">
         <sequence>
-            <element name="reportTemplateList" type="dqa:ReportTemplateType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="reportTemplateList" type="dqa:ReportTemplateType"/>
         </sequence>
     </complexType>
     <complexType name="ReportTemplateType">
@@ -174,7 +172,7 @@
     </complexType>
     <complexType name="CodeReceivedListType">
         <sequence>
-            <element name="codeReceivedList" type="dqa:CodeReceivedType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="codeReceivedList" type="dqa:CodeReceivedType"/>
         </sequence>
     </complexType>
     <complexType name="CodeReceivedType">
@@ -202,7 +200,7 @@
     </complexType>
     <complexType name="CodeReceivedSmallListType">
         <sequence>
-            <element name="codeReceived" type="dqa:CodeReceivedSmallType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="codeReceived" type="dqa:CodeReceivedSmallType"/>
         </sequence>
     </complexType>
     <complexType name="CodeReceivedSmallType">
@@ -226,7 +224,7 @@
     </complexType>
     <complexType name="PotentialIssueStatusListType">
         <sequence>
-            <element name="potentialIssueStatusList" type="dqa:PotentialIssueStatusType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="potentialIssueStatusList" type="dqa:PotentialIssueStatusType"/>
         </sequence>
     </complexType>
     <complexType name="PotentialIssueStatusType">
@@ -278,7 +276,7 @@
     </complexType>
     <complexType name="BatchIssueListType">
         <sequence>
-            <element name="batchIssuesList" type="dqa:BatchIssueType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="batchIssuesList" type="dqa:BatchIssueType"/>
         </sequence>
     </complexType>
     <complexType name="BatchIssueType">
@@ -349,7 +347,7 @@
     </complexType>
     <complexType name="BatchActionListType">
         <sequence>
-            <element name="batchActionsList" type="dqa:BatchActionType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="batchActionsList" type="dqa:BatchActionType"/>
         </sequence>
     </complexType>
     <complexType name="BatchActionType">
@@ -374,7 +372,7 @@
     </complexType>
     <complexType name="BatchVaccineCvxListType">
         <sequence>
-            <element name="batchVaccineCvxList" type="dqa:BatchVaccineCvxType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="batchVaccineCvxList" type="dqa:BatchVaccineCvxType"/>
         </sequence>
     </complexType>
     <complexType name="BatchVaccineCvxType">
@@ -399,7 +397,7 @@
     </complexType>
     <complexType name="BatchCodeReceivedListType">
         <sequence>
-            <element name="batchCodeReceivedList" type="dqa:BatchCodeReceivedType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="batchCodeReceivedList" type="dqa:BatchCodeReceivedType"/>
         </sequence>
     </complexType>
     <complexType name="BatchCodeReceivedType">
@@ -430,7 +428,7 @@
     </complexType>
     <complexType name="MessageReceivedListType">
         <sequence>
-            <element name="messageReceivedList" type="dqa:MessageReceivedType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="messageReceivedList" type="dqa:MessageReceivedType"/>
         </sequence>
     </complexType>
     <complexType name="MessageReceivedType">
@@ -471,7 +469,7 @@
     </complexType>
     <complexType name="IssueFoundListType">
         <sequence>
-            <element name="issueFoundList" type="dqa:IssueFoundType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="issueFoundList" type="dqa:IssueFoundType"/>
         </sequence>
     </complexType>
     <complexType name="IssueFoundType">
@@ -568,7 +566,7 @@
     </complexType>
     <complexType name="VaccinationListType">
         <sequence>
-            <element name="vaccinationList" type="dqa:VaccinationType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="vaccinationList" type="dqa:VaccinationType"/>
         </sequence>
     </complexType>
     <complexType name="VaccinationType">
@@ -618,7 +616,7 @@
     </complexType>   
     <complexType name="NextOfKinListType">
         <sequence>
-            <element name="nextOfKinList" type="dqa:NextOfKinType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="nextOfKinList" type="dqa:NextOfKinType"/>
         </sequence>
     </complexType>
     <complexType name="NextOfKinType">
@@ -653,7 +651,7 @@
     </complexType>
     <complexType name="FaultListType">
         <sequence>
-            <element name="faults" type="dqa:FaultType" minOccurs="0" maxOccurs="unbounded"/>
+            <element maxOccurs="unbounded" minOccurs="0" name="faults" type="dqa:FaultType"/>
         </sequence>
     </complexType>
 </schema>
