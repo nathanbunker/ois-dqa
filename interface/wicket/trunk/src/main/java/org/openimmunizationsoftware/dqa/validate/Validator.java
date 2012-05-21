@@ -779,7 +779,12 @@ public class Validator extends ValidateMessage
     }
     if (notEmpty(header.getMessageDate(), pi.Hl7MshMessageDateIsMissing))
     {
-      if (message.getReceivedDate().before(header.getMessageDate()))
+      // Give the calendar a 12 hour lee-way. This accomodates systems that use
+      // a clock that is out of time. 
+      Calendar calendar = Calendar.getInstance();
+      calendar.setTime(header.getMessageDate());
+      calendar.add(Calendar.HOUR, -12);
+      if (message.getReceivedDate().before(calendar.getTime()))
       {
         registerIssue(pi.Hl7MshMessageDateIsInFuture);
       }

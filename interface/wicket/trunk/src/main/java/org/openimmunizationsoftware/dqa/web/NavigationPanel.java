@@ -89,8 +89,9 @@ public class NavigationPanel extends Panel
   public static MenuLink ERRORS_WARNINGS = new MenuLink("Errors & Warnings", ErrorsWarningsPage.class);
   public static MenuLink WEEKLY_REPORT = new MenuLink("Weekly Report", WeeklyReportPage.class);
   public static MenuLink PERSONAL_SETTINGS = new MenuLink("Personal Settings", PersonalSettingsPage.class);
+  public static MenuLink UPLOAD_NOW = new MenuLink("Upload Now", HomePage.class);
 
-  public static MenuLink ADMIN = new MenuLink("ADMIN", HomePage.class);
+  public static MenuLink ADMIN = new MenuLink("Admin", HomePage.class);
 
   private List<MenuLink> createMenu(DqaSession webSession)
   {
@@ -113,6 +114,7 @@ public class NavigationPanel extends Panel
         {
           profile.getChildList().add(PROFILE_SETTINGS);
         }
+        profile.getChildList().add(UPLOAD_NOW);
       }
 
       if (webSession.isAdmin())

@@ -16,7 +16,6 @@ public class AuthStrategy implements IAuthorizationStrategy
       DqaSession webSession = (DqaSession) Session.get();
       if (webSession.getUsername() == null)
       {
-        System.out.println("--> not logged in ");
         throw new RestartResponseAtInterceptPageException(LoginPage.class);
       }
     }

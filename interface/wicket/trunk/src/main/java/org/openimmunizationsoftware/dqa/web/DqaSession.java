@@ -24,6 +24,28 @@ public class DqaSession extends WebSession
   private String username = null;
   private boolean admin = false;
   private int profileId = 0;
+  private int receivedId = 0;
+  private int batchId = 0;
+
+  public int getBatchId()
+  {
+    return batchId;
+  }
+
+  public void setBatchId(int batchId)
+  {
+    this.batchId = batchId;
+  }
+
+  public int getReceivedId()
+  {
+    return receivedId;
+  }
+
+  public void setReceivedId(int receivedId)
+  {
+    this.receivedId = receivedId;
+  }
 
   private NavigationPanel.MenuLink menuLinkSelected = null;
 
