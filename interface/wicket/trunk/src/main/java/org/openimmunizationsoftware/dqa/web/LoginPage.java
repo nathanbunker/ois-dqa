@@ -8,6 +8,7 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.value.ValueMap;
@@ -40,8 +41,10 @@ public class LoginPage extends DqaBasePage
   public LoginPage(final PageParameters parameters) {
     super(parameters, NavigationPanel.LOGIN);
 
-    add(new LoginForm("loginForm"));
+    FeedbackPanel feedback = new FeedbackPanel("msgs");
+    add(feedback);
 
+    add(new LoginForm("loginForm"));
   }
   
   public class LoginForm extends Form<ValueMap>
@@ -95,6 +98,8 @@ public class LoginPage extends DqaBasePage
       else
       {
         webSession.setUsername(null);
+        error("Unrecognized username or password");
+        return;
       }
       tx.commit();
       setResponsePage(new ProfilePage());
