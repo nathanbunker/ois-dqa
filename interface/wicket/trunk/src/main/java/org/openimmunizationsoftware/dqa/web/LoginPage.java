@@ -21,6 +21,7 @@ import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.db.model.UserAccount;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
 import org.openimmunizationsoftware.dqa.web.profile.ProfilePage;
+import org.openimmunizationsoftware.dqa.web.profile.ProfileSelectPage;
 
 /**
  * Homepage
@@ -102,7 +103,7 @@ public class LoginPage extends DqaBasePage
         return;
       }
       tx.commit();
-      setResponsePage(new ProfilePage());
+      setResponsePage(new ProfileSelectPage());
     }
     
   }

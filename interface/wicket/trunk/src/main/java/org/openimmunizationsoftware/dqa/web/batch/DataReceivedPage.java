@@ -1,4 +1,4 @@
-package org.openimmunizationsoftware.dqa.web.profile;
+package org.openimmunizationsoftware.dqa.web.batch;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -24,7 +24,7 @@ public class DataReceivedPage extends DqaBasePage
 {
 
   public DataReceivedPage(final PageParameters parameters) {
-    super(parameters, NavigationPanel.PROFILE);
+    super(parameters, NavigationPanel.BATCH);
 
     DqaSession webSession = (DqaSession) getSession();
     SubmitterProfile submitterProfile = webSession.getSubmitterProfile();
