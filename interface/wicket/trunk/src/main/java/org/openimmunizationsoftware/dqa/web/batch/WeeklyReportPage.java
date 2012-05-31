@@ -1,4 +1,4 @@
-package org.openimmunizationsoftware.dqa.web.profile;
+package org.openimmunizationsoftware.dqa.web.batch;
 
 import org.apache.wicket.PageParameters;
 import org.openimmunizationsoftware.dqa.web.DqaBasePage;
@@ -9,6 +9,6 @@ public class WeeklyReportPage extends DqaBasePage  implements SecurePage
 {
 
   public WeeklyReportPage(final PageParameters parameters) {
-    super(parameters, NavigationPanel.PROFILE);
+    super(parameters, NavigationPanel.BATCH);
   }
 }

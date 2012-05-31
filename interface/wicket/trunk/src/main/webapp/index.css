@@ -3,8 +3,15 @@ p {color:#2B3E42; width: 600px;}
 
 h1 {color: #0079b2; margin-top: 0px;
 }
-.contents { margin: 5px; padding: 5px; width: 730px;}
-.todo { margin: 50px; 5px; 5px; 5px; padding: 10px; width: 500px; border-width: 2px; border-style: dashed; background-color: #FFB673 ; font-size: smaller;}
+.sideMenu {float: left; border-width: 1px; border-style: solid; border-color: black; margin: 2px;}
+
+a:link.sideMenu {text-decoration:none; color: #666; }
+a:visited.sideMenu {text-decoration:none; color: #666; }
+a:hover.sideMenu {text-decoration:none; color: #666; }
+a:active.sideMenu {text-decoration:none; color: #666; }
+
+.contents {  margin: 5px; padding: 5px; width: 730px;}
+.todo { margin: 50px; 5px; 5px; 5px; padding: 10px; width: 500px; border-width: 2px; border-style: dashed; background-color: #EEEEEE ; font-size: smaller; color: #333333;}
 
 .selected {background-color: #FFB673;}
 

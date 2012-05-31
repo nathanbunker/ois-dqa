@@ -3,6 +3,7 @@ package org.openimmunizationsoftware.dqa.service;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.rmi.RemoteException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.openimmunizationsoftware.dqa.db.model.BatchType;
 import org.openimmunizationsoftware.dqa.db.model.Organization;
 import org.openimmunizationsoftware.dqa.db.model.ReportTemplate;
 import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
+import org.openimmunizationsoftware.dqa.manager.HashManager;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
 import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 
@@ -29,7 +31,16 @@ public class SubmitMessageHandler
     List<IssueType> warningList = new ArrayList<IssueType>();
     SubmitMessageResultType result = new SubmitMessageResultType();
     result.setBatchId(0);
-    result.setHashId("hashId");
+    String hashId = "";
+    try
+    {
+      hashId = HashManager.getMD5Hash(request.getMessageRequest());
+    } catch (NoSuchAlgorithmException nse)
+    {
+      // TODO handle hash problem
+      nse.printStackTrace();
+    }
+    result.setHashId(hashId);
     result.setMessageResponse("NO RESPONSE");
     result.setReceivedId(0);
     result.setResponseStatus("AR");
@@ -88,7 +99,6 @@ public class SubmitMessageHandler
           processDebug(errorList, result, session, profile, stringWriterResponse, qualityCollector);
         }
         result.setBatchId(results.getBatchId());
-        result.setHashId("hashId");
         result.setMessageResponse(stringWriterResponse.toString());
         result.setReceivedId(0);
         result.setResponseStatus(results.getResponseStatus());
