@@ -1,0 +1,49 @@
+body {font-family: Tahoma, Geneva, sans-serif; background:#D5E1DD; margin: 0px; padding: 0px;}
+p {color:#2B3E42; width: 600px;}
+
+.contents { margin: 5px; padding: 5px;}
+.menu {position:absolute; top: 10px; left: 700px; padding:5px; background-color:#F7F3E8; margin: 0px; border-color: #2B3E42; border-width: 1px; border-style: solid}
+
+.mainMenu { list-style-type: none; margin: 0px; padding: 2px; border-color: #FFFFFF; border-width: 2px; border-style: solid; background-color: #FFFFFF;}
+.mainMenuSelected { display:inline; margin: 0px; padding: 4px; border-style: solid; border-width: 0px 1px 0px 1px; border-color: #FFFFF; background-color: #D5E1DD;}
+.mainMenuNotSelected { display:inline; margin: 0px; padding: 4px; border-style: solid; border-width: 0px 0px 0px 0px;  border-color: #FFFFF; background-color: #FFFFFF;}
+
+
+ul#menu { width: 100%; height: 43px; background: #FFF url("images/menu-bg.gif") top left repeat-x; font-size: 0.8em; font-family: "Lucida Grande", Verdana, sans-serif; font-weight: bold; list-style-type: none; margin: 0; padding: 0; }
+ul#menu li { display: block; float: left; margin: 0 0 0 5px; }
+ul#menu li a { height: 43px; color: #777; text-decoration: none; display: block; float: left; line-height: 200%; padding: 8px 15px 0; }
+ul#menu li a:hover { color: #333; }
+ul#menu li a.current{ color: #FFF; background: #FFF url("images/current-bg.gif") top left repeat-x; padding: 5px 15px 0; }
+
+
+a:link.mainMenuLink {color:#2B3E42; text-decoration:none; width:100px;}
+a:visited.mainMenuLink {color:#2B3E42; text-decoration:none; idth:100px;}
+a:hover.mainMenuLink {color:#2B3E42; text-decoration:none; width:100px; background-color:#77BED2;}
+a:active.mainMenuLink {color:#2B3E42; text-decoration:none; width:100px;}
+
+a:link {color:blue; text-decoration:none; padding:3px; width:100px;}
+a:visited {color:blue; text-decoration:none; padding:3px; width:100px;}
+a:hover {color:black; text-decoration:none; padding:3px; width:100px;}
+a:active {color:blue; text-decoration:none; padding:3px; width:100px;}
+
+
+a:link.menuLink {color:#2B3E42; text-decoration:none; width:100px;}
+a:visited.menuLink {color:#2B3E42; text-decoration:none; idth:100px;}
+a:hover.menuLink {color:#2B3E42; text-decoration:none; width:100px; background-color:#77BED2;}
+a:active.menuLink {color:#2B3E42; text-decoration:none; width:100px;}
+.submenu {padding:5px; background-color:#F7F3E8; margin: 0px; border-color: #2B3E42; border-width: 1px; border-style: solid}
+input {border-color: #747E80; background-color: #F7F3E8}
+textarea {border-color: #747E80; background-color: #F7F3E8}
+select {border-color: #747E80; background-color: #F7F3E8}
+pre {background:#F7F3E8; padding:4px; margin: 2px; }
+.scrollbox {width: 700px; height: 300px; overflow:auto;}
+.pass {background:#77BED2; padding-left:10px; width: 600px;}
+.fail {background:#F2583E; padding-left:10px; width: 600px;}
+.help {width:700px; padding: 10px;}
+
+table {background-color:#F7F3E8; border-style: solid; border-right-width: 3px; border-left-width: 1px; border-top-width: 1px; border-bottom-width: 3px; border-collapse: collapse;}
+td {padding-left: 5px; padding-right: 5px; border-style: solid; border-width: 1px; }
+th {padding-left: 5px; padding-right: 5px; background:#E0E0E0; border-style: solid; border-color: #2B3E42; border-width: 1px;text-align: left; font-weight: normal;}
+
+.logo{margin-top: 0px; margin-bottom: 5px; text-align: center; border-bottom-style: solid; border-bottom-width: 2px;}
+.version{margin-top: 5px; margin-bottom: 0px; text-align: center; border-top-style: solid; border-top-width: 2px; font-size: small;}
