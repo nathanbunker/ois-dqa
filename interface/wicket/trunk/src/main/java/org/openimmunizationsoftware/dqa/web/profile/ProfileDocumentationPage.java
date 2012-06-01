@@ -55,7 +55,6 @@ public class ProfileDocumentationPage extends DqaBasePage implements SecurePage
       protected void populateItem(ListItem<Field> item)
       {
         Field field = item.getModelObject();
-        item.add(new Label("documentationItemFieldTitle", field.toString()));
         item.add(new Label("documentationItemText", potentialIssues.getDocumentation(field, potentialIssueStatusMap)).setEscapeModelStrings(false));
       }
     };
