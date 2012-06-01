@@ -35,7 +35,7 @@ public class ProfileSelectPage extends DqaBasePage implements SecurePage
 
     if (webSession.isAdmin())
     {
-      Query query = dataSession.createQuery("from SubmitterProfile where profileId > 1200 order by profileLabel");
+      Query query = dataSession.createQuery("from SubmitterProfile where reportTemplate.templateId != 0 order by profileLabel");
       submitterProfileList = query.list();
     } else
     {
