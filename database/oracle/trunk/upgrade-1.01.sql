@@ -1,5 +1,5 @@
 
-ALTER TABLE dqa_potential_issue ADD COLUMN
+ALTER TABLE dqa_potential_issue ADD 
 (
     hl7_reference  VARCHAR2(100)
 );
@@ -486,9 +486,9 @@ UPDATE dqa_potential_issue SET default_action_code = 'E', change_priority='May',
 UPDATE dqa_potential_issue SET default_action_code = 'E', change_priority='May', target_object='Vaccination', target_field='system entry time', issue_type='is invalid', field_value='', report_denominator='Vaccination Count', table_id = NULL, hl7_reference = 'RXA-22' WHERE issue_id='366';
 UPDATE dqa_potential_issue SET default_action_code = 'A', change_priority='May', target_object='Vaccination', target_field='system entry time', issue_type='is missing', field_value='', report_denominator='Vaccination Count', table_id = NULL, hl7_reference = 'RXA-22' WHERE issue_id='367';
 
-ALTER TABLE dqa_report_template ADD COLUMN
+ALTER TABLE dqa_report_template ADD
 (
-  test_case_script  TEXT
+  test_case_script  CLOB
 );
 
 INSERT INTO dqa_report_type(report_type_id, report_type_label) VALUES (3, 'Vacc Reporting Certification');
