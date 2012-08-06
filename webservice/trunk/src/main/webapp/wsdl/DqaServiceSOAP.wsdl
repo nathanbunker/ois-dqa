@@ -1,0 +1,706 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:dqa="http://dqaws.openimmunizationsoftware.org/dqa/schema" xmlns:dsvc="http://dqaws.openimmunizationsoftware.org/dqa/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="DqaService" targetNamespace="http://dqaws.openimmunizationsoftware.org/dqa/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://dqaws.openimmunizationsoftware.org/dqa/">
+      <xsd:import namespace="http://dqaws.openimmunizationsoftware.org/dqa/schema" schemaLocation="DqaService.xsd"/>
+      
+      <xsd:element name="submitMessageRequest" type="dqa:SubmitMessageType"/>
+      <xsd:element name="submitMessageResponse" type="dqa:SubmitMessageResultType"/>
+
+      <xsd:element name="getBatchesRequest" type="dqa:GetBatchesType"/>
+      <xsd:element name="getBatchesResponse" type="dqa:GetBatchesResultType"/>
+
+      <xsd:element name="getBatchDqaReportRequest" type="dqa:GetBatchDqaReportType"/>
+      <xsd:element name="getBatchDqaReportResponse" type="dqa:GetBatchDqaReportResultType"/>
+
+      <xsd:element name="createMessageBatchRequest" type="dqa:CreateMessageBatchType"/>
+      <xsd:element name="createMessageBatchResponse" type="dqa:CreateMessageBatchResultType"/>
+
+      <xsd:element name="updateSubmitterProfileRequest" type="dqa:UpdateSubmitterProfileType"/>
+      <xsd:element name="updateSubmitterProfileResponse" type="dqa:UpdateSubmitterProfileResultType"/>
+
+      <xsd:element name="getSubmitterProfileRequest" type="dqa:GetSubmitterProfileType"/>
+      <xsd:element name="getSubmitterProfileResponse" type="dqa:GetSubmitterProfileResultType"/>
+
+      <xsd:element name="getReportTemplatesRequest" type="dqa:GetReportTemplatesType"/>
+      <xsd:element name="getReportTemplatesResponse" type="dqa:GetReportTemplatesResultType"/>
+
+      <xsd:element name="getCodeReceivedListRequest" type="dqa:GetCodeReceivedListType"/>
+      <xsd:element name="getCodeReceivedListResponse" type="dqa:GetCodeReceivedListResultType"/>
+
+      <xsd:element name="updateCodeReceivedRequest" type="dqa:UpdateCodeReceivedType"/>
+      <xsd:element name="updateCodeReceivedResponse" type="dqa:UpdateCodeReceivedResultType"/>
+
+      <xsd:element name="getPotentialIssueStatusListRequest" type="dqa:GetPotentialIssueStatusListType"/>
+      <xsd:element name="getPotentialIssueStatusListResponse" type="dqa:GetPotentialIssueStatusListResultType"/>
+
+      <xsd:element name="updatePotentialIssueStatusRequest" type="dqa:UpdatePotentialIssueStatusType"/>
+      <xsd:element name="updatePotentialIssueStatusResponse" type="dqa:UpdatePotentialIssueStatusResultType"/>
+
+      <xsd:element name="getBatchRequest" type="dqa:GetBatchType"/>
+      <xsd:element name="getBatchResponse" type="dqa:GetBatchResultType"/>
+
+      <xsd:element name="getBatchIssueListRequest" type="dqa:GetBatchIssueListType"/>
+      <xsd:element name="getBatchIssueListResponse" type="dqa:GetBatchIssueListResultType"/>
+
+      <xsd:element name="getBatchReportRequest" type="dqa:GetBatchReportType"/>
+      <xsd:element name="getBatchReportResponse" type="dqa:GetBatchReportResultType"/>
+
+      <xsd:element name="getBatchActionListRequest" type="dqa:GetBatchActionListType"/>
+      <xsd:element name="getBatchActionListResponse" type="dqa:GetBatchActionListResultType"/>
+
+      <xsd:element name="getBatchVaccineCvxListRequest" type="dqa:GetBatchVaccineCvxListType"/>
+      <xsd:element name="getBatchVaccineCvxListResponse" type="dqa:GetBatchVaccineCvxListResultType"/>
+
+      <xsd:element name="getBatchCodeReceivedListRequest" type="dqa:GetBatchCodeReceivedListType"/>
+      <xsd:element name="getBatchCodeReceivedListResponse" type="dqa:GetBatchCodeReceivedListResultType"/>
+
+      <xsd:element name="getMessageReceivedListRequest" type="dqa:GetMessageReceivedListType"/>
+      <xsd:element name="getMessageReceivedListResponse" type="dqa:GetMessageReceivedListResultType"/>
+
+      <xsd:element name="getMessageReceivedDetailsRequest" type="dqa:GetMessageReceivedDetailsType"/>
+      <xsd:element name="getMessageReceivedDetailsResponse" type="dqa:GetMessageReceivedDetailsResultType"/>
+
+      <xsd:element name="getPatientRequest" type="dqa:GetPatientType"/>
+      <xsd:element name="getPatientResponse" type="dqa:GetPatientResultType"/>
+
+      <xsd:element name="getVaccinationListRequest" type="dqa:GetVaccinationListType"/>
+      <xsd:element name="getVaccinationListResponse" type="dqa:GetVaccinationListResultType"/>
+
+      <xsd:element name="getNextOfKinListRequest" type="dqa:GetNextOfKinListType"/>
+      <xsd:element name="getNextOfKinListResponse" type="dqa:GetNextOfKinListResultType"/>
+    </xsd:schema>
+
+  </wsdl:types>
+  
+  <wsdl:message name="submitMessageRequest">
+    <wsdl:part element="dsvc:submitMessageRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="submitMessageResponse">
+    <wsdl:part element="dsvc:submitMessageResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="submitMessageFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getBatchesRequest">
+    <wsdl:part element="dsvc:getBatchesRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchesResponse">
+    <wsdl:part element="dsvc:getBatchesResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchesFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+  
+  <wsdl:message name="getBatchDqaReportRequest">
+    <wsdl:part element="dsvc:getBatchDqaReportRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchDqaReportResponse">
+    <wsdl:part element="dsvc:getBatchDqaReportResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchDqaReportFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+  
+  <wsdl:message name="createMessageBatchRequest">
+    <wsdl:part element="dsvc:createMessageBatchRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="createMessageBatchResponse">
+    <wsdl:part element="dsvc:createMessageBatchResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="createMessageBatchFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+  
+  <wsdl:message name="updateSubmitterProfileRequest">
+    <wsdl:part element="dsvc:updateSubmitterProfileRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="updateSubmitterProfileResponse">
+    <wsdl:part element="dsvc:updateSubmitterProfileResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="updateSubmitterProfileFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+  
+  <wsdl:message name="getSubmitterProfileRequest">
+    <wsdl:part element="dsvc:getSubmitterProfileRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getSubmitterProfileResponse">
+    <wsdl:part element="dsvc:getSubmitterProfileResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getSubmitterProfileFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+  
+  <wsdl:message name="getReportTemplatesRequest">
+    <wsdl:part element="dsvc:getReportTemplatesRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getReportTemplatesResponse">
+    <wsdl:part element="dsvc:getReportTemplatesResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getReportTemplatesFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+  
+  <wsdl:message name="getCodeReceivedListRequest">
+    <wsdl:part element="dsvc:getCodeReceivedListRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getCodeReceivedListResponse">
+    <wsdl:part element="dsvc:getCodeReceivedListResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getCodeReceivedListFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="updateCodeReceivedRequest">
+    <wsdl:part element="dsvc:updateCodeReceivedRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="updateCodeReceivedResponse">
+    <wsdl:part element="dsvc:updateCodeReceivedResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="updateCodeReceivedFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getPotentialIssueStatusListRequest">
+    <wsdl:part element="dsvc:getPotentialIssueStatusListRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getPotentialIssueStatusListResponse">
+    <wsdl:part element="dsvc:getPotentialIssueStatusListResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getPotentialIssueStatusListFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="updatePotentialIssueStatusRequest">
+    <wsdl:part element="dsvc:updatePotentialIssueStatusRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="updatePotentialIssueStatusResponse">
+    <wsdl:part element="dsvc:updatePotentialIssueStatusResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="updatePotentialIssueStatusFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getBatchRequest">
+    <wsdl:part element="dsvc:getBatchRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchResponse">
+    <wsdl:part element="dsvc:getBatchResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getBatchIssueListRequest">
+    <wsdl:part element="dsvc:getBatchIssueListRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchIssueListResponse">
+    <wsdl:part element="dsvc:getBatchIssueListResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchIssueListFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getBatchReportRequest">
+    <wsdl:part element="dsvc:getBatchReportRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchReportResponse">
+    <wsdl:part element="dsvc:getBatchReportResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchReportFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+  
+  <wsdl:message name="getBatchActionListRequest">
+    <wsdl:part element="dsvc:getBatchActionListRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchActionListResponse">
+    <wsdl:part element="dsvc:getBatchActionListResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchActionListFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getBatchVaccineCvxListRequest">
+    <wsdl:part element="dsvc:getBatchVaccineCvxListRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchVaccineCvxListResponse">
+    <wsdl:part element="dsvc:getBatchVaccineCvxListResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchVaccineCvxListFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getBatchCodeReceivedListRequest">
+    <wsdl:part element="dsvc:getBatchCodeReceivedListRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchCodeReceivedListResponse">
+    <wsdl:part element="dsvc:getBatchCodeReceivedListResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getBatchCodeReceivedListFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getMessageReceivedListRequest">
+    <wsdl:part element="dsvc:getMessageReceivedListRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getMessageReceivedListResponse">
+    <wsdl:part element="dsvc:getMessageReceivedListResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getMessageReceivedListFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getMessageReceivedDetailsRequest">
+    <wsdl:part element="dsvc:getMessageReceivedDetailsRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getMessageReceivedDetailsResponse">
+    <wsdl:part element="dsvc:getMessageReceivedDetailsResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getMessageReceivedDetailsFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getPatientRequest">
+    <wsdl:part element="dsvc:getPatientRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getPatientResponse">
+    <wsdl:part element="dsvc:getPatientResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getPatientFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:message name="getVaccinationListRequest">
+    <wsdl:part element="dsvc:getVaccinationListRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getVaccinationListResponse">
+    <wsdl:part element="dsvc:getVaccinationListResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getVaccinationListFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+  
+  <wsdl:message name="getNextOfKinListRequest">
+    <wsdl:part element="dsvc:getNextOfKinListRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getNextOfKinListResponse">
+    <wsdl:part element="dsvc:getNextOfKinListResponse" name="result"/>
+  </wsdl:message>
+  <wsdl:message name="getNextOfKinListFault">
+    <wsdl:part element="dqa:Fault" name="fault"/>
+  </wsdl:message>
+
+  <wsdl:portType name="DqaService">
+    <wsdl:operation name="submitMessage">
+      <wsdl:input message="dsvc:submitMessageRequest"/>
+      <wsdl:output message="dsvc:submitMessageResponse"/>
+      <wsdl:fault message="dsvc:submitMessageFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getBatches">
+      <wsdl:input message="dsvc:getBatchesRequest"/>
+      <wsdl:output message="dsvc:getBatchesResponse"/>
+      <wsdl:fault message="dsvc:getBatchesFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getBatchDqaReport">
+      <wsdl:input message="dsvc:getBatchDqaReportRequest"/>
+      <wsdl:output message="dsvc:getBatchDqaReportResponse"/>
+      <wsdl:fault message="dsvc:getBatchDqaReportFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="createMessageBatch">
+      <wsdl:input message="dsvc:createMessageBatchRequest"/>
+      <wsdl:output message="dsvc:createMessageBatchResponse"/>
+      <wsdl:fault message="dsvc:createMessageBatchFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="updateSubmitterProfile">
+      <wsdl:input message="dsvc:updateSubmitterProfileRequest"/>
+      <wsdl:output message="dsvc:updateSubmitterProfileResponse"/>
+      <wsdl:fault message="dsvc:updateSubmitterProfileFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSubmitterProfile">
+      <wsdl:input message="dsvc:getSubmitterProfileRequest"/>
+      <wsdl:output message="dsvc:getSubmitterProfileResponse"/>
+      <wsdl:fault message="dsvc:getSubmitterProfileFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getReportTemplates">
+      <wsdl:input message="dsvc:getReportTemplatesRequest"/>
+      <wsdl:output message="dsvc:getReportTemplatesResponse"/>
+      <wsdl:fault message="dsvc:getReportTemplatesFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getCodeReceivedList">
+      <wsdl:input message="dsvc:getCodeReceivedListRequest"/>
+      <wsdl:output message="dsvc:getCodeReceivedListResponse"/>
+      <wsdl:fault message="dsvc:getCodeReceivedListFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="updateCodeReceived">
+      <wsdl:input message="dsvc:updateCodeReceivedRequest"/>
+      <wsdl:output message="dsvc:updateCodeReceivedResponse"/>
+      <wsdl:fault message="dsvc:updateCodeReceivedFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getPotentialIssueStatusList">
+      <wsdl:input message="dsvc:getPotentialIssueStatusListRequest"/>
+      <wsdl:output message="dsvc:getPotentialIssueStatusListResponse"/>
+      <wsdl:fault message="dsvc:getPotentialIssueStatusListFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="updatePotentialIssueStatus">
+      <wsdl:input message="dsvc:updatePotentialIssueStatusRequest"/>
+      <wsdl:output message="dsvc:updatePotentialIssueStatusResponse"/>
+      <wsdl:fault message="dsvc:updatePotentialIssueStatusFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getBatch">
+      <wsdl:input message="dsvc:getBatchRequest"/>
+      <wsdl:output message="dsvc:getBatchResponse"/>
+      <wsdl:fault message="dsvc:getBatchFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getBatchIssueList">
+      <wsdl:input message="dsvc:getBatchIssueListRequest"/>
+      <wsdl:output message="dsvc:getBatchIssueListResponse"/>
+      <wsdl:fault message="dsvc:getBatchIssueListFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getBatchReport">
+      <wsdl:input message="dsvc:getBatchReportRequest"/>
+      <wsdl:output message="dsvc:getBatchReportResponse"/>
+      <wsdl:fault message="dsvc:getBatchReportFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getBatchActionList">
+      <wsdl:input message="dsvc:getBatchActionListRequest"/>
+      <wsdl:output message="dsvc:getBatchActionListResponse"/>
+      <wsdl:fault message="dsvc:getBatchActionListFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getBatchVaccineCvxList">
+      <wsdl:input message="dsvc:getBatchVaccineCvxListRequest"/>
+      <wsdl:output message="dsvc:getBatchVaccineCvxListResponse"/>
+      <wsdl:fault message="dsvc:getBatchVaccineCvxListFault" name="fault"/>
+    </wsdl:operation> 
+    <wsdl:operation name="getBatchCodeReceivedList">
+      <wsdl:input message="dsvc:getBatchCodeReceivedListRequest"/>
+      <wsdl:output message="dsvc:getBatchCodeReceivedListResponse"/>
+      <wsdl:fault message="dsvc:getBatchCodeReceivedListFault" name="fault"/>
+    </wsdl:operation> 
+    <wsdl:operation name="getMessageReceivedList">
+      <wsdl:input message="dsvc:getMessageReceivedListRequest"/>
+      <wsdl:output message="dsvc:getMessageReceivedListResponse"/>
+      <wsdl:fault message="dsvc:getMessageReceivedListFault" name="fault"/>
+    </wsdl:operation> 
+    <wsdl:operation name="getMessageReceivedDetails">
+      <wsdl:input message="dsvc:getMessageReceivedDetailsRequest"/>
+      <wsdl:output message="dsvc:getMessageReceivedDetailsResponse"/>
+      <wsdl:fault message="dsvc:getMessageReceivedDetailsFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getPatient">
+      <wsdl:input message="dsvc:getPatientRequest"/>
+      <wsdl:output message="dsvc:getPatientResponse"/>
+      <wsdl:fault message="dsvc:getPatientFault" name="fault"/>
+    </wsdl:operation>     
+    <wsdl:operation name="getVaccinationList">
+      <wsdl:input message="dsvc:getVaccinationListRequest"/>
+      <wsdl:output message="dsvc:getVaccinationListResponse"/>
+      <wsdl:fault message="dsvc:getVaccinationListFault" name="fault"/>
+    </wsdl:operation>
+    <wsdl:operation name="getNextOfKinList">
+      <wsdl:input message="dsvc:getNextOfKinListRequest"/>
+      <wsdl:output message="dsvc:getNextOfKinListResponse"/>
+      <wsdl:fault message="dsvc:getNextOfKinListFault" name="fault"/>
+    </wsdl:operation>
+  </wsdl:portType>
+    
+  <wsdl:binding name="DqaServiceSOAP" type="dsvc:DqaService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <wsdl:operation name="submitMessage">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/submitMessage"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getBatches">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatches"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getBatchDqaReport">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatchDqaReport"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="createMessageBatch">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/createMessageBatch"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="updateSubmitterProfile">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/updateSubmitterProfile"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getSubmitterProfile">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getSubmitterProfile"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getReportTemplates">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getReportTemplates"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getCodeReceivedList">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getCodeReceivedList"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="updateCodeReceived">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/updateCodeReceived"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getPotentialIssueStatusList">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getPotentialIssueStatusList"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="updatePotentialIssueStatus">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/updatePotentialIssueStatus"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getBatch">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatch"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getBatchIssueList">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatchIssueList"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getBatchReport">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatchReport"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getBatchActionList">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatchActionList"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getBatchVaccineCvxList">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatchVaccineCvxList"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getBatchCodeReceivedList">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getBatchCodeReceivedList"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getMessageReceivedList">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getMessageReceivedList"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getMessageReceivedDetails">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getMessageReceivedDetails"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getPatient">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getPatient"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getVaccinationList">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getVaccinationList"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="getNextOfKinList">
+      <soap:operation soapAction="http://dqaws.openimmunizationsoftware.org/dqa/getNextOfKinList"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+
+  </wsdl:binding>
+  
+  <wsdl:service name="DqaService">
+    <wsdl:port binding="dsvc:DqaServiceSOAP" name="DqaServiceSOAP">
+      <soap:address location="http://localhost:8080/dqaws/services/DqaServiceSOAP"/>
+    </wsdl:port>
+  </wsdl:service>
+  
+</wsdl:definitions>
