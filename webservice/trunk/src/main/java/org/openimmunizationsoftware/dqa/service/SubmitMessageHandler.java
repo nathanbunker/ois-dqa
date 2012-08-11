@@ -22,6 +22,7 @@ import org.openimmunizationsoftware.dqa.db.model.SubmitterProfile;
 import org.openimmunizationsoftware.dqa.manager.HashManager;
 import org.openimmunizationsoftware.dqa.manager.OrganizationManager;
 import org.openimmunizationsoftware.dqa.parse.VaccinationUpdateParserHL7;
+import org.openimmunizationsoftware.dqa.process.MessageProcessRequest;
 import org.openimmunizationsoftware.dqa.process.MessageProcessor;
 import org.openimmunizationsoftware.dqa.quality.QualityCollector;
 import org.openimmunizationsoftware.dqa.service.schema.FaultType;
@@ -104,7 +105,16 @@ public class SubmitMessageHandler
         ProcessLocker.lock(profile);
         qualityCollector = new QualityCollector("Web Service", BatchType.SUBMISSION, profile);
         String messageData = request.getMessageRequest();
-        MessageReceived msg = MessageProcessor.processMessage(debug, parser, messageData, profile, session, qualityCollector);
+        MessageProcessRequest procRequest = new MessageProcessRequest();
+        procRequest.setDebugFlag(debug);
+        procRequest.setParser(parser);
+        procRequest.setMessageText(messageData);
+        procRequest.setProfile(profile);
+        procRequest.setSession(session);
+        procRequest.setQualityCollector(qualityCollector);
+        procRequest.setMessageKey(hashId);
+        
+        MessageReceived msg = MessageProcessor.processMessage(procRequest).getMessageReceived();
 
         debug = msg.isDebugOn();
         if (!msg.isSuccessful())
