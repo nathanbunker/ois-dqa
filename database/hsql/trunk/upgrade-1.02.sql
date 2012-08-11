@@ -1,7 +1,4 @@
-ALTER TABLE dqa_message_received ADD COLUMN
-(
-    message_key  VARCHAR(100)
-);
+ALTER TABLE dqa_message_received ADD COLUMN message_key  VARCHAR(100);
 
 INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description, table_id, hl7_reference) VALUES (485, 'Next-of-kin', 'relationship', 'is unexpected', '', 'W', 'May', 'NextOfKin Count', 'Next-of-kin relationship is not expected considering the age of the patient. For example, a 5 year old is not expected to have a child.', 22, 'NK1-3');
 
