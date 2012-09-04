@@ -494,3 +494,5 @@ ALTER TABLE dqa_report_template ADD
 INSERT INTO dqa_report_type(report_type_id, report_type_label) VALUES (3, 'Vacc Reporting Certification');
 INSERT INTO dqa_report_type(report_type_id, report_type_label) VALUES (4, 'IIS Profile ');
 
+INSERT INTO dqa_report_template(template_id, template_label, report_type_id, report_definition, base_profile_id) VALUES(7, 'IHS Certification', 3, EMPTY_CLOB(), 257);
+INSERT INTO dqa_report_template(template_id, template_label, report_type_id, report_definition, base_profile_id) VALUES(8, 'ASIIS Profile', 4, EMPTY_CLOB(), 258);
