@@ -3,6 +3,9 @@ ALTER TABLE dqa_message_received ADD
     message_key  VARCHAR2(100)
 );
 
+INSERT INTO dqa_submitter_profile (profile_id, profile_code, profile_label, profile_status, org_id, data_format, transfer_priority, access_key, template_id) VALUES (257, 'TEMPLATE:IHS Certification', 'IHS Certification', 'Template', 1, 'HL7v2', 'Normal', 'template', 7);
+INSERT INTO dqa_submitter_profile (profile_id, profile_code, profile_label, profile_status, org_id, data_format, transfer_priority, access_key, template_id) VALUES (258, 'TEMPLATE:ASIIS Profile', 'ASIIS Profile', 'Template', 1, 'HL7v2', 'Normal', 'template', 8);
+
 INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description, table_id, hl7_reference) VALUES (485, 'Next-of-kin', 'relationship', 'is unexpected', '', 'W', 'May', 'NextOfKin Count', 'Next-of-kin relationship is not expected considering the age of the patient. For example, a 5 year old is not expected to have a child.', 22, 'NK1-3');
 
 INSERT INTO dqa_potential_issue_status (potential_issue_status_id, issue_id, profile_id, action_code, expect_min, expect_max) VALUES(dqa_potential_status_id_seq.NEXTVAL, 485, 251, 'W', 0, 100);	
