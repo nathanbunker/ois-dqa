@@ -3,7 +3,7 @@
   <groupId>org.openimmunizationsoftware.dqa</groupId>
   <artifactId>ois-dqa-webservice</artifactId>
   <packaging>war</packaging>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.5</version>
   <name>DQA Webservice Interface</name>
   <description></description>
   
@@ -28,7 +28,7 @@
       <dependency>
       <groupId>org.openimmunizationsoftware.dqa</groupId>
       <artifactId>ois-dqa-core</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.apache.axis</groupId>
