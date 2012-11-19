@@ -28,7 +28,7 @@ CREATE TABLE dqa_remote_stat
   error_count     INTEGER NOT NULL
 );
 
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.05', 'Creating dqa_remote_log table');
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.05', 'Creating dqa_remote_log table');
 CREATE SEQUENCE dqa_remote_log_id_sequence INCREMENT BY 1 START WITH 1;
 CREATE TABLE dqa_remote_log
 (
