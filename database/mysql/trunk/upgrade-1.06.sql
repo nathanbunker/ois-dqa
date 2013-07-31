@@ -509,16 +509,76 @@ ALTER TABLE dqa_code_master ADD COLUMN
     hl7_error_code  VARCHAR(100)
 );
 
+-- working
 
-INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.06', 'Cleaning up dqa_code_master');
-
-
-DELETE FROM dqa_code_master where table_id = 18 and code_value = 'A' and use_value = '2076-8';
-UPDATE dqa_code_master SET use_value = 'A', code_status = 'D' where table_id = 18 and code_value = 'A';
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(46, 'HL7 Coding System', '');
 
 
+INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.06', 'Dropping dqa_code_master table');
 
-ALTER TABLE dqa_code_master ADD UNIQUE INDEX ()
+DROP TABLE dqa_code_master;
 
-INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.05', 'Finished upgrading');
+INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.06', 'Creating dqa_code_master table');
+
+CREATE TABLE dqa_code_master
+(
+  code_master_id      INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  table_id            INTEGER NOT NULL,
+  context_id          INTEGER,
+  code_value          VARCHAR(50) NOT NULL,
+  code_label          VARCHAR(250) NOT NULL,
+  use_value           VARCHAR(50) NOT NULL,
+  code_status         VARCHAR(1) NOT NULL,
+  indicates_id        INTEGER
+);
+
+ALTER TABLE dqa_code_master ADD UNIQUE INDEX (table_id, context_id, code_value);
+
+
+
+INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.05', 'Inserting code master values');
+
+
+
+INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.06', 'Adding column context_value to dqa_code_received table');
+
+ALTER TABLE dqa_code_received DROP KEY dqa_uk_code_received1;
+
+ALTER TABLE dqa_code_received ADD COLUMN 
+(
+  context_value VARCHAR(50)
+);
+
+ALTER TABLE dqa_code_received ADD CONSTRAINT dqa_uk_code_received1 UNIQUE(profile_id, table_id, context_value, received_value);
+
+INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.06', 'Remove Country Code record from table list, duplicate of Address Country');
+
+DELETE FROM dqa_code_table where table_id = 35; 
+
+INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.06', 'Create table dqa_vaccination_vis');
+
+CREATE TABLE dqa_vaccination_vis
+(
+  vis_id          INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  vaccination_id  INTEGER NOT NULL,
+  position_id     INTEGER NOT NULL,
+  skipped         VARCHAR(1),
+  document_code   VARCHAR(250),
+  published_date  DATE,
+  presented_date  DATE
+);
+
+INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.06', 'Adding funding_source_code, refusal_reason, vis_presented_date, vis_document_code to dqa_vaccination');
+
+ALTER TABLE dqa_vaccination ADD (funding_source_code  VARCHAR(250));
+ALTER TABLE dqa_vaccination ADD (refusal_reason  VARCHAR(250));
+ALTER TABLE dqa_vaccination ADD (vis_presented_date  DATE);
+ALTER TABLE dqa_vaccination ADD (vis_document_code VARCHAR(250));
+
+
+ALTER TABLE dqa_code_master ADD CONSTRAINT dqa_fk_code_master_context FOREIGN KEY(context_id) REFERENCES dqa_code_master(code_master_id);
+
+
+
+INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.06', 'Finished upgrading');
 COMMIT;
