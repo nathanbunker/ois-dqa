@@ -7,8 +7,11 @@
 
 package org.openimmunizationsoftware.dqa.service;
 
+import javax.jws.WebService;
+
 import org.openimmunizationsoftware.dqa.service.DqaServiceSupport;
 
+@WebService(serviceName = "DqaService", targetNamespace = "http://dqaws.openimmunizationsoftware.org/dqa/")
 public class DqaServiceSOAPImpl implements org.openimmunizationsoftware.dqa.service.DqaService_PortType{
     public org.openimmunizationsoftware.dqa.service.schema.SubmitMessageResultType submitMessage(org.openimmunizationsoftware.dqa.service.schema.SubmitMessageType request) throws java.rmi.RemoteException, org.openimmunizationsoftware.dqa.service.schema.FaultType {
       return DqaServiceSupport.submitMessage(request);
