@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.immunizationsoftware.dqa</groupId>
-  <artifactId>webservice-client</artifactId>
+  <groupId>org.openimmunizationsoftware.dqa</groupId>
+  <artifactId>dqa-webservice-client</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.5</version>
   <!-- TODO project name -->
-  <name>DQA Webservice Interface</name>
+  <name>DQA Webservice Client</name>
   <description></description>
   <!-- TODO <organization> <name>company name</name> <url>company url</url> </organization> -->
   <licenses>
@@ -22,6 +22,7 @@
   </properties>
 
   <dependencies>
+<!--
     <dependency>
       <groupId>org.apache.axis</groupId>
       <artifactId>axis</artifactId>
@@ -37,12 +38,12 @@
       <artifactId>wsdl4j</artifactId>
       <version>1.6.2</version>
     </dependency>
-
     <dependency>
       <groupId>org.immunizationsoftware.dqa</groupId>
       <artifactId>webservice</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
+-->
 
     <!-- LOGGING DEPENDENCIES - LOG4J -->
     <dependency>

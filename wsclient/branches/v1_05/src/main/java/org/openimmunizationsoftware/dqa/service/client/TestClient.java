@@ -1,8 +1,8 @@
 package org.openimmunizationsoftware.dqa.service.client;
 
-import java.rmi.RemoteException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-import org.openimmunizationsoftware.dqa.service.client.DqaServiceProxy;
 import org.openimmunizationsoftware.dqa.service.client.SubmitMessageResultType;
 import org.openimmunizationsoftware.dqa.service.client.SubmitMessageType;
 
@@ -10,6 +10,7 @@ public class TestClient
 {
 
   private static final String WS_ENDPOINT_TOMCAT = "http://localhost:8080/dqa/services/DqaServiceSOAP";
+  private static final String WS_ENDPOINT_JBOSS = "http://localhost:8080/dqa-webservice/DqaService";
   private static final String WS_ENDPONT_DEV_NATHAN_TOMCAT = "http://localhost:8086/webservice2/services/DqaServiceSOAP";
   private static final String WS_ENDPONT_DEV_NATHAN_JETTY = "http://localhost:8281/services/DqaServiceSOAP";
 
@@ -48,7 +49,7 @@ public class TestClient
       System.out.println("  + Batch ID:        " + results.getBatchId());
       System.out.println("  + Hash ID:         " + results.getHashId());
       System.out.println("  + Received ID:     " + results.getReceivedId());
-      if (results.getErrorList().length > 0)
+      if (results.getErrorList().size() > 0)
       {
         System.out.println("Errors ");
         for (IssueType issueType : results.getErrorList())
@@ -56,7 +57,7 @@ public class TestClient
           System.out.println("  + " + issueType.getIssueLabel() + " (" + issueType.getIssueId() + ")");
         }
       }
-      if (results.getErrorList().length > 0)
+      if (results.getErrorList().size() > 0)
       {
         System.out.println("Warnings ");
         for (IssueType issueType : results.getWarningList())
@@ -67,17 +68,17 @@ public class TestClient
       System.out.println("Process Report: ");
       System.out.println(results.getProcessReport());
 
-    } catch (RemoteException e)
+    } catch (MalformedURLException e)
     {
       e.printStackTrace();
     }
     System.out.println("***** END web service test *****");
   }
 
-  private static DqaServiceProxy getProxy()
-  {
-    String wsEndpoint = WS_ENDPONT_DEV_NATHAN_JETTY;
-    DqaServiceProxy proxy = new DqaServiceProxy(wsEndpoint);
+  private static DqaServiceSOAPImpl getProxy()
+    throws MalformedURLException {
+    String wsEndpoint = WS_ENDPOINT_JBOSS;
+    DqaServiceSOAPImpl proxy = new DqaService(new URL(wsEndpoint)).getDqaServiceSOAPImplPort();
     return proxy;
   }
 

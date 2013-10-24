@@ -1,128 +1,69 @@
-/**
- * UpdateCodeReceivedType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class UpdateCodeReceivedType  implements java.io.Serializable {
-    private org.openimmunizationsoftware.dqa.service.client.CodeReceivedSmallType[] codeReceivedList;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
-    public UpdateCodeReceivedType() {
-    }
 
-    public UpdateCodeReceivedType(
-           org.openimmunizationsoftware.dqa.service.client.CodeReceivedSmallType[] codeReceivedList) {
-           this.codeReceivedList = codeReceivedList;
-    }
+/**
+ * <p>Java class for updateCodeReceivedType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="updateCodeReceivedType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="codeReceivedList" type="{http://dqaws.openimmunizationsoftware.org/dqa/}codeReceivedSmallType" maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "updateCodeReceivedType", propOrder = {
+    "codeReceivedList"
+})
+public class UpdateCodeReceivedType {
 
+    @XmlElement(nillable = true)
+    protected List<CodeReceivedSmallType> codeReceivedList;
 
     /**
-     * Gets the codeReceivedList value for this UpdateCodeReceivedType.
+     * Gets the value of the codeReceivedList property.
      * 
-     * @return codeReceivedList
-     */
-    public org.openimmunizationsoftware.dqa.service.client.CodeReceivedSmallType[] getCodeReceivedList() {
-        return codeReceivedList;
-    }
-
-
-    /**
-     * Sets the codeReceivedList value for this UpdateCodeReceivedType.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the codeReceivedList property.
      * 
-     * @param codeReceivedList
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getCodeReceivedList().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link CodeReceivedSmallType }
+     * 
+     * 
      */
-    public void setCodeReceivedList(org.openimmunizationsoftware.dqa.service.client.CodeReceivedSmallType[] codeReceivedList) {
-        this.codeReceivedList = codeReceivedList;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof UpdateCodeReceivedType)) return false;
-        UpdateCodeReceivedType other = (UpdateCodeReceivedType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
+    public List<CodeReceivedSmallType> getCodeReceivedList() {
+        if (codeReceivedList == null) {
+            codeReceivedList = new ArrayList<CodeReceivedSmallType>();
         }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            ((this.codeReceivedList==null && other.getCodeReceivedList()==null) || 
-             (this.codeReceivedList!=null &&
-              java.util.Arrays.equals(this.codeReceivedList, other.getCodeReceivedList())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        if (getCodeReceivedList() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getCodeReceivedList());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getCodeReceivedList(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(UpdateCodeReceivedType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "UpdateCodeReceivedType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeReceivedList");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeReceivedList"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "CodeReceivedSmallType"));
-        elemField.setNillable(false);
-        elemField.setItemQName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "item"));
-        typeDesc.addFieldDesc(elemField);
-    }
-
-    /**
-     * Return type metadata object
-     */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
-    }
-
-    /**
-     * Get Custom Serializer
-     */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+        return this.codeReceivedList;
     }
 
 }

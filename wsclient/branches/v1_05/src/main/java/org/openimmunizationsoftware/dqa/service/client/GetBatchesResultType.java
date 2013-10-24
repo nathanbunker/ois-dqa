@@ -1,128 +1,69 @@
-/**
- * GetBatchesResultType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class GetBatchesResultType  implements java.io.Serializable {
-    private org.openimmunizationsoftware.dqa.service.client.MessageBatchType[] messageBatchList;
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
-    public GetBatchesResultType() {
-    }
 
-    public GetBatchesResultType(
-           org.openimmunizationsoftware.dqa.service.client.MessageBatchType[] messageBatchList) {
-           this.messageBatchList = messageBatchList;
-    }
+/**
+ * <p>Java class for getBatchesResultType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="getBatchesResultType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="messageBatchList" type="{http://dqaws.openimmunizationsoftware.org/dqa/}messageBatchType" maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "getBatchesResultType", propOrder = {
+    "messageBatchList"
+})
+public class GetBatchesResultType {
 
+    @XmlElement(nillable = true)
+    protected List<MessageBatchType> messageBatchList;
 
     /**
-     * Gets the messageBatchList value for this GetBatchesResultType.
+     * Gets the value of the messageBatchList property.
      * 
-     * @return messageBatchList
-     */
-    public org.openimmunizationsoftware.dqa.service.client.MessageBatchType[] getMessageBatchList() {
-        return messageBatchList;
-    }
-
-
-    /**
-     * Sets the messageBatchList value for this GetBatchesResultType.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the messageBatchList property.
      * 
-     * @param messageBatchList
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getMessageBatchList().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link MessageBatchType }
+     * 
+     * 
      */
-    public void setMessageBatchList(org.openimmunizationsoftware.dqa.service.client.MessageBatchType[] messageBatchList) {
-        this.messageBatchList = messageBatchList;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof GetBatchesResultType)) return false;
-        GetBatchesResultType other = (GetBatchesResultType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
+    public List<MessageBatchType> getMessageBatchList() {
+        if (messageBatchList == null) {
+            messageBatchList = new ArrayList<MessageBatchType>();
         }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            ((this.messageBatchList==null && other.getMessageBatchList()==null) || 
-             (this.messageBatchList!=null &&
-              java.util.Arrays.equals(this.messageBatchList, other.getMessageBatchList())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        if (getMessageBatchList() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getMessageBatchList());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getMessageBatchList(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(GetBatchesResultType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "GetBatchesResultType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("messageBatchList");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "messageBatchList"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "MessageBatchType"));
-        elemField.setNillable(false);
-        elemField.setItemQName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "item"));
-        typeDesc.addFieldDesc(elemField);
-    }
-
-    /**
-     * Return type metadata object
-     */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
-    }
-
-    /**
-     * Get Custom Serializer
-     */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+        return this.messageBatchList;
     }
 
 }

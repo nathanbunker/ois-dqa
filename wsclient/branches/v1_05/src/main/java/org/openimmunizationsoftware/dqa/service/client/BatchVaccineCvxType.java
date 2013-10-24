@@ -1,251 +1,144 @@
-/**
- * BatchVaccineCvxType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class BatchVaccineCvxType  implements java.io.Serializable {
-    private long batchVaccineCvxId;
-
-    private long batchId;
-
-    private java.lang.String cvxCode;
-
-    private java.lang.String cvxLabel;
-
-    private long receivedCount;
-
-    public BatchVaccineCvxType() {
-    }
-
-    public BatchVaccineCvxType(
-           long batchVaccineCvxId,
-           long batchId,
-           java.lang.String cvxCode,
-           java.lang.String cvxLabel,
-           long receivedCount) {
-           this.batchVaccineCvxId = batchVaccineCvxId;
-           this.batchId = batchId;
-           this.cvxCode = cvxCode;
-           this.cvxLabel = cvxLabel;
-           this.receivedCount = receivedCount;
-    }
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
 
-    /**
-     * Gets the batchVaccineCvxId value for this BatchVaccineCvxType.
-     * 
-     * @return batchVaccineCvxId
-     */
-    public long getBatchVaccineCvxId() {
-        return batchVaccineCvxId;
-    }
+/**
+ * <p>Java class for batchVaccineCvxType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="batchVaccineCvxType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="batchId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="batchVaccineCvxId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="cvxCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="cvxLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="receivedCount" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "batchVaccineCvxType", propOrder = {
+    "batchId",
+    "batchVaccineCvxId",
+    "cvxCode",
+    "cvxLabel",
+    "receivedCount"
+})
+public class BatchVaccineCvxType {
 
-
-    /**
-     * Sets the batchVaccineCvxId value for this BatchVaccineCvxType.
-     * 
-     * @param batchVaccineCvxId
-     */
-    public void setBatchVaccineCvxId(long batchVaccineCvxId) {
-        this.batchVaccineCvxId = batchVaccineCvxId;
-    }
-
+    protected long batchId;
+    protected long batchVaccineCvxId;
+    protected String cvxCode;
+    protected String cvxLabel;
+    protected long receivedCount;
 
     /**
-     * Gets the batchId value for this BatchVaccineCvxType.
+     * Gets the value of the batchId property.
      * 
-     * @return batchId
      */
     public long getBatchId() {
         return batchId;
     }
 
-
     /**
-     * Sets the batchId value for this BatchVaccineCvxType.
+     * Sets the value of the batchId property.
      * 
-     * @param batchId
      */
-    public void setBatchId(long batchId) {
-        this.batchId = batchId;
+    public void setBatchId(long value) {
+        this.batchId = value;
     }
 
+    /**
+     * Gets the value of the batchVaccineCvxId property.
+     * 
+     */
+    public long getBatchVaccineCvxId() {
+        return batchVaccineCvxId;
+    }
 
     /**
-     * Gets the cvxCode value for this BatchVaccineCvxType.
+     * Sets the value of the batchVaccineCvxId property.
      * 
-     * @return cvxCode
      */
-    public java.lang.String getCvxCode() {
+    public void setBatchVaccineCvxId(long value) {
+        this.batchVaccineCvxId = value;
+    }
+
+    /**
+     * Gets the value of the cvxCode property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCvxCode() {
         return cvxCode;
     }
 
-
     /**
-     * Sets the cvxCode value for this BatchVaccineCvxType.
+     * Sets the value of the cvxCode property.
      * 
-     * @param cvxCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setCvxCode(java.lang.String cvxCode) {
-        this.cvxCode = cvxCode;
+    public void setCvxCode(String value) {
+        this.cvxCode = value;
     }
 
-
     /**
-     * Gets the cvxLabel value for this BatchVaccineCvxType.
+     * Gets the value of the cvxLabel property.
      * 
-     * @return cvxLabel
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getCvxLabel() {
+    public String getCvxLabel() {
         return cvxLabel;
     }
 
-
     /**
-     * Sets the cvxLabel value for this BatchVaccineCvxType.
+     * Sets the value of the cvxLabel property.
      * 
-     * @param cvxLabel
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setCvxLabel(java.lang.String cvxLabel) {
-        this.cvxLabel = cvxLabel;
+    public void setCvxLabel(String value) {
+        this.cvxLabel = value;
     }
 
-
     /**
-     * Gets the receivedCount value for this BatchVaccineCvxType.
+     * Gets the value of the receivedCount property.
      * 
-     * @return receivedCount
      */
     public long getReceivedCount() {
         return receivedCount;
     }
 
-
     /**
-     * Sets the receivedCount value for this BatchVaccineCvxType.
+     * Sets the value of the receivedCount property.
      * 
-     * @param receivedCount
      */
-    public void setReceivedCount(long receivedCount) {
-        this.receivedCount = receivedCount;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof BatchVaccineCvxType)) return false;
-        BatchVaccineCvxType other = (BatchVaccineCvxType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            this.batchVaccineCvxId == other.getBatchVaccineCvxId() &&
-            this.batchId == other.getBatchId() &&
-            ((this.cvxCode==null && other.getCvxCode()==null) || 
-             (this.cvxCode!=null &&
-              this.cvxCode.equals(other.getCvxCode()))) &&
-            ((this.cvxLabel==null && other.getCvxLabel()==null) || 
-             (this.cvxLabel!=null &&
-              this.cvxLabel.equals(other.getCvxLabel()))) &&
-            this.receivedCount == other.getReceivedCount();
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        _hashCode += new Long(getBatchVaccineCvxId()).hashCode();
-        _hashCode += new Long(getBatchId()).hashCode();
-        if (getCvxCode() != null) {
-            _hashCode += getCvxCode().hashCode();
-        }
-        if (getCvxLabel() != null) {
-            _hashCode += getCvxLabel().hashCode();
-        }
-        _hashCode += new Long(getReceivedCount()).hashCode();
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(BatchVaccineCvxType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "BatchVaccineCvxType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("batchVaccineCvxId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "batchVaccineCvxId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("batchId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "batchId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("cvxCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "cvxCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("cvxLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "cvxLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("receivedCount");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "receivedCount"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-    }
-
-    /**
-     * Return type metadata object
-     */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
-    }
-
-    /**
-     * Get Custom Serializer
-     */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public void setReceivedCount(long value) {
+        this.receivedCount = value;
     }
 
 }

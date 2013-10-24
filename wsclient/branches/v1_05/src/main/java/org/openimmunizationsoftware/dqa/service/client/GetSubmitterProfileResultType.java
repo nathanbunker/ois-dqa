@@ -1,119 +1,60 @@
-/**
- * GetSubmitterProfileResultType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class GetSubmitterProfileResultType  implements java.io.Serializable {
-    private org.openimmunizationsoftware.dqa.service.client.SubmitterProfileType submitterProfile;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
-    public GetSubmitterProfileResultType() {
-    }
 
-    public GetSubmitterProfileResultType(
-           org.openimmunizationsoftware.dqa.service.client.SubmitterProfileType submitterProfile) {
-           this.submitterProfile = submitterProfile;
-    }
+/**
+ * <p>Java class for getSubmitterProfileResultType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="getSubmitterProfileResultType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="submitterProfile" type="{http://dqaws.openimmunizationsoftware.org/dqa/}submitterProfileType" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "getSubmitterProfileResultType", propOrder = {
+    "submitterProfile"
+})
+public class GetSubmitterProfileResultType {
 
+    protected SubmitterProfileType submitterProfile;
 
     /**
-     * Gets the submitterProfile value for this GetSubmitterProfileResultType.
+     * Gets the value of the submitterProfile property.
      * 
-     * @return submitterProfile
+     * @return
+     *     possible object is
+     *     {@link SubmitterProfileType }
+     *     
      */
-    public org.openimmunizationsoftware.dqa.service.client.SubmitterProfileType getSubmitterProfile() {
+    public SubmitterProfileType getSubmitterProfile() {
         return submitterProfile;
     }
 
-
     /**
-     * Sets the submitterProfile value for this GetSubmitterProfileResultType.
+     * Sets the value of the submitterProfile property.
      * 
-     * @param submitterProfile
+     * @param value
+     *     allowed object is
+     *     {@link SubmitterProfileType }
+     *     
      */
-    public void setSubmitterProfile(org.openimmunizationsoftware.dqa.service.client.SubmitterProfileType submitterProfile) {
-        this.submitterProfile = submitterProfile;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof GetSubmitterProfileResultType)) return false;
-        GetSubmitterProfileResultType other = (GetSubmitterProfileResultType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            ((this.submitterProfile==null && other.getSubmitterProfile()==null) || 
-             (this.submitterProfile!=null &&
-              this.submitterProfile.equals(other.getSubmitterProfile())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        if (getSubmitterProfile() != null) {
-            _hashCode += getSubmitterProfile().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(GetSubmitterProfileResultType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "GetSubmitterProfileResultType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("submitterProfile");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "submitterProfile"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "SubmitterProfileType"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-    }
-
-    /**
-     * Return type metadata object
-     */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
-    }
-
-    /**
-     * Get Custom Serializer
-     */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public void setSubmitterProfile(SubmitterProfileType value) {
+        this.submitterProfile = value;
     }
 
 }

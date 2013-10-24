@@ -1,503 +1,333 @@
-/**
- * MessageBatchType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class MessageBatchType  implements java.io.Serializable {
-    private long batchId;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
-    private java.lang.String batchTitle;
 
-    private java.lang.String typeCode;
+/**
+ * <p>Java class for messageBatchType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="messageBatchType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="batchId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="batchTitle" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="endDate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="messageCount" type="{http://www.w3.org/2001/XMLSchema}long" minOccurs="0"/>
+ *         &lt;element name="overallScore" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="profileCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="profileId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="startDate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="submitCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="submitLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="typeCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="typeLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "messageBatchType", propOrder = {
+    "batchId",
+    "batchTitle",
+    "endDate",
+    "messageCount",
+    "overallScore",
+    "profileCode",
+    "profileId",
+    "startDate",
+    "submitCode",
+    "submitLabel",
+    "typeCode",
+    "typeLabel"
+})
+public class MessageBatchType {
 
-    private java.lang.String typeLabel;
-
-    private java.lang.String startDate;
-
-    private java.lang.String endDate;
-
-    private java.lang.String submitCode;
-
-    private java.lang.String submitLabel;
-
-    private long profileId;
-
-    private java.lang.String profileCode;
-
-    private long overallScore;
-
-    private java.lang.Long messageCount;
-
-    public MessageBatchType() {
-    }
-
-    public MessageBatchType(
-           long batchId,
-           java.lang.String batchTitle,
-           java.lang.String typeCode,
-           java.lang.String typeLabel,
-           java.lang.String startDate,
-           java.lang.String endDate,
-           java.lang.String submitCode,
-           java.lang.String submitLabel,
-           long profileId,
-           java.lang.String profileCode,
-           long overallScore,
-           java.lang.Long messageCount) {
-           this.batchId = batchId;
-           this.batchTitle = batchTitle;
-           this.typeCode = typeCode;
-           this.typeLabel = typeLabel;
-           this.startDate = startDate;
-           this.endDate = endDate;
-           this.submitCode = submitCode;
-           this.submitLabel = submitLabel;
-           this.profileId = profileId;
-           this.profileCode = profileCode;
-           this.overallScore = overallScore;
-           this.messageCount = messageCount;
-    }
-
+    protected long batchId;
+    protected String batchTitle;
+    protected String endDate;
+    protected Long messageCount;
+    protected long overallScore;
+    protected String profileCode;
+    protected long profileId;
+    protected String startDate;
+    protected String submitCode;
+    protected String submitLabel;
+    protected String typeCode;
+    protected String typeLabel;
 
     /**
-     * Gets the batchId value for this MessageBatchType.
+     * Gets the value of the batchId property.
      * 
-     * @return batchId
      */
     public long getBatchId() {
         return batchId;
     }
 
-
     /**
-     * Sets the batchId value for this MessageBatchType.
+     * Sets the value of the batchId property.
      * 
-     * @param batchId
      */
-    public void setBatchId(long batchId) {
-        this.batchId = batchId;
+    public void setBatchId(long value) {
+        this.batchId = value;
     }
 
-
     /**
-     * Gets the batchTitle value for this MessageBatchType.
+     * Gets the value of the batchTitle property.
      * 
-     * @return batchTitle
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getBatchTitle() {
+    public String getBatchTitle() {
         return batchTitle;
     }
 
-
     /**
-     * Sets the batchTitle value for this MessageBatchType.
+     * Sets the value of the batchTitle property.
      * 
-     * @param batchTitle
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setBatchTitle(java.lang.String batchTitle) {
-        this.batchTitle = batchTitle;
+    public void setBatchTitle(String value) {
+        this.batchTitle = value;
     }
 
-
     /**
-     * Gets the typeCode value for this MessageBatchType.
+     * Gets the value of the endDate property.
      * 
-     * @return typeCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getTypeCode() {
-        return typeCode;
-    }
-
-
-    /**
-     * Sets the typeCode value for this MessageBatchType.
-     * 
-     * @param typeCode
-     */
-    public void setTypeCode(java.lang.String typeCode) {
-        this.typeCode = typeCode;
-    }
-
-
-    /**
-     * Gets the typeLabel value for this MessageBatchType.
-     * 
-     * @return typeLabel
-     */
-    public java.lang.String getTypeLabel() {
-        return typeLabel;
-    }
-
-
-    /**
-     * Sets the typeLabel value for this MessageBatchType.
-     * 
-     * @param typeLabel
-     */
-    public void setTypeLabel(java.lang.String typeLabel) {
-        this.typeLabel = typeLabel;
-    }
-
-
-    /**
-     * Gets the startDate value for this MessageBatchType.
-     * 
-     * @return startDate
-     */
-    public java.lang.String getStartDate() {
-        return startDate;
-    }
-
-
-    /**
-     * Sets the startDate value for this MessageBatchType.
-     * 
-     * @param startDate
-     */
-    public void setStartDate(java.lang.String startDate) {
-        this.startDate = startDate;
-    }
-
-
-    /**
-     * Gets the endDate value for this MessageBatchType.
-     * 
-     * @return endDate
-     */
-    public java.lang.String getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-
     /**
-     * Sets the endDate value for this MessageBatchType.
+     * Sets the value of the endDate property.
      * 
-     * @param endDate
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setEndDate(java.lang.String endDate) {
-        this.endDate = endDate;
+    public void setEndDate(String value) {
+        this.endDate = value;
     }
 
-
     /**
-     * Gets the submitCode value for this MessageBatchType.
+     * Gets the value of the messageCount property.
      * 
-     * @return submitCode
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
      */
-    public java.lang.String getSubmitCode() {
-        return submitCode;
+    public Long getMessageCount() {
+        return messageCount;
     }
 
-
     /**
-     * Sets the submitCode value for this MessageBatchType.
+     * Sets the value of the messageCount property.
      * 
-     * @param submitCode
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
      */
-    public void setSubmitCode(java.lang.String submitCode) {
-        this.submitCode = submitCode;
+    public void setMessageCount(Long value) {
+        this.messageCount = value;
     }
 
-
     /**
-     * Gets the submitLabel value for this MessageBatchType.
+     * Gets the value of the overallScore property.
      * 
-     * @return submitLabel
-     */
-    public java.lang.String getSubmitLabel() {
-        return submitLabel;
-    }
-
-
-    /**
-     * Sets the submitLabel value for this MessageBatchType.
-     * 
-     * @param submitLabel
-     */
-    public void setSubmitLabel(java.lang.String submitLabel) {
-        this.submitLabel = submitLabel;
-    }
-
-
-    /**
-     * Gets the profileId value for this MessageBatchType.
-     * 
-     * @return profileId
-     */
-    public long getProfileId() {
-        return profileId;
-    }
-
-
-    /**
-     * Sets the profileId value for this MessageBatchType.
-     * 
-     * @param profileId
-     */
-    public void setProfileId(long profileId) {
-        this.profileId = profileId;
-    }
-
-
-    /**
-     * Gets the profileCode value for this MessageBatchType.
-     * 
-     * @return profileCode
-     */
-    public java.lang.String getProfileCode() {
-        return profileCode;
-    }
-
-
-    /**
-     * Sets the profileCode value for this MessageBatchType.
-     * 
-     * @param profileCode
-     */
-    public void setProfileCode(java.lang.String profileCode) {
-        this.profileCode = profileCode;
-    }
-
-
-    /**
-     * Gets the overallScore value for this MessageBatchType.
-     * 
-     * @return overallScore
      */
     public long getOverallScore() {
         return overallScore;
     }
 
-
     /**
-     * Sets the overallScore value for this MessageBatchType.
+     * Sets the value of the overallScore property.
      * 
-     * @param overallScore
      */
-    public void setOverallScore(long overallScore) {
-        this.overallScore = overallScore;
+    public void setOverallScore(long value) {
+        this.overallScore = value;
     }
 
-
     /**
-     * Gets the messageCount value for this MessageBatchType.
+     * Gets the value of the profileCode property.
      * 
-     * @return messageCount
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.Long getMessageCount() {
-        return messageCount;
+    public String getProfileCode() {
+        return profileCode;
     }
 
-
     /**
-     * Sets the messageCount value for this MessageBatchType.
+     * Sets the value of the profileCode property.
      * 
-     * @param messageCount
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setMessageCount(java.lang.Long messageCount) {
-        this.messageCount = messageCount;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof MessageBatchType)) return false;
-        MessageBatchType other = (MessageBatchType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            this.batchId == other.getBatchId() &&
-            ((this.batchTitle==null && other.getBatchTitle()==null) || 
-             (this.batchTitle!=null &&
-              this.batchTitle.equals(other.getBatchTitle()))) &&
-            ((this.typeCode==null && other.getTypeCode()==null) || 
-             (this.typeCode!=null &&
-              this.typeCode.equals(other.getTypeCode()))) &&
-            ((this.typeLabel==null && other.getTypeLabel()==null) || 
-             (this.typeLabel!=null &&
-              this.typeLabel.equals(other.getTypeLabel()))) &&
-            ((this.startDate==null && other.getStartDate()==null) || 
-             (this.startDate!=null &&
-              this.startDate.equals(other.getStartDate()))) &&
-            ((this.endDate==null && other.getEndDate()==null) || 
-             (this.endDate!=null &&
-              this.endDate.equals(other.getEndDate()))) &&
-            ((this.submitCode==null && other.getSubmitCode()==null) || 
-             (this.submitCode!=null &&
-              this.submitCode.equals(other.getSubmitCode()))) &&
-            ((this.submitLabel==null && other.getSubmitLabel()==null) || 
-             (this.submitLabel!=null &&
-              this.submitLabel.equals(other.getSubmitLabel()))) &&
-            this.profileId == other.getProfileId() &&
-            ((this.profileCode==null && other.getProfileCode()==null) || 
-             (this.profileCode!=null &&
-              this.profileCode.equals(other.getProfileCode()))) &&
-            this.overallScore == other.getOverallScore() &&
-            ((this.messageCount==null && other.getMessageCount()==null) || 
-             (this.messageCount!=null &&
-              this.messageCount.equals(other.getMessageCount())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        _hashCode += new Long(getBatchId()).hashCode();
-        if (getBatchTitle() != null) {
-            _hashCode += getBatchTitle().hashCode();
-        }
-        if (getTypeCode() != null) {
-            _hashCode += getTypeCode().hashCode();
-        }
-        if (getTypeLabel() != null) {
-            _hashCode += getTypeLabel().hashCode();
-        }
-        if (getStartDate() != null) {
-            _hashCode += getStartDate().hashCode();
-        }
-        if (getEndDate() != null) {
-            _hashCode += getEndDate().hashCode();
-        }
-        if (getSubmitCode() != null) {
-            _hashCode += getSubmitCode().hashCode();
-        }
-        if (getSubmitLabel() != null) {
-            _hashCode += getSubmitLabel().hashCode();
-        }
-        _hashCode += new Long(getProfileId()).hashCode();
-        if (getProfileCode() != null) {
-            _hashCode += getProfileCode().hashCode();
-        }
-        _hashCode += new Long(getOverallScore()).hashCode();
-        if (getMessageCount() != null) {
-            _hashCode += getMessageCount().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(MessageBatchType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "MessageBatchType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("batchId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "batchId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("batchTitle");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "batchTitle"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("typeCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "typeCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("typeLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "typeLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("startDate");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "startDate"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("endDate");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "endDate"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("submitCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "submitCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("submitLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "submitLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("profileId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "profileId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("profileCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "profileCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("overallScore");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "overallScore"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("messageCount");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "messageCount"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
+    public void setProfileCode(String value) {
+        this.profileCode = value;
     }
 
     /**
-     * Return type metadata object
+     * Gets the value of the profileId property.
+     * 
      */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
+    public long getProfileId() {
+        return profileId;
     }
 
     /**
-     * Get Custom Serializer
+     * Sets the value of the profileId property.
+     * 
      */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
+    public void setProfileId(long value) {
+        this.profileId = value;
     }
 
     /**
-     * Get Custom Deserializer
+     * Gets the value of the startDate property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public String getStartDate() {
+        return startDate;
+    }
+
+    /**
+     * Sets the value of the startDate property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setStartDate(String value) {
+        this.startDate = value;
+    }
+
+    /**
+     * Gets the value of the submitCode property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSubmitCode() {
+        return submitCode;
+    }
+
+    /**
+     * Sets the value of the submitCode property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSubmitCode(String value) {
+        this.submitCode = value;
+    }
+
+    /**
+     * Gets the value of the submitLabel property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSubmitLabel() {
+        return submitLabel;
+    }
+
+    /**
+     * Sets the value of the submitLabel property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSubmitLabel(String value) {
+        this.submitLabel = value;
+    }
+
+    /**
+     * Gets the value of the typeCode property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getTypeCode() {
+        return typeCode;
+    }
+
+    /**
+     * Sets the value of the typeCode property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTypeCode(String value) {
+        this.typeCode = value;
+    }
+
+    /**
+     * Gets the value of the typeLabel property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getTypeLabel() {
+        return typeLabel;
+    }
+
+    /**
+     * Sets the value of the typeLabel property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTypeLabel(String value) {
+        this.typeLabel = value;
     }
 
 }

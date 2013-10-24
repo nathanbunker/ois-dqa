@@ -1,215 +1,117 @@
-/**
- * UpdatePotentialIssueStatusType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class UpdatePotentialIssueStatusType  implements java.io.Serializable {
-    private long issueId;
-
-    private java.lang.String actionCode;
-
-    private long expectMin;
-
-    private long expectMax;
-
-    public UpdatePotentialIssueStatusType() {
-    }
-
-    public UpdatePotentialIssueStatusType(
-           long issueId,
-           java.lang.String actionCode,
-           long expectMin,
-           long expectMax) {
-           this.issueId = issueId;
-           this.actionCode = actionCode;
-           this.expectMin = expectMin;
-           this.expectMax = expectMax;
-    }
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
 
-    /**
-     * Gets the issueId value for this UpdatePotentialIssueStatusType.
-     * 
-     * @return issueId
-     */
-    public long getIssueId() {
-        return issueId;
-    }
+/**
+ * <p>Java class for updatePotentialIssueStatusType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="updatePotentialIssueStatusType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="actionCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="expectMax" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="expectMin" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="issueId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "updatePotentialIssueStatusType", propOrder = {
+    "actionCode",
+    "expectMax",
+    "expectMin",
+    "issueId"
+})
+public class UpdatePotentialIssueStatusType {
 
-
-    /**
-     * Sets the issueId value for this UpdatePotentialIssueStatusType.
-     * 
-     * @param issueId
-     */
-    public void setIssueId(long issueId) {
-        this.issueId = issueId;
-    }
-
+    protected String actionCode;
+    protected long expectMax;
+    protected long expectMin;
+    protected long issueId;
 
     /**
-     * Gets the actionCode value for this UpdatePotentialIssueStatusType.
+     * Gets the value of the actionCode property.
      * 
-     * @return actionCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getActionCode() {
+    public String getActionCode() {
         return actionCode;
     }
 
-
     /**
-     * Sets the actionCode value for this UpdatePotentialIssueStatusType.
+     * Sets the value of the actionCode property.
      * 
-     * @param actionCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setActionCode(java.lang.String actionCode) {
-        this.actionCode = actionCode;
+    public void setActionCode(String value) {
+        this.actionCode = value;
     }
 
-
     /**
-     * Gets the expectMin value for this UpdatePotentialIssueStatusType.
+     * Gets the value of the expectMax property.
      * 
-     * @return expectMin
-     */
-    public long getExpectMin() {
-        return expectMin;
-    }
-
-
-    /**
-     * Sets the expectMin value for this UpdatePotentialIssueStatusType.
-     * 
-     * @param expectMin
-     */
-    public void setExpectMin(long expectMin) {
-        this.expectMin = expectMin;
-    }
-
-
-    /**
-     * Gets the expectMax value for this UpdatePotentialIssueStatusType.
-     * 
-     * @return expectMax
      */
     public long getExpectMax() {
         return expectMax;
     }
 
-
     /**
-     * Sets the expectMax value for this UpdatePotentialIssueStatusType.
+     * Sets the value of the expectMax property.
      * 
-     * @param expectMax
      */
-    public void setExpectMax(long expectMax) {
-        this.expectMax = expectMax;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof UpdatePotentialIssueStatusType)) return false;
-        UpdatePotentialIssueStatusType other = (UpdatePotentialIssueStatusType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            this.issueId == other.getIssueId() &&
-            ((this.actionCode==null && other.getActionCode()==null) || 
-             (this.actionCode!=null &&
-              this.actionCode.equals(other.getActionCode()))) &&
-            this.expectMin == other.getExpectMin() &&
-            this.expectMax == other.getExpectMax();
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        _hashCode += new Long(getIssueId()).hashCode();
-        if (getActionCode() != null) {
-            _hashCode += getActionCode().hashCode();
-        }
-        _hashCode += new Long(getExpectMin()).hashCode();
-        _hashCode += new Long(getExpectMax()).hashCode();
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(UpdatePotentialIssueStatusType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "UpdatePotentialIssueStatusType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("issueId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "issueId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("actionCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "actionCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("expectMin");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "expectMin"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("expectMax");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "expectMax"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
+    public void setExpectMax(long value) {
+        this.expectMax = value;
     }
 
     /**
-     * Return type metadata object
+     * Gets the value of the expectMin property.
+     * 
      */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
+    public long getExpectMin() {
+        return expectMin;
     }
 
     /**
-     * Get Custom Serializer
+     * Sets the value of the expectMin property.
+     * 
      */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
+    public void setExpectMin(long value) {
+        this.expectMin = value;
     }
 
     /**
-     * Get Custom Deserializer
+     * Gets the value of the issueId property.
+     * 
      */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public long getIssueId() {
+        return issueId;
+    }
+
+    /**
+     * Sets the value of the issueId property.
+     * 
+     */
+    public void setIssueId(long value) {
+        this.issueId = value;
     }
 
 }

@@ -1,417 +1,275 @@
-/**
- * SubmitMessageResultType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class SubmitMessageResultType  implements java.io.Serializable {
-    private java.lang.String messageResponse;
-
-    private java.lang.String responseStatus;
-
-    private java.lang.String responseText;
-
-    private long batchId;
-
-    private long receivedId;
-
-    private java.lang.String hashId;
-
-    private org.openimmunizationsoftware.dqa.service.client.IssueType[] errorList;
-
-    private org.openimmunizationsoftware.dqa.service.client.IssueType[] warningList;
-
-    private java.lang.String processReport;
-
-    public SubmitMessageResultType() {
-    }
-
-    public SubmitMessageResultType(
-           java.lang.String messageResponse,
-           java.lang.String responseStatus,
-           java.lang.String responseText,
-           long batchId,
-           long receivedId,
-           java.lang.String hashId,
-           org.openimmunizationsoftware.dqa.service.client.IssueType[] errorList,
-           org.openimmunizationsoftware.dqa.service.client.IssueType[] warningList,
-           java.lang.String processReport) {
-           this.messageResponse = messageResponse;
-           this.responseStatus = responseStatus;
-           this.responseText = responseText;
-           this.batchId = batchId;
-           this.receivedId = receivedId;
-           this.hashId = hashId;
-           this.errorList = errorList;
-           this.warningList = warningList;
-           this.processReport = processReport;
-    }
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
 
-    /**
-     * Gets the messageResponse value for this SubmitMessageResultType.
-     * 
-     * @return messageResponse
-     */
-    public java.lang.String getMessageResponse() {
-        return messageResponse;
-    }
+/**
+ * <p>Java class for submitMessageResultType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="submitMessageResultType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="batchId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="errorList" type="{http://dqaws.openimmunizationsoftware.org/dqa/}issueType" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element name="hashId" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="messageResponse" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="processReport" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="receivedId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="responseStatus" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="responseText" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="warningList" type="{http://dqaws.openimmunizationsoftware.org/dqa/}issueType" maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "submitMessageResultType", propOrder = {
+    "batchId",
+    "errorList",
+    "hashId",
+    "messageResponse",
+    "processReport",
+    "receivedId",
+    "responseStatus",
+    "responseText",
+    "warningList"
+})
+public class SubmitMessageResultType {
 
-
-    /**
-     * Sets the messageResponse value for this SubmitMessageResultType.
-     * 
-     * @param messageResponse
-     */
-    public void setMessageResponse(java.lang.String messageResponse) {
-        this.messageResponse = messageResponse;
-    }
-
+    protected long batchId;
+    @XmlElement(nillable = true)
+    protected List<IssueType> errorList;
+    protected String hashId;
+    protected String messageResponse;
+    protected String processReport;
+    protected long receivedId;
+    protected String responseStatus;
+    protected String responseText;
+    @XmlElement(nillable = true)
+    protected List<IssueType> warningList;
 
     /**
-     * Gets the responseStatus value for this SubmitMessageResultType.
+     * Gets the value of the batchId property.
      * 
-     * @return responseStatus
-     */
-    public java.lang.String getResponseStatus() {
-        return responseStatus;
-    }
-
-
-    /**
-     * Sets the responseStatus value for this SubmitMessageResultType.
-     * 
-     * @param responseStatus
-     */
-    public void setResponseStatus(java.lang.String responseStatus) {
-        this.responseStatus = responseStatus;
-    }
-
-
-    /**
-     * Gets the responseText value for this SubmitMessageResultType.
-     * 
-     * @return responseText
-     */
-    public java.lang.String getResponseText() {
-        return responseText;
-    }
-
-
-    /**
-     * Sets the responseText value for this SubmitMessageResultType.
-     * 
-     * @param responseText
-     */
-    public void setResponseText(java.lang.String responseText) {
-        this.responseText = responseText;
-    }
-
-
-    /**
-     * Gets the batchId value for this SubmitMessageResultType.
-     * 
-     * @return batchId
      */
     public long getBatchId() {
         return batchId;
     }
 
-
     /**
-     * Sets the batchId value for this SubmitMessageResultType.
+     * Sets the value of the batchId property.
      * 
-     * @param batchId
      */
-    public void setBatchId(long batchId) {
-        this.batchId = batchId;
+    public void setBatchId(long value) {
+        this.batchId = value;
     }
 
+    /**
+     * Gets the value of the errorList property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the errorList property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getErrorList().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link IssueType }
+     * 
+     * 
+     */
+    public List<IssueType> getErrorList() {
+        if (errorList == null) {
+            errorList = new ArrayList<IssueType>();
+        }
+        return this.errorList;
+    }
 
     /**
-     * Gets the receivedId value for this SubmitMessageResultType.
+     * Gets the value of the hashId property.
      * 
-     * @return receivedId
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getHashId() {
+        return hashId;
+    }
+
+    /**
+     * Sets the value of the hashId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setHashId(String value) {
+        this.hashId = value;
+    }
+
+    /**
+     * Gets the value of the messageResponse property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getMessageResponse() {
+        return messageResponse;
+    }
+
+    /**
+     * Sets the value of the messageResponse property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setMessageResponse(String value) {
+        this.messageResponse = value;
+    }
+
+    /**
+     * Gets the value of the processReport property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getProcessReport() {
+        return processReport;
+    }
+
+    /**
+     * Sets the value of the processReport property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setProcessReport(String value) {
+        this.processReport = value;
+    }
+
+    /**
+     * Gets the value of the receivedId property.
+     * 
      */
     public long getReceivedId() {
         return receivedId;
     }
 
-
     /**
-     * Sets the receivedId value for this SubmitMessageResultType.
+     * Sets the value of the receivedId property.
      * 
-     * @param receivedId
      */
-    public void setReceivedId(long receivedId) {
-        this.receivedId = receivedId;
+    public void setReceivedId(long value) {
+        this.receivedId = value;
     }
 
-
     /**
-     * Gets the hashId value for this SubmitMessageResultType.
+     * Gets the value of the responseStatus property.
      * 
-     * @return hashId
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getHashId() {
-        return hashId;
+    public String getResponseStatus() {
+        return responseStatus;
     }
 
-
     /**
-     * Sets the hashId value for this SubmitMessageResultType.
+     * Sets the value of the responseStatus property.
      * 
-     * @param hashId
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setHashId(java.lang.String hashId) {
-        this.hashId = hashId;
+    public void setResponseStatus(String value) {
+        this.responseStatus = value;
     }
 
-
     /**
-     * Gets the errorList value for this SubmitMessageResultType.
+     * Gets the value of the responseText property.
      * 
-     * @return errorList
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public org.openimmunizationsoftware.dqa.service.client.IssueType[] getErrorList() {
-        return errorList;
+    public String getResponseText() {
+        return responseText;
     }
 
-
     /**
-     * Sets the errorList value for this SubmitMessageResultType.
+     * Sets the value of the responseText property.
      * 
-     * @param errorList
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setErrorList(org.openimmunizationsoftware.dqa.service.client.IssueType[] errorList) {
-        this.errorList = errorList;
+    public void setResponseText(String value) {
+        this.responseText = value;
     }
 
-
     /**
-     * Gets the warningList value for this SubmitMessageResultType.
+     * Gets the value of the warningList property.
      * 
-     * @return warningList
-     */
-    public org.openimmunizationsoftware.dqa.service.client.IssueType[] getWarningList() {
-        return warningList;
-    }
-
-
-    /**
-     * Sets the warningList value for this SubmitMessageResultType.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the warningList property.
      * 
-     * @param warningList
-     */
-    public void setWarningList(org.openimmunizationsoftware.dqa.service.client.IssueType[] warningList) {
-        this.warningList = warningList;
-    }
-
-
-    /**
-     * Gets the processReport value for this SubmitMessageResultType.
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getWarningList().add(newItem);
+     * </pre>
      * 
-     * @return processReport
-     */
-    public java.lang.String getProcessReport() {
-        return processReport;
-    }
-
-
-    /**
-     * Sets the processReport value for this SubmitMessageResultType.
      * 
-     * @param processReport
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link IssueType }
+     * 
+     * 
      */
-    public void setProcessReport(java.lang.String processReport) {
-        this.processReport = processReport;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof SubmitMessageResultType)) return false;
-        SubmitMessageResultType other = (SubmitMessageResultType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
+    public List<IssueType> getWarningList() {
+        if (warningList == null) {
+            warningList = new ArrayList<IssueType>();
         }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            ((this.messageResponse==null && other.getMessageResponse()==null) || 
-             (this.messageResponse!=null &&
-              this.messageResponse.equals(other.getMessageResponse()))) &&
-            ((this.responseStatus==null && other.getResponseStatus()==null) || 
-             (this.responseStatus!=null &&
-              this.responseStatus.equals(other.getResponseStatus()))) &&
-            ((this.responseText==null && other.getResponseText()==null) || 
-             (this.responseText!=null &&
-              this.responseText.equals(other.getResponseText()))) &&
-            this.batchId == other.getBatchId() &&
-            this.receivedId == other.getReceivedId() &&
-            ((this.hashId==null && other.getHashId()==null) || 
-             (this.hashId!=null &&
-              this.hashId.equals(other.getHashId()))) &&
-            ((this.errorList==null && other.getErrorList()==null) || 
-             (this.errorList!=null &&
-              java.util.Arrays.equals(this.errorList, other.getErrorList()))) &&
-            ((this.warningList==null && other.getWarningList()==null) || 
-             (this.warningList!=null &&
-              java.util.Arrays.equals(this.warningList, other.getWarningList()))) &&
-            ((this.processReport==null && other.getProcessReport()==null) || 
-             (this.processReport!=null &&
-              this.processReport.equals(other.getProcessReport())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        if (getMessageResponse() != null) {
-            _hashCode += getMessageResponse().hashCode();
-        }
-        if (getResponseStatus() != null) {
-            _hashCode += getResponseStatus().hashCode();
-        }
-        if (getResponseText() != null) {
-            _hashCode += getResponseText().hashCode();
-        }
-        _hashCode += new Long(getBatchId()).hashCode();
-        _hashCode += new Long(getReceivedId()).hashCode();
-        if (getHashId() != null) {
-            _hashCode += getHashId().hashCode();
-        }
-        if (getErrorList() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getErrorList());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getErrorList(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
-        }
-        if (getWarningList() != null) {
-            for (int i=0;
-                 i<java.lang.reflect.Array.getLength(getWarningList());
-                 i++) {
-                java.lang.Object obj = java.lang.reflect.Array.get(getWarningList(), i);
-                if (obj != null &&
-                    !obj.getClass().isArray()) {
-                    _hashCode += obj.hashCode();
-                }
-            }
-        }
-        if (getProcessReport() != null) {
-            _hashCode += getProcessReport().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(SubmitMessageResultType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "SubmitMessageResultType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("messageResponse");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "messageResponse"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("responseStatus");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "responseStatus"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("responseText");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "responseText"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("batchId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "batchId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("receivedId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "receivedId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("hashId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "hashId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("errorList");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "errorList"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "IssueType"));
-        elemField.setNillable(false);
-        elemField.setItemQName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "item"));
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("warningList");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "warningList"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "IssueType"));
-        elemField.setNillable(false);
-        elemField.setItemQName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "item"));
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("processReport");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "processReport"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-    }
-
-    /**
-     * Return type metadata object
-     */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
-    }
-
-    /**
-     * Get Custom Serializer
-     */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+        return this.warningList;
     }
 
 }
