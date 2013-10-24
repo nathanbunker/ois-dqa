@@ -1,427 +1,271 @@
-/**
- * CodeReceivedType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class CodeReceivedType  implements java.io.Serializable {
-    private long codeId;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
-    private java.lang.String codeLabel;
 
-    private long profileId;
+/**
+ * <p>Java class for codeReceivedType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="codeReceivedType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="codeId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="codeLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="codeLabel2" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="codeStatus" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="codeValue" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="profileId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="receivedCount" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="receivedValue" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="tableId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="tableLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "codeReceivedType", propOrder = {
+    "codeId",
+    "codeLabel",
+    "codeLabel2",
+    "codeStatus",
+    "codeValue",
+    "profileId",
+    "receivedCount",
+    "receivedValue",
+    "tableId",
+    "tableLabel"
+})
+public class CodeReceivedType {
 
-    private long tableId;
-
-    private java.lang.String tableLabel;
-
-    private java.lang.String receivedValue;
-
-    private java.lang.String codeValue;
-
-    private java.lang.String codeStatus;
-
-    private long receivedCount;
-
-    private java.lang.String codeLabel2;
-
-    public CodeReceivedType() {
-    }
-
-    public CodeReceivedType(
-           long codeId,
-           java.lang.String codeLabel,
-           long profileId,
-           long tableId,
-           java.lang.String tableLabel,
-           java.lang.String receivedValue,
-           java.lang.String codeValue,
-           java.lang.String codeStatus,
-           long receivedCount,
-           java.lang.String codeLabel2) {
-           this.codeId = codeId;
-           this.codeLabel = codeLabel;
-           this.profileId = profileId;
-           this.tableId = tableId;
-           this.tableLabel = tableLabel;
-           this.receivedValue = receivedValue;
-           this.codeValue = codeValue;
-           this.codeStatus = codeStatus;
-           this.receivedCount = receivedCount;
-           this.codeLabel2 = codeLabel2;
-    }
-
+    protected long codeId;
+    protected String codeLabel;
+    protected String codeLabel2;
+    protected String codeStatus;
+    protected String codeValue;
+    protected long profileId;
+    protected long receivedCount;
+    protected String receivedValue;
+    protected long tableId;
+    protected String tableLabel;
 
     /**
-     * Gets the codeId value for this CodeReceivedType.
+     * Gets the value of the codeId property.
      * 
-     * @return codeId
      */
     public long getCodeId() {
         return codeId;
     }
 
-
     /**
-     * Sets the codeId value for this CodeReceivedType.
+     * Sets the value of the codeId property.
      * 
-     * @param codeId
      */
-    public void setCodeId(long codeId) {
-        this.codeId = codeId;
+    public void setCodeId(long value) {
+        this.codeId = value;
     }
 
-
     /**
-     * Gets the codeLabel value for this CodeReceivedType.
+     * Gets the value of the codeLabel property.
      * 
-     * @return codeLabel
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getCodeLabel() {
+    public String getCodeLabel() {
         return codeLabel;
     }
 
-
     /**
-     * Sets the codeLabel value for this CodeReceivedType.
+     * Sets the value of the codeLabel property.
      * 
-     * @param codeLabel
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setCodeLabel(java.lang.String codeLabel) {
-        this.codeLabel = codeLabel;
+    public void setCodeLabel(String value) {
+        this.codeLabel = value;
     }
 
+    /**
+     * Gets the value of the codeLabel2 property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCodeLabel2() {
+        return codeLabel2;
+    }
 
     /**
-     * Gets the profileId value for this CodeReceivedType.
+     * Sets the value of the codeLabel2 property.
      * 
-     * @return profileId
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCodeLabel2(String value) {
+        this.codeLabel2 = value;
+    }
+
+    /**
+     * Gets the value of the codeStatus property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCodeStatus() {
+        return codeStatus;
+    }
+
+    /**
+     * Sets the value of the codeStatus property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCodeStatus(String value) {
+        this.codeStatus = value;
+    }
+
+    /**
+     * Gets the value of the codeValue property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCodeValue() {
+        return codeValue;
+    }
+
+    /**
+     * Sets the value of the codeValue property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCodeValue(String value) {
+        this.codeValue = value;
+    }
+
+    /**
+     * Gets the value of the profileId property.
+     * 
      */
     public long getProfileId() {
         return profileId;
     }
 
-
     /**
-     * Sets the profileId value for this CodeReceivedType.
+     * Sets the value of the profileId property.
      * 
-     * @param profileId
      */
-    public void setProfileId(long profileId) {
-        this.profileId = profileId;
+    public void setProfileId(long value) {
+        this.profileId = value;
     }
 
-
     /**
-     * Gets the tableId value for this CodeReceivedType.
+     * Gets the value of the receivedCount property.
      * 
-     * @return tableId
-     */
-    public long getTableId() {
-        return tableId;
-    }
-
-
-    /**
-     * Sets the tableId value for this CodeReceivedType.
-     * 
-     * @param tableId
-     */
-    public void setTableId(long tableId) {
-        this.tableId = tableId;
-    }
-
-
-    /**
-     * Gets the tableLabel value for this CodeReceivedType.
-     * 
-     * @return tableLabel
-     */
-    public java.lang.String getTableLabel() {
-        return tableLabel;
-    }
-
-
-    /**
-     * Sets the tableLabel value for this CodeReceivedType.
-     * 
-     * @param tableLabel
-     */
-    public void setTableLabel(java.lang.String tableLabel) {
-        this.tableLabel = tableLabel;
-    }
-
-
-    /**
-     * Gets the receivedValue value for this CodeReceivedType.
-     * 
-     * @return receivedValue
-     */
-    public java.lang.String getReceivedValue() {
-        return receivedValue;
-    }
-
-
-    /**
-     * Sets the receivedValue value for this CodeReceivedType.
-     * 
-     * @param receivedValue
-     */
-    public void setReceivedValue(java.lang.String receivedValue) {
-        this.receivedValue = receivedValue;
-    }
-
-
-    /**
-     * Gets the codeValue value for this CodeReceivedType.
-     * 
-     * @return codeValue
-     */
-    public java.lang.String getCodeValue() {
-        return codeValue;
-    }
-
-
-    /**
-     * Sets the codeValue value for this CodeReceivedType.
-     * 
-     * @param codeValue
-     */
-    public void setCodeValue(java.lang.String codeValue) {
-        this.codeValue = codeValue;
-    }
-
-
-    /**
-     * Gets the codeStatus value for this CodeReceivedType.
-     * 
-     * @return codeStatus
-     */
-    public java.lang.String getCodeStatus() {
-        return codeStatus;
-    }
-
-
-    /**
-     * Sets the codeStatus value for this CodeReceivedType.
-     * 
-     * @param codeStatus
-     */
-    public void setCodeStatus(java.lang.String codeStatus) {
-        this.codeStatus = codeStatus;
-    }
-
-
-    /**
-     * Gets the receivedCount value for this CodeReceivedType.
-     * 
-     * @return receivedCount
      */
     public long getReceivedCount() {
         return receivedCount;
     }
 
-
     /**
-     * Sets the receivedCount value for this CodeReceivedType.
+     * Sets the value of the receivedCount property.
      * 
-     * @param receivedCount
      */
-    public void setReceivedCount(long receivedCount) {
-        this.receivedCount = receivedCount;
+    public void setReceivedCount(long value) {
+        this.receivedCount = value;
     }
 
-
     /**
-     * Gets the codeLabel2 value for this CodeReceivedType.
+     * Gets the value of the receivedValue property.
      * 
-     * @return codeLabel2
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getCodeLabel2() {
-        return codeLabel2;
+    public String getReceivedValue() {
+        return receivedValue;
     }
 
-
     /**
-     * Sets the codeLabel2 value for this CodeReceivedType.
+     * Sets the value of the receivedValue property.
      * 
-     * @param codeLabel2
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setCodeLabel2(java.lang.String codeLabel2) {
-        this.codeLabel2 = codeLabel2;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof CodeReceivedType)) return false;
-        CodeReceivedType other = (CodeReceivedType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            this.codeId == other.getCodeId() &&
-            ((this.codeLabel==null && other.getCodeLabel()==null) || 
-             (this.codeLabel!=null &&
-              this.codeLabel.equals(other.getCodeLabel()))) &&
-            this.profileId == other.getProfileId() &&
-            this.tableId == other.getTableId() &&
-            ((this.tableLabel==null && other.getTableLabel()==null) || 
-             (this.tableLabel!=null &&
-              this.tableLabel.equals(other.getTableLabel()))) &&
-            ((this.receivedValue==null && other.getReceivedValue()==null) || 
-             (this.receivedValue!=null &&
-              this.receivedValue.equals(other.getReceivedValue()))) &&
-            ((this.codeValue==null && other.getCodeValue()==null) || 
-             (this.codeValue!=null &&
-              this.codeValue.equals(other.getCodeValue()))) &&
-            ((this.codeStatus==null && other.getCodeStatus()==null) || 
-             (this.codeStatus!=null &&
-              this.codeStatus.equals(other.getCodeStatus()))) &&
-            this.receivedCount == other.getReceivedCount() &&
-            ((this.codeLabel2==null && other.getCodeLabel2()==null) || 
-             (this.codeLabel2!=null &&
-              this.codeLabel2.equals(other.getCodeLabel2())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        _hashCode += new Long(getCodeId()).hashCode();
-        if (getCodeLabel() != null) {
-            _hashCode += getCodeLabel().hashCode();
-        }
-        _hashCode += new Long(getProfileId()).hashCode();
-        _hashCode += new Long(getTableId()).hashCode();
-        if (getTableLabel() != null) {
-            _hashCode += getTableLabel().hashCode();
-        }
-        if (getReceivedValue() != null) {
-            _hashCode += getReceivedValue().hashCode();
-        }
-        if (getCodeValue() != null) {
-            _hashCode += getCodeValue().hashCode();
-        }
-        if (getCodeStatus() != null) {
-            _hashCode += getCodeStatus().hashCode();
-        }
-        _hashCode += new Long(getReceivedCount()).hashCode();
-        if (getCodeLabel2() != null) {
-            _hashCode += getCodeLabel2().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(CodeReceivedType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "CodeReceivedType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("profileId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "profileId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("tableId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "tableId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("tableLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "tableLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("receivedValue");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "receivedValue"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeValue");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeValue"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeStatus");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeStatus"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("receivedCount");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "receivedCount"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeLabel2");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeLabel2"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
+    public void setReceivedValue(String value) {
+        this.receivedValue = value;
     }
 
     /**
-     * Return type metadata object
+     * Gets the value of the tableId property.
+     * 
      */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
+    public long getTableId() {
+        return tableId;
     }
 
     /**
-     * Get Custom Serializer
+     * Sets the value of the tableId property.
+     * 
      */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
+    public void setTableId(long value) {
+        this.tableId = value;
     }
 
     /**
-     * Get Custom Deserializer
+     * Gets the value of the tableLabel property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public String getTableLabel() {
+        return tableLabel;
+    }
+
+    /**
+     * Sets the value of the tableLabel property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTableLabel(String value) {
+        this.tableLabel = value;
     }
 
 }

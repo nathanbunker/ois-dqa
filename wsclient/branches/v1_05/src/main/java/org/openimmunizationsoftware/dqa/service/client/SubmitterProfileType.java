@@ -1,403 +1,268 @@
-/**
- * SubmitterProfileType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class SubmitterProfileType  implements java.io.Serializable {
-    private java.lang.String profileCode;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
-    private java.lang.Long profileId;
 
-    private java.lang.String profileLabel;
+/**
+ * <p>Java class for submitterProfileType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="submitterProfileType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="accessKey" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="orgLocalCode" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="orgLocalLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="profileCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="profileId" type="{http://www.w3.org/2001/XMLSchema}long" minOccurs="0"/>
+ *         &lt;element name="profileLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="profileStatus" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="templateId" type="{http://www.w3.org/2001/XMLSchema}long" minOccurs="0"/>
+ *         &lt;element name="transferPriority" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "submitterProfileType", propOrder = {
+    "accessKey",
+    "orgLocalCode",
+    "orgLocalLabel",
+    "profileCode",
+    "profileId",
+    "profileLabel",
+    "profileStatus",
+    "templateId",
+    "transferPriority"
+})
+public class SubmitterProfileType {
 
-    private java.lang.String profileStatus;
-
-    private long orgLocalCode;
-
-    private java.lang.String orgLocalLabel;
-
-    private java.lang.String transferPriority;
-
-    private java.lang.String accessKey;
-
-    private java.lang.Long templateId;
-
-    public SubmitterProfileType() {
-    }
-
-    public SubmitterProfileType(
-           java.lang.String profileCode,
-           java.lang.Long profileId,
-           java.lang.String profileLabel,
-           java.lang.String profileStatus,
-           long orgLocalCode,
-           java.lang.String orgLocalLabel,
-           java.lang.String transferPriority,
-           java.lang.String accessKey,
-           java.lang.Long templateId) {
-           this.profileCode = profileCode;
-           this.profileId = profileId;
-           this.profileLabel = profileLabel;
-           this.profileStatus = profileStatus;
-           this.orgLocalCode = orgLocalCode;
-           this.orgLocalLabel = orgLocalLabel;
-           this.transferPriority = transferPriority;
-           this.accessKey = accessKey;
-           this.templateId = templateId;
-    }
-
+    protected String accessKey;
+    protected long orgLocalCode;
+    protected String orgLocalLabel;
+    protected String profileCode;
+    protected Long profileId;
+    protected String profileLabel;
+    protected String profileStatus;
+    protected Long templateId;
+    protected String transferPriority;
 
     /**
-     * Gets the profileCode value for this SubmitterProfileType.
+     * Gets the value of the accessKey property.
      * 
-     * @return profileCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getProfileCode() {
-        return profileCode;
+    public String getAccessKey() {
+        return accessKey;
     }
 
-
     /**
-     * Sets the profileCode value for this SubmitterProfileType.
+     * Sets the value of the accessKey property.
      * 
-     * @param profileCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setProfileCode(java.lang.String profileCode) {
-        this.profileCode = profileCode;
+    public void setAccessKey(String value) {
+        this.accessKey = value;
     }
 
-
     /**
-     * Gets the profileId value for this SubmitterProfileType.
+     * Gets the value of the orgLocalCode property.
      * 
-     * @return profileId
-     */
-    public java.lang.Long getProfileId() {
-        return profileId;
-    }
-
-
-    /**
-     * Sets the profileId value for this SubmitterProfileType.
-     * 
-     * @param profileId
-     */
-    public void setProfileId(java.lang.Long profileId) {
-        this.profileId = profileId;
-    }
-
-
-    /**
-     * Gets the profileLabel value for this SubmitterProfileType.
-     * 
-     * @return profileLabel
-     */
-    public java.lang.String getProfileLabel() {
-        return profileLabel;
-    }
-
-
-    /**
-     * Sets the profileLabel value for this SubmitterProfileType.
-     * 
-     * @param profileLabel
-     */
-    public void setProfileLabel(java.lang.String profileLabel) {
-        this.profileLabel = profileLabel;
-    }
-
-
-    /**
-     * Gets the profileStatus value for this SubmitterProfileType.
-     * 
-     * @return profileStatus
-     */
-    public java.lang.String getProfileStatus() {
-        return profileStatus;
-    }
-
-
-    /**
-     * Sets the profileStatus value for this SubmitterProfileType.
-     * 
-     * @param profileStatus
-     */
-    public void setProfileStatus(java.lang.String profileStatus) {
-        this.profileStatus = profileStatus;
-    }
-
-
-    /**
-     * Gets the orgLocalCode value for this SubmitterProfileType.
-     * 
-     * @return orgLocalCode
      */
     public long getOrgLocalCode() {
         return orgLocalCode;
     }
 
-
     /**
-     * Sets the orgLocalCode value for this SubmitterProfileType.
+     * Sets the value of the orgLocalCode property.
      * 
-     * @param orgLocalCode
      */
-    public void setOrgLocalCode(long orgLocalCode) {
-        this.orgLocalCode = orgLocalCode;
+    public void setOrgLocalCode(long value) {
+        this.orgLocalCode = value;
     }
 
-
     /**
-     * Gets the orgLocalLabel value for this SubmitterProfileType.
+     * Gets the value of the orgLocalLabel property.
      * 
-     * @return orgLocalLabel
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getOrgLocalLabel() {
+    public String getOrgLocalLabel() {
         return orgLocalLabel;
     }
 
-
     /**
-     * Sets the orgLocalLabel value for this SubmitterProfileType.
+     * Sets the value of the orgLocalLabel property.
      * 
-     * @param orgLocalLabel
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setOrgLocalLabel(java.lang.String orgLocalLabel) {
-        this.orgLocalLabel = orgLocalLabel;
+    public void setOrgLocalLabel(String value) {
+        this.orgLocalLabel = value;
     }
 
-
     /**
-     * Gets the transferPriority value for this SubmitterProfileType.
+     * Gets the value of the profileCode property.
      * 
-     * @return transferPriority
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getTransferPriority() {
-        return transferPriority;
+    public String getProfileCode() {
+        return profileCode;
     }
 
-
     /**
-     * Sets the transferPriority value for this SubmitterProfileType.
+     * Sets the value of the profileCode property.
      * 
-     * @param transferPriority
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setTransferPriority(java.lang.String transferPriority) {
-        this.transferPriority = transferPriority;
+    public void setProfileCode(String value) {
+        this.profileCode = value;
     }
 
-
     /**
-     * Gets the accessKey value for this SubmitterProfileType.
+     * Gets the value of the profileId property.
      * 
-     * @return accessKey
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
      */
-    public java.lang.String getAccessKey() {
-        return accessKey;
+    public Long getProfileId() {
+        return profileId;
     }
 
-
     /**
-     * Sets the accessKey value for this SubmitterProfileType.
+     * Sets the value of the profileId property.
      * 
-     * @param accessKey
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
      */
-    public void setAccessKey(java.lang.String accessKey) {
-        this.accessKey = accessKey;
+    public void setProfileId(Long value) {
+        this.profileId = value;
     }
 
+    /**
+     * Gets the value of the profileLabel property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getProfileLabel() {
+        return profileLabel;
+    }
 
     /**
-     * Gets the templateId value for this SubmitterProfileType.
+     * Sets the value of the profileLabel property.
      * 
-     * @return templateId
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public java.lang.Long getTemplateId() {
+    public void setProfileLabel(String value) {
+        this.profileLabel = value;
+    }
+
+    /**
+     * Gets the value of the profileStatus property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getProfileStatus() {
+        return profileStatus;
+    }
+
+    /**
+     * Sets the value of the profileStatus property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setProfileStatus(String value) {
+        this.profileStatus = value;
+    }
+
+    /**
+     * Gets the value of the templateId property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getTemplateId() {
         return templateId;
     }
 
-
     /**
-     * Sets the templateId value for this SubmitterProfileType.
+     * Sets the value of the templateId property.
      * 
-     * @param templateId
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
      */
-    public void setTemplateId(java.lang.Long templateId) {
-        this.templateId = templateId;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof SubmitterProfileType)) return false;
-        SubmitterProfileType other = (SubmitterProfileType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            ((this.profileCode==null && other.getProfileCode()==null) || 
-             (this.profileCode!=null &&
-              this.profileCode.equals(other.getProfileCode()))) &&
-            ((this.profileId==null && other.getProfileId()==null) || 
-             (this.profileId!=null &&
-              this.profileId.equals(other.getProfileId()))) &&
-            ((this.profileLabel==null && other.getProfileLabel()==null) || 
-             (this.profileLabel!=null &&
-              this.profileLabel.equals(other.getProfileLabel()))) &&
-            ((this.profileStatus==null && other.getProfileStatus()==null) || 
-             (this.profileStatus!=null &&
-              this.profileStatus.equals(other.getProfileStatus()))) &&
-            this.orgLocalCode == other.getOrgLocalCode() &&
-            ((this.orgLocalLabel==null && other.getOrgLocalLabel()==null) || 
-             (this.orgLocalLabel!=null &&
-              this.orgLocalLabel.equals(other.getOrgLocalLabel()))) &&
-            ((this.transferPriority==null && other.getTransferPriority()==null) || 
-             (this.transferPriority!=null &&
-              this.transferPriority.equals(other.getTransferPriority()))) &&
-            ((this.accessKey==null && other.getAccessKey()==null) || 
-             (this.accessKey!=null &&
-              this.accessKey.equals(other.getAccessKey()))) &&
-            ((this.templateId==null && other.getTemplateId()==null) || 
-             (this.templateId!=null &&
-              this.templateId.equals(other.getTemplateId())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        if (getProfileCode() != null) {
-            _hashCode += getProfileCode().hashCode();
-        }
-        if (getProfileId() != null) {
-            _hashCode += getProfileId().hashCode();
-        }
-        if (getProfileLabel() != null) {
-            _hashCode += getProfileLabel().hashCode();
-        }
-        if (getProfileStatus() != null) {
-            _hashCode += getProfileStatus().hashCode();
-        }
-        _hashCode += new Long(getOrgLocalCode()).hashCode();
-        if (getOrgLocalLabel() != null) {
-            _hashCode += getOrgLocalLabel().hashCode();
-        }
-        if (getTransferPriority() != null) {
-            _hashCode += getTransferPriority().hashCode();
-        }
-        if (getAccessKey() != null) {
-            _hashCode += getAccessKey().hashCode();
-        }
-        if (getTemplateId() != null) {
-            _hashCode += getTemplateId().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(SubmitterProfileType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "SubmitterProfileType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("profileCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "profileCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("profileId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "profileId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("profileLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "profileLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("profileStatus");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "profileStatus"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("orgLocalCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "orgLocalCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("orgLocalLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "orgLocalLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("transferPriority");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "transferPriority"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("accessKey");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "accessKey"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("templateId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "templateId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
+    public void setTemplateId(Long value) {
+        this.templateId = value;
     }
 
     /**
-     * Return type metadata object
+     * Gets the value of the transferPriority property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
+    public String getTransferPriority() {
+        return transferPriority;
     }
 
     /**
-     * Get Custom Serializer
+     * Sets the value of the transferPriority property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public void setTransferPriority(String value) {
+        this.transferPriority = value;
     }
 
 }

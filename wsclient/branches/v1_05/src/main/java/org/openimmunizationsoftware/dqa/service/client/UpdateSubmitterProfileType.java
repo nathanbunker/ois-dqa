@@ -1,155 +1,87 @@
-/**
- * UpdateSubmitterProfileType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class UpdateSubmitterProfileType  implements java.io.Serializable {
-    private org.openimmunizationsoftware.dqa.service.client.SubmitterProfileType submitterProfileList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
-    private java.lang.String autoCreate;
 
-    public UpdateSubmitterProfileType() {
-    }
+/**
+ * <p>Java class for updateSubmitterProfileType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="updateSubmitterProfileType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="autoCreate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="submitterProfileList" type="{http://dqaws.openimmunizationsoftware.org/dqa/}submitterProfileType" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "updateSubmitterProfileType", propOrder = {
+    "autoCreate",
+    "submitterProfileList"
+})
+public class UpdateSubmitterProfileType {
 
-    public UpdateSubmitterProfileType(
-           org.openimmunizationsoftware.dqa.service.client.SubmitterProfileType submitterProfileList,
-           java.lang.String autoCreate) {
-           this.submitterProfileList = submitterProfileList;
-           this.autoCreate = autoCreate;
-    }
-
+    protected String autoCreate;
+    protected SubmitterProfileType submitterProfileList;
 
     /**
-     * Gets the submitterProfileList value for this UpdateSubmitterProfileType.
+     * Gets the value of the autoCreate property.
      * 
-     * @return submitterProfileList
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public org.openimmunizationsoftware.dqa.service.client.SubmitterProfileType getSubmitterProfileList() {
-        return submitterProfileList;
-    }
-
-
-    /**
-     * Sets the submitterProfileList value for this UpdateSubmitterProfileType.
-     * 
-     * @param submitterProfileList
-     */
-    public void setSubmitterProfileList(org.openimmunizationsoftware.dqa.service.client.SubmitterProfileType submitterProfileList) {
-        this.submitterProfileList = submitterProfileList;
-    }
-
-
-    /**
-     * Gets the autoCreate value for this UpdateSubmitterProfileType.
-     * 
-     * @return autoCreate
-     */
-    public java.lang.String getAutoCreate() {
+    public String getAutoCreate() {
         return autoCreate;
     }
 
-
     /**
-     * Sets the autoCreate value for this UpdateSubmitterProfileType.
+     * Sets the value of the autoCreate property.
      * 
-     * @param autoCreate
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setAutoCreate(java.lang.String autoCreate) {
-        this.autoCreate = autoCreate;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof UpdateSubmitterProfileType)) return false;
-        UpdateSubmitterProfileType other = (UpdateSubmitterProfileType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            ((this.submitterProfileList==null && other.getSubmitterProfileList()==null) || 
-             (this.submitterProfileList!=null &&
-              this.submitterProfileList.equals(other.getSubmitterProfileList()))) &&
-            ((this.autoCreate==null && other.getAutoCreate()==null) || 
-             (this.autoCreate!=null &&
-              this.autoCreate.equals(other.getAutoCreate())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        if (getSubmitterProfileList() != null) {
-            _hashCode += getSubmitterProfileList().hashCode();
-        }
-        if (getAutoCreate() != null) {
-            _hashCode += getAutoCreate().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(UpdateSubmitterProfileType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "UpdateSubmitterProfileType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("submitterProfileList");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "submitterProfileList"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "SubmitterProfileType"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("autoCreate");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "autoCreate"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
+    public void setAutoCreate(String value) {
+        this.autoCreate = value;
     }
 
     /**
-     * Return type metadata object
+     * Gets the value of the submitterProfileList property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link SubmitterProfileType }
+     *     
      */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
+    public SubmitterProfileType getSubmitterProfileList() {
+        return submitterProfileList;
     }
 
     /**
-     * Get Custom Serializer
+     * Sets the value of the submitterProfileList property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link SubmitterProfileType }
+     *     
      */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public void setSubmitterProfileList(SubmitterProfileType value) {
+        this.submitterProfileList = value;
     }
 
 }

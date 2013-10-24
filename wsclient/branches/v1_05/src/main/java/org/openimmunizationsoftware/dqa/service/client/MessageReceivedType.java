@@ -1,327 +1,206 @@
-/**
- * MessageReceivedType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class MessageReceivedType  implements java.io.Serializable {
-    private long receivedId;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
-    private long profileId;
 
-    private java.lang.String receivedDate;
+/**
+ * <p>Java class for messageReceivedType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="messageReceivedType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="actionCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="actionLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="profileId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="receivedDate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="receivedId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="submitCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="submitLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "messageReceivedType", propOrder = {
+    "actionCode",
+    "actionLabel",
+    "profileId",
+    "receivedDate",
+    "receivedId",
+    "submitCode",
+    "submitLabel"
+})
+public class MessageReceivedType {
 
-    private java.lang.String actionCode;
-
-    private java.lang.String actionLabel;
-
-    private java.lang.String submitCode;
-
-    private java.lang.String submitLabel;
-
-    public MessageReceivedType() {
-    }
-
-    public MessageReceivedType(
-           long receivedId,
-           long profileId,
-           java.lang.String receivedDate,
-           java.lang.String actionCode,
-           java.lang.String actionLabel,
-           java.lang.String submitCode,
-           java.lang.String submitLabel) {
-           this.receivedId = receivedId;
-           this.profileId = profileId;
-           this.receivedDate = receivedDate;
-           this.actionCode = actionCode;
-           this.actionLabel = actionLabel;
-           this.submitCode = submitCode;
-           this.submitLabel = submitLabel;
-    }
-
+    protected String actionCode;
+    protected String actionLabel;
+    protected long profileId;
+    protected String receivedDate;
+    protected long receivedId;
+    protected String submitCode;
+    protected String submitLabel;
 
     /**
-     * Gets the receivedId value for this MessageReceivedType.
+     * Gets the value of the actionCode property.
      * 
-     * @return receivedId
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getReceivedId() {
-        return receivedId;
+    public String getActionCode() {
+        return actionCode;
     }
 
-
     /**
-     * Sets the receivedId value for this MessageReceivedType.
+     * Sets the value of the actionCode property.
      * 
-     * @param receivedId
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setReceivedId(long receivedId) {
-        this.receivedId = receivedId;
+    public void setActionCode(String value) {
+        this.actionCode = value;
     }
 
+    /**
+     * Gets the value of the actionLabel property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getActionLabel() {
+        return actionLabel;
+    }
 
     /**
-     * Gets the profileId value for this MessageReceivedType.
+     * Sets the value of the actionLabel property.
      * 
-     * @return profileId
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setActionLabel(String value) {
+        this.actionLabel = value;
+    }
+
+    /**
+     * Gets the value of the profileId property.
+     * 
      */
     public long getProfileId() {
         return profileId;
     }
 
-
     /**
-     * Sets the profileId value for this MessageReceivedType.
+     * Sets the value of the profileId property.
      * 
-     * @param profileId
      */
-    public void setProfileId(long profileId) {
-        this.profileId = profileId;
+    public void setProfileId(long value) {
+        this.profileId = value;
     }
 
-
     /**
-     * Gets the receivedDate value for this MessageReceivedType.
+     * Gets the value of the receivedDate property.
      * 
-     * @return receivedDate
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getReceivedDate() {
+    public String getReceivedDate() {
         return receivedDate;
     }
 
-
     /**
-     * Sets the receivedDate value for this MessageReceivedType.
+     * Sets the value of the receivedDate property.
      * 
-     * @param receivedDate
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setReceivedDate(java.lang.String receivedDate) {
-        this.receivedDate = receivedDate;
+    public void setReceivedDate(String value) {
+        this.receivedDate = value;
     }
 
-
     /**
-     * Gets the actionCode value for this MessageReceivedType.
+     * Gets the value of the receivedId property.
      * 
-     * @return actionCode
      */
-    public java.lang.String getActionCode() {
-        return actionCode;
+    public long getReceivedId() {
+        return receivedId;
     }
 
-
     /**
-     * Sets the actionCode value for this MessageReceivedType.
+     * Sets the value of the receivedId property.
      * 
-     * @param actionCode
      */
-    public void setActionCode(java.lang.String actionCode) {
-        this.actionCode = actionCode;
+    public void setReceivedId(long value) {
+        this.receivedId = value;
     }
 
-
     /**
-     * Gets the actionLabel value for this MessageReceivedType.
+     * Gets the value of the submitCode property.
      * 
-     * @return actionLabel
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getActionLabel() {
-        return actionLabel;
-    }
-
-
-    /**
-     * Sets the actionLabel value for this MessageReceivedType.
-     * 
-     * @param actionLabel
-     */
-    public void setActionLabel(java.lang.String actionLabel) {
-        this.actionLabel = actionLabel;
-    }
-
-
-    /**
-     * Gets the submitCode value for this MessageReceivedType.
-     * 
-     * @return submitCode
-     */
-    public java.lang.String getSubmitCode() {
+    public String getSubmitCode() {
         return submitCode;
     }
 
-
     /**
-     * Sets the submitCode value for this MessageReceivedType.
+     * Sets the value of the submitCode property.
      * 
-     * @param submitCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setSubmitCode(java.lang.String submitCode) {
-        this.submitCode = submitCode;
+    public void setSubmitCode(String value) {
+        this.submitCode = value;
     }
 
-
     /**
-     * Gets the submitLabel value for this MessageReceivedType.
+     * Gets the value of the submitLabel property.
      * 
-     * @return submitLabel
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getSubmitLabel() {
+    public String getSubmitLabel() {
         return submitLabel;
     }
 
-
     /**
-     * Sets the submitLabel value for this MessageReceivedType.
+     * Sets the value of the submitLabel property.
      * 
-     * @param submitLabel
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setSubmitLabel(java.lang.String submitLabel) {
-        this.submitLabel = submitLabel;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof MessageReceivedType)) return false;
-        MessageReceivedType other = (MessageReceivedType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            this.receivedId == other.getReceivedId() &&
-            this.profileId == other.getProfileId() &&
-            ((this.receivedDate==null && other.getReceivedDate()==null) || 
-             (this.receivedDate!=null &&
-              this.receivedDate.equals(other.getReceivedDate()))) &&
-            ((this.actionCode==null && other.getActionCode()==null) || 
-             (this.actionCode!=null &&
-              this.actionCode.equals(other.getActionCode()))) &&
-            ((this.actionLabel==null && other.getActionLabel()==null) || 
-             (this.actionLabel!=null &&
-              this.actionLabel.equals(other.getActionLabel()))) &&
-            ((this.submitCode==null && other.getSubmitCode()==null) || 
-             (this.submitCode!=null &&
-              this.submitCode.equals(other.getSubmitCode()))) &&
-            ((this.submitLabel==null && other.getSubmitLabel()==null) || 
-             (this.submitLabel!=null &&
-              this.submitLabel.equals(other.getSubmitLabel())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        _hashCode += new Long(getReceivedId()).hashCode();
-        _hashCode += new Long(getProfileId()).hashCode();
-        if (getReceivedDate() != null) {
-            _hashCode += getReceivedDate().hashCode();
-        }
-        if (getActionCode() != null) {
-            _hashCode += getActionCode().hashCode();
-        }
-        if (getActionLabel() != null) {
-            _hashCode += getActionLabel().hashCode();
-        }
-        if (getSubmitCode() != null) {
-            _hashCode += getSubmitCode().hashCode();
-        }
-        if (getSubmitLabel() != null) {
-            _hashCode += getSubmitLabel().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(MessageReceivedType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "MessageReceivedType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("receivedId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "receivedId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("profileId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "profileId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("receivedDate");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "receivedDate"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("actionCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "actionCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("actionLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "actionLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("submitCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "submitCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("submitLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "submitLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-    }
-
-    /**
-     * Return type metadata object
-     */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
-    }
-
-    /**
-     * Get Custom Serializer
-     */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public void setSubmitLabel(String value) {
+        this.submitLabel = value;
     }
 
 }

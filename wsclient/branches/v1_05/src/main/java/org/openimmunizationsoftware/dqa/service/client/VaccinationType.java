@@ -1,1151 +1,819 @@
-/**
- * VaccinationType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class VaccinationType  implements java.io.Serializable {
-    private long vaccinationId;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
-    private long positionId;
 
-    private java.lang.String skipped;
+/**
+ * <p>Java class for vaccinationType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="vaccinationType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="adminCodeCpt" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="adminCodeCvx" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="adminDate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="amount" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="amountUnitCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="bodyRouteCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="bodySiteCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="completionStatusCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="confidentialityCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="enteredByNameFirst" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="enteredByNameLast" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="enteredByNumber" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="expirationDate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="facilityId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="facilityName" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="financialEligibilityCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="givenByNameFirst" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="givenByNameLast" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="givenByNumber" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="idSubmitter" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="informationSourceCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="lotNumber" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="manufacturerCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="orderedByNumber" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="positionId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="refusalCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="skipped" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="systemEntryDate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="vaccinationId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="visPublicationDate" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "vaccinationType", propOrder = {
+    "adminCodeCpt",
+    "adminCodeCvx",
+    "adminDate",
+    "amount",
+    "amountUnitCode",
+    "bodyRouteCode",
+    "bodySiteCode",
+    "completionStatusCode",
+    "confidentialityCode",
+    "enteredByNameFirst",
+    "enteredByNameLast",
+    "enteredByNumber",
+    "expirationDate",
+    "facilityId",
+    "facilityName",
+    "financialEligibilityCode",
+    "givenByNameFirst",
+    "givenByNameLast",
+    "givenByNumber",
+    "idSubmitter",
+    "informationSourceCode",
+    "lotNumber",
+    "manufacturerCode",
+    "orderedByNumber",
+    "positionId",
+    "refusalCode",
+    "skipped",
+    "systemEntryDate",
+    "vaccinationId",
+    "visPublicationDate"
+})
+public class VaccinationType {
 
-    private java.lang.String adminCodeCpt;
-
-    private java.lang.String adminCodeCvx;
-
-    private java.lang.String adminDate;
-
-    private java.lang.String amount;
-
-    private java.lang.String amountUnitCode;
-
-    private java.lang.String bodyRouteCode;
-
-    private java.lang.String bodySiteCode;
-
-    private java.lang.String completionStatusCode;
-
-    private java.lang.String confidentialityCode;
-
-    private java.lang.String enteredByNumber;
-
-    private java.lang.String enteredByNameFirst;
-
-    private java.lang.String enteredByNameLast;
-
-    private java.lang.String expirationDate;
-
-    private long facilityId;
-
-    private java.lang.String facilityName;
-
-    private java.lang.String financialEligibilityCode;
-
-    private java.lang.String givenByNumber;
-
-    private java.lang.String givenByNameLast;
-
-    private java.lang.String givenByNameFirst;
-
-    private java.lang.String idSubmitter;
-
-    private java.lang.String informationSourceCode;
-
-    private java.lang.String lotNumber;
-
-    private java.lang.String manufacturerCode;
-
-    private java.lang.String orderedByNumber;
-
-    private java.lang.String refusalCode;
-
-    private java.lang.String systemEntryDate;
-
-    private java.lang.String visPublicationDate;
-
-    public VaccinationType() {
-    }
-
-    public VaccinationType(
-           long vaccinationId,
-           long positionId,
-           java.lang.String skipped,
-           java.lang.String adminCodeCpt,
-           java.lang.String adminCodeCvx,
-           java.lang.String adminDate,
-           java.lang.String amount,
-           java.lang.String amountUnitCode,
-           java.lang.String bodyRouteCode,
-           java.lang.String bodySiteCode,
-           java.lang.String completionStatusCode,
-           java.lang.String confidentialityCode,
-           java.lang.String enteredByNumber,
-           java.lang.String enteredByNameFirst,
-           java.lang.String enteredByNameLast,
-           java.lang.String expirationDate,
-           long facilityId,
-           java.lang.String facilityName,
-           java.lang.String financialEligibilityCode,
-           java.lang.String givenByNumber,
-           java.lang.String givenByNameLast,
-           java.lang.String givenByNameFirst,
-           java.lang.String idSubmitter,
-           java.lang.String informationSourceCode,
-           java.lang.String lotNumber,
-           java.lang.String manufacturerCode,
-           java.lang.String orderedByNumber,
-           java.lang.String refusalCode,
-           java.lang.String systemEntryDate,
-           java.lang.String visPublicationDate) {
-           this.vaccinationId = vaccinationId;
-           this.positionId = positionId;
-           this.skipped = skipped;
-           this.adminCodeCpt = adminCodeCpt;
-           this.adminCodeCvx = adminCodeCvx;
-           this.adminDate = adminDate;
-           this.amount = amount;
-           this.amountUnitCode = amountUnitCode;
-           this.bodyRouteCode = bodyRouteCode;
-           this.bodySiteCode = bodySiteCode;
-           this.completionStatusCode = completionStatusCode;
-           this.confidentialityCode = confidentialityCode;
-           this.enteredByNumber = enteredByNumber;
-           this.enteredByNameFirst = enteredByNameFirst;
-           this.enteredByNameLast = enteredByNameLast;
-           this.expirationDate = expirationDate;
-           this.facilityId = facilityId;
-           this.facilityName = facilityName;
-           this.financialEligibilityCode = financialEligibilityCode;
-           this.givenByNumber = givenByNumber;
-           this.givenByNameLast = givenByNameLast;
-           this.givenByNameFirst = givenByNameFirst;
-           this.idSubmitter = idSubmitter;
-           this.informationSourceCode = informationSourceCode;
-           this.lotNumber = lotNumber;
-           this.manufacturerCode = manufacturerCode;
-           this.orderedByNumber = orderedByNumber;
-           this.refusalCode = refusalCode;
-           this.systemEntryDate = systemEntryDate;
-           this.visPublicationDate = visPublicationDate;
-    }
-
+    protected String adminCodeCpt;
+    protected String adminCodeCvx;
+    protected String adminDate;
+    protected String amount;
+    protected String amountUnitCode;
+    protected String bodyRouteCode;
+    protected String bodySiteCode;
+    protected String completionStatusCode;
+    protected String confidentialityCode;
+    protected String enteredByNameFirst;
+    protected String enteredByNameLast;
+    protected String enteredByNumber;
+    protected String expirationDate;
+    protected long facilityId;
+    protected String facilityName;
+    protected String financialEligibilityCode;
+    protected String givenByNameFirst;
+    protected String givenByNameLast;
+    protected String givenByNumber;
+    protected String idSubmitter;
+    protected String informationSourceCode;
+    protected String lotNumber;
+    protected String manufacturerCode;
+    protected String orderedByNumber;
+    protected long positionId;
+    protected String refusalCode;
+    protected String skipped;
+    protected String systemEntryDate;
+    protected long vaccinationId;
+    protected String visPublicationDate;
 
     /**
-     * Gets the vaccinationId value for this VaccinationType.
+     * Gets the value of the adminCodeCpt property.
      * 
-     * @return vaccinationId
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getVaccinationId() {
-        return vaccinationId;
-    }
-
-
-    /**
-     * Sets the vaccinationId value for this VaccinationType.
-     * 
-     * @param vaccinationId
-     */
-    public void setVaccinationId(long vaccinationId) {
-        this.vaccinationId = vaccinationId;
-    }
-
-
-    /**
-     * Gets the positionId value for this VaccinationType.
-     * 
-     * @return positionId
-     */
-    public long getPositionId() {
-        return positionId;
-    }
-
-
-    /**
-     * Sets the positionId value for this VaccinationType.
-     * 
-     * @param positionId
-     */
-    public void setPositionId(long positionId) {
-        this.positionId = positionId;
-    }
-
-
-    /**
-     * Gets the skipped value for this VaccinationType.
-     * 
-     * @return skipped
-     */
-    public java.lang.String getSkipped() {
-        return skipped;
-    }
-
-
-    /**
-     * Sets the skipped value for this VaccinationType.
-     * 
-     * @param skipped
-     */
-    public void setSkipped(java.lang.String skipped) {
-        this.skipped = skipped;
-    }
-
-
-    /**
-     * Gets the adminCodeCpt value for this VaccinationType.
-     * 
-     * @return adminCodeCpt
-     */
-    public java.lang.String getAdminCodeCpt() {
+    public String getAdminCodeCpt() {
         return adminCodeCpt;
     }
 
-
     /**
-     * Sets the adminCodeCpt value for this VaccinationType.
+     * Sets the value of the adminCodeCpt property.
      * 
-     * @param adminCodeCpt
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setAdminCodeCpt(java.lang.String adminCodeCpt) {
-        this.adminCodeCpt = adminCodeCpt;
+    public void setAdminCodeCpt(String value) {
+        this.adminCodeCpt = value;
     }
 
-
     /**
-     * Gets the adminCodeCvx value for this VaccinationType.
+     * Gets the value of the adminCodeCvx property.
      * 
-     * @return adminCodeCvx
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getAdminCodeCvx() {
+    public String getAdminCodeCvx() {
         return adminCodeCvx;
     }
 
-
     /**
-     * Sets the adminCodeCvx value for this VaccinationType.
+     * Sets the value of the adminCodeCvx property.
      * 
-     * @param adminCodeCvx
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setAdminCodeCvx(java.lang.String adminCodeCvx) {
-        this.adminCodeCvx = adminCodeCvx;
+    public void setAdminCodeCvx(String value) {
+        this.adminCodeCvx = value;
     }
 
-
     /**
-     * Gets the adminDate value for this VaccinationType.
+     * Gets the value of the adminDate property.
      * 
-     * @return adminDate
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getAdminDate() {
+    public String getAdminDate() {
         return adminDate;
     }
 
-
     /**
-     * Sets the adminDate value for this VaccinationType.
+     * Sets the value of the adminDate property.
      * 
-     * @param adminDate
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setAdminDate(java.lang.String adminDate) {
-        this.adminDate = adminDate;
+    public void setAdminDate(String value) {
+        this.adminDate = value;
     }
 
-
     /**
-     * Gets the amount value for this VaccinationType.
+     * Gets the value of the amount property.
      * 
-     * @return amount
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getAmount() {
+    public String getAmount() {
         return amount;
     }
 
-
     /**
-     * Sets the amount value for this VaccinationType.
+     * Sets the value of the amount property.
      * 
-     * @param amount
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setAmount(java.lang.String amount) {
-        this.amount = amount;
+    public void setAmount(String value) {
+        this.amount = value;
     }
 
-
     /**
-     * Gets the amountUnitCode value for this VaccinationType.
+     * Gets the value of the amountUnitCode property.
      * 
-     * @return amountUnitCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getAmountUnitCode() {
+    public String getAmountUnitCode() {
         return amountUnitCode;
     }
 
-
     /**
-     * Sets the amountUnitCode value for this VaccinationType.
+     * Sets the value of the amountUnitCode property.
      * 
-     * @param amountUnitCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setAmountUnitCode(java.lang.String amountUnitCode) {
-        this.amountUnitCode = amountUnitCode;
+    public void setAmountUnitCode(String value) {
+        this.amountUnitCode = value;
     }
 
-
     /**
-     * Gets the bodyRouteCode value for this VaccinationType.
+     * Gets the value of the bodyRouteCode property.
      * 
-     * @return bodyRouteCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getBodyRouteCode() {
+    public String getBodyRouteCode() {
         return bodyRouteCode;
     }
 
-
     /**
-     * Sets the bodyRouteCode value for this VaccinationType.
+     * Sets the value of the bodyRouteCode property.
      * 
-     * @param bodyRouteCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setBodyRouteCode(java.lang.String bodyRouteCode) {
-        this.bodyRouteCode = bodyRouteCode;
+    public void setBodyRouteCode(String value) {
+        this.bodyRouteCode = value;
     }
 
-
     /**
-     * Gets the bodySiteCode value for this VaccinationType.
+     * Gets the value of the bodySiteCode property.
      * 
-     * @return bodySiteCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getBodySiteCode() {
+    public String getBodySiteCode() {
         return bodySiteCode;
     }
 
-
     /**
-     * Sets the bodySiteCode value for this VaccinationType.
+     * Sets the value of the bodySiteCode property.
      * 
-     * @param bodySiteCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setBodySiteCode(java.lang.String bodySiteCode) {
-        this.bodySiteCode = bodySiteCode;
+    public void setBodySiteCode(String value) {
+        this.bodySiteCode = value;
     }
 
-
     /**
-     * Gets the completionStatusCode value for this VaccinationType.
+     * Gets the value of the completionStatusCode property.
      * 
-     * @return completionStatusCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getCompletionStatusCode() {
+    public String getCompletionStatusCode() {
         return completionStatusCode;
     }
 
-
     /**
-     * Sets the completionStatusCode value for this VaccinationType.
+     * Sets the value of the completionStatusCode property.
      * 
-     * @param completionStatusCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setCompletionStatusCode(java.lang.String completionStatusCode) {
-        this.completionStatusCode = completionStatusCode;
+    public void setCompletionStatusCode(String value) {
+        this.completionStatusCode = value;
     }
 
-
     /**
-     * Gets the confidentialityCode value for this VaccinationType.
+     * Gets the value of the confidentialityCode property.
      * 
-     * @return confidentialityCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getConfidentialityCode() {
+    public String getConfidentialityCode() {
         return confidentialityCode;
     }
 
-
     /**
-     * Sets the confidentialityCode value for this VaccinationType.
+     * Sets the value of the confidentialityCode property.
      * 
-     * @param confidentialityCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setConfidentialityCode(java.lang.String confidentialityCode) {
-        this.confidentialityCode = confidentialityCode;
+    public void setConfidentialityCode(String value) {
+        this.confidentialityCode = value;
     }
 
-
     /**
-     * Gets the enteredByNumber value for this VaccinationType.
+     * Gets the value of the enteredByNameFirst property.
      * 
-     * @return enteredByNumber
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getEnteredByNumber() {
-        return enteredByNumber;
-    }
-
-
-    /**
-     * Sets the enteredByNumber value for this VaccinationType.
-     * 
-     * @param enteredByNumber
-     */
-    public void setEnteredByNumber(java.lang.String enteredByNumber) {
-        this.enteredByNumber = enteredByNumber;
-    }
-
-
-    /**
-     * Gets the enteredByNameFirst value for this VaccinationType.
-     * 
-     * @return enteredByNameFirst
-     */
-    public java.lang.String getEnteredByNameFirst() {
+    public String getEnteredByNameFirst() {
         return enteredByNameFirst;
     }
 
-
     /**
-     * Sets the enteredByNameFirst value for this VaccinationType.
+     * Sets the value of the enteredByNameFirst property.
      * 
-     * @param enteredByNameFirst
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setEnteredByNameFirst(java.lang.String enteredByNameFirst) {
-        this.enteredByNameFirst = enteredByNameFirst;
+    public void setEnteredByNameFirst(String value) {
+        this.enteredByNameFirst = value;
     }
 
-
     /**
-     * Gets the enteredByNameLast value for this VaccinationType.
+     * Gets the value of the enteredByNameLast property.
      * 
-     * @return enteredByNameLast
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getEnteredByNameLast() {
+    public String getEnteredByNameLast() {
         return enteredByNameLast;
     }
 
-
     /**
-     * Sets the enteredByNameLast value for this VaccinationType.
+     * Sets the value of the enteredByNameLast property.
      * 
-     * @param enteredByNameLast
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setEnteredByNameLast(java.lang.String enteredByNameLast) {
-        this.enteredByNameLast = enteredByNameLast;
+    public void setEnteredByNameLast(String value) {
+        this.enteredByNameLast = value;
     }
 
+    /**
+     * Gets the value of the enteredByNumber property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getEnteredByNumber() {
+        return enteredByNumber;
+    }
 
     /**
-     * Gets the expirationDate value for this VaccinationType.
+     * Sets the value of the enteredByNumber property.
      * 
-     * @return expirationDate
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getExpirationDate() {
+    public void setEnteredByNumber(String value) {
+        this.enteredByNumber = value;
+    }
+
+    /**
+     * Gets the value of the expirationDate property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getExpirationDate() {
         return expirationDate;
     }
 
-
     /**
-     * Sets the expirationDate value for this VaccinationType.
+     * Sets the value of the expirationDate property.
      * 
-     * @param expirationDate
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setExpirationDate(java.lang.String expirationDate) {
-        this.expirationDate = expirationDate;
+    public void setExpirationDate(String value) {
+        this.expirationDate = value;
     }
 
-
     /**
-     * Gets the facilityId value for this VaccinationType.
+     * Gets the value of the facilityId property.
      * 
-     * @return facilityId
      */
     public long getFacilityId() {
         return facilityId;
     }
 
-
     /**
-     * Sets the facilityId value for this VaccinationType.
+     * Sets the value of the facilityId property.
      * 
-     * @param facilityId
      */
-    public void setFacilityId(long facilityId) {
-        this.facilityId = facilityId;
+    public void setFacilityId(long value) {
+        this.facilityId = value;
     }
 
-
     /**
-     * Gets the facilityName value for this VaccinationType.
+     * Gets the value of the facilityName property.
      * 
-     * @return facilityName
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getFacilityName() {
+    public String getFacilityName() {
         return facilityName;
     }
 
-
     /**
-     * Sets the facilityName value for this VaccinationType.
+     * Sets the value of the facilityName property.
      * 
-     * @param facilityName
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setFacilityName(java.lang.String facilityName) {
-        this.facilityName = facilityName;
+    public void setFacilityName(String value) {
+        this.facilityName = value;
     }
 
-
     /**
-     * Gets the financialEligibilityCode value for this VaccinationType.
+     * Gets the value of the financialEligibilityCode property.
      * 
-     * @return financialEligibilityCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getFinancialEligibilityCode() {
+    public String getFinancialEligibilityCode() {
         return financialEligibilityCode;
     }
 
-
     /**
-     * Sets the financialEligibilityCode value for this VaccinationType.
+     * Sets the value of the financialEligibilityCode property.
      * 
-     * @param financialEligibilityCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setFinancialEligibilityCode(java.lang.String financialEligibilityCode) {
-        this.financialEligibilityCode = financialEligibilityCode;
+    public void setFinancialEligibilityCode(String value) {
+        this.financialEligibilityCode = value;
     }
 
-
     /**
-     * Gets the givenByNumber value for this VaccinationType.
+     * Gets the value of the givenByNameFirst property.
      * 
-     * @return givenByNumber
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getGivenByNumber() {
-        return givenByNumber;
-    }
-
-
-    /**
-     * Sets the givenByNumber value for this VaccinationType.
-     * 
-     * @param givenByNumber
-     */
-    public void setGivenByNumber(java.lang.String givenByNumber) {
-        this.givenByNumber = givenByNumber;
-    }
-
-
-    /**
-     * Gets the givenByNameLast value for this VaccinationType.
-     * 
-     * @return givenByNameLast
-     */
-    public java.lang.String getGivenByNameLast() {
-        return givenByNameLast;
-    }
-
-
-    /**
-     * Sets the givenByNameLast value for this VaccinationType.
-     * 
-     * @param givenByNameLast
-     */
-    public void setGivenByNameLast(java.lang.String givenByNameLast) {
-        this.givenByNameLast = givenByNameLast;
-    }
-
-
-    /**
-     * Gets the givenByNameFirst value for this VaccinationType.
-     * 
-     * @return givenByNameFirst
-     */
-    public java.lang.String getGivenByNameFirst() {
+    public String getGivenByNameFirst() {
         return givenByNameFirst;
     }
 
-
     /**
-     * Sets the givenByNameFirst value for this VaccinationType.
+     * Sets the value of the givenByNameFirst property.
      * 
-     * @param givenByNameFirst
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setGivenByNameFirst(java.lang.String givenByNameFirst) {
-        this.givenByNameFirst = givenByNameFirst;
+    public void setGivenByNameFirst(String value) {
+        this.givenByNameFirst = value;
     }
 
+    /**
+     * Gets the value of the givenByNameLast property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getGivenByNameLast() {
+        return givenByNameLast;
+    }
 
     /**
-     * Gets the idSubmitter value for this VaccinationType.
+     * Sets the value of the givenByNameLast property.
      * 
-     * @return idSubmitter
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getIdSubmitter() {
+    public void setGivenByNameLast(String value) {
+        this.givenByNameLast = value;
+    }
+
+    /**
+     * Gets the value of the givenByNumber property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getGivenByNumber() {
+        return givenByNumber;
+    }
+
+    /**
+     * Sets the value of the givenByNumber property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setGivenByNumber(String value) {
+        this.givenByNumber = value;
+    }
+
+    /**
+     * Gets the value of the idSubmitter property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getIdSubmitter() {
         return idSubmitter;
     }
 
-
     /**
-     * Sets the idSubmitter value for this VaccinationType.
+     * Sets the value of the idSubmitter property.
      * 
-     * @param idSubmitter
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setIdSubmitter(java.lang.String idSubmitter) {
-        this.idSubmitter = idSubmitter;
+    public void setIdSubmitter(String value) {
+        this.idSubmitter = value;
     }
 
-
     /**
-     * Gets the informationSourceCode value for this VaccinationType.
+     * Gets the value of the informationSourceCode property.
      * 
-     * @return informationSourceCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getInformationSourceCode() {
+    public String getInformationSourceCode() {
         return informationSourceCode;
     }
 
-
     /**
-     * Sets the informationSourceCode value for this VaccinationType.
+     * Sets the value of the informationSourceCode property.
      * 
-     * @param informationSourceCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setInformationSourceCode(java.lang.String informationSourceCode) {
-        this.informationSourceCode = informationSourceCode;
+    public void setInformationSourceCode(String value) {
+        this.informationSourceCode = value;
     }
 
-
     /**
-     * Gets the lotNumber value for this VaccinationType.
+     * Gets the value of the lotNumber property.
      * 
-     * @return lotNumber
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getLotNumber() {
+    public String getLotNumber() {
         return lotNumber;
     }
 
-
     /**
-     * Sets the lotNumber value for this VaccinationType.
+     * Sets the value of the lotNumber property.
      * 
-     * @param lotNumber
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setLotNumber(java.lang.String lotNumber) {
-        this.lotNumber = lotNumber;
+    public void setLotNumber(String value) {
+        this.lotNumber = value;
     }
 
-
     /**
-     * Gets the manufacturerCode value for this VaccinationType.
+     * Gets the value of the manufacturerCode property.
      * 
-     * @return manufacturerCode
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getManufacturerCode() {
+    public String getManufacturerCode() {
         return manufacturerCode;
     }
 
-
     /**
-     * Sets the manufacturerCode value for this VaccinationType.
+     * Sets the value of the manufacturerCode property.
      * 
-     * @param manufacturerCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setManufacturerCode(java.lang.String manufacturerCode) {
-        this.manufacturerCode = manufacturerCode;
+    public void setManufacturerCode(String value) {
+        this.manufacturerCode = value;
     }
 
-
     /**
-     * Gets the orderedByNumber value for this VaccinationType.
+     * Gets the value of the orderedByNumber property.
      * 
-     * @return orderedByNumber
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getOrderedByNumber() {
+    public String getOrderedByNumber() {
         return orderedByNumber;
     }
 
-
     /**
-     * Sets the orderedByNumber value for this VaccinationType.
+     * Sets the value of the orderedByNumber property.
      * 
-     * @param orderedByNumber
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setOrderedByNumber(java.lang.String orderedByNumber) {
-        this.orderedByNumber = orderedByNumber;
+    public void setOrderedByNumber(String value) {
+        this.orderedByNumber = value;
     }
 
+    /**
+     * Gets the value of the positionId property.
+     * 
+     */
+    public long getPositionId() {
+        return positionId;
+    }
 
     /**
-     * Gets the refusalCode value for this VaccinationType.
+     * Sets the value of the positionId property.
      * 
-     * @return refusalCode
      */
-    public java.lang.String getRefusalCode() {
+    public void setPositionId(long value) {
+        this.positionId = value;
+    }
+
+    /**
+     * Gets the value of the refusalCode property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getRefusalCode() {
         return refusalCode;
     }
 
-
     /**
-     * Sets the refusalCode value for this VaccinationType.
+     * Sets the value of the refusalCode property.
      * 
-     * @param refusalCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setRefusalCode(java.lang.String refusalCode) {
-        this.refusalCode = refusalCode;
+    public void setRefusalCode(String value) {
+        this.refusalCode = value;
     }
 
+    /**
+     * Gets the value of the skipped property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSkipped() {
+        return skipped;
+    }
 
     /**
-     * Gets the systemEntryDate value for this VaccinationType.
+     * Sets the value of the skipped property.
      * 
-     * @return systemEntryDate
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getSystemEntryDate() {
+    public void setSkipped(String value) {
+        this.skipped = value;
+    }
+
+    /**
+     * Gets the value of the systemEntryDate property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSystemEntryDate() {
         return systemEntryDate;
     }
 
-
     /**
-     * Sets the systemEntryDate value for this VaccinationType.
+     * Sets the value of the systemEntryDate property.
      * 
-     * @param systemEntryDate
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setSystemEntryDate(java.lang.String systemEntryDate) {
-        this.systemEntryDate = systemEntryDate;
+    public void setSystemEntryDate(String value) {
+        this.systemEntryDate = value;
     }
 
+    /**
+     * Gets the value of the vaccinationId property.
+     * 
+     */
+    public long getVaccinationId() {
+        return vaccinationId;
+    }
 
     /**
-     * Gets the visPublicationDate value for this VaccinationType.
+     * Sets the value of the vaccinationId property.
      * 
-     * @return visPublicationDate
      */
-    public java.lang.String getVisPublicationDate() {
+    public void setVaccinationId(long value) {
+        this.vaccinationId = value;
+    }
+
+    /**
+     * Gets the value of the visPublicationDate property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getVisPublicationDate() {
         return visPublicationDate;
     }
 
-
     /**
-     * Sets the visPublicationDate value for this VaccinationType.
+     * Sets the value of the visPublicationDate property.
      * 
-     * @param visPublicationDate
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setVisPublicationDate(java.lang.String visPublicationDate) {
-        this.visPublicationDate = visPublicationDate;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof VaccinationType)) return false;
-        VaccinationType other = (VaccinationType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            this.vaccinationId == other.getVaccinationId() &&
-            this.positionId == other.getPositionId() &&
-            ((this.skipped==null && other.getSkipped()==null) || 
-             (this.skipped!=null &&
-              this.skipped.equals(other.getSkipped()))) &&
-            ((this.adminCodeCpt==null && other.getAdminCodeCpt()==null) || 
-             (this.adminCodeCpt!=null &&
-              this.adminCodeCpt.equals(other.getAdminCodeCpt()))) &&
-            ((this.adminCodeCvx==null && other.getAdminCodeCvx()==null) || 
-             (this.adminCodeCvx!=null &&
-              this.adminCodeCvx.equals(other.getAdminCodeCvx()))) &&
-            ((this.adminDate==null && other.getAdminDate()==null) || 
-             (this.adminDate!=null &&
-              this.adminDate.equals(other.getAdminDate()))) &&
-            ((this.amount==null && other.getAmount()==null) || 
-             (this.amount!=null &&
-              this.amount.equals(other.getAmount()))) &&
-            ((this.amountUnitCode==null && other.getAmountUnitCode()==null) || 
-             (this.amountUnitCode!=null &&
-              this.amountUnitCode.equals(other.getAmountUnitCode()))) &&
-            ((this.bodyRouteCode==null && other.getBodyRouteCode()==null) || 
-             (this.bodyRouteCode!=null &&
-              this.bodyRouteCode.equals(other.getBodyRouteCode()))) &&
-            ((this.bodySiteCode==null && other.getBodySiteCode()==null) || 
-             (this.bodySiteCode!=null &&
-              this.bodySiteCode.equals(other.getBodySiteCode()))) &&
-            ((this.completionStatusCode==null && other.getCompletionStatusCode()==null) || 
-             (this.completionStatusCode!=null &&
-              this.completionStatusCode.equals(other.getCompletionStatusCode()))) &&
-            ((this.confidentialityCode==null && other.getConfidentialityCode()==null) || 
-             (this.confidentialityCode!=null &&
-              this.confidentialityCode.equals(other.getConfidentialityCode()))) &&
-            ((this.enteredByNumber==null && other.getEnteredByNumber()==null) || 
-             (this.enteredByNumber!=null &&
-              this.enteredByNumber.equals(other.getEnteredByNumber()))) &&
-            ((this.enteredByNameFirst==null && other.getEnteredByNameFirst()==null) || 
-             (this.enteredByNameFirst!=null &&
-              this.enteredByNameFirst.equals(other.getEnteredByNameFirst()))) &&
-            ((this.enteredByNameLast==null && other.getEnteredByNameLast()==null) || 
-             (this.enteredByNameLast!=null &&
-              this.enteredByNameLast.equals(other.getEnteredByNameLast()))) &&
-            ((this.expirationDate==null && other.getExpirationDate()==null) || 
-             (this.expirationDate!=null &&
-              this.expirationDate.equals(other.getExpirationDate()))) &&
-            this.facilityId == other.getFacilityId() &&
-            ((this.facilityName==null && other.getFacilityName()==null) || 
-             (this.facilityName!=null &&
-              this.facilityName.equals(other.getFacilityName()))) &&
-            ((this.financialEligibilityCode==null && other.getFinancialEligibilityCode()==null) || 
-             (this.financialEligibilityCode!=null &&
-              this.financialEligibilityCode.equals(other.getFinancialEligibilityCode()))) &&
-            ((this.givenByNumber==null && other.getGivenByNumber()==null) || 
-             (this.givenByNumber!=null &&
-              this.givenByNumber.equals(other.getGivenByNumber()))) &&
-            ((this.givenByNameLast==null && other.getGivenByNameLast()==null) || 
-             (this.givenByNameLast!=null &&
-              this.givenByNameLast.equals(other.getGivenByNameLast()))) &&
-            ((this.givenByNameFirst==null && other.getGivenByNameFirst()==null) || 
-             (this.givenByNameFirst!=null &&
-              this.givenByNameFirst.equals(other.getGivenByNameFirst()))) &&
-            ((this.idSubmitter==null && other.getIdSubmitter()==null) || 
-             (this.idSubmitter!=null &&
-              this.idSubmitter.equals(other.getIdSubmitter()))) &&
-            ((this.informationSourceCode==null && other.getInformationSourceCode()==null) || 
-             (this.informationSourceCode!=null &&
-              this.informationSourceCode.equals(other.getInformationSourceCode()))) &&
-            ((this.lotNumber==null && other.getLotNumber()==null) || 
-             (this.lotNumber!=null &&
-              this.lotNumber.equals(other.getLotNumber()))) &&
-            ((this.manufacturerCode==null && other.getManufacturerCode()==null) || 
-             (this.manufacturerCode!=null &&
-              this.manufacturerCode.equals(other.getManufacturerCode()))) &&
-            ((this.orderedByNumber==null && other.getOrderedByNumber()==null) || 
-             (this.orderedByNumber!=null &&
-              this.orderedByNumber.equals(other.getOrderedByNumber()))) &&
-            ((this.refusalCode==null && other.getRefusalCode()==null) || 
-             (this.refusalCode!=null &&
-              this.refusalCode.equals(other.getRefusalCode()))) &&
-            ((this.systemEntryDate==null && other.getSystemEntryDate()==null) || 
-             (this.systemEntryDate!=null &&
-              this.systemEntryDate.equals(other.getSystemEntryDate()))) &&
-            ((this.visPublicationDate==null && other.getVisPublicationDate()==null) || 
-             (this.visPublicationDate!=null &&
-              this.visPublicationDate.equals(other.getVisPublicationDate())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        _hashCode += new Long(getVaccinationId()).hashCode();
-        _hashCode += new Long(getPositionId()).hashCode();
-        if (getSkipped() != null) {
-            _hashCode += getSkipped().hashCode();
-        }
-        if (getAdminCodeCpt() != null) {
-            _hashCode += getAdminCodeCpt().hashCode();
-        }
-        if (getAdminCodeCvx() != null) {
-            _hashCode += getAdminCodeCvx().hashCode();
-        }
-        if (getAdminDate() != null) {
-            _hashCode += getAdminDate().hashCode();
-        }
-        if (getAmount() != null) {
-            _hashCode += getAmount().hashCode();
-        }
-        if (getAmountUnitCode() != null) {
-            _hashCode += getAmountUnitCode().hashCode();
-        }
-        if (getBodyRouteCode() != null) {
-            _hashCode += getBodyRouteCode().hashCode();
-        }
-        if (getBodySiteCode() != null) {
-            _hashCode += getBodySiteCode().hashCode();
-        }
-        if (getCompletionStatusCode() != null) {
-            _hashCode += getCompletionStatusCode().hashCode();
-        }
-        if (getConfidentialityCode() != null) {
-            _hashCode += getConfidentialityCode().hashCode();
-        }
-        if (getEnteredByNumber() != null) {
-            _hashCode += getEnteredByNumber().hashCode();
-        }
-        if (getEnteredByNameFirst() != null) {
-            _hashCode += getEnteredByNameFirst().hashCode();
-        }
-        if (getEnteredByNameLast() != null) {
-            _hashCode += getEnteredByNameLast().hashCode();
-        }
-        if (getExpirationDate() != null) {
-            _hashCode += getExpirationDate().hashCode();
-        }
-        _hashCode += new Long(getFacilityId()).hashCode();
-        if (getFacilityName() != null) {
-            _hashCode += getFacilityName().hashCode();
-        }
-        if (getFinancialEligibilityCode() != null) {
-            _hashCode += getFinancialEligibilityCode().hashCode();
-        }
-        if (getGivenByNumber() != null) {
-            _hashCode += getGivenByNumber().hashCode();
-        }
-        if (getGivenByNameLast() != null) {
-            _hashCode += getGivenByNameLast().hashCode();
-        }
-        if (getGivenByNameFirst() != null) {
-            _hashCode += getGivenByNameFirst().hashCode();
-        }
-        if (getIdSubmitter() != null) {
-            _hashCode += getIdSubmitter().hashCode();
-        }
-        if (getInformationSourceCode() != null) {
-            _hashCode += getInformationSourceCode().hashCode();
-        }
-        if (getLotNumber() != null) {
-            _hashCode += getLotNumber().hashCode();
-        }
-        if (getManufacturerCode() != null) {
-            _hashCode += getManufacturerCode().hashCode();
-        }
-        if (getOrderedByNumber() != null) {
-            _hashCode += getOrderedByNumber().hashCode();
-        }
-        if (getRefusalCode() != null) {
-            _hashCode += getRefusalCode().hashCode();
-        }
-        if (getSystemEntryDate() != null) {
-            _hashCode += getSystemEntryDate().hashCode();
-        }
-        if (getVisPublicationDate() != null) {
-            _hashCode += getVisPublicationDate().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(VaccinationType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "VaccinationType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("vaccinationId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "vaccinationId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("positionId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "positionId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("skipped");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "skipped"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("adminCodeCpt");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "adminCodeCpt"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("adminCodeCvx");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "adminCodeCvx"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("adminDate");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "adminDate"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("amount");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "amount"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("amountUnitCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "amountUnitCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("bodyRouteCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "bodyRouteCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("bodySiteCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "bodySiteCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("completionStatusCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "completionStatusCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("confidentialityCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "confidentialityCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("enteredByNumber");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "enteredByNumber"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("enteredByNameFirst");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "enteredByNameFirst"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("enteredByNameLast");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "enteredByNameLast"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("expirationDate");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "expirationDate"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("facilityId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "facilityId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("facilityName");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "facilityName"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("financialEligibilityCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "financialEligibilityCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("givenByNumber");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "givenByNumber"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("givenByNameLast");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "givenByNameLast"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("givenByNameFirst");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "givenByNameFirst"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("idSubmitter");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "idSubmitter"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("informationSourceCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "informationSourceCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("lotNumber");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "lotNumber"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("manufacturerCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "manufacturerCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("orderedByNumber");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "orderedByNumber"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("refusalCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "refusalCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("systemEntryDate");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "systemEntryDate"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("visPublicationDate");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "visPublicationDate"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-    }
-
-    /**
-     * Return type metadata object
-     */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
-    }
-
-    /**
-     * Get Custom Serializer
-     */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public void setVisPublicationDate(String value) {
+        this.visPublicationDate = value;
     }
 
 }

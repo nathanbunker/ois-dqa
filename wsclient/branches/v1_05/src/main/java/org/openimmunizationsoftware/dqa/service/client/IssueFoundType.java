@@ -1,595 +1,382 @@
-/**
- * IssueFoundType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class IssueFoundType  implements java.io.Serializable {
-    private long issueFoundId;
-
-    private long issueId;
-
-    private java.lang.String issueLabel;
-
-    private long positionId;
-
-    private java.lang.String actionCode;
-
-    private java.lang.String actionLabel;
-
-    private long codeId;
-
-    private java.lang.String codeLabel;
-
-    private long tableId;
-
-    private java.lang.String tableLabel;
-
-    private java.lang.String receivedValue;
-
-    private java.lang.String codeValue;
-
-    private long codeStatus;
-
-    private long receivedCount;
-
-    private java.lang.String codeLabel2;
-
-    public IssueFoundType() {
-    }
-
-    public IssueFoundType(
-           long issueFoundId,
-           long issueId,
-           java.lang.String issueLabel,
-           long positionId,
-           java.lang.String actionCode,
-           java.lang.String actionLabel,
-           long codeId,
-           java.lang.String codeLabel,
-           long tableId,
-           java.lang.String tableLabel,
-           java.lang.String receivedValue,
-           java.lang.String codeValue,
-           long codeStatus,
-           long receivedCount,
-           java.lang.String codeLabel2) {
-           this.issueFoundId = issueFoundId;
-           this.issueId = issueId;
-           this.issueLabel = issueLabel;
-           this.positionId = positionId;
-           this.actionCode = actionCode;
-           this.actionLabel = actionLabel;
-           this.codeId = codeId;
-           this.codeLabel = codeLabel;
-           this.tableId = tableId;
-           this.tableLabel = tableLabel;
-           this.receivedValue = receivedValue;
-           this.codeValue = codeValue;
-           this.codeStatus = codeStatus;
-           this.receivedCount = receivedCount;
-           this.codeLabel2 = codeLabel2;
-    }
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
 
-    /**
-     * Gets the issueFoundId value for this IssueFoundType.
-     * 
-     * @return issueFoundId
-     */
-    public long getIssueFoundId() {
-        return issueFoundId;
-    }
+/**
+ * <p>Java class for issueFoundType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="issueFoundType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="actionCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="actionLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="codeId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="codeLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="codeLabel2" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="codeStatus" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="codeValue" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="issueFoundId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="issueId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="issueLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="positionId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="receivedCount" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="receivedValue" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="tableId" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="tableLabel" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "issueFoundType", propOrder = {
+    "actionCode",
+    "actionLabel",
+    "codeId",
+    "codeLabel",
+    "codeLabel2",
+    "codeStatus",
+    "codeValue",
+    "issueFoundId",
+    "issueId",
+    "issueLabel",
+    "positionId",
+    "receivedCount",
+    "receivedValue",
+    "tableId",
+    "tableLabel"
+})
+public class IssueFoundType {
 
+    protected String actionCode;
+    protected String actionLabel;
+    protected long codeId;
+    protected String codeLabel;
+    protected String codeLabel2;
+    protected long codeStatus;
+    protected String codeValue;
+    protected long issueFoundId;
+    protected long issueId;
+    protected String issueLabel;
+    protected long positionId;
+    protected long receivedCount;
+    protected String receivedValue;
+    protected long tableId;
+    protected String tableLabel;
 
     /**
-     * Sets the issueFoundId value for this IssueFoundType.
+     * Gets the value of the actionCode property.
      * 
-     * @param issueFoundId
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public void setIssueFoundId(long issueFoundId) {
-        this.issueFoundId = issueFoundId;
-    }
-
-
-    /**
-     * Gets the issueId value for this IssueFoundType.
-     * 
-     * @return issueId
-     */
-    public long getIssueId() {
-        return issueId;
-    }
-
-
-    /**
-     * Sets the issueId value for this IssueFoundType.
-     * 
-     * @param issueId
-     */
-    public void setIssueId(long issueId) {
-        this.issueId = issueId;
-    }
-
-
-    /**
-     * Gets the issueLabel value for this IssueFoundType.
-     * 
-     * @return issueLabel
-     */
-    public java.lang.String getIssueLabel() {
-        return issueLabel;
-    }
-
-
-    /**
-     * Sets the issueLabel value for this IssueFoundType.
-     * 
-     * @param issueLabel
-     */
-    public void setIssueLabel(java.lang.String issueLabel) {
-        this.issueLabel = issueLabel;
-    }
-
-
-    /**
-     * Gets the positionId value for this IssueFoundType.
-     * 
-     * @return positionId
-     */
-    public long getPositionId() {
-        return positionId;
-    }
-
-
-    /**
-     * Sets the positionId value for this IssueFoundType.
-     * 
-     * @param positionId
-     */
-    public void setPositionId(long positionId) {
-        this.positionId = positionId;
-    }
-
-
-    /**
-     * Gets the actionCode value for this IssueFoundType.
-     * 
-     * @return actionCode
-     */
-    public java.lang.String getActionCode() {
+    public String getActionCode() {
         return actionCode;
     }
 
-
     /**
-     * Sets the actionCode value for this IssueFoundType.
+     * Sets the value of the actionCode property.
      * 
-     * @param actionCode
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setActionCode(java.lang.String actionCode) {
-        this.actionCode = actionCode;
+    public void setActionCode(String value) {
+        this.actionCode = value;
     }
 
-
     /**
-     * Gets the actionLabel value for this IssueFoundType.
+     * Gets the value of the actionLabel property.
      * 
-     * @return actionLabel
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getActionLabel() {
+    public String getActionLabel() {
         return actionLabel;
     }
 
-
     /**
-     * Sets the actionLabel value for this IssueFoundType.
+     * Sets the value of the actionLabel property.
      * 
-     * @param actionLabel
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setActionLabel(java.lang.String actionLabel) {
-        this.actionLabel = actionLabel;
+    public void setActionLabel(String value) {
+        this.actionLabel = value;
     }
 
-
     /**
-     * Gets the codeId value for this IssueFoundType.
+     * Gets the value of the codeId property.
      * 
-     * @return codeId
      */
     public long getCodeId() {
         return codeId;
     }
 
-
     /**
-     * Sets the codeId value for this IssueFoundType.
+     * Sets the value of the codeId property.
      * 
-     * @param codeId
      */
-    public void setCodeId(long codeId) {
-        this.codeId = codeId;
+    public void setCodeId(long value) {
+        this.codeId = value;
     }
 
-
     /**
-     * Gets the codeLabel value for this IssueFoundType.
+     * Gets the value of the codeLabel property.
      * 
-     * @return codeLabel
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getCodeLabel() {
+    public String getCodeLabel() {
         return codeLabel;
     }
 
-
     /**
-     * Sets the codeLabel value for this IssueFoundType.
+     * Sets the value of the codeLabel property.
      * 
-     * @param codeLabel
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setCodeLabel(java.lang.String codeLabel) {
-        this.codeLabel = codeLabel;
+    public void setCodeLabel(String value) {
+        this.codeLabel = value;
     }
 
-
     /**
-     * Gets the tableId value for this IssueFoundType.
+     * Gets the value of the codeLabel2 property.
      * 
-     * @return tableId
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public long getTableId() {
-        return tableId;
+    public String getCodeLabel2() {
+        return codeLabel2;
     }
 
-
     /**
-     * Sets the tableId value for this IssueFoundType.
+     * Sets the value of the codeLabel2 property.
      * 
-     * @param tableId
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setTableId(long tableId) {
-        this.tableId = tableId;
+    public void setCodeLabel2(String value) {
+        this.codeLabel2 = value;
     }
 
-
     /**
-     * Gets the tableLabel value for this IssueFoundType.
+     * Gets the value of the codeStatus property.
      * 
-     * @return tableLabel
-     */
-    public java.lang.String getTableLabel() {
-        return tableLabel;
-    }
-
-
-    /**
-     * Sets the tableLabel value for this IssueFoundType.
-     * 
-     * @param tableLabel
-     */
-    public void setTableLabel(java.lang.String tableLabel) {
-        this.tableLabel = tableLabel;
-    }
-
-
-    /**
-     * Gets the receivedValue value for this IssueFoundType.
-     * 
-     * @return receivedValue
-     */
-    public java.lang.String getReceivedValue() {
-        return receivedValue;
-    }
-
-
-    /**
-     * Sets the receivedValue value for this IssueFoundType.
-     * 
-     * @param receivedValue
-     */
-    public void setReceivedValue(java.lang.String receivedValue) {
-        this.receivedValue = receivedValue;
-    }
-
-
-    /**
-     * Gets the codeValue value for this IssueFoundType.
-     * 
-     * @return codeValue
-     */
-    public java.lang.String getCodeValue() {
-        return codeValue;
-    }
-
-
-    /**
-     * Sets the codeValue value for this IssueFoundType.
-     * 
-     * @param codeValue
-     */
-    public void setCodeValue(java.lang.String codeValue) {
-        this.codeValue = codeValue;
-    }
-
-
-    /**
-     * Gets the codeStatus value for this IssueFoundType.
-     * 
-     * @return codeStatus
      */
     public long getCodeStatus() {
         return codeStatus;
     }
 
-
     /**
-     * Sets the codeStatus value for this IssueFoundType.
+     * Sets the value of the codeStatus property.
      * 
-     * @param codeStatus
      */
-    public void setCodeStatus(long codeStatus) {
-        this.codeStatus = codeStatus;
+    public void setCodeStatus(long value) {
+        this.codeStatus = value;
     }
 
+    /**
+     * Gets the value of the codeValue property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getCodeValue() {
+        return codeValue;
+    }
 
     /**
-     * Gets the receivedCount value for this IssueFoundType.
+     * Sets the value of the codeValue property.
      * 
-     * @return receivedCount
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setCodeValue(String value) {
+        this.codeValue = value;
+    }
+
+    /**
+     * Gets the value of the issueFoundId property.
+     * 
+     */
+    public long getIssueFoundId() {
+        return issueFoundId;
+    }
+
+    /**
+     * Sets the value of the issueFoundId property.
+     * 
+     */
+    public void setIssueFoundId(long value) {
+        this.issueFoundId = value;
+    }
+
+    /**
+     * Gets the value of the issueId property.
+     * 
+     */
+    public long getIssueId() {
+        return issueId;
+    }
+
+    /**
+     * Sets the value of the issueId property.
+     * 
+     */
+    public void setIssueId(long value) {
+        this.issueId = value;
+    }
+
+    /**
+     * Gets the value of the issueLabel property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getIssueLabel() {
+        return issueLabel;
+    }
+
+    /**
+     * Sets the value of the issueLabel property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setIssueLabel(String value) {
+        this.issueLabel = value;
+    }
+
+    /**
+     * Gets the value of the positionId property.
+     * 
+     */
+    public long getPositionId() {
+        return positionId;
+    }
+
+    /**
+     * Sets the value of the positionId property.
+     * 
+     */
+    public void setPositionId(long value) {
+        this.positionId = value;
+    }
+
+    /**
+     * Gets the value of the receivedCount property.
+     * 
      */
     public long getReceivedCount() {
         return receivedCount;
     }
 
-
     /**
-     * Sets the receivedCount value for this IssueFoundType.
+     * Sets the value of the receivedCount property.
      * 
-     * @param receivedCount
      */
-    public void setReceivedCount(long receivedCount) {
-        this.receivedCount = receivedCount;
+    public void setReceivedCount(long value) {
+        this.receivedCount = value;
     }
 
-
     /**
-     * Gets the codeLabel2 value for this IssueFoundType.
+     * Gets the value of the receivedValue property.
      * 
-     * @return codeLabel2
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getCodeLabel2() {
-        return codeLabel2;
+    public String getReceivedValue() {
+        return receivedValue;
     }
 
-
     /**
-     * Sets the codeLabel2 value for this IssueFoundType.
+     * Sets the value of the receivedValue property.
      * 
-     * @param codeLabel2
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setCodeLabel2(java.lang.String codeLabel2) {
-        this.codeLabel2 = codeLabel2;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof IssueFoundType)) return false;
-        IssueFoundType other = (IssueFoundType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            this.issueFoundId == other.getIssueFoundId() &&
-            this.issueId == other.getIssueId() &&
-            ((this.issueLabel==null && other.getIssueLabel()==null) || 
-             (this.issueLabel!=null &&
-              this.issueLabel.equals(other.getIssueLabel()))) &&
-            this.positionId == other.getPositionId() &&
-            ((this.actionCode==null && other.getActionCode()==null) || 
-             (this.actionCode!=null &&
-              this.actionCode.equals(other.getActionCode()))) &&
-            ((this.actionLabel==null && other.getActionLabel()==null) || 
-             (this.actionLabel!=null &&
-              this.actionLabel.equals(other.getActionLabel()))) &&
-            this.codeId == other.getCodeId() &&
-            ((this.codeLabel==null && other.getCodeLabel()==null) || 
-             (this.codeLabel!=null &&
-              this.codeLabel.equals(other.getCodeLabel()))) &&
-            this.tableId == other.getTableId() &&
-            ((this.tableLabel==null && other.getTableLabel()==null) || 
-             (this.tableLabel!=null &&
-              this.tableLabel.equals(other.getTableLabel()))) &&
-            ((this.receivedValue==null && other.getReceivedValue()==null) || 
-             (this.receivedValue!=null &&
-              this.receivedValue.equals(other.getReceivedValue()))) &&
-            ((this.codeValue==null && other.getCodeValue()==null) || 
-             (this.codeValue!=null &&
-              this.codeValue.equals(other.getCodeValue()))) &&
-            this.codeStatus == other.getCodeStatus() &&
-            this.receivedCount == other.getReceivedCount() &&
-            ((this.codeLabel2==null && other.getCodeLabel2()==null) || 
-             (this.codeLabel2!=null &&
-              this.codeLabel2.equals(other.getCodeLabel2())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        _hashCode += new Long(getIssueFoundId()).hashCode();
-        _hashCode += new Long(getIssueId()).hashCode();
-        if (getIssueLabel() != null) {
-            _hashCode += getIssueLabel().hashCode();
-        }
-        _hashCode += new Long(getPositionId()).hashCode();
-        if (getActionCode() != null) {
-            _hashCode += getActionCode().hashCode();
-        }
-        if (getActionLabel() != null) {
-            _hashCode += getActionLabel().hashCode();
-        }
-        _hashCode += new Long(getCodeId()).hashCode();
-        if (getCodeLabel() != null) {
-            _hashCode += getCodeLabel().hashCode();
-        }
-        _hashCode += new Long(getTableId()).hashCode();
-        if (getTableLabel() != null) {
-            _hashCode += getTableLabel().hashCode();
-        }
-        if (getReceivedValue() != null) {
-            _hashCode += getReceivedValue().hashCode();
-        }
-        if (getCodeValue() != null) {
-            _hashCode += getCodeValue().hashCode();
-        }
-        _hashCode += new Long(getCodeStatus()).hashCode();
-        _hashCode += new Long(getReceivedCount()).hashCode();
-        if (getCodeLabel2() != null) {
-            _hashCode += getCodeLabel2().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(IssueFoundType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "IssueFoundType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("issueFoundId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "issueFoundId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("issueId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "issueId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("issueLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "issueLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("positionId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "positionId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("actionCode");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "actionCode"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("actionLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "actionLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("tableId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "tableId"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("tableLabel");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "tableLabel"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("receivedValue");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "receivedValue"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeValue");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeValue"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeStatus");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeStatus"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("receivedCount");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "receivedCount"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "long"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-        elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("codeLabel2");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "codeLabel2"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(true);
-        typeDesc.addFieldDesc(elemField);
+    public void setReceivedValue(String value) {
+        this.receivedValue = value;
     }
 
     /**
-     * Return type metadata object
+     * Gets the value of the tableId property.
+     * 
      */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
+    public long getTableId() {
+        return tableId;
     }
 
     /**
-     * Get Custom Serializer
+     * Sets the value of the tableId property.
+     * 
      */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
+    public void setTableId(long value) {
+        this.tableId = value;
     }
 
     /**
-     * Get Custom Deserializer
+     * Gets the value of the tableLabel property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public String getTableLabel() {
+        return tableLabel;
+    }
+
+    /**
+     * Sets the value of the tableLabel property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setTableLabel(String value) {
+        this.tableLabel = value;
     }
 
 }

@@ -1,119 +1,60 @@
-/**
- * GetBatchDqaReportResultType.java
- *
- * This file was auto-generated from WSDL
- * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
- */
 
 package org.openimmunizationsoftware.dqa.service.client;
 
-public class GetBatchDqaReportResultType  implements java.io.Serializable {
-    private java.lang.String dqaReport;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlType;
 
-    public GetBatchDqaReportResultType() {
-    }
 
-    public GetBatchDqaReportResultType(
-           java.lang.String dqaReport) {
-           this.dqaReport = dqaReport;
-    }
+/**
+ * <p>Java class for getBatchDqaReportResultType complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="getBatchDqaReportResultType">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="dqaReport" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *       &lt;/sequence>
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "getBatchDqaReportResultType", propOrder = {
+    "dqaReport"
+})
+public class GetBatchDqaReportResultType {
 
+    protected String dqaReport;
 
     /**
-     * Gets the dqaReport value for this GetBatchDqaReportResultType.
+     * Gets the value of the dqaReport property.
      * 
-     * @return dqaReport
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public java.lang.String getDqaReport() {
+    public String getDqaReport() {
         return dqaReport;
     }
 
-
     /**
-     * Sets the dqaReport value for this GetBatchDqaReportResultType.
+     * Sets the value of the dqaReport property.
      * 
-     * @param dqaReport
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setDqaReport(java.lang.String dqaReport) {
-        this.dqaReport = dqaReport;
-    }
-
-    private java.lang.Object __equalsCalc = null;
-    public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof GetBatchDqaReportResultType)) return false;
-        GetBatchDqaReportResultType other = (GetBatchDqaReportResultType) obj;
-        if (obj == null) return false;
-        if (this == obj) return true;
-        if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
-        }
-        __equalsCalc = obj;
-        boolean _equals;
-        _equals = true && 
-            ((this.dqaReport==null && other.getDqaReport()==null) || 
-             (this.dqaReport!=null &&
-              this.dqaReport.equals(other.getDqaReport())));
-        __equalsCalc = null;
-        return _equals;
-    }
-
-    private boolean __hashCodeCalc = false;
-    public synchronized int hashCode() {
-        if (__hashCodeCalc) {
-            return 0;
-        }
-        __hashCodeCalc = true;
-        int _hashCode = 1;
-        if (getDqaReport() != null) {
-            _hashCode += getDqaReport().hashCode();
-        }
-        __hashCodeCalc = false;
-        return _hashCode;
-    }
-
-    // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc =
-        new org.apache.axis.description.TypeDesc(GetBatchDqaReportResultType.class, true);
-
-    static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "GetBatchDqaReportResultType"));
-        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("dqaReport");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://dqaws.openimmunizationsoftware.org/dqa/schema", "dqaReport"));
-        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
-        elemField.setNillable(false);
-        typeDesc.addFieldDesc(elemField);
-    }
-
-    /**
-     * Return type metadata object
-     */
-    public static org.apache.axis.description.TypeDesc getTypeDesc() {
-        return typeDesc;
-    }
-
-    /**
-     * Get Custom Serializer
-     */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanSerializer(
-            _javaType, _xmlType, typeDesc);
-    }
-
-    /**
-     * Get Custom Deserializer
-     */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-           java.lang.String mechType, 
-           java.lang.Class _javaType,  
-           javax.xml.namespace.QName _xmlType) {
-        return 
-          new  org.apache.axis.encoding.ser.BeanDeserializer(
-            _javaType, _xmlType, typeDesc);
+    public void setDqaReport(String value) {
+        this.dqaReport = value;
     }
 
 }
