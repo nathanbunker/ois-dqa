@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.openimmunizationsoftware.dqa</groupId>
-  <artifactId>dqa-webservice-client</artifactId>
+  <groupId>org.immunizationsoftware.dqa</groupId>
+  <artifactId>ois-dqa-wsclient</artifactId>
   <packaging>jar</packaging>
   <version>1.5</version>
   <!-- TODO project name -->
@@ -38,13 +38,7 @@
       <artifactId>wsdl4j</artifactId>
       <version>1.6.2</version>
     </dependency>
-    <dependency>
-      <groupId>org.immunizationsoftware.dqa</groupId>
-      <artifactId>webservice</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
 -->
-
     <!-- LOGGING DEPENDENCIES - LOG4J -->
     <dependency>
       <groupId>org.slf4j</groupId>
