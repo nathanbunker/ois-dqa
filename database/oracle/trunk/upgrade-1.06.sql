@@ -550,7 +550,6 @@ DELETE FROM dqa_code_table where table_id = 35;
 
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.06', 'Create table dqa_vaccination_vis');
 
-
 CREATE SEQUENCE dqa_vacc_vis_id_sequence INCREMENT BY 1 START WITH 1;
 
 CREATE TABLE dqa_vaccination_vis
