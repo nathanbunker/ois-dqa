@@ -1,7 +1,8 @@
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.06', 'Starting upgrade process');
 
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.06', 'Adding hl7_error_code column to dqa_potential_issue table');
-ALTER TABLE dqa_potential_issue ADD COLUMN
+
+ALTER TABLE dqa_potential_issue ADD 
 (
     hl7_error_code  VARCHAR2(100)
 );
@@ -502,12 +503,11 @@ UPDATE dqa_potential_issue SET default_action_code = 'E', change_priority='May',
 UPDATE dqa_potential_issue SET default_action_code = 'A', change_priority='May', target_object='Vaccination', target_field='system entry time', issue_type='is missing', field_value='', report_denominator='Vaccination Count', table_id = NULL, hl7_reference = 'RXA-22', hl7_error_code = '101' WHERE issue_id='367';
 
 
-ALTER TABLE dqa_code_master ADD COLUMN
+ALTER TABLE dqa_code_master ADD 
 (
     hl7_error_code  VARCHAR2(100)
 );
 
--- working
 
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(46, 'HL7 Coding System', '');
 
@@ -529,22 +529,15 @@ CREATE TABLE dqa_code_master
   indicates_id        INTEGER
 );
 
-CREATE UNIQUE INDEX dqa_in_pi ON dqa_potential_issue(target_object, target_field, issue_type, field_value);
-
-
-ALTER TABLE dqa_code_master ADD UNIQUE INDEX (table_id, context_id, code_value);
-
-
+CREATE INDEX dqa_in_cm_table_id  ON dqa_code_master(table_id, context_id, code_value);
 
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.05', 'Inserting code master values');
 
-
-
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.06', 'Adding column context_value to dqa_code_received table');
 
-ALTER TABLE dqa_code_received DROP KEY dqa_uk_code_received1;
+ALTER TABLE dqa_code_received DROP CONSTRAINT dqa_uk_code_received1;
 
-ALTER TABLE dqa_code_received ADD COLUMN 
+ALTER TABLE dqa_code_received ADD 
 (
   context_value VARCHAR2(50)
 );
@@ -557,9 +550,12 @@ DELETE FROM dqa_code_table where table_id = 35;
 
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.06', 'Create table dqa_vaccination_vis');
 
+
+CREATE SEQUENCE dqa_vacc_vis_id_sequence INCREMENT BY 1 START WITH 1;
+
 CREATE TABLE dqa_vaccination_vis
 (
-  vis_id          INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  vis_id          INTEGER NOT NULL PRIMARY KEY,
   vaccination_id  INTEGER NOT NULL,
   position_id     INTEGER NOT NULL,
   skipped         VARCHAR2(1),
@@ -575,10 +571,7 @@ ALTER TABLE dqa_vaccination ADD (refusal_reason  VARCHAR2(250));
 ALTER TABLE dqa_vaccination ADD (vis_presented_date  DATE);
 ALTER TABLE dqa_vaccination ADD (vis_document_code VARCHAR2(250));
 
-
 ALTER TABLE dqa_code_master ADD CONSTRAINT dqa_fk_code_master_context FOREIGN KEY(context_id) REFERENCES dqa_code_master(code_master_id);
-
-
 
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.06', 'Finished upgrading');
 COMMIT;
