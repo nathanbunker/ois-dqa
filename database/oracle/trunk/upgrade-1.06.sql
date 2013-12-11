@@ -510,7 +510,17 @@ ALTER TABLE dqa_code_master ADD
 
 
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(46, 'HL7 Coding System', '');
-
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(49, 'Contraindication or Precation', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(51, 'Evidence of Immunity', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(57, 'Financial Status Obs Method', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(55, 'Forecast Immunization Schedule', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(54, 'Forecast Reason', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(56, 'Forecast Series Status', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(47, 'Vaccination Funding Source', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(50, 'Vaccination Reaction', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(52, 'Vaccination Special Indications', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(53, 'Vaccination VIS Doc Type', '');
+INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(48, 'Vaccine Type', '');
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.06', 'Dropping dqa_code_master table');
 
 DROP TABLE dqa_code_master;
