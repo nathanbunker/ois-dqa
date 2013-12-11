@@ -9847,4 +9847,10 @@ INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id,
 INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id, mvx_code, valid_start_date, use_start_date, use_end_date, valid_end_date) VALUES (85, 'Flumist quadrivalent ', 'influenza, live, intranasal, quadrivalent', '149', 'MED', '2012-01-01', '2012-02-29', '2100-01-01', '2100-01-01');
 INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id, mvx_code, valid_start_date, use_start_date, use_end_date, valid_end_date) VALUES (86, 'Adenovirus types 4 and 7 ', 'Adenovirus types 4 and 7', '143', 'BRR', '2011-01-01', '2011-03-16', '2100-01-01', '2100-01-01');
 
+INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.07', 'Dropping and recreating the VIS Publication Date column in DQA vaccination');
+
+ALTER TABLE dqa_vaccination DROP COLUMN vis_publication_date;
+
+ALTER TABLE dqa_vaccination ADD COLUMN (vis_publication_date DATE);
+
 INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.07', 'Finished upgrading');
