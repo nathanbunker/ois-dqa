@@ -33,8 +33,6 @@ INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, b
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, 'UNK', NULL, NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, 'UNKN', NULL, NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, 'NONE', NULL, NULL, 'Invalid Name');
-INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, NULL, 'X', NULL, 'Invalid Name');
-INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, NULL, 'U', NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, NULL, 'UN', NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, NULL, 'UK', NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, NULL, 'UNK', NULL, 'Invalid Name');
@@ -9895,5 +9893,11 @@ INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id,
 INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id, mvx_code, valid_start_date, use_start_date, use_end_date, valid_end_date) VALUES (84, 'MENHIBRIX', 'Meningococcal C/Y-HIB PRP', 148, 'SKB', TO_DATE('2012-01-01', 'YYYY-MM-DD'), TO_DATE('2012-06-14', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'));
 INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id, mvx_code, valid_start_date, use_start_date, use_end_date, valid_end_date) VALUES (85, 'Flumist quadrivalent ', 'influenza, live, intranasal, quadrivalent', 149, 'MED', TO_DATE('2012-01-01', 'YYYY-MM-DD'), TO_DATE('2012-02-29', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'));
 INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id, mvx_code, valid_start_date, use_start_date, use_end_date, valid_end_date) VALUES (86, 'Adenovirus types 4 and 7 ', 'Adenovirus types 4 and 7', 143, 'BRR', TO_DATE('2011-01-01', 'YYYY-MM-DD'), TO_DATE('2011-03-16', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'));
+
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.07', 'Drop and re-add VIS publication date column');
+ALTER TABLE dqa_vaccination DROP COLUMN vis_publication_date;
+ALTER TABLE dqa_vaccination ADD (vis_publication_date DATE);
+
+update dqa_code_received set context_value = 'USA' where table_id = 4 and context_value is null;
 
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.07', 'Finished upgrading');
