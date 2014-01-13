@@ -9896,7 +9896,7 @@ INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id,
 
 INSERT INTO dqa_database_log VALUES (NEXTVAL('dqa_change_id_sequence'), CURRENT_TIMESTAMP, '1.07', 'Drop and re-add VIS publication date column');
 ALTER TABLE dqa_vaccination DROP COLUMN vis_publication_date;
-ALTER TABLE dqa_vaccination ADD (vis_publication_date DATE);
+ALTER TABLE dqa_vaccination ADD vis_publication_date DATE;
 
 update dqa_code_received set context_value = 'USA' where table_id = 4 and context_value is null;
 
