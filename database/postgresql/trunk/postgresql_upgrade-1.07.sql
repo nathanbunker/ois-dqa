@@ -8843,28 +8843,7 @@ UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table
 
 UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table_id = 45 and received_value = 'CE';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table_id = 45 and received_value = 'TS';
-
-
-
-
-
 
 UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table_id = 12 and received_value = 'AN';
 UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table_id = 12 and received_value = 'ANON';
@@ -9035,14 +9014,6 @@ UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table
 UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table_id = 51 and received_value = '38907003';
 UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table_id = 51 and received_value = '16541001';
 UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table_id = 51 and received_value = '271511000';
-
-
-
-
-
-
-
-
 
 UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table_id = 53 and received_value = '253088698300001111110714';
 UPDATE dqa_code_received set code_status = 'V' where code_status = 'U' and table_id = 53 and received_value = '253088698300002811100310';
@@ -9604,7 +9575,6 @@ INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) V
 INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (35, 'YELLOWFEVER', 'Yellow Fever', 'Optional');
 INSERT INTO dqa_vaccine_group(group_id, group_code, group_label, group_status) VALUES (36, 'ZOSTER', 'Zoster', 'Optional');
 
---ERROR:  missing FROM-clause entry for table "dqa_cvx_group_id_sequence"--
 INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_id) VALUES (NEXTVAL('dqa_cvx_group_id_sequence'), 2, 54);
 INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_id) VALUES (NEXTVAL('dqa_cvx_group_id_sequence'), 2, 55);
 INSERT INTO dqa_vaccine_cvx_group (cvx_group_id, group_id, cvx_id) VALUES (NEXTVAL('dqa_cvx_group_id_sequence'), 2, 82);
@@ -9894,7 +9864,7 @@ INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id,
 INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id, mvx_code, valid_start_date, use_start_date, use_end_date, valid_end_date) VALUES (84, 'MENHIBRIX', 'Meningococcal C/Y-HIB PRP', 148, 'SKB', TO_DATE('2012-01-01', 'YYYY-MM-DD'), TO_DATE('2012-06-14', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'));
 INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id, mvx_code, valid_start_date, use_start_date, use_end_date, valid_end_date) VALUES (85, 'Flumist quadrivalent ', 'influenza, live, intranasal, quadrivalent', 149, 'MED', TO_DATE('2012-01-01', 'YYYY-MM-DD'), TO_DATE('2012-02-29', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'));
 INSERT INTO dqa_vaccine_product(product_id, product_name, product_label, cvx_id, mvx_code, valid_start_date, use_start_date, use_end_date, valid_end_date) VALUES (86, 'Adenovirus types 4 and 7 ', 'Adenovirus types 4 and 7', 143, 'BRR', TO_DATE('2011-01-01', 'YYYY-MM-DD'), TO_DATE('2011-03-16', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'), TO_DATE('2100-01-01', 'YYYY-MM-DD'));
---end here--
+
 INSERT INTO dqa_database_log VALUES (NEXTVAL('dqa_change_id_sequence'), CURRENT_TIMESTAMP, '1.07', 'Drop and re-add VIS publication date column');
 ALTER TABLE dqa_vaccination DROP COLUMN vis_publication_date;
 ALTER TABLE dqa_vaccination ADD vis_publication_date DATE;
