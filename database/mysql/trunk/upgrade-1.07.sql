@@ -32,8 +32,6 @@ INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name
 INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES (NULL, 'UNK', NULL, NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES (NULL, 'UNKN', NULL, NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES (NULL, 'NONE', NULL, NULL, 'Invalid Name');
-INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES (NULL, NULL, 'X', NULL, 'Invalid Name');
-INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES (NULL, NULL, 'U', NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES (NULL, NULL, 'UN', NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES (NULL, NULL, 'UK', NULL, 'Invalid Name');
 INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES (NULL, NULL, 'UNK', NULL, 'Invalid Name');
@@ -177,6 +175,7 @@ INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name
 INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES ('BG1', NULL, NULL, NULL, 'Junk Name');
 INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES ('MALE', NULL, NULL, NULL, 'Junk Name');
 INSERT INTO dqa_known_name (name_first, name_last, name_middle, birth_date, name_type) VALUES ('FEMALE', NULL, NULL, NULL, 'Junk Name');
+
 INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.07', 'Adding cvx code to VIS table');
 ALTER TABLE dqa_vaccination_vis ADD COLUMN (cvx_code   VARCHAR(30));
 
@@ -236,7 +235,6 @@ INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.07', 'Add app_error_code co
 ALTER TABLE dqa_potential_issue ADD COLUMN (app_error_code varchar(100));
 
 INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.07', 'Inserting new potential issues');
-
 INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description, table_id, hl7_reference) VALUES (526, 'HL7 MSH', 'message date', 'is not precise', '', 'A', 'May', 'Message Count', 'HL7 MSH message date does not have time and second components', NULL, 'MSH-7');
 INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description, table_id, hl7_reference) VALUES (527, 'HL7 MSH', 'message date', 'is missing timezone', '', 'W', 'May', 'Message Count', 'HL7 MSH message date does not indicate time zone', NULL, 'MSH-7');
 INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description, table_id, hl7_reference) VALUES (525, 'HL7 MSH', 'message trigger', 'is unsupported', '', 'E', 'May', 'Message Count', 'HL7 MSH message trigger is recognized but not supported', NULL, 'MSH-9.2');
