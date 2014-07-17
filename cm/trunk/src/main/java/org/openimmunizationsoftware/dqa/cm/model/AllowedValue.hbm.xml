@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="AllowedValue" table="allowed_value">
+    <id name="allowedValueId" column="allowed_value_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="attributeType" column="attribute_type_id" class="AttributeType"/>
+    <property name="savedValue" column="saved_value" type="string"/>
+    <property name="displayText" column="display_text" type="string"/>
+    <property name="displayOrder" column="display_order" type="integer"/>
+  </class>
+</hibernate-mapping>

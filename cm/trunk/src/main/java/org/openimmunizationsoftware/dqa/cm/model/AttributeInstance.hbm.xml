@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="AttributeInstance" table="attribute_instance">
+    <id name="attributeInstanceId" column="attribute_instance_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="value" column="value_id" class="AttributeValue"/> 
+    <many-to-one name="codeInstance" column="code_instance_id" class="CodeInstance"/> 
+    <property name="acceptStatusString" column="accept_status" type="string"/>
+  </class>
+</hibernate-mapping>

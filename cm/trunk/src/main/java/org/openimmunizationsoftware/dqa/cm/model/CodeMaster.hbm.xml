@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="CodeMaster" table="code_master">
+    <id name="codeId" column="code_id">
+      <generator class="assigned"/>
+      <!--  native or assigned -->
+    </id>
+    <many-to-one name="table" column="table_id" class="CodeTable"/>
+    <property name="codeValue" column="code_value" type="string"/>
+    
+    <!--
+    <property name="applicationType" column="application_type" type="string"/> 
+    <property name="runThis" column="run_this" type="yes_no"/>
+    -->
+    
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="CodeInstance" table="code_instance">
+    <id name="codeInstanceId" column="code_instance_id">
+      <generator class="native"/>
+      <!--  native or assigned -->
+    </id>
+    <many-to-one name="code" column="code_id" class="CodeMaster"/>
+    <many-to-one name="context" column="context_id" class="CodeMaster"/>
+    <many-to-one name="indicatesTable" column="indicates_table_id" class="CodeTable"/>
+    <property name="codeLabel" column="code_label" type="string"/>
+    <property name="useValue" column="use_value" type="string"/>
+    <property name="codeStatus" column="code_status" type="string"/>
+    <property name="hl7CodeTable" column="hl7_code_table" type="string"/>
+    <many-to-one name="tableInstance" column="table_instance_id" class="CodeTableInstance"/>
+    <property name="issueCount" column="issue_count" type="integer"/>
+    <property name="inclusionStatusString" column="inclusion_status" type="string"/>
+    <property name="tempValues" column="temp_values" type="string"/>
+    
+    <!--
+    <property name="applicationType" column="application_type" type="string"/> 
+    <property name="runThis" column="run_this" type="yes_no"/>
+    <many-to-one name="primaryReportTemplate" column="primary_template_id" class="ReportTemplate"/> -->
+    
+  </class>
+</hibernate-mapping>
