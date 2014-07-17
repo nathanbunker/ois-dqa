@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="AttributeType" table="attribute_type">
+    <id name="attributeTypeId" column="attribute_type_id">
+      <generator class="native"/>
+      <!--  native or assigned -->
+    </id>
+    <property name="attributeLabel" column="attribute_label" type="string"/>
+    <property name="attributeHelp" column="attribute_help" type="string"/>
+    <property name="attributeFormatString" column="attribute_format" type="string"/>
+    <many-to-one name="refTable" column="ref_table_id" class="CodeTable"/> 
+    
+  </class>
+</hibernate-mapping>

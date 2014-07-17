@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="CodeTableInstance" table="code_table_instance">
+    <id name="tableInstanceId" column="table_instance_id">
+      <generator class="native"/>
+      <!--  native or assigned -->
+    </id>
+    <many-to-one name="table" column="table_id" class="CodeTable"/>
+    <many-to-one name="release" column="release_id" class="ReleaseVersion"/>
+    <property name="tableLabel" column="table_label" type="string"/>
+    <property name="issueCount" column="issue_count" type="integer"/>
+    <property name="inclusionStatusString" column="inclusion_status" type="string"/>
+    <property name="enforceUniqe" column="enforce_unique" type="yes_no"/>
+    
+  </class>
+</hibernate-mapping>

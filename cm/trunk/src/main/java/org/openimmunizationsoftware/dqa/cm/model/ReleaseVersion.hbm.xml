@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="ReleaseVersion" table="release_version">
+    <id name="releaseId" column="release_id">
+      <generator class="native"/>
+    </id>
+    <property name="majorVersionNum" column="major_version_num" type="integer"/>
+    <property name="minorVersionNum" column="minor_version_num" type="integer"/>
+    <property name="startedDate" column="started_date" type="timestamp"/>
+    <property name="releasedDate" column="released_date" type="timestamp"/>
+    <property name="retiredDate" column="retired_date" type="timestamp"/>
+    <property name="releaseStatusString" column="release_status" type="string"/>
+    
+    <!--
+    <property name="applicationType" column="application_type" type="string"/> 
+    <property name="runThis" column="run_this" type="yes_no"/>
+    <many-to-one name="primaryReportTemplate" column="primary_template_id" class="ReportTemplate"/> 
+    
+    -->
+    
+  </class>
+</hibernate-mapping>

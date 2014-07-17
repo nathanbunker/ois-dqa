@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="AttributeAssigned" table="attribute_assigned">
+    <id name="attributeAssignedId" column="attribute_assigned_id">
+      <generator class="native" />
+    </id>
+    <many-to-one name="attributeType" column="attribute_type_id" class="AttributeType" />
+    <many-to-one name="table" column="table_id" class="CodeTable" />
+    <property name="displayOrder" column="display_order" type="integer" />
+    <property name="attributeStatusString" column="attribute_status" type="string" />
+    <property name="allowMultiple" column="allow_multiple" type="yes_no" />
+  </class>
+</hibernate-mapping>

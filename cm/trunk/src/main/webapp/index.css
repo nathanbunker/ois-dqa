@@ -1,0 +1,251 @@
+body {font-family: Tahoma, Geneva, sans-serif; background:#FFFFFF; margin: 0px; padding: 0px; margin-bottom: 20px; }
+
+
+
+.menu { 
+	padding-left: 7px;
+	padding-right: 2px;
+	padding-top: 2px;
+padding-bottom: 2px;
+	border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #0000FF;
+	background-color: #0000FF;
+	color: #CCFFFF;
+}
+
+.likethisblue
+{
+	color:  #0079b2;
+}
+
+.codeStatusLabel
+{
+	font-size: x-small;
+	text-transform: lowercase;
+	color: #0000FF;
+	float: right; 
+	background-color: #FFFFFF;
+	padding-right: 2px;
+	padding-left: 2px;
+	padding-bottom: 1px;
+	padding-top: 1px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #CCCCCC;
+}
+
+.issueCountLabel
+{
+	font-size: x-small;
+	text-transform: lowercase;
+	color: #0000FF;
+	float: right; 
+	background-color: #FFFF99;
+	padding-right: 2px;
+	padding-left: 2px;
+	padding-bottom: 1px;
+	padding-top: 1px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #CCCCCC;
+	margin-left: 3px;
+}
+
+.inclusionStatusLabel
+{
+	font-size: x-small;
+	text-transform: lowercase;
+	color: #FFFFFF;
+	font-weight: bold;
+	float: right; 
+	background-color: #FF0000;
+	padding-right: 2px;
+	padding-left: 2px;
+	padding-bottom: 1px;
+	padding-top: 1px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #333333;
+}
+
+.formButtonFloat
+{
+	float: right;
+}
+
+.userCommentHeader
+{
+	display:block;
+	font-size: smaller;
+	margin-bottom: 3px;
+}
+
+.hiddenArea
+{
+	display:none;
+}
+
+.userCommentDate
+{
+	font-size: x-small;
+	float: right; 
+	padding-left: 2px;
+	padding-bottom: 1px;
+	margin-left: 3px;
+}
+
+
+a:link.menuLink {text-decoration:none; color: #CCFFFF; }
+a:visited.menuLink {text-decoration:none; color: #CCFFFF; }
+a:hover.menuLink {text-decoration:none; color: black; background-color: #CCFFFF;}
+a:active.menuLink {text-decoration:none; color: #CCFFFF; }
+
+.strike 
+{
+	text-decoration: line-through;
+}
+.appTitle {
+	float: right; 
+	width: 400px;  
+	text-align: right; 
+	padding-right: 5px;
+}
+.logo {
+	padding-right: 5px; 
+	font-size: larger;
+	font-weight: bolder;
+}
+
+.contents {  
+	postion: relative;
+	width: 1330px; 
+	margin: 5px; 
+	padding: 5px; 
+}
+
+.leftColumn {
+	float:left;
+	width: 360px;
+	margin-bottom: 30px; 
+ }
+ 
+.topBox 
+{
+	width: 100%;
+	height: 170px;
+}
+ 
+.centerColumn {
+	float:left;
+    width: 520px;
+    margin-left: 15px; 
+    margin-bottom: 30px;
+}
+
+.rightColumn {
+	float: left;
+    width: 420px;
+    margin-left: 15px; 
+    margin-bottom: 30px;
+}
+
+.cmVersion {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	color: #3300FF;
+	border-width: 1px;
+	border-color: #3300FF;
+	border-top-style: solid;
+	border-left-style: solid;
+	padding: 2px;
+    background-color: #FFFFCC;
+    font-size: small;
+}
+
+caption {
+	background-color: #33CCFF;
+	
+}
+h1 {color: #0000FF; margin-top: 0px; }
+h2 {color: #0000FF; margin-top: 0px; }
+h3 {color: #0000FF; margin-top: 0px; }
+p {color:#2B3E42; }
+
+
+
+a:link {text-decoration:none; color: #0000FF; }
+a:visited {text-decoration:none; color: #0000FF; }
+a:hover {text-decoration:none; color: black; background-color: #FFFF99;}
+a:active {text-decoration:none; color: #0000FF; }
+
+
+.sideMenu {float: left; border-width: 1px; border-style: solid; border-color: black; margin: 2px;}
+
+.todo { margin: 50px; 5px; 5px; 5px; padding: 10px; width: 500px; border-width: 2px; border-style: dashed; background-color: #EEEEEE ; font-size: smaller; color: #333333;}
+
+.selected {background-color: #FFB673;}
+
+a:link.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #eee; color: #666; font-variant: small-caps;}
+a:visited.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #eee; color: #666; font-variant: small-caps;}
+a:hover.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #0000FF; color: #FFF; font-variant: small-caps;}
+a:active.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #eee; color: #666; font-variant: small-caps;}
+
+
+.messageConfirmation
+{
+	color: blue;
+	padding-left: 7px;
+	width: 100%;
+	background-color: #FFFF99;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #0000FF;
+}
+
+.messageError
+{
+	padding-left: 20px;
+	width: 100%;
+	color: red;
+	background-color: #FFFF99;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #0000FF;
+}
+
+table {
+	border-collapse: collapse;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #666;
+}
+caption {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #666;
+}
+th {
+	background-color: #D0D0D0;
+	text-align: left; 
+	padding-left: 4px; 
+	padding-right: 8px; 
+	padding-bottom: 3px; 
+	padding-top: 3px; 
+	border-width: 1px; 
+	border-style: solid; 
+	border-color: #666;
+	font-size: smaller;
+}
+td {
+	background-color: #F0F0F0;
+	padding: 2px; 
+	padding-left: 4px; 
+	padding-right: 8px; 
+	padding-bottom: 3px; 
+	padding-top: 3px; 
+	border-width: 1px; 
+	border-style: solid; 
+	border-color: #666;; 
+	color: #000;
+}
+		
