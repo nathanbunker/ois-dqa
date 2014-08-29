@@ -1,48 +1,47 @@
-USE dqa;
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.08', 'Starting upgrade process');
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Starting upgrade process');
 
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.08', 'Adding fields to patient table for AIRA ASC report');
-ALTER TABLE dqa_patient ADD COLUMN (system_creation_date DATE);
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Adding fields to patient table for AIRA ASC report');
+ALTER TABLE dqa_patient ADD (system_creation_date DATE);
 
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.08', 'Adding fields to vaccination table for AIRA ASC report');
-ALTER TABLE dqa_vaccination ADD COLUMN (facility_type_code VARCHAR2(250));
-ALTER TABLE dqa_vaccination ADD COLUMN (trade_name_code VARCHAR2(250));
-ALTER TABLE dqa_vaccination ADD COLUMN (vaccine_validity_code VARCHAR2(250));
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Adding fields to vaccination table for AIRA ASC report');
+ALTER TABLE dqa_vaccination ADD (facility_type_code VARCHAR2(250));
+ALTER TABLE dqa_vaccination ADD (trade_name_code VARCHAR2(250));
+ALTER TABLE dqa_vaccination ADD (vaccine_validity_code VARCHAR2(250));
 
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.08', 'Adding new tables to support new values for AIRA ASC report');
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Adding new tables to support new values for AIRA ASC report');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(61, 'Potential Issue', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(62, 'Vaccine Group', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(63, 'Facility Type', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(64, 'Vaccination Trade Name', '');
 INSERT INTO dqa_code_table (table_id, table_label, default_code_value) VALUES(65, 'Vaccination Validity', '');
 
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.08', 'Adding new potential issues');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (584, 'Patient', 'system creation date', 'is missing', '', 'A', 'May', 'Patient Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (585, 'Patient', 'system creation date', 'is invalid', '', 'W', 'May', 'Patient Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (586, 'Patient', 'system creation date', 'is before birth', '', 'W', 'May', 'Patient Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (587, 'Patient', 'system creation date', 'is in future', '', 'W', 'May', 'Patient Count', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (588, 'Vaccination', 'facility type', 'is deprecated', '', 'W', 'May', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (589, 'Vaccination', 'facility type', 'is ignored', '', 'S', 'May', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (590, 'Vaccination', 'facility type', 'is invalid', '', 'W', 'May', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (591, 'Vaccination', 'facility type', 'is missing', '', 'A', 'May', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (592, 'Vaccination', 'facility type', 'is unrecognized', '', 'W', 'May', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (593, 'Vaccination', 'facility type', 'is valued as', 'public', 'A', 'May', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (594, 'Vaccination', 'facility type', 'is valued as', 'private', 'A', 'May', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (595, 'Vaccination', 'trade name', 'is deprecated', '', 'W', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (596, 'Vaccination', 'trade name', 'is ignored', '', 'S', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (597, 'Vaccination', 'trade name', 'is invalid', '', 'W', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (598, 'Vaccination', 'trade name', 'is missing', '', 'A', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (599, 'Vaccination', 'trade name', 'is unrecognized', '', 'W', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (600, 'Vaccination', 'trade name and vaccine', 'are inconsistent', '', 'W', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (601, 'Vaccination', 'trade name and manufacturer', 'are inconsistent', '', 'W', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (603, 'Vaccination', 'validity code', 'is invalid', '', 'W', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (604, 'Vaccination', 'validity code', 'is deprecated', '', 'W', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (605, 'Vaccination', 'validity code', 'is ignored', '', 'S', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (606, 'Vaccination', 'validity code', 'is missing', '', 'A', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (607, 'Vaccination', 'validity code', 'is unrecognized', '', 'W', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (608, 'Vaccination', 'validity code', 'is valued as', 'valid', 'A', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (609, 'Vaccination', 'validity code', 'is valued as', 'invalid', 'A', '', '', '');
-REPLACE INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (610, 'Vaccination', 'body route', 'is invalid for body site indicated', '', 'W', '', '', '');
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Adding new potential issues');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (584, 'Patient', 'system creation date', 'is missing', '', 'A', 'May', 'Patient Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (585, 'Patient', 'system creation date', 'is invalid', '', 'W', 'May', 'Patient Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (586, 'Patient', 'system creation date', 'is before birth', '', 'W', 'May', 'Patient Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (587, 'Patient', 'system creation date', 'is in future', '', 'W', 'May', 'Patient Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (588, 'Vaccination', 'facility type', 'is deprecated', '', 'W', 'May', 'Vaccination Admin Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (589, 'Vaccination', 'facility type', 'is ignored', '', 'S', 'May', 'Vaccination Admin Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (590, 'Vaccination', 'facility type', 'is invalid', '', 'W', 'May', 'Vaccination Admin Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (591, 'Vaccination', 'facility type', 'is missing', '', 'A', 'May', 'Vaccination Admin Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (592, 'Vaccination', 'facility type', 'is unrecognized', '', 'W', 'May', 'Vaccination Admin Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (593, 'Vaccination', 'facility type', 'is valued as', 'public', 'A', 'May', 'Vaccination Admin Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (594, 'Vaccination', 'facility type', 'is valued as', 'private', 'A', 'May', 'Vaccination Admin Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (595, 'Vaccination', 'trade name', 'is deprecated', '', 'W', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (596, 'Vaccination', 'trade name', 'is ignored', '', 'S', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (597, 'Vaccination', 'trade name', 'is invalid', '', 'W', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (598, 'Vaccination', 'trade name', 'is missing', '', 'A', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (599, 'Vaccination', 'trade name', 'is unrecognized', '', 'W', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (600, 'Vaccination', 'trade name and vaccine', 'are inconsistent', '', 'W', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (601, 'Vaccination', 'trade name and manufacturer', 'are inconsistent', '', 'W', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (603, 'Vaccination', 'validity code', 'is invalid', '', 'W', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (604, 'Vaccination', 'validity code', 'is deprecated', '', 'W', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (605, 'Vaccination', 'validity code', 'is ignored', '', 'S', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (606, 'Vaccination', 'validity code', 'is missing', '', 'A', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (607, 'Vaccination', 'validity code', 'is unrecognized', '', 'W', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (608, 'Vaccination', 'validity code', 'is valued as', 'valid', 'A', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (609, 'Vaccination', 'validity code', 'is valued as', 'invalid', 'A', 'May', 'Vaccination Count', '');
+INSERT INTO dqa_potential_issue(issue_id, target_object, target_field, issue_type, field_value, default_action_code, change_priority, report_denominator, issue_description) VALUES (610, 'Vaccination', 'body route', 'is invalid for body site indicated', '', 'W', 'May', 'Vaccination Count', '');
 
 INSERT INTO dqa_potential_issue_status (potential_issue_status_id, issue_id, profile_id, action_code, expect_min, expect_max) VALUES(dqa_potential_status_id_seq.NEXTVAL, 584, 251, 'A', 0, 100);
 INSERT INTO dqa_potential_issue_status (potential_issue_status_id, issue_id, profile_id, action_code, expect_min, expect_max) VALUES(dqa_potential_status_id_seq.NEXTVAL, 585, 251, 'W', 0, 100);
@@ -260,7 +259,7 @@ INSERT INTO dqa_potential_issue_status (potential_issue_status_id, issue_id, pro
 INSERT INTO dqa_potential_issue_status (potential_issue_status_id, issue_id, profile_id, action_code, expect_min, expect_max) VALUES(dqa_potential_status_id_seq.NEXTVAL, 609, 258, 'A', 0, 100);
 INSERT INTO dqa_potential_issue_status (potential_issue_status_id, issue_id, profile_id, action_code, expect_min, expect_max) VALUES(dqa_potential_status_id_seq.NEXTVAL, 610, 258, 'W', 0, 100);
 
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.08', 'Adding new coded values');
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Adding new coded values');
 
 INSERT INTO dqa_code_master(code_master_id, table_id, context_id, code_value, code_label, use_value, code_status, indicates_id) VALUES (630001, 63, NULL, 'PRI', 'Private', 'PRI', 'V', NULL);
 INSERT INTO dqa_code_master(code_master_id, table_id, context_id, code_value, code_label, use_value, code_status, indicates_id) VALUES (630002, 63, NULL, 'PUB', 'Public', 'PUB', 'V', NULL);
@@ -271,7 +270,7 @@ INSERT INTO dqa_code_master(code_master_id, table_id, context_id, code_value, co
 INSERT INTO dqa_code_master(code_master_id, table_id, context_id, code_value, code_label, use_value, code_status, indicates_id) VALUES (650003, 65, NULL, 'VALID', 'Valid', 'V', 'D', NULL);
 INSERT INTO dqa_code_master(code_master_id, table_id, context_id, code_value, code_label, use_value, code_status, indicates_id) VALUES (650004, 65, NULL, 'INVALID', 'Invalid', 'I', 'D', NULL);
 
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.08', 'Creating dqa_submission table to hold submissions via the database');
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Creating dqa_submission table to hold submissions via the database');
 
 CREATE SEQUENCE dqa_submission_id_sequence INCREMENT BY 1 START WITH 1;
 
@@ -307,10 +306,10 @@ CREATE TABLE dqa_submission
 );
 
 -- INSERT INTO dqa_submission(submission_id, submitter_name, request_content, request_name, submission_status, submission_status_date, created_date)
--- VALUES (dqa_submission_id_sequence.NEXTVAL, 'ImmTracSubTest', 'MSH|^~\\&|||||20140804133821-0400||VXU^V04^VXU_V04|[MRN].1463|P|2.5.1|\rPID|1||L47I746^^^OIS-TEST^MR||Monroe^Waverly^Leandro^^^^L|Thorne^Suki|20140128|M|||178 Medina Pl^^Felch^MI^49877^USA^P||^PRN^PH^^^906^3507796|\rNK1|1|Thorne^Suki|MTH^Mother^HL70063|\rPV1|1|R|\rORC|RE||L47I746.1^OIS|\rRXA|0|1|20140402||133^PCV 13^CVX|999|||01^Historical^NIP001||||||||||||A|\rORC|RE||L47I746.2^OIS|\rRXA|0|1|20140527||133^PCV 13^CVX|999|||01^Historical^NIP001||||||||||||A|\rORC|RE||L47I746.3^OIS|||||||I-23432^Burden^Donna^A^^^^^NIST-AA-1||57422^RADON^NICHOLAS^^^^^^NIST-AA-1^L|\rRXA|0|1|20140804||49^Hib^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001||||||U5086LL||MSD^Merck and Co^MVX||||A|\rOBX|1|CE|64994-7^Vaccine funding program eligibility category^LN|1|V01^Not VFC eligible^HL70064||||||F|||20140804|||VXC40^Eligibility captured at the immunization level^CDCPHINVS|\rOBX|2|CE|30956-7^Vaccine Type^LN|2|17^Hib^CVX||||||F|\rOBX|3|TS|29768-9^Date vaccine information statement published^LN|2|19981216||||||F|\rOBX|4|TS|29769-7^Date vaccine information statement presented^LN|2|20140804||||||F|\r', 'Test1.hl7','C',now(),now());
+-- VALUES (dqa_submission_id_sequence.NEXTVAL, 'ImmTracSubTest', 'MSH|^~\\&|||||20140804133821-0400||VXU^V04^VXU_V04|[MRN].1463|P|2.5.1|\rPID|1||L47I746^^^OIS-TEST^MR||Monroe^Waverly^Leandro^^^^L|Thorne^Suki|20140128|M|||178 Medina Pl^^Felch^MI^49877^USA^P||^PRN^PH^^^906^3507796|\rNK1|1|Thorne^Suki|MTH^Mother^HL70063|\rPV1|1|R|\rORC|RE||L47I746.1^OIS|\rRXA|0|1|20140402||133^PCV 13^CVX|999|||01^Historical^NIP001||||||||||||A|\rORC|RE||L47I746.2^OIS|\rRXA|0|1|20140527||133^PCV 13^CVX|999|||01^Historical^NIP001||||||||||||A|\rORC|RE||L47I746.3^OIS|||||||I-23432^Burden^Donna^A^^^^^NIST-AA-1||57422^RADON^NICHOLAS^^^^^^NIST-AA-1^L|\rRXA|0|1|20140804||49^Hib^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001||||||U5086LL||MSD^Merck and Co^MVX||||A|\rOBX|1|CE|64994-7^Vaccine funding program eligibility category^LN|1|V01^Not VFC eligible^HL70064||||||F|||20140804|||VXC40^Eligibility captured at the immunization level^CDCPHINVS|\rOBX|2|CE|30956-7^Vaccine Type^LN|2|17^Hib^CVX||||||F|\rOBX|3|TS|29768-9^Date vaccine information statement published^LN|2|19981216||||||F|\rOBX|4|TS|29769-7^Date vaccine information statement presented^LN|2|20140804||||||F|\r', 'Test1.hl7','C',SYSDATE,SYSDATE);
 
 
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.08', 'Creating dqa_submission_analysis table to hold analysis of submissions via the database');
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Creating dqa_submission_analysis table to hold analysis of submissions via the database');
 
 CREATE SEQUENCE dqa_sub_analysis_id_sequence INCREMENT BY 1 START WITH 1;
 
@@ -323,8 +322,6 @@ CREATE TABLE dqa_submission_analysis
   analysis_content        DATE
 );
 
-INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, NOW(), '1.08', 'Finished upgrading');
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Finished upgrading');
 
-
-
-
+COMMIT;
