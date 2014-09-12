@@ -322,6 +322,8 @@ CREATE TABLE dqa_submission_analysis
   analysis_content        DATE
 );
 
+INSERT INTO dqa_report_type(report_type_id, report_type_label) VALUES (5, 'IIS Data Quality');
+
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Finished upgrading');
 
 COMMIT;
