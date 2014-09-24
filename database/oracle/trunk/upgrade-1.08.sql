@@ -322,7 +322,53 @@ CREATE TABLE dqa_submission_analysis
   analysis_content        DATE
 );
 
+
+
+
+
+
+
+
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Adding ASC report template');
 INSERT INTO dqa_report_type(report_type_id, report_type_label) VALUES (5, 'IIS Data Quality');
+INSERT INTO dqa_report_template(template_id, template_label, report_type_id, base_profile_id) VALUES(9, 'ASC IIS DQA', 5, 259);
+INSERT INTO dqa_submitter_profile (profile_id, profile_code, profile_label, profile_status, org_id, data_format, transfer_priority, access_key, template_id) VALUES (259, 'TEMPLATE:ASC IIS DQA', 'ASC IIS DQA', 'Template', 1, 'HL7v2', 'Normal', 'template', 9);
+INSERT INTO dqa_application (application_id, application_label, application_type, run_this) VALUES (15, 'ASC', 'Test', 'N');
+UPDATE dqa_application SET primary_template_id = 9 WHERE application_id = 15;
+
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Add new counts to the report');
+ALTER TABLE dqa_batch_report ADD (vacc_refusal_count INTEGER DEFAULT 0 NOT NULL);
+
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Update the labels for a select set of potential issues');
+
+UPDATE dqa_potential_issue SET default_action_code = 'W', change_priority='May', target_object='Observation', target_field='identifier code', issue_type='is deprecated', field_value='', report_denominator='Vaccination Count', table_id = 43, hl7_reference = 'OBX-3', hl7_error_code = '102', app_error_code = NULL WHERE issue_id='475';
+UPDATE dqa_potential_issue SET default_action_code = 'S', change_priority='May', target_object='Observation', target_field='identifier code', issue_type='is ignored', field_value='', report_denominator='Vaccination Count', table_id = 43, hl7_reference = 'OBX-3', hl7_error_code = '102', app_error_code = NULL WHERE issue_id='476';
+UPDATE dqa_potential_issue SET default_action_code = 'W', change_priority='May', target_object='Observation', target_field='identifier code', issue_type='is invalid', field_value='', report_denominator='Vaccination Count', table_id = 43, hl7_reference = 'OBX-3', hl7_error_code = '102', app_error_code = NULL WHERE issue_id='477';
+UPDATE dqa_potential_issue SET default_action_code = 'W', change_priority='May', target_object='Observation', target_field='identifier code', issue_type='is missing', field_value='', report_denominator='Vaccination Count', table_id = 43, hl7_reference = 'OBX-3', hl7_error_code = '101', app_error_code = NULL WHERE issue_id='478';
+UPDATE dqa_potential_issue SET default_action_code = 'W', change_priority='May', target_object='Observation', target_field='identifier code', issue_type='is unrecognized', field_value='', report_denominator='Vaccination Count', table_id = 43, hl7_reference = 'OBX-3', hl7_error_code = '103', app_error_code = NULL WHERE issue_id='479';
+UPDATE dqa_potential_issue SET default_action_code = 'W', change_priority='May', target_object='Observation', target_field='value', issue_type='is missing', field_value='', report_denominator='Vaccination Count', table_id = NULL, hl7_reference = 'OBX-5', hl7_error_code = '101', app_error_code = NULL WHERE issue_id='480';
+
+
+INSERT INTO dqa_report_template(template_id, template_label, report_type_id, base_profile_id) VALUES(0, 'No Template', 1, 1);
+
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Dropping group_status from dqa_database_log, old data not used anymore');
+
+ALTER TABLE dqa_vaccine_group DROP COLUMN group_status;
+
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Increasing password field to accommodate hashed password');
+
+ALTER TABLE dqa_user_account MODIFY password  VARCHAR(250);
+
+
+
+
+
+
+
+
+
+
+
 
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Finished upgrading');
 
