@@ -319,7 +319,7 @@ CREATE TABLE dqa_submission_analysis
   submission_id           INTEGER NOT NULL,
   analysis_label          VARCHAR2(240) NOT NULL,
   received_id             INTEGER NOT NULL,
-  analysis_content        DATE
+  analysis_content        CLOB
 );
 
 
