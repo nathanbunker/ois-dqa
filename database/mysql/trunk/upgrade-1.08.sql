@@ -503,6 +503,9 @@ INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.08', 'Increasing password f
 ALTER TABLE dqa_user_account MODIFY password  VARCHAR(250);
 -- not run yet
 
+ALTER TABLE dqa_keyed_setting MODIFY keyed_code VARCHAR(250);
+
+
 INSERT INTO dqa_database_log VALUES (NULL, NOW(), '1.08', 'Finished upgrading');
 
 
