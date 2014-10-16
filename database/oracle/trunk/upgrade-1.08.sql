@@ -359,6 +359,8 @@ INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1
 
 ALTER TABLE dqa_user_account MODIFY password  VARCHAR(250);
 
+INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.08', 'Increasing keyed setting code field to accommodate larger possible values');
+
 ALTER TABLE dqa_keyed_setting MODIFY keyed_code VARCHAR(250);
 
 
