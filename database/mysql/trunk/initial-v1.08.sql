@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `dqa_user_account` (
 --
 
 INSERT INTO `dqa_user_account` (`username`, `password`, `account_type`, `org_id`, `email`) VALUES
-('dqa_admin', 'changeme', 'Admin', 1, 'email@gmail.com');
+('dqa_admin', 'change_this_password', 'Admin', 1, 'set_this_email@email.com');
 
 -- --------------------------------------------------------
 
