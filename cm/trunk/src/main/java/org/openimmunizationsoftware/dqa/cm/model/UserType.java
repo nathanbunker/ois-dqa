@@ -3,9 +3,8 @@ package org.openimmunizationsoftware.dqa.cm.model;
 import java.io.Serializable;
 
 public enum UserType implements Serializable {
-  ADMIN("A", "Admin"), EXPERT("E", "Expert"), PENDING("P", "Pending"), DELETED ("D", "Deleted")
+  ADMIN("A", "Admin"), EXPERT("E", "Expert"), PENDING("P", "Pending"), DELETED("D", "Deleted"), SYSTEM("S", "System");
 
-  ;
   private String id = "";
   private String label = "";
 

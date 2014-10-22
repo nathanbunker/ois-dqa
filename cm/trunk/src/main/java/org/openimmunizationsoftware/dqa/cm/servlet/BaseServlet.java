@@ -18,6 +18,7 @@ import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.thread.UpdateCountThread;
 import org.openimmunizationsoftware.dqa.cm.model.CodeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
@@ -31,6 +32,7 @@ public abstract class BaseServlet extends HttpServlet
 
   public static final String PARAM_CODE_TABLE_INSTANCE_ID = "codeTableInstanceId";
   public static final String PARAM_ATTRIBUTE_INSTANCE_ID = "attributeInstanceId";
+  public static final String PARAM_ATTRIBUTE_TYPE_ID = "attributeTypeId";
 
   private String servletTitle = "";
   protected HttpSession webSession = null;
@@ -104,6 +106,7 @@ public abstract class BaseServlet extends HttpServlet
       initUserSession();
     }
     dataSession = userSession.getDataSession();
+    dataSession.clear();
     resp.setContentType("text/html");
     out = new PrintWriter(resp.getOutputStream());
   }
@@ -131,9 +134,15 @@ public abstract class BaseServlet extends HttpServlet
       messageError = "Unable to login, unrecognized user name or password";
     } else
     {
-      messageConfirmation = "Welcome " + user.getUserName() + "!";
-      userSession.setUser(user);
-      userSession.setReleaseVersion(ReleaseVersionLogic.getProposedReleaseVersion(dataSession));
+      if (user.getUserType() == UserType.ADMIN || user.getUserType() == UserType.EXPERT)
+      {
+        messageConfirmation = "Welcome " + user.getUserName() + "!";
+        userSession.setUser(user);
+        userSession.setReleaseVersion(ReleaseVersionLogic.getProposedReleaseVersion(dataSession));
+      } else
+      {
+        messageError = "Account not authorized for access";
+      }
     }
   }
 

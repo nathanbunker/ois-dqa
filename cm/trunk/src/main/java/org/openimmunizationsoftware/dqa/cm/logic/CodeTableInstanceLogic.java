@@ -7,7 +7,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.cm.model.CodeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
-import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 
 public class CodeTableInstanceLogic
 {
@@ -24,10 +23,6 @@ public class CodeTableInstanceLogic
         CodeInstanceLogic.updateIssueCount(codeInstance, dataSession);
       }
       issueCount += codeInstance.getIssueCount();
-      if (codeInstance.getInclusionStatus() != InclusionStatus.INCLUDE && codeInstance.getInclusionStatus() != InclusionStatus.REMOVE)
-      {
-        issueCount++;
-      }
     }
     if (issueCount != codeTableInstance.getIssueCount())
     {

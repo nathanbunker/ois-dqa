@@ -51,7 +51,13 @@ public class AttributeValue implements Serializable
     {
       return 0;
     }
-    return Integer.parseInt(attributeValue);
+    try
+    {
+      return Integer.parseInt(attributeValue);
+    } catch (NumberFormatException nfe)
+    {
+      return 0;
+    }
   }
 
   public void setAttributeValue(String attributeValue)

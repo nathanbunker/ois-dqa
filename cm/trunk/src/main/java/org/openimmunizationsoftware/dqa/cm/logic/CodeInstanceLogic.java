@@ -39,13 +39,20 @@ public class CodeInstanceLogic
     return codeInstance;
   }
   
-  public static void saveCodeInstance(CodeInstance codeInstance, Session dataSession)
+  public static void updateCodeInstance(CodeInstance codeInstance, Session dataSession)
   {
     Transaction transaction = dataSession.beginTransaction();
     dataSession.update(codeInstance);
     transaction.commit();
   }
 
+  public static void saveCodeInstance(CodeInstance codeInstance, Session dataSession)
+  {
+    Transaction transaction = dataSession.beginTransaction();
+    dataSession.save(codeInstance);
+    transaction.commit();
+  }
+ 
   public static void populateAttributeValueList(CodeInstance codeInstance, Session dataSession)
   {
     List<AttributeValue> attributeValueList = new ArrayList<AttributeValue>();
@@ -162,7 +169,7 @@ public class CodeInstanceLogic
     return null;
   }
 
-  public static void updateIssueCount(CodeInstance codeInstance, Session dataSession)
+  public static boolean updateIssueCount(CodeInstance codeInstance, Session dataSession)
   {
     Query query = dataSession.createQuery("from AttributeInstance where codeInstance = ?");
     query.setParameter(0, codeInstance);
@@ -181,7 +188,9 @@ public class CodeInstanceLogic
       codeInstance.setIssueCount(issueCount);
       dataSession.update(codeInstance);
       transaction.commit();
+      return true;
     }
+    return false;
   }
 
 }

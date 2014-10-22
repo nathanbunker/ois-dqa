@@ -11,6 +11,7 @@ import org.openimmunizationsoftware.dqa.cm.model.AttributeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeValue;
 import org.openimmunizationsoftware.dqa.cm.model.PositionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
+import org.openimmunizationsoftware.dqa.cm.model.UserType;
 
 public class AttributeInstanceLogic
 {
@@ -52,6 +53,10 @@ public class AttributeInstanceLogic
       } else if (attributeComment.getPositionStatus() == PositionStatus.FOR)
       {
         confirmedCount++;
+        if (attributeComment.getUser().getUserType() == UserType.SYSTEM)
+        {
+          confirmedCount++;
+        }
       }
     }
     if (againstCount >= 2)

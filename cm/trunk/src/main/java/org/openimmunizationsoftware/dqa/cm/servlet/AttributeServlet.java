@@ -10,6 +10,8 @@ import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_US
 import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.getAttributeType;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -17,18 +19,23 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openimmunizationsoftware.dqa.cm.CentralControl;
 import org.openimmunizationsoftware.dqa.cm.logic.AllowedValueLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.AttributeAssignedLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeCommentLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeInstanceLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeValueLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeMasterLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
 import org.openimmunizationsoftware.dqa.cm.model.AcceptStatus;
 import org.openimmunizationsoftware.dqa.cm.model.AllowedValue;
+import org.openimmunizationsoftware.dqa.cm.model.AttributeAssigned;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeComment;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeFormat;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeInstance;
+import org.openimmunizationsoftware.dqa.cm.model.AttributeStatus;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeType;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeValue;
 import org.openimmunizationsoftware.dqa.cm.model.CodeInstance;
@@ -46,16 +53,19 @@ public class AttributeServlet extends HomeServlet
   }
 
   protected static final String PARAM_POSITION_STATUS = "positionStatus";
+  protected static final String PARAM_CHANGE_TO = "changeTo";
   protected static final String PARAM_COMMENT_TEXT = "commentText";
   protected static final String PARAM_COMMENT_TEXT_NEW = "commentTextNew";
   protected static final String PARAM_VALUE_NEW = "valueNew";
 
   protected static final String ACTION_UPDATE = "Update";
+  protected static final String ACTION_ADD = "Add";
 
   private String paramPositionStatus;
   private String paramCommentText;
   private String paramValueNew;
   private String paramCommentTextNew;
+  private String paramChangeTo;
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -76,99 +86,244 @@ public class AttributeServlet extends HomeServlet
     {
       CodeInstance codeInstance = null;
       AttributeInstance attributeInstance = null;
+      if (req.getParameter(PARAM_ATTRIBUTE_INSTANCE_ID) != null)
       {
         int attributeInstanceId = Integer.parseInt(req.getParameter(PARAM_ATTRIBUTE_INSTANCE_ID));
         attributeInstance = AttributeInstanceLogic.getAttributeInstance(attributeInstanceId, dataSession);
         codeInstance = attributeInstance.getCodeInstance();
+      } else if (req.getParameter(PARAM_CODE_INSTANCE_ID) != null)
+      {
+        int codeInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_INSTANCE_ID));
+        codeInstance = CodeInstanceLogic.getCodeInstance(codeInstanceId, dataSession);
+      }
+      AttributeType attributeType = null;
+      if (req.getParameter(PARAM_ATTRIBUTE_TYPE_ID) != null)
+      {
+        int attributeTypeId = Integer.parseInt(req.getParameter(PARAM_ATTRIBUTE_TYPE_ID));
+        attributeType = (AttributeType) AttributeTypeLogic.getAttributeType(attributeTypeId, dataSession);
       }
       CodeInstanceLogic.populateAttributeValueList(codeInstance, dataSession);
       String action = req.getParameter(PARAM_ACTION);
       readParams(req);
       if (action != null)
       {
-        if (action.equals(ACTION_UPDATE))
+        if (action.equals(ACTION_UPDATE) || action.equals(ACTION_ADD))
         {
-
-          if (paramPositionStatus.equals(""))
+          if (!paramValueNew.equals(""))
           {
-            messageError = "Unable to update your position, you did not indicate your position.";
-          } else if (paramCommentText.equals(""))
-          {
-            messageError = "Unable to update your position, you did not indicate the reason for your position.";
-          } else if (!paramValueNew.equals("") && paramCommentTextNew.equals(""))
-          {
-            messageError = "Unable to update new proposed value, you did not indicate the reason for the new proposed value.";
-          } else
-          {
-            AttributeComment attributeComment = new AttributeComment();
-            attributeComment.setValue(attributeInstance.getValue());
-            attributeComment.setUser(userSession.getUser());
-            attributeComment.setCommentText(paramCommentText);
-            attributeComment.setEntryDate(new Date());
-            attributeComment.setPositionStatus(PositionStatus.get(paramPositionStatus));
-            AttributeCommentLogic.saveAttributeComment(attributeComment, dataSession);
-            AttributeInstanceLogic.updateAttributeInstanceAcceptStatus(attributeInstance, dataSession);
-
-            if (!paramValueNew.equals(""))
+            AttributeFormat attributeFormat = null;
+            if (attributeInstance != null)
             {
-              AttributeValue attributeValueNew = AttributeValueLogic.getAttributeValue(attributeInstance.getValue().getCode(), paramValueNew,
-                  dataSession);
-              if (attributeValueNew == null)
-              {
-                attributeValueNew = new AttributeValue();
-                attributeValueNew.setAttributeType(attributeInstance.getValue().getAttributeType());
-                attributeValueNew.setCode(attributeInstance.getValue().getCode());
-                attributeValueNew.setAttributeValue(paramValueNew);
-                AttributeValueLogic.saveAttributeValue(attributeValueNew, dataSession);
-              }
-              AttributeInstance attributeInstanceNew = AttributeInstanceLogic.getAttributeInstance(userSession.getReleaseVersion(),
-                  attributeValueNew, dataSession);
-              if (attributeInstanceNew == null)
-              {
-                attributeInstanceNew = new AttributeInstance();
-                attributeInstanceNew.setValue(attributeValueNew);
-                attributeInstanceNew.setCodeInstance(codeInstance);
-                attributeInstanceNew.setAcceptStatus(AcceptStatus.PROPOSED);
-                AttributeInstanceLogic.saveAttributeInstance(attributeInstanceNew, dataSession);
-              }
-              AttributeComment attributeCommentNew = new AttributeComment();
-              attributeCommentNew.setValue(attributeValueNew);
-              attributeCommentNew.setUser(userSession.getUser());
-              attributeCommentNew.setCommentText(paramCommentTextNew);
-              attributeCommentNew.setEntryDate(new Date());
-              attributeCommentNew.setPositionStatus(PositionStatus.FOR);
-              AttributeCommentLogic.saveAttributeComment(attributeCommentNew, dataSession);
-              AttributeInstanceLogic.updateAttributeInstanceAcceptStatus(attributeInstanceNew, dataSession);
+              attributeFormat = attributeInstance.getValue().getAttributeType().getAttributeFormat();
+            } else
+            {
+              attributeFormat = attributeType.getAttributeFormat();
             }
-            paramPositionStatus = "";
-            paramCommentText = "";
-            paramValueNew = "";
-            paramCommentTextNew = "";
-            CodeInstanceLogic.populateAttributeValueList(codeInstance, dataSession);
-            CodeInstanceLogic.populateTableValuesFromAttributeInstance(codeInstance, dataSession);
-            CodeInstanceLogic.saveCodeInstance(codeInstance, dataSession);
+            switch (attributeFormat) {
+            case CODE_MASTER:
+              // no validation needed, should be in drop down
+              break;
+            case DATE:
+              SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+              try
+              {
+                sdf.setLenient(false);
+                sdf.parse(paramValueNew);
+              } catch (ParseException pe)
+              {
+                messageError = "Invalid date format, must be MM/DD/YYYY";
+              }
+              break;
+            case FREE_TEXT:
+              // No validation needed
+              break;
+            case CODE_TABLE:
+              // No validation needed
+              break;
+            case INTEGER:
+              try
+              {
+                Integer.parseInt(paramValueNew);
+              } catch (NumberFormatException nfe)
+              {
+                messageError = "Invalid format, must be a whole number";
+              }
+              break;
+            case LONG_TEXT:
+              // No validation needed
+              break;
+            case SELECT_TEXT:
+              // No validation needed, should be from drop down list
+              break;
+            }
           }
 
+          if (action.equals(ACTION_ADD))
+          {
+            if (paramValueNew.equals(""))
+            {
+              messageError = "Unable to add new code, value was not defined.";
+            } else if (paramCommentTextNew.equals(""))
+            {
+              messageError = "Unable to add new code, you did not indicate the reason for your position.";
+            }
+            if (messageError == null)
+            {
+              AttributeValue attributeValue = new AttributeValue();
+              attributeValue.setAttributeType(attributeType);
+              attributeValue.setCode(codeInstance.getCode());
+              attributeValue.setAttributeValue(paramValueNew);
+              AttributeValueLogic.saveAttributeValue(attributeValue, dataSession);
+
+              AttributeComment attributeComment = new AttributeComment();
+              attributeComment.setValue(attributeValue);
+              attributeComment.setUser(userSession.getUser());
+              attributeComment.setCommentText(paramCommentTextNew);
+              attributeComment.setEntryDate(new Date());
+              attributeComment.setPositionStatus(PositionStatus.FOR);
+              AttributeCommentLogic.saveAttributeComment(attributeComment, dataSession);
+
+              attributeInstance = new AttributeInstance();
+              attributeInstance.setValue(attributeValue);
+              attributeInstance.setCodeInstance(codeInstance);
+              attributeInstance.setAcceptStatus(AcceptStatus.PROPOSED);
+              AttributeInstanceLogic.saveAttributeInstance(attributeInstance, dataSession);
+
+              paramPositionStatus = "";
+              paramCommentText = "";
+              paramValueNew = "";
+              paramCommentTextNew = "";
+            }
+
+          } else if (action.equals(ACTION_UPDATE))
+          {
+            if (messageError == null)
+            {
+              if (paramPositionStatus.equals(""))
+              {
+                messageError = "Unable to update your position, you did not indicate your position.";
+              } else if (paramCommentText.equals(""))
+              {
+                messageError = "Unable to update your position, you did not indicate the reason for your position.";
+              } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff") && paramValueNew.equals(""))
+              {
+                messageError = "Unable to update your position, you did not indicate the proposed value to use instead. ";
+              } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff")
+                  && paramValueNew.equals(attributeInstance.getValue()))
+              {
+                messageError = "Unable to update your position, your proposed value is the same as the current value. ";
+              } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff") && paramCommentTextNew.equals(""))
+              {
+                messageError = "Unable to update new proposed value, you did not indicate the reason for the new proposed value.";
+              } else
+              {
+                AttributeComment attributeComment = new AttributeComment();
+                attributeComment.setValue(attributeInstance.getValue());
+                attributeComment.setUser(userSession.getUser());
+                attributeComment.setCommentText(paramCommentText);
+                attributeComment.setEntryDate(new Date());
+                attributeComment.setPositionStatus(PositionStatus.get(paramPositionStatus));
+                AttributeCommentLogic.saveAttributeComment(attributeComment, dataSession);
+                AttributeInstanceLogic.updateAttributeInstanceAcceptStatus(attributeInstance, dataSession);
+
+                if (paramChangeTo.equals("Diff"))
+                {
+                  AttributeValue attributeValueNew = AttributeValueLogic.getAttributeValue(attributeInstance.getValue().getCode(), attributeInstance.getValue().getAttributeType(), paramValueNew,
+                      dataSession);
+                  if (attributeValueNew == null)
+                  {
+                    attributeValueNew = new AttributeValue();
+                    attributeValueNew.setAttributeType(attributeInstance.getValue().getAttributeType());
+                    attributeValueNew.setCode(attributeInstance.getValue().getCode());
+                    attributeValueNew.setAttributeValue(paramValueNew);
+                    AttributeValueLogic.saveAttributeValue(attributeValueNew, dataSession);
+                  }
+                  AttributeInstance attributeInstanceNew = AttributeInstanceLogic.getAttributeInstance(userSession.getReleaseVersion(),
+                      attributeValueNew, dataSession);
+                  if (attributeInstanceNew == null)
+                  {
+                    attributeInstanceNew = new AttributeInstance();
+                    attributeInstanceNew.setValue(attributeValueNew);
+                    attributeInstanceNew.setCodeInstance(codeInstance);
+                    attributeInstanceNew.setAcceptStatus(AcceptStatus.PROPOSED);
+                    AttributeInstanceLogic.saveAttributeInstance(attributeInstanceNew, dataSession);
+                  }
+                  AttributeComment attributeCommentNew = new AttributeComment();
+                  attributeCommentNew.setValue(attributeValueNew);
+                  attributeCommentNew.setUser(userSession.getUser());
+                  attributeCommentNew.setCommentText(paramCommentTextNew);
+                  attributeCommentNew.setEntryDate(new Date());
+                  attributeCommentNew.setPositionStatus(PositionStatus.FOR);
+                  AttributeCommentLogic.saveAttributeComment(attributeCommentNew, dataSession);
+                  AttributeInstanceLogic.updateAttributeInstanceAcceptStatus(attributeInstanceNew, dataSession);
+                }
+                paramPositionStatus = "";
+                paramCommentText = "";
+                paramValueNew = "";
+                paramCommentTextNew = "";
+                CodeInstanceLogic.populateAttributeValueList(codeInstance, dataSession);
+                CodeInstanceLogic.populateTableValuesFromAttributeInstance(codeInstance, dataSession);
+                CodeInstanceLogic.updateCodeInstance(codeInstance, dataSession);
+                CentralControl.getUpdateCountThread(dataSession).addItem(codeInstance.getCodeInstanceId());
+              }
+            }
+          }
         }
       }
       createHeader();
 
-      out.println("<div class=\"leftColumn\">");
-      printTopBoxForCode(codeInstance);
-      printCodeAttributes(codeInstance, attributeInstance, "attribute?");
-      out.println("</div>");
+      if (attributeInstance == null)
+      {
 
-      out.println("<div class=\"centerColumn\">");
-      printTopBoxForComments(attributeInstance);
-      printComments(attributeInstance);
+        out.println("<div class=\"leftColumn\">");
+        printTopBoxForCode(codeInstance);
+        printCodeAttributes(codeInstance, attributeInstance, attributeType, "attribute?");
+        out.println("</div>");
 
-      out.println("</div>");
+        out.println("<div class=\"centerColumn\">");
 
-      out.println("<div class=\"rightColumn\">");
-      printTopBoxForCommentPosition(attributeInstance);
-      printCommentForm(attributeInstance, req);
-      out.println("</div>");
+        out.println("<div class=\"topBox\">");
+        out.println("  <form action=\"attribute\" method=\"POST\">");
+        out.println("  <input type=\"hidden\" name=\"" + PARAM_ATTRIBUTE_TYPE_ID + "\" value=\"" + attributeType.getAttributeTypeId() + "\"/>");
+        out.println("  <input type=\"hidden\" name=\"" + PARAM_CODE_INSTANCE_ID + "\" value=\"" + codeInstance.getCodeInstanceId() + "\"/>");
 
+        out.println("    <table width=\"100%\">");
+        out.println("      <caption>Add " + attributeType.getAttributeLabel() + "</caption>");
+        printProposedValueAndBecause(paramValueNew, attributeType, "");
+        out.println("    <tr>");
+        out.println("      <td colspan=\"2\"><span class=\"formButtonFloat\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
+            + ACTION_ADD + "\"/></span></td>");
+        out.println("    </tr>");
+        out.println("    </table>");
+        out.println("  </form>");
+        out.println("</div>");
+        // printTopBoxForComments(attributeInstance);
+        // printComments(attributeInstance);
+
+        out.println("</div>");
+
+        out.println("<div class=\"rightColumn\">");
+        // printTopBoxForCommentPosition(attributeInstance);
+        // printCommentForm(attributeInstance, req);
+        out.println("</div>");
+      } else
+      {
+        out.println("<div class=\"leftColumn\">");
+        printTopBoxForCode(codeInstance);
+        printCodeAttributes(codeInstance, attributeInstance, null, "attribute?");
+        out.println("</div>");
+
+        out.println("<div class=\"centerColumn\">");
+        printTopBoxForComments(attributeInstance);
+        printComments(attributeInstance);
+
+        out.println("</div>");
+
+        out.println("<div class=\"rightColumn\">");
+        printTopBoxForCommentPosition(attributeInstance);
+        printCommentForm(attributeInstance, req);
+        out.println("</div>");
+      }
     } catch (Exception e)
     {
       e.printStackTrace();
@@ -228,6 +383,7 @@ public class AttributeServlet extends HomeServlet
     paramCommentText = req.getParameter(PARAM_COMMENT_TEXT);
     paramValueNew = req.getParameter(PARAM_VALUE_NEW);
     paramCommentTextNew = req.getParameter(PARAM_COMMENT_TEXT_NEW);
+    paramChangeTo = req.getParameter(PARAM_CHANGE_TO);
     if (paramPositionStatus == null)
     {
       paramPositionStatus = "";
@@ -244,6 +400,10 @@ public class AttributeServlet extends HomeServlet
     {
       paramCommentTextNew = "";
     }
+    if (paramChangeTo == null)
+    {
+      paramChangeTo = "";
+    }
   }
 
   public void printCommentForm(AttributeInstance attributeInstance, HttpServletRequest req)
@@ -257,14 +417,27 @@ public class AttributeServlet extends HomeServlet
     out.println("    function openAgainst1() { ");
     out.println("      against1Div = document.getElementById('against1'); ");
     out.println("      against1Div.style.display = 'table-row';");
-    out.println("    }");
-    out.println("    function openAgainst2(field) { ");
     out.println("      against2Div = document.getElementById('against2'); ");
-    out.println("      if (field.value != '') ");
+    out.println("      against2Div.style.display = 'table-row';");
+    out.println("    }");
+    out.println("    function openAgainst2(openYes) { ");
+    out.println("      against2Div = document.getElementById('against2'); ");
+    out.println("      if (openYes) ");
     out.println("      { ");
     out.println("        against2Div.style.display = 'table-row';");
-    out.println("      } else { ");
+    out.println("        } else { ");
     out.println("        against2Div.style.display = 'none';");
+    out.println("        against3Div = document.getElementById('against3'); ");
+    out.println("        against3Div.style.display = 'none';");
+    out.println("      }");
+    out.println("    }");
+    out.println("    function openAgainst3(field) { ");
+    out.println("      against3Div = document.getElementById('against3'); ");
+    out.println("      if (field.value != '') ");
+    out.println("      { ");
+    out.println("        against3Div.style.display = 'table-row';");
+    out.println("      } else { ");
+    out.println("        against3Div.style.display = 'none';");
     out.println("      }");
     out.println("    }");
     out.println("  --> ");
@@ -281,11 +454,11 @@ public class AttributeServlet extends HomeServlet
     out.println("    <tr>");
     out.println("      <th>My Position</th>");
     out.println("      <td>");
-    printRadioOption(paramPositionStatus, PositionStatus.FOR, "I agree", "");
-    printRadioOption(paramPositionStatus, PositionStatus.RESEARCH, "I think research is needed", "");
-    printRadioOption(paramPositionStatus, PositionStatus.QUESTION, "I have a question", "");
-    printRadioOption(paramPositionStatus, PositionStatus.PROBLEM, "I see a problem", "");
-    printRadioOption(paramPositionStatus, PositionStatus.AGAINST, "I disagree", " onChange=\"openAgainst1()\"");
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.FOR, "I agree", "");
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.RESEARCH, "I think research is needed", "");
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.QUESTION, "I have a question", "");
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.PROBLEM, "I see a problem", "");
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.AGAINST, "I disagree", " onChange=\"openAgainst1()\"");
     out.println("      </td>");
     out.println("    </tr>");
     out.println("    <tr>");
@@ -293,16 +466,42 @@ public class AttributeServlet extends HomeServlet
     out.println("      <td><textarea rows=\"2\" cols=\"30\" name=\"" + PARAM_COMMENT_TEXT + "\">" + paramCommentText + "</textarea></td>");
     out.println("    </tr>");
     String hiddenAreaClass = "";
-    if (paramValueNew.length() == 0)
+    if (!paramPositionStatus.equals(PositionStatus.AGAINST.getId()))
     {
       hiddenAreaClass = " class=\"hiddenArea\"";
     }
     out.println("    <tr" + hiddenAreaClass + " id=\"against1\">");
+    out.println("      <th>Change to</th>");
+    out.println("      <td>");
+    printRadioOptionForChangeTo(true, "Diff", "a different value", " onChange=\"openAgainst2(true)\"");
+    AttributeAssigned attributeAssigned = AttributeAssignedLogic.getAttributeAssigned(attributeInstance, at, dataSession);
+    if (attributeAssigned.getAttributeStatus() != AttributeStatus.REQUIRED)
+    {
+      printRadioOptionForChangeTo(false, "No Value", "no value", " onChange=\"openAgainst2(false)\"");
+    }
+    out.println("      </td>");
+    out.println("    </tr>");
+    if (!paramPositionStatus.equals(PositionStatus.AGAINST.getId()) || paramChangeTo.equals("No Value"))
+    {
+      hiddenAreaClass = " class=\"hiddenArea\"";
+    }
+    printProposedValueAndBecause(value, at, hiddenAreaClass);
+    out.println("    <tr>");
+    out.println("      <td colspan=\"2\"><span class=\"formButtonFloat\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
+        + ACTION_UPDATE + "\"/></span></td>");
+    out.println("    </tr>");
+    out.println("  </table>");
+    out.println("</form>");
+  }
+
+  public void printProposedValueAndBecause(String value, AttributeType at, String hiddenAreaClass)
+  {
+    out.println("    <tr" + hiddenAreaClass + " id=\"against2\">");
     out.println("      <th>Proposed value</th>");
     out.println("      <td>");
     if (at.getAttributeFormat() == AttributeFormat.CODE_MASTER)
     {
-      out.println("        <select name=\"" + PARAM_VALUE_NEW + "\" onchange=\"openAgainst2(this)\">");
+      out.println("        <select name=\"" + PARAM_VALUE_NEW + "\" onchange=\"openAgainst3(this)\">");
       out.println("          <option value=\"\">--select--</option>");
       CodeTableInstance codeTableInstance = CodeTableLogic.getCodeTableInstance(at.getRefTable(), userSession.getReleaseVersion(), dataSession);
       List<CodeInstance> codeInstanceList = CodeMasterLogic.getCodeValues(codeTableInstance, dataSession);
@@ -320,7 +519,7 @@ public class AttributeServlet extends HomeServlet
       out.println("        </select>");
     } else if (at.getAttributeFormat() == AttributeFormat.CODE_TABLE)
     {
-      out.println("        <select name=\"" + PARAM_VALUE_NEW + "\" onChange=\"openAgainst2(this)\">");
+      out.println("        <select name=\"" + PARAM_VALUE_NEW + "\" onChange=\"openAgainst3(this)\">");
       out.println("          <option value=\"\">--select--</option>");
       List<CodeTableInstance> codeTableInstanceList = CodeTableLogic.getCodeTables(userSession.getReleaseVersion(), dataSession);
       for (CodeTableInstance cti : codeTableInstanceList)
@@ -337,22 +536,22 @@ public class AttributeServlet extends HomeServlet
     } else if (at.getAttributeFormat() == AttributeFormat.DATE)
     {
       out.println("        <input type=\"text\" name=\"" + PARAM_VALUE_NEW + "\" size=\"10\" value=\"" + paramValueNew
-          + "\" onkeyup=\"openAgainst2(this)\"/>");
+          + "\" onkeyup=\"openAgainst3(this)\"/>");
     } else if (at.getAttributeFormat() == AttributeFormat.FREE_TEXT)
     {
       out.println("        <input type=\"text\" name=\"" + PARAM_VALUE_NEW + "\" size=\"30\" value=\"" + paramValueNew
-          + "\" onkeyup=\"openAgainst2(this)\"/>");
+          + "\" onkeyup=\"openAgainst3(this)\"/>");
     } else if (at.getAttributeFormat() == AttributeFormat.INTEGER)
     {
       out.println("        <input type=\"text\" name=\"" + PARAM_VALUE_NEW + "\" size=\"4\" value=\"" + paramValueNew
-          + "\" onkeyup=\"openAgainst2(this)\"/>");
+          + "\" onkeyup=\"openAgainst3(this)\"/>");
     } else if (at.getAttributeFormat() == AttributeFormat.LONG_TEXT)
     {
-      out.println("        <textarea rows=\"2\" cols=\"30\" name=\"" + PARAM_VALUE_NEW + "\" onkeyup=\"openAgainst2(this)\">" + paramValueNew
+      out.println("        <textarea rows=\"2\" cols=\"30\" name=\"" + PARAM_VALUE_NEW + "\" onkeyup=\"openAgainst3(this)\">" + paramValueNew
           + "</textarea>");
     } else if (at.getAttributeFormat() == AttributeFormat.SELECT_TEXT)
     {
-      out.println("        <select name=\"" + PARAM_VALUE_NEW + "\" onChange=\"openAgainst2(this)\">");
+      out.println("        <select name=\"" + PARAM_VALUE_NEW + "\" onChange=\"openAgainst3(this)\">");
       out.println("          <option value=\"\">--select--</option>");
       List<AllowedValue> allowedValueList = AllowedValueLogic.getAllowedValueList(at, dataSession);
       for (AllowedValue allowedValue : allowedValueList)
@@ -367,26 +566,26 @@ public class AttributeServlet extends HomeServlet
       out.println("        </select>");
     } else
     {
-      out.println("        <input type=\"text\" name=\"" + PARAM_VALUE_NEW + "\" value=\"" + paramValueNew + "\" onkeyup=\"openAgainst2(this)\"/>");
+      out.println("        <input type=\"text\" name=\"" + PARAM_VALUE_NEW + "\" value=\"" + paramValueNew + "\" onkeyup=\"openAgainst3(this)\"/>");
     }
     out.println("      </td>");
     out.println("    </tr>");
-    out.println("    <tr" + hiddenAreaClass + " id=\"against2\">");
+    out.println("    <tr" + hiddenAreaClass + " id=\"against3\">");
     out.println("      <th>Because</th>");
     out.println("      <td><textarea rows=\"2\" cols=\"30\" name=\"" + PARAM_COMMENT_TEXT_NEW + "\"/>" + paramCommentTextNew + "</textarea></td>");
     out.println("    </tr>");
-    out.println("    <tr>");
-    out.println("      <td colspan=\"2\"><span class=\"formButtonFloat\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
-        + ACTION_UPDATE + "\"/></span></td>");
-    out.println("    </tr>");
-    out.println("  </table>");
-    out.println("</form>");
   }
 
-  public void printRadioOption(String positionStatus, PositionStatus ps, String text, String extraOption)
+  public void printRadioOptionForPositionStatus(String positionStatus, PositionStatus ps, String text, String extraOption)
   {
     out.println("        <input type=\"radio\" name=\"" + PARAM_POSITION_STATUS + "\" value=\"" + ps.getId() + "\""
         + (positionStatus.equals(ps.getId()) ? " checked=\"true\"" : "") + extraOption + "/> " + text + " <br/>");
+  }
+
+  public void printRadioOptionForChangeTo(boolean checked, String changeTo, String text, String extraOption)
+  {
+    out.println("        <input type=\"radio\" name=\"" + PARAM_CHANGE_TO + "\" value=\"" + changeTo + "\"" + (checked ? " checked=\"true\"" : "")
+        + extraOption + "/> " + text + " <br/>");
   }
 
   public void printTopBoxForComments(AttributeInstance attributeInstance)
