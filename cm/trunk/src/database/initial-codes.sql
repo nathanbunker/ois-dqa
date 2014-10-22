@@ -1,4 +1,4 @@
-USE dqacm;
+-- USE dqacm;
 
 -- Code Master Values
 INSERT INTO code_master(code_id, table_id, code_value) VALUES(400001, 40, 'AL');
