@@ -11,6 +11,12 @@ import org.openimmunizationsoftware.dqa.cm.model.UserType;
 
 public class UserLogic
 {
+  
+  public static final String DQA_INITIAL = "DQA Initial";
+  public static final String CDC_IISSB = "CDC IISSB";
+  public static final String DQACM = "DQAcm";
+  
+  
   public static User getUser(int userId, Session dataSession)
   {
     User user = (User) dataSession.get(User.class, userId);

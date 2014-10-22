@@ -13,6 +13,8 @@ import org.openimmunizationsoftware.dqa.cm.logic.AllowedValueLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeAssignedLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeCommentLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeInstanceLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.AttributeValueLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeMasterLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableInstanceLogic;
@@ -25,16 +27,15 @@ import org.openimmunizationsoftware.dqa.cm.model.AttributeComment;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeFormat;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeType;
+import org.openimmunizationsoftware.dqa.cm.model.AttributeValue;
 import org.openimmunizationsoftware.dqa.cm.model.CodeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.CodeMaster;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTable;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.PositionStatus;
-import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
-import org.openimmunizationsoftware.dqa.cm.model.UserType;
 
 public class HomeServlet extends BaseServlet
 {
@@ -63,10 +64,24 @@ public class HomeServlet extends BaseServlet
   protected static final String PARAM_CONTEXT_CODE_INSTANCE_ID = "contextCodeInstanceId";
   protected static final String PARAM_VIEW = "view";
 
+  protected static final String ACTION_ADD_VALUE = "Add Value";
+  protected static final String PARAM_USE_VALUE = "useValue";
+  protected static final String PARAM_CODE_STATUS = "codeStatus";
+  protected static final String PARAM_HL7_CODE_TABLE = "hl7CodeTable";
+  protected static final String PARAM_COMMENT_TEXT = "commentText";
+
   protected static final String VIEW_DEFAULT = "default";
   protected static final String VIEW_SEARCH = "search";
   protected static final String VIEW_TABLE = "table";
   protected static final String VIEW_CODE = "code";
+
+  private String paramCodeValue = null;
+  private String paramCodeLabel = null;
+  private String paramUseValue = null;
+  private String paramCodeStatus = null;
+  private String paramHl7CodeTable = null;
+  private String paramCommentText = null;
+  private CodeInstance codeInstance = null;
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -82,20 +97,6 @@ public class HomeServlet extends BaseServlet
     {
       String action = req.getParameter(PARAM_ACTION);
       String view = req.getParameter(PARAM_VIEW);
-      if (view == null)
-      {
-        view = VIEW_DEFAULT;
-      }
-      if (action != null)
-      {
-        if (action.equals(ACTION_LOGIN))
-        {
-          login(req.getParameter(PARAM_USER_NAME), req.getParameter(PARAM_PASSWORD));
-        } else if (action.equals(ACTION_LOGOUT))
-        {
-          logout();
-        }
-      }
       if (req.getParameter(PARAM_RELEASE_ID) != null)
       {
         int releaseVersionId = Integer.parseInt(req.getParameter(PARAM_RELEASE_ID));
@@ -111,6 +112,116 @@ public class HomeServlet extends BaseServlet
         int tableInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID));
         userSession.setCodeTableInstance(CodeTableInstanceLogic.getCodeTableInstance(tableInstanceId, dataSession));
       }
+      readParams(req);
+      if (view == null)
+      {
+        view = VIEW_DEFAULT;
+      }
+      if (action != null)
+      {
+        if (action.equals(ACTION_LOGIN))
+        {
+          login(req.getParameter(PARAM_USER_NAME), req.getParameter(PARAM_PASSWORD));
+        } else if (action.equals(ACTION_LOGOUT))
+        {
+          logout();
+        } else if (action.equals(ACTION_ADD_VALUE))
+        {
+          if (paramCodeValue.equals(""))
+          {
+            messageError = "Code value is required, please specify the code you are documenting";
+          } else if (paramCodeLabel.equals(""))
+          {
+            messageError = "Code label is required, please specify a human readable description";
+          } else if (paramCodeStatus.equals(""))
+          {
+            messageError = "Code status is required, please select a code status";
+          } else if (paramCommentText.equals(""))
+          {
+            messageError = "Comment is required, please indicate the reason for this code being added";
+          } else
+          {
+            boolean notUnique = false;
+            CodeTableInstance codeTableInstance = userSession.getCodeTableInstance();
+            CodeTable codeTable = codeTableInstance.getTable();
+            ReleaseVersion releaseVersion = userSession.getReleaseVersion();
+            CodeInstance codeInstanceNew = null;
+            CodeMaster codeMaster = null;
+            if (codeTableInstance.isEnforceUniqe())
+            {
+              codeMaster = CodeMasterLogic.getCodeMaster(codeTable, paramCodeValue, dataSession);
+            }
+            if (codeMaster == null)
+            {
+              codeMaster = new CodeMaster();
+              codeMaster.setTable(codeTable);
+              codeMaster.setCodeValue(paramCodeValue);
+              CodeMasterLogic.saveCodeMaster(codeMaster, dataSession);
+            }
+            codeInstanceNew = CodeInstanceLogic.getCodeInstance(codeMaster, releaseVersion, dataSession);
+            CodeMaster contextCodeMaster = null;
+            if (paramUseValue.equals(""))
+            {
+              paramUseValue = paramCodeValue;
+            }
+            if (codeInstanceNew == null)
+            {
+              codeInstanceNew = new CodeInstance();
+              codeInstanceNew.setCode(codeMaster);
+              if (req.getParameter(PARAM_CONTEXT_CODE_INSTANCE_ID) != null)
+              {
+                int contextCodeInstanceId = readInt(PARAM_CONTEXT_CODE_INSTANCE_ID, req);
+                contextCodeMaster = CodeInstanceLogic.getCodeInstance(contextCodeInstanceId, dataSession).getCode();
+                codeInstanceNew.setContext(contextCodeMaster);
+              }
+              codeInstanceNew.setCodeLabel(paramCodeLabel);
+              codeInstanceNew.setUseValue(paramUseValue);
+              codeInstanceNew.setCodeStatus(paramCodeStatus);
+              codeInstanceNew.setHl7CodeTable(paramHl7CodeTable);
+              codeInstanceNew.setInclusionStatus(InclusionStatus.INCLUDE);
+              codeInstanceNew.setTableInstance(codeTableInstance);
+              CodeInstanceLogic.saveCodeInstance(codeInstanceNew, dataSession);
+            } else
+            {
+              notUnique = true;
+            }
+            codeInstance = codeInstanceNew;
+            CodeInstanceLogic.populateAttributeValueList(codeInstanceNew, dataSession);
+
+            if (contextCodeMaster != null)
+            {
+              addAttributeComment("" + contextCodeMaster.getCodeId(), AttributeTypeLogic.AT_CONTEXT_CODE, "", codeMaster);
+            }
+            addAttributeComment(paramCodeLabel, AttributeTypeLogic.AT_CODE_LABEL, paramCommentText, codeMaster);
+            addAttributeComment(paramUseValue, AttributeTypeLogic.AT_USE_VALUE, paramUseValue.equals(paramCodeValue) ? "Same as code value"
+                : "Different than code value, value is being mapped", codeMaster);
+            addAttributeComment(paramCodeStatus, AttributeTypeLogic.AT_CODE_STATUS, "Initially defined value", codeMaster);
+            if (!paramHl7CodeTable.equals(""))
+            {
+              addAttributeComment(paramHl7CodeTable, AttributeTypeLogic.AT_HL7_CODE_TABLE, "Initially defined value", codeMaster);
+            }
+            addAttributeComment(InclusionStatus.INCLUDE.getId(), AttributeTypeLogic.AT_INCLUSION_STATUS, paramCommentText, codeMaster);
+
+            if (notUnique)
+            {
+              messageConfirmation = "Code value is already defined, code value has been updated";
+            } else
+            {
+              messageConfirmation = "Code value has been defined";
+            }
+
+            paramCodeValue = "";
+            paramUseValue = "";
+            paramCodeLabel = "";
+            paramCodeStatus = "";
+            paramHl7CodeTable = "";
+            paramCommentText = "";
+
+          }
+
+        }
+      }
+
       createHeader();
 
       if (view.equals(VIEW_DEFAULT))
@@ -139,11 +250,8 @@ public class HomeServlet extends BaseServlet
       } else if (view.equals(VIEW_TABLE))
       {
         CodeTableInstance codeTableInstance = null;
-        CodeInstance codeInstance = null;
-        if (req.getParameter(PARAM_CODE_INSTANCE_ID) != null)
+        if (codeInstance != null)
         {
-          int codeInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_INSTANCE_ID));
-          codeInstance = CodeInstanceLogic.getCodeInstance(codeInstanceId, dataSession);
           codeTableInstance = codeInstance.getTableInstance();
         } else
         {
@@ -161,13 +269,15 @@ public class HomeServlet extends BaseServlet
           out.println("<div class=\"centerColumn\">");
           printTopBoxForTable(codeTableInstance);
           printCodeValues(codeTableInstance, codeInstance, Format.FULL, VIEW_TABLE);
+          out.println("<br/>");
+          printCodeValueAddForm(codeTableInstance, null, VIEW_TABLE);
           out.println("</div>");
 
           if (codeInstance != null)
           {
             out.println("<div class=\"rightColumn\">");
             printTopBoxForCode(codeInstance);
-            printCodeAttributes(codeInstance, null, "home?" + PARAM_VIEW + "=" + VIEW_CODE + "&");
+            printCodeAttributes(codeInstance, null, null, "home?" + PARAM_VIEW + "=" + VIEW_CODE + "&");
             out.println("</div>");
           }
         } else
@@ -189,10 +299,10 @@ public class HomeServlet extends BaseServlet
           if (contextCodeInstance != null)
           {
             out.println("<div class=\"rightColumn\">");
-
             printTopBoxForTable(codeTableInstance);
-
             printContextCodeValues(codeTableInstance, contextCodeInstance, codeInstance, Format.FULL, VIEW_CODE);
+            out.println("<br/>");
+            printCodeValueAddForm(codeTableInstance, contextCodeInstance, VIEW_TABLE);
             out.println("</div>");
           }
         }
@@ -226,7 +336,7 @@ public class HomeServlet extends BaseServlet
           out.println("<div class=\"centerColumn\">");
           printTopBoxForCode(codeInstance);
 
-          printCodeAttributes(codeInstance, attributeInstance, "home?" + PARAM_VIEW + "=" + VIEW_SEARCH + "&");
+          printCodeAttributes(codeInstance, attributeInstance, null, "home?" + PARAM_VIEW + "=" + VIEW_SEARCH + "&");
           out.println("</div>");
           if (attributeInstance != null)
           {
@@ -277,16 +387,19 @@ public class HomeServlet extends BaseServlet
         {
           printTopBoxForTable(codeTableInstance);
           printCodeValues(codeTableInstance, codeInstance, Format.SHORT, VIEW_CODE);
+          out.println("<br/>");
+          printCodeValueAddForm(codeTableInstance, null, VIEW_CODE);
         } else
         {
           printTopBoxForTable(codeTableInstance);
-
           printContextCodeValues(codeTableInstance, contextCodeInstance, codeInstance, Format.SHORT, VIEW_CODE);
+          out.println("<br/>");
+          printCodeValueAddForm(codeTableInstance, contextCodeInstance, VIEW_TABLE);
         }
         out.println("</div>");
         out.println("<div class=\"centerColumn\">");
         printTopBoxForCode(codeInstance);
-        printCodeAttributes(codeInstance, attributeInstance, "home?" + PARAM_VIEW + "=" + VIEW_CODE + "&");
+        printCodeAttributes(codeInstance, attributeInstance, null, "home?" + PARAM_VIEW + "=" + VIEW_CODE + "&");
         out.println("</div>");
         if (attributeInstance != null)
         {
@@ -304,6 +417,80 @@ public class HomeServlet extends BaseServlet
       out.println("</pre>");
     }
     createFooter();
+  }
+
+  public void addAttributeComment(String value, int attributeTypeId, String comment, CodeMaster codeMaster)
+  {
+    {
+      AttributeType attributeType = AttributeTypeLogic.getAttributeType(attributeTypeId, dataSession);
+      AttributeValue attributeValue = AttributeValueLogic.getAttributeValue(codeMaster, attributeType, value, dataSession);
+      if (attributeValue == null)
+      {
+        attributeValue = new AttributeValue();
+        attributeValue.setAttributeType(attributeType);
+        attributeValue.setCode(codeMaster);
+        attributeValue.setAttributeValue(value);
+        AttributeValueLogic.saveAttributeValue(attributeValue, dataSession);
+      }
+      AttributeInstance attributeInstance = AttributeInstanceLogic.getAttributeInstance(userSession.getReleaseVersion(), attributeValue, dataSession);
+      if (attributeInstance == null)
+      {
+        attributeInstance = new AttributeInstance();
+        attributeInstance.setValue(attributeValue);
+        attributeInstance.setCodeInstance(codeInstance);
+        attributeInstance.setAcceptStatus(AcceptStatus.PROPOSED);
+        AttributeInstanceLogic.saveAttributeInstance(attributeInstance, dataSession);
+      }
+      AttributeComment attributeComment = new AttributeComment();
+      attributeComment.setValue(attributeValue);
+      attributeComment.setUser(userSession.getUser());
+      attributeComment.setCommentText(comment);
+      attributeComment.setEntryDate(new Date());
+      attributeComment.setPositionStatus(PositionStatus.FOR);
+      AttributeCommentLogic.saveAttributeComment(attributeComment, dataSession);
+    }
+  }
+
+  public void readParams(HttpServletRequest req)
+  {
+    paramCodeValue = req.getParameter(PARAM_CODE_VALUE);
+    paramCodeLabel = req.getParameter(PARAM_CODE_LABEL);
+    paramUseValue = req.getParameter(PARAM_USE_VALUE);
+    paramCodeStatus = req.getParameter(PARAM_CODE_STATUS);
+    paramHl7CodeTable = req.getParameter(PARAM_HL7_CODE_TABLE);
+    paramCommentText = req.getParameter(PARAM_COMMENT_TEXT);
+    if (paramCodeValue == null)
+    {
+      paramCodeValue = "";
+    }
+    if (paramCodeLabel == null)
+    {
+      paramCodeLabel = "";
+    }
+    if (paramUseValue == null)
+    {
+      paramUseValue = "";
+    }
+    if (paramCodeStatus == null)
+    {
+      paramCodeStatus = "";
+    }
+    if (paramHl7CodeTable == null)
+    {
+      paramHl7CodeTable = "";
+    }
+    if (paramCommentText == null)
+    {
+      paramCommentText = "";
+    }
+    if (req.getParameter(PARAM_CODE_INSTANCE_ID) != null)
+    {
+      int codeInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_INSTANCE_ID));
+      codeInstance = CodeInstanceLogic.getCodeInstance(codeInstanceId, dataSession);
+    } else
+    {
+      codeInstance = null;
+    }
   }
 
   public void printTopBoxSearch(HttpServletRequest req, String action)
@@ -339,7 +526,11 @@ public class HomeServlet extends BaseServlet
     out.println("    <td><input type=\"text\" name=\"" + PARAM_CODE_LABEL + "\" size=\"30\" value=\"" + codeLabel + "\"/></td>");
     out.println("  </tr>");
     out.println("  <tr>");
-    out.println("    <td colspan=\"2\" align=\"right\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/></td>");
+    out.println("    <td colspan=\"2\">");
+    out.println("      <span class=\"formButtonFloat\">");
+    out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
+    out.println("      </span>");
+    out.println("    </td>");
     out.println("  </tr>");
     out.println("</table>");
     out.println("<input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_SEARCH + "\"/></td>");
@@ -439,7 +630,11 @@ public class HomeServlet extends BaseServlet
       out.println("    <td><input type=\"password\" name=\"" + PARAM_PASSWORD + "\" size=\"15\"/></td>");
       out.println("  </tr>");
       out.println("  <tr>");
-      out.println("    <td colspan=\"2\" align=\"right\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/></td>");
+      out.println("    <td colspan=\"2\">");
+      out.println("      <span class=\"formButtonFloat\">");
+      out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
+      out.println("      </span>");
+      out.println("    </td>");
       out.println("  </tr>");
       out.println("</table>");
       out.println("</form>");
@@ -457,7 +652,11 @@ public class HomeServlet extends BaseServlet
       out.println("    <td>" + user.getUserType() + "</td>");
       out.println("  </tr>");
       out.println("  <tr>");
-      out.println("    <td colspan=\"2\" align=\"right\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGOUT + "\"/></td>");
+      out.println("    <td colspan=\"2\">");
+      out.println("      <span class=\"formButtonFloat\">");
+      out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGOUT + "\"/>");
+      out.println("      </span>");
+      out.println("    </td>");
       out.println("  </tr>");
       out.println("</table>");
       out.println("</form>");
@@ -547,7 +746,7 @@ public class HomeServlet extends BaseServlet
     out.println("</div>");
   }
 
-  public void printCodeAttributes(CodeInstance codeInstance, AttributeInstance attributeInstance, String view)
+  public void printCodeAttributes(CodeInstance codeInstance, AttributeInstance attributeInstance, AttributeType attributeType, String view)
   {
     out.println("<table width=\"100%\">");
     out.println("  <caption>Attributes</caption>");
@@ -560,6 +759,7 @@ public class HomeServlet extends BaseServlet
     for (AttributeAssigned aa : attributeAssignedList)
     {
       AttributeType at = aa.getAttributeType();
+      CodeInstanceLogic.populateAttributeValueList(codeInstance, dataSession);
       // SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
       List<AttributeInstance> attributeInstanceList = codeInstance.getAttributeTypeToValueMap().get(at);
       boolean showedOne = false;
@@ -583,13 +783,13 @@ public class HomeServlet extends BaseServlet
           }
           String link = view + PARAM_ATTRIBUTE_INSTANCE_ID + "=" + ai.getAttributeInstanceId();
           String issueCountLabel = "";
-          if (userSession.canEdit() && (ai.getAcceptStatus() != AcceptStatus.REJECTED && ai.getAcceptStatus() != AcceptStatus.CONFIRMED))
+          if (userSession.canEdit())
           {
             if (ai.getAcceptStatus() != AcceptStatus.REJECTED && ai.getAcceptStatus() != AcceptStatus.CONFIRMED)
             {
               issueCountLabel = " <span class=\"issueCountLabel\">" + ai.getAcceptStatus() + "</span>";
             }
-            if (acceptedOne && !aa.isAllowMultiple())
+            if (acceptedOne && !aa.isAllowMultiple() && ai.getAcceptStatus() != AcceptStatus.REJECTED)
             {
               issueCountLabel += " <span class=\"issueCountLabel\">duplicate</span>";
             }
@@ -621,25 +821,6 @@ public class HomeServlet extends BaseServlet
             {
               out.println("    <td class=\"" + classString + "\"><a href=\"" + link + "\">" + getValueLabel(ai) + "</a>" + issueCountLabel + "</td>");
             }
-          } else if (at.getAttributeFormat() == AttributeFormat.CODE_MASTER)
-          {
-            CodeMaster codeMaster = CodeMasterLogic.getCodeMaster(ai.getValue().getAttributeValueInt(), dataSession);
-            CodeInstance ci = null;
-            if (codeMaster != null)
-            {
-              ci = CodeInstanceLogic.getCodeInstance(codeMaster, userSession.getReleaseVersion(), dataSession);
-            }
-            if (ci != null)
-            {
-              out.println("    <td class=\"" + classString + "\"><a href=\"" + link + "\">" + ci.getCodeLabel() + "</a>" + issueCountLabel + "</td>");
-            } else
-            {
-              out.println("    <td class=\"" + classString + "\"><a href=\"" + link + "\">" + getValueLabel(ai) + "</a>" + issueCountLabel + "</td>");
-            }
-          } else if (at.getAttributeFormat() == AttributeFormat.CODE_TABLE)
-          {
-            // TODO
-            out.println("    <td class=\"" + classString + "\"><a href=\"" + link + "\">" + getValueLabel(ai) + "</a>" + issueCountLabel + "</td>");
           } else
           {
             out.println("    <td class=\"" + classString + "\"><a href=\"" + link + "\">" + getValueLabel(ai) + "</a>" + issueCountLabel + "</td>");
@@ -651,8 +832,22 @@ public class HomeServlet extends BaseServlet
       if (!showedOne)
       {
         out.println("  <tr>");
-        out.println("    <td>" + at.getAttributeLabel() + "</td>");
-        out.println("    <td></td>");
+        String classString = "";
+        if (userSession.canEdit())
+        {
+          if (attributeType != null && attributeType.equals(at))
+          {
+            classString = "selected";
+          }
+
+          String link = "attribute?" + PARAM_CODE_INSTANCE_ID + "=" + codeInstance.getCodeInstanceId() + "&" + PARAM_ATTRIBUTE_TYPE_ID + "="
+              + at.getAttributeTypeId();
+          out.println("    <td class=\"" + classString + "\"><a href=\"" + link + "\">" + at.getAttributeLabel() + "</a></td>");
+        } else
+        {
+          out.println("    <td class=\"" + classString + "\">" + at.getAttributeLabel() + "</td>");
+        }
+        out.println("    <td class=\"" + classString + "\"></td>");
         out.println("  </tr>");
       }
     }
@@ -680,7 +875,9 @@ public class HomeServlet extends BaseServlet
       out.println("        <form action=\"attribute\" method=\"GET\">");
       out.println("          <input type=\"hidden\" name=\"" + PARAM_ATTRIBUTE_INSTANCE_ID + "\" value=\""
           + attributeInstance.getAttributeInstanceId() + "\"/>");
-      out.println("          <span class=\"formButtonFloat\"><input type=\"submit\" name=\"submit\" value=\"Edit\"/></span>");
+      out.println("          <span class=\"formButtonFloat\">");
+      out.println("            <input type=\"submit\" name=\"submit\" value=\"Edit\"/>");
+      out.println("          </span>");
       out.println("        </form></td>");
       out.println("    </tr>");
     }
@@ -695,7 +892,13 @@ public class HomeServlet extends BaseServlet
     {
       String codeValue = attributeInstance.getValue().getAttributeValue();
       CodeInstance codeInstance = CodeInstanceLogic.getCodeInstance(at.getRefTable(), userSession.getReleaseVersion(), codeValue, dataSession);
-      return codeValue + " - " + codeInstance.getCodeLabel();
+      if (codeInstance != null)
+      {
+        return codeValue + " - " + codeInstance.getCodeLabel();
+      } else
+      {
+        return codeValue;
+      }
     } else if (at.getAttributeFormat() == AttributeFormat.CODE_TABLE)
     {
       int tableId = 0;
@@ -790,7 +993,7 @@ public class HomeServlet extends BaseServlet
     out.println("      <td>" + codeInstance.getCode().getCodeValue() + "</td>");
     out.println("    </tr>");
     out.println("    <tr>");
-    out.println("      <th>DQAcm Code Id</th>");
+    out.println("      <th>Code Id</th>");
     out.println("      <td>" + codeInstance.getCode().getCodeId() + "</td>");
     out.println("    </tr>");
     // if (codeInstance.getContext() != null)
@@ -984,5 +1187,66 @@ public class HomeServlet extends BaseServlet
       out.println("  </tr>");
     }
     out.println("</table>");
+  }
+
+  public void printCodeValueAddForm(CodeTableInstance codeTableInstance, CodeInstance contextCodeInstance, String view)
+  {
+    out.println("<form action=\"home\" method=\"POST\">");
+    out.println("<input type=\"hidden\" name=\"" + PARAM_CODE_TABLE_INSTANCE_ID + "\" value=\"" + codeTableInstance.getTableInstanceId() + "\"/>");
+    out.println("<input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"" + view + "\"/>");
+    if (contextCodeInstance != null)
+    {
+      out.println("<input type=\"hidden\" name=\"" + PARAM_CONTEXT_CODE_INSTANCE_ID + "\" value=\"" + contextCodeInstance.getCodeInstanceId()
+          + "\"/>");
+    }
+    if (userSession.canEdit())
+    {
+      out.println("  <table width=\"100%\">");
+      out.println("    <caption>Add New Code Value</caption>");
+      out.println("    <tr>");
+      out.println("      <th>Value</th>");
+      out.println("      <td><input type=\"text\" size=\"7\" name=\"" + PARAM_CODE_VALUE + "\" value=\"" + paramCodeValue + "\"/></td>");
+      out.println("    </tr>");
+      out.println("    <tr>");
+      out.println("      <th>Label</th>");
+      out.println("      <td><input type=\"text\" size=\"30\" name=\"" + PARAM_CODE_LABEL + "\" value=\"" + paramCodeLabel + "\"/></td>");
+      out.println("    </tr>");
+      out.println("    <tr>");
+      out.println("      <th>Code Status</th>");
+      out.println("      <td>");
+      out.println("        <select name=\"" + PARAM_CODE_STATUS + "\"/>");
+      out.println("          <option value=\"\">--select--</option>");
+      AttributeType attributTypeCodeStatus = AttributeTypeLogic.getAttributeType(AttributeTypeLogic.AT_CODE_STATUS, dataSession);
+      List<AllowedValue> allowedValueList = AllowedValueLogic.getAllowedValueList(attributTypeCodeStatus, dataSession);
+      for (AllowedValue allowedValue : allowedValueList)
+      {
+        out.println("          <option value=\"" + allowedValue.getSavedValue() + "\""
+            + (allowedValue.getSavedValue().equals(paramCodeStatus) ? " selected=\"true\"" : "") + ">" + allowedValue.getDisplayText() + "</option>");
+      }
+      out.println("        </select>");
+      out.println("      </td>");
+      out.println("    </tr>");
+      out.println("    <tr>");
+      out.println("      <th>Use Value</th>");
+      out.println("      <td><input type=\"text\" size=\"7\" name=\"" + PARAM_USE_VALUE + "\" value=\"" + paramUseValue + "\"/></td>");
+      out.println("    </tr>");
+      out.println("    <tr>");
+      out.println("      <th>HL7 Code Table</th>");
+      out.println("      <td><input type=\"text\" size=\"30\" name=\"" + PARAM_HL7_CODE_TABLE + "\" value=\"" + paramHl7CodeTable + "\"/></td>");
+      out.println("    </tr>");
+      out.println("    <tr>");
+      out.println("      <th>Comment</th>");
+      out.println("      <td><textarea cols=\"30\" rows=\"3\" name=\"" + PARAM_COMMENT_TEXT + "\">" + paramCommentText + "</textarea></td>");
+      out.println("    </tr>");
+      out.println("    <tr>");
+      out.println("      <td colspan=\"2\">");
+      out.println("        <span class=\"formButtonFloat\">");
+      out.println("          <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_VALUE + "\"/>");
+      out.println("        </span>");
+      out.println("      </td>");
+      out.println("    </tr>");
+      out.println("  </table>");
+      out.println("</form>");
+    }
   }
 }

@@ -6,7 +6,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.SetupThread;
+import org.openimmunizationsoftware.dqa.cm.model.User;
 
 public class SetupServlet extends BaseServlet
 {
@@ -51,7 +53,8 @@ public class SetupServlet extends BaseServlet
       sendToHome(req, resp);
       return;
     }
-    setupLogic = new SetupThread(userSession.getUser());
+    User user = UserLogic.getUser(UserLogic.DQA_INITIAL, dataSession);
+    setupLogic = new SetupThread(user);
     setupLogic.start();
     doGet(req, resp);
   }
