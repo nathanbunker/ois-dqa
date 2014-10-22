@@ -117,14 +117,14 @@ a:active.menuLink {text-decoration:none; color: #CCFFFF; }
 
 .contents {  
 	postion: relative;
-	width: 1240px; 
+	width: 1330px; 
 	margin: 5px; 
 	padding: 5px; 
 }
 
 .leftColumn {
 	float:left;
-	width: 340px;
+	width: 360px;
 	margin-bottom: 30px; 
 	overflow: auto;
  }
@@ -139,7 +139,7 @@ a:active.menuLink {text-decoration:none; color: #CCFFFF; }
  
 .centerColumn {
 	float:left;
-    width: 470px;
+    width: 520px;
     margin-left: 15px; 
     margin-bottom: 30px;
     overflow: auto;
@@ -147,7 +147,7 @@ a:active.menuLink {text-decoration:none; color: #CCFFFF; }
 
 .rightColumn {
 	float: left;
-    width: 380px;
+    width: 420px;
     margin-left: 15px; 
     margin-bottom: 30px;
     overflow: auto;
