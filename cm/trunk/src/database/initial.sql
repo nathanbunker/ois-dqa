@@ -1,8 +1,3 @@
-CREATE DATABASE dqacm;
-
-USE dqacm;
-
-
 CREATE TABLE release_version (
   release_id             INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
   major_version_num      INTEGER NOT NULL,
@@ -185,7 +180,7 @@ INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_
 INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_label, inclusion_status, enforce_unique) VALUES (9, 9, 1, 'Body Site', 'I', 'Y');
 INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_label, inclusion_status, enforce_unique) VALUES (59, 59, 1, 'CDC PHIN VADS', 'I', 'Y');
 INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_label, inclusion_status, enforce_unique) VALUES (36, 36, 1, 'Character Set', 'I', 'Y');
-INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_label, inclusion_status, enforce_unique) VALUES (49, 49, 1, 'Contraindication or Precation', 'I', 'Y');
+INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_label, inclusion_status, enforce_unique) VALUES (49, 49, 1, 'Contraindication or Precaution', 'I', 'Y');
 INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_label, inclusion_status, enforce_unique) VALUES (51, 51, 1, 'Evidence of Immunity', 'I', 'Y');
 INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_label, inclusion_status, enforce_unique) VALUES (10, 10, 1, 'Financial Status Code', 'I', 'Y');
 INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_label, inclusion_status, enforce_unique) VALUES (57, 57, 1, 'Financial Status Obs Method', 'I', 'Y');
@@ -240,6 +235,9 @@ INSERT INTO code_table_instance (table_instance_id, table_id, release_id, table_
 
 
 INSERT INTO user (user_name, password, email_address, user_type) VALUES ('Nathan Bunker', 'panda', 'Nathan.Bunker@gmail.com', 'A');
+INSERT INTO user (user_name, password, email_address, user_type) VALUES ('DQA Initial', 'panda', 'Nathan.Bunker@gmail.com', 'S');
+INSERT INTO user (user_name, password, email_address, user_type) VALUES ('CDC IISSB', 'panda', 'Nathan.Bunker@gmail.com', 'S');
+INSERT INTO user (user_name, password, email_address, user_type) VALUES ('DQAcm', 'panda', 'Nathan.Bunker@gmail.com', 'S');
 
 -- FREE_TEXT       "T" - "Free Text"
 -- LONG_TEXT       "L" - "Long Text"
@@ -294,6 +292,11 @@ INSERT INTO attribute_type(attribute_type_id, attribute_format, attribute_label,
 -- INSERT INTO attribute_type(attribute_type_id, attribute_format, attribute_label, attribute_help ) VALUES (40, 'T', '', '');
 -- INSERT INTO attribute_type(attribute_type_id, attribute_format, attribute_label, attribute_help ) VALUES (41, 'T', '', '');
 -- INSERT INTO attribute_type(attribute_type_id, attribute_format, attribute_label, attribute_help ) VALUES (42, 'T', '', '');
+
+INSERT INTO allowed_value(attribute_type_id, saved_value, display_text) VALUES (27, 'I', 'Included');
+INSERT INTO allowed_value(attribute_type_id, saved_value, display_text) VALUES (27, 'R', 'Removed');
+INSERT INTO allowed_value(attribute_type_id, saved_value, display_text) VALUES (27, 'Y', 'Proposed Include');
+INSERT INTO allowed_value(attribute_type_id, saved_value, display_text) VALUES (27, 'N', 'Proposed Remove');
 
 INSERT INTO allowed_value(attribute_type_id, saved_value, display_text) VALUES (33, 'Blocked', 'Blocked');
 INSERT INTO allowed_value(attribute_type_id, saved_value, display_text) VALUES (33, 'Can', 'Can');
