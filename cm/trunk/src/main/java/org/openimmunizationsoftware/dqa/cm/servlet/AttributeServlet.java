@@ -210,7 +210,7 @@ public class AttributeServlet extends HomeServlet
               {
                 messageError = "Unable to update your position, you did not indicate the proposed value to use instead. ";
               } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff")
-                  && paramValueNew.equals(attributeInstance.getValue()))
+                  && paramValueNew.equals(attributeInstance.getValue().getAttributeValue()))
               {
                 messageError = "Unable to update your position, your proposed value is the same as the current value. ";
               } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff") && paramCommentTextNew.equals(""))
