@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.cm.logic;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -57,6 +58,9 @@ public class AttributeInstanceLogic
         {
           confirmedCount++;
         }
+      } else if (attributeComment.getPositionStatus() == PositionStatus.RESEARCH && attributeComment.getUser().getUserType() == UserType.SYSTEM)
+      {
+        confirmedCount++;
       }
     }
     if (againstCount >= 2)
