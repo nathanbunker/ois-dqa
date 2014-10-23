@@ -128,7 +128,8 @@ public class AttributeServlet extends HomeServlet
               try
               {
                 sdf.setLenient(false);
-                sdf.parse(paramValueNew);
+                Date date = sdf.parse(paramValueNew);
+                paramValueNew = sdf.format(date);
               } catch (ParseException pe)
               {
                 messageError = "Invalid date format, must be MM/DD/YYYY";
@@ -226,7 +227,8 @@ public class AttributeServlet extends HomeServlet
                 AttributeCommentLogic.saveAttributeComment(attributeComment, dataSession);
                 AttributeInstanceLogic.updateAttributeInstanceAcceptStatus(attributeInstance, dataSession);
 
-                if (paramChangeTo.equals("Diff"))
+                
+                if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff"))
                 {
                   AttributeValue attributeValueNew = AttributeValueLogic.getAttributeValue(attributeInstance.getValue().getCode(), attributeInstance.getValue().getAttributeType(), paramValueNew,
                       dataSession);

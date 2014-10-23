@@ -1,6 +1,8 @@
 package org.openimmunizationsoftware.dqa.cm.logic;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +36,17 @@ public class AttributeCommentLogic
       }
       attributeCommentMap.put(attributeComment.getUser(), attributeComment);
     }
-    return new ArrayList<AttributeComment>(attributeCommentMap.values());
+    ArrayList<AttributeComment> acFinalList = new ArrayList<AttributeComment>(attributeCommentMap.values());
+    Collections.sort(acFinalList, new Comparator<AttributeComment>() {
+      @Override
+      public int compare(AttributeComment ac1, AttributeComment ac2)
+      {
+        return ac2.getEntryDate().compareTo(ac1.getEntryDate());
+      }
+    });
+    return acFinalList;
   }
-  
+
   public static void saveAttributeComment(AttributeComment attributeComment, Session dataSession)
   {
     Transaction transaction = dataSession.beginTransaction();
