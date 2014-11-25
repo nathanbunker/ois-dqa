@@ -301,8 +301,8 @@ CREATE TABLE dqa_submission
     -- E  Error
   submission_status_date    DATE NOT NULL,
   created_date              DATE NOT NULL,
-  submitter_defined_value1  VARCHAR2(240),
-  submitter_defined_value2  VARCHAR2(240)
+  submitter_defined_value1  VARCHAR2(4000),
+  submitter_defined_value2  VARCHAR2(4000)
 );
 
 -- INSERT INTO dqa_submission(submission_id, submitter_name, request_content, request_name, submission_status, submission_status_date, created_date)
