@@ -51,7 +51,7 @@ INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, b
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, 'TEST', NULL, NULL, 'Test Patient');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, 'PATIENT', NULL, NULL, NULL, 'Test Patient');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, 'PATIENT', NULL, NULL, 'Test Patient');
-INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, 'BENJAMIN', 'PETERSON', 'S', '2002-03-13', 'Test Patient');
+INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, 'BENJAMIN', 'PETERSON', 'S', TO_DATE('20020313','YYYYMMDD'), 'Test Patient');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, 'ZZ', NULL, NULL, NULL, 'Invalid Prefixes');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, 'XX', NULL, NULL, NULL, 'Invalid Prefixes');
 INSERT INTO dqa_known_name (known_name_id, name_first, name_last, name_middle, birth_date, name_type) VALUES (dqa_known_name_id_sequence.NEXTVAL, NULL, 'ZZ', NULL, NULL, 'Invalid Prefixes');
@@ -9901,3 +9901,4 @@ ALTER TABLE dqa_vaccination ADD (vis_publication_date DATE);
 update dqa_code_received set context_value = 'USA' where table_id = 4 and context_value is null;
 
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.07', 'Finished upgrading');
+COMMIT;
