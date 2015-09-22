@@ -54,11 +54,11 @@ public class AttributeInstanceLogic
       } else if (attributeComment.getPositionStatus() == PositionStatus.FOR)
       {
         confirmedCount++;
-        if (attributeComment.getUser().getUserType() == UserType.SYSTEM)
+        if (attributeComment.getUser().isSystemUser())
         {
           confirmedCount++;
         }
-      } else if (attributeComment.getPositionStatus() == PositionStatus.RESEARCH && attributeComment.getUser().getUserType() == UserType.SYSTEM)
+      } else if (attributeComment.getPositionStatus() == PositionStatus.RESEARCH && attributeComment.getUser().isSystemUser())
       {
         confirmedCount++;
       }

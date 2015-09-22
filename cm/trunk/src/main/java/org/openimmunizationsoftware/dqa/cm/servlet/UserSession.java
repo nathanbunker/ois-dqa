@@ -76,13 +76,13 @@ public class UserSession implements Serializable
 
   public boolean canEdit()
   {
-    if (user == null)
+    if (user == null || user.getApplicationUser() == null)
     {
       return false;
     }
     if (releaseVersion.getReleaseStatus() == ReleaseStatus.PROPOSED)
     {
-      if (user.getUserType() == UserType.ADMIN || user.getUserType() == UserType.EXPERT)
+      if (user.getApplicationUser().getUserType() == UserType.ADMIN || user.getApplicationUser().getUserType() == UserType.EXPERT)
       {
         return true;
       }

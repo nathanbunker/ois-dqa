@@ -9,7 +9,6 @@
     <property name="userName" column="user_name" type="string"/>
     <property name="password" column="password" type="string"/>
     <property name="emailAddress" column="email_address" type="string"/>
-    <property name="userTypeString" column="user_type" type="string"/>
     
     <!--
     <property name="applicationType" column="application_type" type="string"/> 

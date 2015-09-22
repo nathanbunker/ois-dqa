@@ -8,27 +8,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
-import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.ApplicationLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.DeleteProposedVersionThread;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.ReleaseNewVersionThread;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.UpdateIssueCountThread;
-import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
-import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
+import org.openimmunizationsoftware.dqa.cm.model.Application;
+import org.openimmunizationsoftware.dqa.cm.model.ApplicationUser;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
 
-public class AdminUserServlet extends BaseServlet
-{
+public class AdminUserServlet extends BaseServlet {
   public AdminUserServlet() {
     super("Admin User");
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-  {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     doGet(req, resp);
   }
 
@@ -46,88 +44,91 @@ public class AdminUserServlet extends BaseServlet
   public static final String PARAM_USER_NAME = "userName";
   public static final String PARAM_EMAIL_ADDRESS = "emailAddress";
   public static final String PARAM_USER_TYPE = "userType";
+  public static final String PARAM_APPLICATION_ID = "applicationId";
 
   private static ReleaseNewVersionThread releaseNewVersionThread = null;
   private static DeleteProposedVersionThread deleteProposedVersionThread = null;
   private static UpdateIssueCountThread updateIssueCountThread = null;
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-  {
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     setup(req, resp);
-    if (!isAdmin())
-    {
+    if (!isAdmin()) {
       sendToHome(req, resp);
       return;
     }
     String action = req.getParameter(PARAM_ACTION);
     User userBeingEdited = null;
-    if (req.getParameter(PARAM_USER_ID) != null)
-    {
+    if (req.getParameter(PARAM_USER_ID) != null) {
       int userId = readInt(PARAM_USER_ID, req);
       userBeingEdited = UserLogic.getUser(userId, dataSession);
     }
-    if (action != null)
-    {
-      if (action.equals(ACTION_RELEASE_VERSION) && (releaseNewVersionThread == null || releaseNewVersionThread.isComplete()))
-      {
+    if (action != null) {
+      if (action.equals(ACTION_RELEASE_VERSION) && (releaseNewVersionThread == null || releaseNewVersionThread.isComplete())) {
         ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
         releaseNewVersionThread = new ReleaseNewVersionThread(rv, userSession.getUser());
         releaseNewVersionThread.start();
-      } else if (action.equals(ACTION_UPDATE_ISSUE_COUNTS) && (updateIssueCountThread == null || updateIssueCountThread.isComplete()))
-      {
+      } else if (action.equals(ACTION_UPDATE_ISSUE_COUNTS) && (updateIssueCountThread == null || updateIssueCountThread.isComplete())) {
         ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
         updateIssueCountThread = new UpdateIssueCountThread(rv, userSession.getUser());
         updateIssueCountThread.start();
-      } else if (action.equals(ACTION_DELETE_VERSION))
-      {
+      } else if (action.equals(ACTION_DELETE_VERSION)) {
         ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
         deleteProposedVersionThread = new DeleteProposedVersionThread(userSession.getUser(), rv);
         deleteProposedVersionThread.start();
-      } else if (action.equals(ACTION_ADD_USER))
-      {
+      } else if (action.equals(ACTION_ADD_USER)) {
         String userName = req.getParameter(PARAM_USER_NAME);
-        if (userName.equals(""))
-        {
+        if (userName.equals("")) {
           messageError = "Unable to add user, user name not specified";
-        } else
-        {
+        } else {
           userBeingEdited = UserLogic.getUser(userName, dataSession);
-          if (userBeingEdited != null)
-          {
+          if (userBeingEdited != null) {
             messageError = "Unable to add user, user name is already used";
-          } else
-          {
-            userBeingEdited = new User();
-            userBeingEdited.setUserName(userName);
-            userBeingEdited.setEmailAddress(req.getParameter(PARAM_EMAIL_ADDRESS));
-            UserLogic.createUser(userBeingEdited, dataSession);
-            messageConfirmation = "User created, password is " + userBeingEdited.getPassword();
+          } else {
+            String applicationIdString = req.getParameter(PARAM_APPLICATION_ID);
+            String userTypeString = req.getParameter(PARAM_USER_TYPE);
+            if (applicationIdString.equals("")) {
+              messageError = "Unable to add user, application was not selected";
+            } else if (userTypeString.equals("")) {
+              messageError = "Unable to add user, user type was not selected";
+            } else {
+              int applicationId = Integer.parseInt(applicationIdString);
+              Application application = ApplicationLogic.getApplication(applicationId, dataSession);
+              UserType userType = UserType.get(userTypeString);
+              userBeingEdited = new User();
+              userBeingEdited.setUserName(userName);
+              userBeingEdited.setEmailAddress(req.getParameter(PARAM_EMAIL_ADDRESS));
+              UserLogic.createUser(userBeingEdited, application, userType, dataSession);
+              messageConfirmation = "User created, password is " + userBeingEdited.getPassword();
+            }
           }
         }
-      } else if (action.equals(ACTION_UPDATE_USER))
-      {
+      } else if (action.equals(ACTION_UPDATE_USER)) {
         String userName = req.getParameter(PARAM_USER_NAME);
-        if (!userName.equals(userBeingEdited.getUserName()))
-        {
+        if (!userName.equals(userBeingEdited.getUserName())) {
           User otherUser = UserLogic.getUser(userName, dataSession);
-          if (otherUser != null)
-          {
+          if (otherUser != null) {
             messageError = "Unable to update user, user name is already in used by a different acount";
           }
         }
-        if (messageError == null)
-        {
+        if (messageError == null) {
           String emailAddress = req.getParameter(PARAM_EMAIL_ADDRESS);
-          String userTypeString = req.getParameter(PARAM_USER_TYPE);
           userBeingEdited.setEmailAddress(emailAddress);
-          userBeingEdited.setUserTypeString(userTypeString);
           userBeingEdited.setUserName(userName);
           UserLogic.updateUser(userBeingEdited, dataSession);
+
+          for (Application application : ApplicationLogic.getApplications(dataSession)) {
+            String userTypeString = req.getParameter(PARAM_USER_TYPE + "." + application.getApplicationId());
+            UserType userType = null;
+            if (!userTypeString.equals("")) {
+              userType = UserType.get(userTypeString);
+            }
+            UserLogic.createOrUpdateApplicationUser(userBeingEdited, application, userType, dataSession);
+          }
+
           messageConfirmation = "User updated";
         }
-      } else if (action.equals(ACTION_RESET_PASSWORD))
-      {
+      } else if (action.equals(ACTION_RESET_PASSWORD)) {
         UserLogic.resetPassword(userBeingEdited, dataSession);
         messageConfirmation = "Password is now " + userBeingEdited.getPassword();
       }
@@ -152,8 +153,7 @@ public class AdminUserServlet extends BaseServlet
 
   }
 
-  public void printCreateUser()
-  {
+  public void printCreateUser() {
     out.println("  <form action=\"adminUser\" method=\"POST\">");
     out.println("  <table width=\"100%\">");
     out.println("    <caption>Create User</caption>");
@@ -166,6 +166,24 @@ public class AdminUserServlet extends BaseServlet
     out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" size=\"30\"/></td>");
     out.println("    <tr>");
     out.println("    <tr>");
+    out.println("      <th>Application</th>");
+    out.println("      <td>");
+    out.println("         <select name=\"" + PARAM_APPLICATION_ID + "\">");
+    for (Application application : ApplicationLogic.getApplications(dataSession)) {
+      out.println("           <option value=\"" + application.getApplicationId() + "\">" + application.getApplicationAcronym() + "</option>");
+    }
+    out.println("         </select>");
+    out.println("      </td>");
+    out.println("    <tr>");
+    out.println("      <th>User Type</th>");
+    out.println("      <td>");
+    out.println("         <select name=\"" + PARAM_USER_TYPE + "\">");
+    for (UserType userType : UserType.values()) {
+      out.println("           <option value=\"" + userType.getId() + "\">" + userType.getLabel() + "</option>");
+    }
+    out.println("         </select>");
+    out.println("      </td>");
+    out.println("    <tr>");
     out.println("      <td colspan=\"2\" align=\"right\">");
     out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_USER + "\"/>");
     out.println("      </td>");
@@ -175,35 +193,31 @@ public class AdminUserServlet extends BaseServlet
     out.println("  <br/>");
   }
 
-  public void printUsers(User userBeingEdited)
-  {
+  public void printUsers(User userBeingEdited) {
     out.println("  <table width=\"100%\">");
     out.println("    <caption>Users</caption>");
     out.println("    <tr>");
     out.println("      <th>User Name</th>");
-    out.println("      <th>User Type</th>");
+    // out.println("      <th>User Type</th>");
     out.println("    <tr>");
     List<User> userList = UserLogic.getUserList(dataSession);
-    for (User u : userList)
-    {
+    for (User u : userList) {
       String link = "adminUser?userId=" + u.getUserId();
       String classString = "";
-      if (u.equals(userBeingEdited))
-      {
+      if (u.equals(userBeingEdited)) {
         classString = "selected";
       }
       out.println("    <tr>");
       out.println("      <td class=\"" + classString + "\"><a href=\"" + link + "\">" + u.getUserName() + "</a></td>");
-      out.println("      <td class=\"" + classString + "\"><a href=\"" + link + "\">" + u.getUserType() + "</a></td>");
+      // out.println("      <td class=\"" + classString + "\"><a href=\""
+      // + link + "\">" + u.getUserType() + "</a></td>");
       out.println("    <tr>");
     }
     out.println("  </table>");
   }
 
-  public void printEditUser(User userBeingEdited)
-  {
-    if (userBeingEdited != null)
-    {
+  public void printEditUser(User userBeingEdited) {
+    if (userBeingEdited != null) {
       out.println("  <form action=\"adminUser\" method=\"POST\">");
       out.println("  <input type=\"hidden\" name=\"" + PARAM_USER_ID + "\" value=\"" + userBeingEdited.getUserId() + "\"/>");
       out.println("  <table width=\"100%\">");
@@ -218,21 +232,30 @@ public class AdminUserServlet extends BaseServlet
           + "\" size=\"30\"/></td>");
       out.println("    <tr>");
       out.println("    <tr>");
-      out.println("      <th>Emaile</th>");
+      out.println("      <th>Email</th>");
       out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" value=\"" + userBeingEdited.getEmailAddress()
           + "\" size=\"30\"/></td>");
       out.println("    <tr>");
-      out.println("    <tr>");
-      out.println("      <th>User Type</th>");
-      out.println("      <td>");
-      out.println("         <select name=\"" + PARAM_USER_TYPE + "\">");
-      for (UserType userType : UserType.values())
-      {
-        out.println("           <option value=\"" + userType.getId() + "\"" + (userType == userBeingEdited.getUserType() ? " selected=\"true\"" : "")
-            + ">" + userType.getLabel() + "</option>");
+      for (Application application : ApplicationLogic.getApplications(dataSession)) {
+        out.println("    <tr>");
+        out.println("      <th>" + application.getApplicationAcronym() + " User Type</th>");
+        out.println("      <td>");
+        out.println("         <select name=\"" + PARAM_USER_TYPE + "." + application.getApplicationId() + "\">");
+        UserType userTypeSelected = null;
+        for (ApplicationUser applicationUser : userBeingEdited.getApplicationUserList()) {
+          if (applicationUser.getApplication() == application) {
+            userTypeSelected = applicationUser.getUserType();
+            break;
+          }
+        }
+        out.println("           <option value=\"\"" + (userTypeSelected == null ? " selected=\"true\"" : "") + ">none</option>");
+        for (UserType userType : UserType.values()) {
+          out.println("           <option value=\"" + userType.getId() + "\"" + (userType == userTypeSelected ? " selected=\"true\"" : "") + ">"
+              + userType.getLabel() + "</option>");
+        }
+        out.println("         </select>");
+        out.println("      </td>");
       }
-      out.println("         </select>");
-      out.println("      </td>");
       out.println("    <tr>");
       out.println("    <tr>");
       out.println("      <td colspan=\"2\" align=\"right\">");

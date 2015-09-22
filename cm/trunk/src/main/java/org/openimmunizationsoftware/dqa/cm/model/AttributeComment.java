@@ -11,7 +11,7 @@ public class AttributeComment implements Serializable
   private String commentText = "";
   private Date entryDate = null;
   private PositionStatus positionStatus = null;
-
+  
   public int getAttributeCommentId()
   {
     return attributeCommentId;

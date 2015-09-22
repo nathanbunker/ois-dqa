@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="Application" table="application">
+    <id name="applicationId" column="application_id">
+      <generator class="assigned"/>
+      <!--  native or assigned -->
+    </id>
+    <property name="applicationLabel" column="application_label" type="string"/>
+    <property name="applicationAcronym" column="application_acronym" type="string"/>
+  </class>
+</hibernate-mapping>
