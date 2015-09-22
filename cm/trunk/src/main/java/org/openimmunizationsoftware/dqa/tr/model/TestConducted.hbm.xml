@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TestConducted" table="test_conducted">
+    <id name="testConductedId" column="test_conducted_id">
+      <generator class="native"/>
+    </id>
+    <property name="connectionLabel" column="connection_label" type="string"/>
+    <property name="connectionType" column="connection_type" type="string"/>
+    <property name="connectionUrl" column="connection_url" type="string"/>
+    <property name="connectionAckType" column="connection_ack_type" type="string"/>
+    <property name="connectionConfig" column="connection_config" type="string"/>
+    <property name="queryType" column="query_type" type="string"/>
+    <property name="queryEnabled" column="query_enabled" type="string"/>
+    <property name="queryPause" column="query_pause" type="string"/>
+    <property name="testLog" column="test_log" type="string"/>
+    <property name="testStartedTime" column="test_started_time" type="timestamp"/>
+    <property name="testFinishedTime" column="test_finished_time" type="timestamp"/>
+    <property name="countUpdate" column="count_update" type="integer"/>
+    <property name="countQuery" column="count_query" type="integer"/>
+    <property name="profileBaseName" column="profile_base_name" type="string"/>
+    <property name="profileCompareName" column="profile_compare_name" type="string"/>
+  </class>
+</hibernate-mapping>

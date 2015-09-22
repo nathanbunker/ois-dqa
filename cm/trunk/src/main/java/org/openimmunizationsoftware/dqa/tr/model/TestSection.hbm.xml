@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TestSection" table="test_section">
+    <id name="testSectionId" column="test_section_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="testConducted" column="test_conducted_id" class="TestConducted"/>
+    <property name="testSectionType" column="test_section_type" type="string"/>
+    <property name="testEnabled" column="test_enabled" type="yes_no"/>
+    <property name="scoreLevel1" column="score_level1" type="integer"/>
+    <property name="scoreLevel2" column="score_level2" type="integer"/>
+    <property name="scoreLevel3" column="score_level3" type="integer"/>
+    <property name="progressLevel1" column="progress_level1" type="integer"/>
+    <property name="progressLevel2" column="progress_level2" type="integer"/>
+    <property name="progressLevel3" column="progress_level3" type="integer"/>
+    <property name="countLevel1" column="count_level1" type="integer"/>
+    <property name="countLevel2" column="count_level2" type="integer"/>
+    <property name="countLevel3" column="count_level3" type="integer"/>
+  </class>
+</hibernate-mapping>

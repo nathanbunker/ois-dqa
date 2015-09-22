@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TestMessage" table="test_message">
+    <id name="testMessageId" column="test_message_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="testSection" column="test_section_id" class="TestSection"/>
+    <property name="testPosition" column="test_position" type="integer"/>
+    <property name="testType" column="test_type" type="string"/>
+    <property name="testCaseSet" column="test_case_set" type="string"/>
+    <property name="testCaseNumber" column="test_case_number" type="string"/>
+    <property name="testCaseCategory" column="test_case_category" type="string"/>
+    <property name="testCaseDescription" column="test_case_description" type="string"/>
+    <property name="testCaseAssertResult" column="test_case_assert_result" type="string"/>
+    <property name="prepPatientType" column="prep_patient_type" type="string"/>
+    <property name="prepTransformsQuick" column="prep_transforms_quick" type="string"/>
+    <property name="prepTransformsCustom" column="prep_transforms_custom" type="string"/>
+    <property name="prepTransformsAddition" column="prep_transforms_addition" type="string"/>
+    <property name="prepTransformsCauseIssue" column="prep_transforms_cause_issue" type="string"/>
+    <property name="prepCauseIssueNames" column="prep_cause_issue_names" type="string"/>
+    <property name="prepHasIssue" column="prep_has_issue" type="string"/>
+    <property name="prepMajorChagnesMade" column="prep_major_changes_made" type="string"/>
+    <property name="prepNotExpectedToConform" column="prep_not_expected_to_conform" type="string"/>
+    <property name="prepMessageAcceptStatusDebug" column="prep_message_accept_status_debug" type="string"/>
+    <property name="prepScenarioName" column="prep_scenario_name" type="string"/>
+    <property name="prepMessageDerivedFrom" column="prep_message_derived_from" type="string"/>
+    <property name="prepMessageOriginal" column="prep_message_original" type="string"/>
+    <property name="prepMessageActual" column="prep_message_actual" type="string"/>
+    <property name="resultMessageActual" column="result_message_actual" type="string"/>
+    <property name="resultStatus" column="result_status" type="string"/>
+    <property name="resultExceptionText" column="result_exception_text" type="string"/>
+    <property name="resultAcceptedMessage" column="result_accepted_message" type="string"/>
+    <property name="resultResponseType" column="result_response_type" type="string"/>
+    <property name="resultAckType" column="result_ack_type" type="string"/>
+    <property name="forecastTestPanelCaseId" column="forecast_test_panel_case_id" type="integer"/>
+    <property name="forecastTestPanelId" column="forecast_test_panel_id" type="integer"/>
+  </class>
+</hibernate-mapping>

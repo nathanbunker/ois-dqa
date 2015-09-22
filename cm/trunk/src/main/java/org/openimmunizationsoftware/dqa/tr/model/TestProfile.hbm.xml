@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TestProfile" table="test_profile">
+    <id name="testProfileId" column="test_profile_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="testSection" column="test_section_id" class="TestSection"/>
+    <property name="testProfileStatus" column="test_profile_status" type="string"/>
+    <property name="profileFieldPos" column="profile_field_pos" type="integer"/>
+    <property name="usageExpected" column="usage_expected" type="string"/>
+    <property name="usageDetected" column="usage_detected" type="string"/>
+    <property name="acceptExpected" column="accept_expected" type="string"/>
+    <property name="acceptDetected" column="accept_detected" type="string"/>
+    <many-to-one name="testMessagePresent" column="test_message_present_id" class="TestSection"/>
+    <many-to-one name="testMessageAbsent" column="test_message_absent_id" class="TestSection"/>
+    <property name="messageAcceptStatusDebug" column="message_accept_status_debug" type="string"/>
+    <property name="compatibilityConformance" column="compatibility_conformance" type="string"/>
+  </class>
+</hibernate-mapping>
