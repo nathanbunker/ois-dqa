@@ -5,7 +5,7 @@
     <id name="testSectionId" column="test_section_id">
       <generator class="native"/>
     </id>
-    <many-to-one name="testConducted" column="test_conducted_id" class="TestConducted"/>
+    <many-to-one name="testConducted" column="test_conducted_id" class="TestConducted" lazy="false"/>
     <property name="testSectionType" column="test_section_type" type="string"/>
     <property name="testEnabled" column="test_enabled" type="yes_no"/>
     <property name="scoreLevel1" column="score_level1" type="integer"/>

@@ -119,12 +119,18 @@ public class HomeServlet extends BaseServlet {
         } else if (action.equals(ACTION_LOGOUT)) {
           logout();
         } else if (action.equals(ACTION_SELECT_APPLICATION)) {
-          userSession.getUser().setApplicationUser(null);
-          int applicationId = Integer.parseInt(req.getParameter(PARAM_APPLICATION_ID));
-          for (ApplicationUser applicationUser : userSession.getUser().getApplicationUserList()) {
-            if (applicationUser.getApplication().getApplicationId() == applicationId) {
-              userSession.getUser().setApplicationUser(applicationUser);
-              break;
+          if (userSession.getUser() != null) {
+            userSession.getUser().setApplicationUser(null);
+            int applicationId = Integer.parseInt(req.getParameter(PARAM_APPLICATION_ID));
+            for (ApplicationUser applicationUser : userSession.getUser().getApplicationUserList()) {
+              if (applicationUser.getApplication().getApplicationId() == applicationId) {
+                userSession.getUser().setApplicationUser(applicationUser);
+                if (applicationUser.getApplication().isApplicationDqais()) {
+                  sendToApplication(req, resp, applicationUser.getApplication());
+                  return;
+                }
+                break;
+              }
             }
           }
         } else if (action.equals(ACTION_ADD_VALUE)) {
@@ -549,7 +555,7 @@ public class HomeServlet extends BaseServlet {
     out.println("</table>");
   }
 
-  private void printLogin(User user) {
+  protected void printLogin(User user) {
     if (user == null) {
       out.println("<form method=\"POST\" action=\"home\">");
       out.println("<table width=\"100%\">");

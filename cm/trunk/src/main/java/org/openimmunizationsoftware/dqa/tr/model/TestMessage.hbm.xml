@@ -5,7 +5,7 @@
     <id name="testMessageId" column="test_message_id">
       <generator class="native"/>
     </id>
-    <many-to-one name="testSection" column="test_section_id" class="TestSection"/>
+    <many-to-one name="testSection" column="test_section_id" class="TestSection" lazy="false"/>
     <property name="testPosition" column="test_position" type="integer"/>
     <property name="testType" column="test_type" type="string"/>
     <property name="testCaseSet" column="test_case_set" type="string"/>
@@ -29,6 +29,7 @@
     <property name="prepMessageActual" column="prep_message_actual" type="string"/>
     <property name="resultMessageActual" column="result_message_actual" type="string"/>
     <property name="resultStatus" column="result_status" type="string"/>
+    <property name="resultAccepted" column="result_accepted" type="yes_no"/>
     <property name="resultExceptionText" column="result_exception_text" type="string"/>
     <property name="resultAcceptedMessage" column="result_accepted_message" type="string"/>
     <property name="resultResponseType" column="result_response_type" type="string"/>

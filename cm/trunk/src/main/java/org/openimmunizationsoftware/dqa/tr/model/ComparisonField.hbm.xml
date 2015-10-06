@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="ComparisonField" table="comparison_field">
+    <id name="comparisonFieldId" column="comparison_field_id">
+      <generator class="native"/>
+    </id>
+    <property name="fieldName" column="field_name" type="string"/>
+    <property name="fieldLabel" column="field_label" type="string"/>
+    <property name="priorityLabel" column="priority_label" type="string"/>
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="Comparison" table="comparison">
+    <id name="comparisonId" column="comparison_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="comparisonField" column="comparison_field_id" class="ComparisonField"/>
+    <many-to-one name="testMessage" column="test_message_id" class="TestMessage"/>
+    <property name="valueOriginal" column="value_original" type="string"/>
+    <property name="valueCompare" column="value_compare" type="string"/>
+    <property name="comparisonStatus" column="comparison_status" type="string"/>
+  </class>
+</hibernate-mapping>

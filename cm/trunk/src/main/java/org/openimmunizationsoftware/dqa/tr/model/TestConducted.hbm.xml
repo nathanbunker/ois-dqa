@@ -10,15 +10,36 @@
     <property name="connectionUrl" column="connection_url" type="string"/>
     <property name="connectionAckType" column="connection_ack_type" type="string"/>
     <property name="connectionConfig" column="connection_config" type="string"/>
+    <property name="latestTest" column="latest_test" type="yes_no"/>
     <property name="queryType" column="query_type" type="string"/>
     <property name="queryEnabled" column="query_enabled" type="string"/>
     <property name="queryPause" column="query_pause" type="string"/>
     <property name="testLog" column="test_log" type="string"/>
+    <property name="testStatus" column="test_status" type="string"/>
     <property name="testStartedTime" column="test_started_time" type="timestamp"/>
     <property name="testFinishedTime" column="test_finished_time" type="timestamp"/>
     <property name="countUpdate" column="count_update" type="integer"/>
     <property name="countQuery" column="count_query" type="integer"/>
     <property name="profileBaseName" column="profile_base_name" type="string"/>
     <property name="profileCompareName" column="profile_compare_name" type="string"/>
+    <property name="scoreOverall" column="score_overall" type="integer"/>
+    <property name="scoreInterop" column="score_interop" type="integer"/>
+    <property name="scoreCoded" column="score_coded" type="integer"/>
+    <property name="scoreLocal" column="score_local" type="integer"/>
+    <property name="scoreNational" column="score_national" type="integer"/>
+    <property name="scoreTolerance" column="score_tolerance" type="integer"/>
+    <property name="scoreEhr" column="score_ehr" type="integer"/>
+    <property name="scorePerform" column="score_perform" type="integer"/>
+    <property name="scoreAck" column="score_ack" type="integer"/>
+    <property name="perQueryTotal" column="per_query_total" type="integer"/>
+    <property name="perQueryCount" column="per_query_count" type="integer"/>
+    <property name="perQueryMin" column="per_query_min" type="integer"/>
+    <property name="perQueryMax" column="per_query_max" type="integer"/>
+    <property name="perQueryStd" column="per_query_std" type="float"/>
+    <property name="perUpdateTotal" column="per_update_total" type="integer"/>
+    <property name="perUpdateCount" column="per_update_count" type="integer"/>
+    <property name="perUpdateMin" column="per_update_min" type="integer"/>
+    <property name="perUpdateMax" column="per_update_max" type="integer"/>
+    <property name="perUpdateStd" column="per_update_std" type="float"/>
   </class>
 </hibernate-mapping>

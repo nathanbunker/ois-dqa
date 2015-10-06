@@ -27,12 +27,17 @@ import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
+import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 
 public abstract class BaseServlet extends HttpServlet {
 
   public static final String PARAM_CODE_TABLE_INSTANCE_ID = "codeTableInstanceId";
   public static final String PARAM_ATTRIBUTE_INSTANCE_ID = "attributeInstanceId";
   public static final String PARAM_ATTRIBUTE_TYPE_ID = "attributeTypeId";
+
+  public static final String ATTRIBUTE_TEST_PARTICIPANT = "testParticipant";
+  public static final String ATTRIBUTE_TEST_CONDUCTED = "testConducted";
+  public static final String ATTRIBUTE_TEST_MESSAGE = "testMessage";
 
   private String servletTitle = "";
   protected HttpSession webSession = null;
@@ -82,6 +87,16 @@ public abstract class BaseServlet extends HttpServlet {
   protected void sendToHome(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     RequestDispatcher dispatcher = req.getRequestDispatcher("home");
     dispatcher.forward(req, resp);
+  }
+
+  protected void sendToApplication(HttpServletRequest req, HttpServletResponse resp, Application application) throws ServletException, IOException {
+    if (application.isApplicationDqais()) {
+      RequestDispatcher dispatcher = req.getRequestDispatcher("testReport?" + TestReportServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP);
+      dispatcher.forward(req, resp);
+    } else {
+      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
+      dispatcher.forward(req, resp);
+    }
   }
 
   protected BaseServlet(String servletTitle) {
@@ -141,16 +156,31 @@ public abstract class BaseServlet extends HttpServlet {
     out.println("  </head>");
     out.println("  <body>");
     out.println("    <div class=\"menu\">");
-    out.println("     <a href=\"home\" class=\"menuLink\">home</a>");
-    out.println("     |");
-    out.println("     <a href=\"home?" + HomeServlet.PARAM_VIEW + "=" + HomeServlet.VIEW_SEARCH + "\" class=\"menuLink\">search</a>");
-    if (isAdmin()) {
+    if (application.isApplicationDqacm()) {
       out.println("     |");
-      out.println("     <a href=\"adminUser\" class=\"menuLink\">users</a>");
+      out.println("     <a href=\"home?" + HomeServlet.PARAM_VIEW + "=" + HomeServlet.VIEW_SEARCH + "\" class=\"menuLink\">search</a>");
+      if (isAdmin()) {
+        out.println("     |");
+        out.println("     <a href=\"adminUser\" class=\"menuLink\">users</a>");
+        out.println("     |");
+        out.println("     <a href=\"adminTable\" class=\"menuLink\">tables</a>");
+        out.println("     |");
+        out.println("     <a href=\"admin\" class=\"menuLink\">admin</a>");
+      }
+    } else if (application.isApplicationDqais()) {
+      out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_HOME + "\" class=\"menuLink\">home</a>");
+      TestConducted testConducted = (TestConducted) webSession.getAttribute(ATTRIBUTE_TEST_CONDUCTED);
       out.println("     |");
-      out.println("     <a href=\"adminTable\" class=\"menuLink\">tables</a>");
+      out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP + "\" class=\"menuLink\">dashboard</a>");
       out.println("     |");
-      out.println("     <a href=\"admin\" class=\"menuLink\">admin</a>");
+      out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_REPORTS + "\" class=\"menuLink\">reports</a>");
+      if (testConducted != null) {
+        out.println("     |");
+        out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_TEST_MESSAGES
+            + "\" class=\"menuLink\">tests</a>");
+      }
+    } else {
+      out.println("     <a href=\"home\" class=\"menuLink\">home</a>");
     }
 
     out.println("      <span class=\"appTitle\">");

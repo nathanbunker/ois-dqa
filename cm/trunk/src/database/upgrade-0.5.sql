@@ -7,7 +7,7 @@ CREATE TABLE application (
 );
 
 INSERT INTO application(application_id, application_label, application_acronym) VALUES (1, 'Data Quality Assurance - Code Manager', 'DQAcm');
-INSERT INTO application(application_id, application_label, application_acronym) VALUES (2, 'Data Quality Assurance - Interoperability Analysis System', 'DQAias');
+INSERT INTO application(application_id, application_label, application_acronym) VALUES (2, 'Eric''s Analysis Tool', 'EAT');
 
 
 CREATE TABLE application_user (
@@ -49,17 +49,38 @@ CREATE TABLE test_conducted (
   connection_type      VARCHAR(250),
   connection_url       VARCHAR(250),
   connection_ack_type  VARCHAR(250),
-  connection_config    TEXT, 
+  connection_config    TEXT,
+  latest_test          VARCHAR(1), 
   query_type           VARCHAR(250),
   query_enabled        VARCHAR(1),
   query_pause          VARCHAR(1),
   test_log             TEXT,
+  test_status          VARCHAR(250),
   test_started_time    DATETIME,
   test_finished_time   DATETIME,
   count_update         INTEGER,
   count_query          INTEGER,
   profile_base_name    VARCHAR(250),
-  profile_compare_name VARCHAR(250)
+  profile_compare_name VARCHAR(250),
+  score_overall        INTEGER,
+  score_interop        INTEGER,
+  score_coded          INTEGER,
+  score_local          INTEGER,
+  score_national       INTEGER,
+  score_tolerance      INTEGER,
+  score_ehr            INTEGER,
+  score_perform        INTEGER,
+  score_ack            INTEGER,
+  per_query_total      INTEGER,
+  per_query_count      INTEGER,
+  per_query_min        INTEGER,
+  per_query_max        INTEGER,
+  per_query_std        FLOAT,
+  per_update_total     INTEGER,
+  per_update_count     INTEGER,
+  per_update_min       INTEGER,
+  per_update_max       INTEGER,
+  per_update_std       FLOAT
 );
 
 CREATE TABLE test_section (
@@ -104,6 +125,7 @@ CREATE TABLE test_message (
   prep_message_actual                TEXT,
   result_message_actual              TEXT,
   result_status                      VARCHAR(250),
+  result_accepted                    VARCHAR(1), 
   result_exception_text              TEXT,
   result_accepted_message            VARCHAR(250),
   result_response_type               VARCHAR(250),
@@ -126,4 +148,46 @@ CREATE TABLE test_profile (
   test_message_absent_id             INTEGER NOT NULL,
   message_accept_status_debug        VARCHAR(250),
   compatibility_conformance          VARCHAR(250)
+);
+
+CREATE TABLE comparison (
+  comparison_id                     INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  comparison_field_id               INTEGER NOT NULL,
+  test_message_id                   INTEGER NOT NULL,
+  value_original                    VARCHAR(250),
+  value_compare                     VARCHAR(250),
+  comparison_status                 VARCHAR(250)
+);
+
+CREATE TABLE comparison_field (
+  comparison_field_id               INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  field_name                        VARCHAR(250),
+  field_label                       VARCHAR(250),
+  priority_label                    VARCHAR(250)
+);
+
+CREATE TABLE test_participant (
+  test_participant_id               INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  organization_name                 VARCHAR(250) NOT NULL,
+  connection_label                  VARCHAR(250),
+  map_row                           INTEGER,
+  map_col                           INTEGER,
+  platform_label                    VARCHAR(250),
+  vendor_label                      VARCHAR(250),
+  internal_comments                 TEXT,
+  phase1_participation              VARCHAR(250),
+  phase1_status                     VARCHAR(250),
+  phase1_comments                   TEXT,
+  phase2_participation              VARCHAR(250),
+  phase2_status                     VARCHAR(250),
+  phase2_comments                   TEXT,
+  ihs_status                        VARCHAR(250),
+  guide_status                      VARCHAR(250),
+  guide_name                        VARCHAR(250),
+  connect_status                    VARCHAR(250),
+  general_comments                  TEXT,
+  transport_type                    VARCHAR(250),
+  query_support                     VARCHAR(250),
+  nist_status                       VARCHAR(250),
+  access_passcode                   VARCHAR(250)
 );
