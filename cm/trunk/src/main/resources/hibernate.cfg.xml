@@ -37,11 +37,13 @@
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/CodeTableInstance.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/ReleaseVersion.hbm.xml"/> 
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/User.hbm.xml"/>
-
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestConducted.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestMessage.hbm.xml"/>
-    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestSection.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestParticipant.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestProfile.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestSection.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Comparison.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ComparisonField.hbm.xml"/>
 
   </session-factory>
 </hibernate-configuration>

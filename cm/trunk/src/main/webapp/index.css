@@ -7,21 +7,21 @@ body {font-family: Tahoma, Geneva, sans-serif; background:#FFFFFF; margin: 0px; 
 	padding-right: 2px;
 	padding-top: 2px;
 padding-bottom: 2px;
-	border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #0000FF;
-	background-color: #0000FF;
-	color: #CCFFFF;
+	border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #051838;
+	background-color: #051838;
+	color: #FFE1AA;
 }
 
 .likethisblue
 {
-	color:  #0079b2;
+	color:  #051838;
 }
 
 .codeStatusLabel
 {
 	font-size: x-small;
 	text-transform: lowercase;
-	color: #0000FF;
+	color: #051838;
 	float: right; 
 	background-color: #FFFFFF;
 	padding-right: 2px;
@@ -30,23 +30,23 @@ padding-bottom: 2px;
 	padding-top: 1px;
 	border-style: solid;
 	border-width: 1px;
-	border-color: #CCCCCC;
+	border-color: #553700;
 }
 
 .issueCountLabel
 {
 	font-size: x-small;
 	text-transform: lowercase;
-	color: #0000FF;
+	color: #051838;
 	float: right; 
-	background-color: #FFFF99;
+	background-color: #FFE1AA;
 	padding-right: 2px;
 	padding-left: 2px;
 	padding-bottom: 1px;
 	padding-top: 1px;
 	border-style: solid;
 	border-width: 1px;
-	border-color: #CCCCCC;
+	border-color: #553700;
 	margin-left: 3px;
 }
 
@@ -94,10 +94,10 @@ padding-bottom: 2px;
 }
 
 
-a:link.menuLink {text-decoration:none; color: #CCFFFF; }
-a:visited.menuLink {text-decoration:none; color: #CCFFFF; }
-a:hover.menuLink {text-decoration:none; color: black; background-color: #CCFFFF;}
-a:active.menuLink {text-decoration:none; color: #CCFFFF; }
+a:link.menuLink {text-decoration:none; color: #FFE1AA; }
+a:visited.menuLink {text-decoration:none; color: #FFE1AA; }
+a:hover.menuLink {text-decoration:none; color: black; background-color: #FFE1AA;}
+a:active.menuLink {text-decoration:none; color: #FFE1AA; }
 
 .strike 
 {
@@ -117,7 +117,7 @@ a:active.menuLink {text-decoration:none; color: #CCFFFF; }
 
 .contents {  
 	postion: relative;
-	width: 1330px; 
+	width: 1430px; 
 	margin: 5px; 
 	padding: 5px; 
 }
@@ -127,6 +127,11 @@ a:active.menuLink {text-decoration:none; color: #CCFFFF; }
 	width: 360px;
 	margin-bottom: 30px; 
 	overflow: auto;
+ }
+ 
+ pre {
+   width: 100%;
+   overflow: auto;
  }
  
 .topBox 
@@ -147,7 +152,15 @@ a:active.menuLink {text-decoration:none; color: #CCFFFF; }
 
 .rightColumn {
 	float: left;
-    width: 420px;
+    width: 520px;
+    margin-left: 15px; 
+    margin-bottom: 30px;
+    overflow: auto;
+}
+
+.rightFullColumn {
+	float: left;
+    width: 1040px;
     margin-left: 15px; 
     margin-bottom: 30px;
     overflow: auto;
@@ -171,28 +184,28 @@ caption {
 	background-color: #33CCFF;
 	
 }
-h1 {color: #0000FF; margin-top: 0px; }
-h2 {color: #0000FF; margin-top: 0px; }
-h3 {color: #0000FF; margin-top: 0px; }
-p {color:#2B3E42; }
+h1 {color: #152C55; margin-top: 0px; }
+h2 {color: #152C55; margin-top: 0px; }
+h3 {color: #152C55; margin-top: 0px; }
+p {color:#051838; }
 
 
 
-a:link {text-decoration:none; color: #0000FF; }
-a:visited {text-decoration:none; color: #0000FF; }
-a:hover {text-decoration:none; color: black; background-color: #FFFF99;}
-a:active {text-decoration:none; color: #0000FF; }
+a:link {text-decoration:none; color: #051838; }
+a:visited {text-decoration:none; color: #051838; }
+a:hover {text-decoration:none; color: black; background-color: #FFE1AA;}
+a:active {text-decoration:none; color: #051838; }
 
 
 .sideMenu {float: left; border-width: 1px; border-style: solid; border-color: black; margin: 2px;}
 
 .todo { margin: 50px; 5px; 5px; 5px; padding: 10px; width: 500px; border-width: 2px; border-style: dashed; background-color: #EEEEEE ; font-size: smaller; color: #333333;}
 
-.selected {background-color: #FFB673;}
+.selected {background-color: #7788AA;}
 
 a:link.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #eee; color: #666; font-variant: small-caps;}
 a:visited.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #eee; color: #666; font-variant: small-caps;}
-a:hover.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #0000FF; color: #FFF; font-variant: small-caps;}
+a:hover.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #051838; color: #FFF; font-variant: small-caps;}
 a:active.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #eee; color: #666; font-variant: small-caps;}
 
 
@@ -201,10 +214,10 @@ a:active.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px;
 	color: blue;
 	padding-left: 7px;
 	width: 100%;
-	background-color: #FFFF99;
+	background-color: #FFE1AA;
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
-	border-bottom-color: #0000FF;
+	border-bottom-color: #051838;
 }
 
 .messageError
@@ -212,25 +225,28 @@ a:active.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px;
 	padding-left: 20px;
 	width: 100%;
 	color: red;
-	background-color: #FFFF99;
+	background-color: #FFE1AA;
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
-	border-bottom-color: #0000FF;
+	border-bottom-color: #051838;
 }
 
 table {
 	border-collapse: collapse;
 	border-width: 1px;
 	border-style: solid;
-	border-color: #666;
+	border-color: #553700;
 }
 caption {
 	border-width: 1px;
 	border-style: solid;
-	border-color: #666;
+	border-color: #061739;
+	background-color: #152B55;
+	color: #D4B06A;	
 }
 th {
-	background-color: #D0D0D0;
+	background-color: #2D4471;
+	color: #D4B06A;	
 	text-align: left; 
 	padding-left: 4px; 
 	padding-right: 8px; 
@@ -238,19 +254,70 @@ th {
 	padding-top: 3px; 
 	border-width: 1px; 
 	border-style: solid; 
-	border-color: #666;
+	border-color: #061739;
 	font-size: smaller;
 }
 td {
 	background-color: #F0F0F0;
 	padding: 2px; 
 	padding-left: 4px; 
-	padding-right: 8px; 
+	padding-right: 4px; 
 	padding-bottom: 3px; 
 	padding-top: 3px; 
 	border-width: 1px; 
 	border-style: solid; 
-	border-color: #666;; 
+	border-color: #061739; 
 	color: #000;
 }
-		
+
+.pass {background:#54A759; padding-left:5px; border-width: 1px; border-style: solid; padding-left: 4px; padding-right: 4px; }
+.fail {background:#D46D6A; padding-left:5px; border-width: 1px; border-style: solid; padding-left: 4px; padding-right: 4px; }
+
+.map {
+  background-color: #F0F0F0;
+  width: 100px;
+  height: 100px;
+  vertical-align: top;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;  
+  border-color: #061739; 
+}
+
+.mapPass {
+  background:#54A759; 
+  width: 100px;
+  height: 100px;
+  vertical-align: top;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;  
+  border-color: #061739;
+}
+
+.mapFail {
+  background:#D46D6A; 
+  width: 100px;
+  height: 100px;
+  vertical-align: top;
+  text-align: center;
+  border-width: 1px;
+  border-style: solid;  
+  border-color: #061739; 
+}
+
+.mapEmpty {
+  background-color: #FFFFFF;
+  width: 100px;
+  height: 100px;
+  vertical-align: top;
+  text-align: center;
+  border-width: 1px;
+  border-style: none;  
+  border-color: #061739; 
+}
+
+a:link.hl7 {    background: #F7F3E8; text-decoration:none;  border-style: solid; border-color: #F7F3E8; border-width: 1px; color: #000;}
+a:visited.hl7 { background: #F7F3E8; text-decoration:none;  border-style: solid; border-color: #F7F3E8; border-width: 1px; color: #000;}
+a:hover.hl7 {   background: #77BED2; text-decoration:none;  border-style: solid; border-color: #2B3E42; border-width: 1px; color: #2B3E42;}
+a:active.hl7 {  background: #F7F3E8; text-decoration:none;  border-style: solid; border-color: #F7F3E8; border-width: 1px; color: #000;}

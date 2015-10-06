@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TestParticipant" table="test_participant">
+    <id name="testParticipantId" column="test_participant_id">
+      <generator class="native"/>
+    </id>
+    <property name="organizationName" column="organization_name" type="string"/>
+    <property name="connectionLabel" column="connection_label" type="string"/>
+    <property name="mapRow" column="map_row" type="integer"/>
+    <property name="mapCol" column="map_col" type="integer"/>
+    <property name="platformLabel" column="platform_label" type="string"/>
+    <property name="vendorLabel" column="vendor_label" type="string"/>
+    <property name="internalComments" column="internal_comments" type="string"/>
+    <property name="phase1Participation" column="phase1_participation" type="string"/>
+    <property name="phase1Status" column="phase1_status" type="string"/>
+    <property name="phase1Comments" column="phase1_comments" type="string"/>
+    <property name="phase2Participation" column="phase2_participation" type="string"/>
+    <property name="phase2Status" column="phase2_status" type="string"/>
+    <property name="phase2Comments" column="phase2_comments" type="string"/>
+    <property name="ihsStatus" column="ihs_status" type="string"/>
+    <property name="guideStatus" column="guide_status" type="string"/>
+    <property name="guideName" column="guide_name" type="string"/>
+    <property name="connectStatus" column="connect_status" type="string"/>
+    <property name="generalComments" column="general_comments" type="string"/>
+    <property name="transportType" column="transport_type" type="string"/>
+    <property name="querySupport" column="query_support" type="string"/>
+    <property name="nistStatus" column="nist_status" type="string"/>
+    <property name="accessPasscode" column="access_passcode" type="string"/>
+  </class>
+</hibernate-mapping>

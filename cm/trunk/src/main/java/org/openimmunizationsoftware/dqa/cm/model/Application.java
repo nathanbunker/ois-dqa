@@ -4,6 +4,19 @@ public class Application {
 	private int applicationId = 0;
 	private String applicationLabel = "";
 	private String applicationAcronym = "";
+	
+	private static final int APPLICATION_DQACM = 1;
+	private static final int APPLICATION_DQAIS = 2;
+	
+	public boolean isApplicationDqacm()
+	{
+	  return applicationId == APPLICATION_DQACM;
+	}
+
+    public boolean isApplicationDqais()
+    {
+      return applicationId == APPLICATION_DQAIS;
+    }
 
 	public int getApplicationId() {
 		return applicationId;

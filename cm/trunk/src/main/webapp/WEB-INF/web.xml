@@ -28,6 +28,14 @@
     <servlet-name>SetupServlet</servlet-name>
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.SetupServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>RecordServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.RecordServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>TestReportServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.TestReportServlet</servlet-class>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>AdminServlet</servlet-name>
@@ -53,6 +61,15 @@
     <servlet-name>SetupServlet</servlet-name>
     <url-pattern>/setup</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>RecordServlet</servlet-name>
+    <url-pattern>/record</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TestReportServlet</servlet-name>
+    <url-pattern>/testReport</url-pattern>
+  </servlet-mapping>
+
 
 
 </web-app>

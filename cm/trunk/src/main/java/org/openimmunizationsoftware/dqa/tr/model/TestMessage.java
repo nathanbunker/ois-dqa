@@ -28,12 +28,21 @@ public class TestMessage implements Serializable {
   private String prepMessageActual = "";
   private String resultMessageActual = "";
   private String resultStatus = "";
+  private boolean resultAccepted = false; 
   private String resultExceptionText = "";
   private String resultAcceptedMessage = "";
   private String resultResponseType = "";
   private String resultAckType = "";
   private int forecastTestPanelCaseId = 0;
   private int forecastTestPanelId = 0;
+
+  public boolean isResultAccepted() {
+    return resultAccepted;
+  }
+
+  public void setResultAccepted(boolean resultAccepted) {
+    this.resultAccepted = resultAccepted;
+  }
 
   public int getTestMessageId() {
     return testMessageId;
