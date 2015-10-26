@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="Resource" table="resource">
+    <id name="resourceId" column="resource_id">
+      <generator class="native"/>
+      <!--  native or assigned -->
+    </id>
+    <property name="displayLabel" column="display_label" type="string"/>
+    <property name="url" column="url" type="string"/>
+  </class>
+</hibernate-mapping>

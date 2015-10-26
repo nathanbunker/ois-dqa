@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="SupportingInfo" table="supporting_info">
+    <id name="supportingInfoId" column="supporting_info_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="code" column="code_id" class="CodeMaster"/>
+    <many-to-one name="user" column="user_id" class="User"/> 
+    <many-to-one name="resource" column="resource_id" class="Resource"/> 
+    <property name="abstractText" column="abstract_text" type="string"/>
+    <property name="commentText" column="comment_text" type="string"/>
+    <property name="effectiveDate" column="effective_date" type="timestamp"/>
+    <property name="entryDate" column="entry_date" type="timestamp"/>
+  </class>
+</hibernate-mapping>
