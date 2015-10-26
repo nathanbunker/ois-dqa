@@ -8,9 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
+import org.openimmunizationsoftware.dqa.cm.logic.CodeTableInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.LoadCdcDataLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.LoadCdcDataLogic.LoadResult;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.DeleteProposedVersionThread;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.ReleaseNewVersionThread;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.UpdateIssueCountThread;
@@ -34,7 +37,9 @@ public class AdminServlet extends BaseServlet
 
   public static final String PARAM_ACTION = "action";
   public static final String PARAM_RELEASE_ID = "releaseId";
+  public static final String PARAM_CDC_TEXT = "cdcText";
 
+  public static final String ACTION_LOAD_CODES = "Load Codes";
   public static final String ACTION_RELEASE_VERSION = "Release Version";
   public static final String ACTION_DELETE_VERSION = "Delete Version";
   public static final String ACTION_UPDATE_ISSUE_COUNTS = "Update Issue Counts";
@@ -46,6 +51,7 @@ public class AdminServlet extends BaseServlet
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
+    List<LoadResult> loadResultList = null;
     setup(req, resp);
     if (!isAdmin())
     {
@@ -70,7 +76,18 @@ public class AdminServlet extends BaseServlet
         ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
         deleteProposedVersionThread = new DeleteProposedVersionThread(userSession.getUser(), rv);
         deleteProposedVersionThread.start();
-      } 
+      } else if (action.equals(ACTION_LOAD_CODES))
+      {
+        CodeTableInstance codeTableInstance = null;
+        if (!req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID).equals(""))
+        {
+          int codeTableInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID));
+          codeTableInstance = CodeTableInstanceLogic.getCodeTableInstance(codeTableInstanceId, dataSession);
+          String data = req.getParameter(PARAM_CDC_TEXT);
+          loadResultList = LoadCdcDataLogic.loadCdcData(codeTableInstance, userSession.getUser(), data, dataSession);
+        }
+
+      }
     }
 
     createHeader();
@@ -78,13 +95,42 @@ public class AdminServlet extends BaseServlet
     out.println("<div class=\"leftColumn\">");
     out.println("</div>");
 
-
     out.println("<div class=\"centerColumn\">");
     printReleaseMaintenance();
+
+    printUpdateCdcTables();
+
     out.println("</div>");
 
     out.println("<div class=\"rightColumn\">");
-    out.println("<p><a href=\"setup\">Initial DQAcm Setup</a></p>");
+    if (loadResultList != null)
+    {
+      out.println("<table width=\"100%\">");
+      out.println("  <caption>Codes Loaded</caption>");
+      out.println("  <tr>");
+      out.println("    <th>Value</th>");
+      out.println("    <th>Label</th>");
+      out.println("    <th>Status</th>");
+      out.println("  </tr>");
+      for (LoadResult loadResult : loadResultList)
+      {
+        out.println("  <tr>");
+        if (loadResult.getCodeInstance() == null)
+        {
+          out.println("    <td colspan=\"2\">No Code Instance</td>");
+          out.println("    <td>" + loadResult.getLoadStatus() + "</td>");
+        } else
+        {
+          out.println("    <td>" + (loadResult.getCodeInstance().getCode() == null ? "###" : loadResult.getCodeInstance().getCode().getCodeValue())
+              + "</td>");
+          out.println("    <td>" + loadResult.getCodeInstance().getCodeLabel() + "</td>");
+          out.println("    <td>" + loadResult.getLoadStatus() + "</td>");
+        }
+        out.println("  </tr>");
+      }
+      out.println("</table>");
+    }
+    // out.println("<p><a href=\"setup\">Initial DQAcm Setup</a></p>");
     out.println("</div>");
 
     out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
@@ -139,4 +185,35 @@ public class AdminServlet extends BaseServlet
     }
   }
 
+  public void printUpdateCdcTables()
+  {
+    out.println("  <form action=\"admin\" method=\"POST\">");
+    out.println("  <table width=\"100%\">");
+    out.println("    <caption>Update CDC Tables</caption>");
+    out.println("    <tr>");
+    out.println("      <td>Table</td>");
+    out.println("      <td>");
+    out.println("        <select name=\"" + PARAM_CODE_TABLE_INSTANCE_ID + "\">");
+    ReleaseVersion releaseVersion = ReleaseVersionLogic.getProposedReleaseVersion(dataSession);
+    List<CodeTableInstance> codeTableInstanceList = CodeTableLogic.getCodeTables(releaseVersion, dataSession);
+    for (CodeTableInstance cti : codeTableInstanceList)
+    {
+      out.println("          <option value=\"" + cti.getTableInstanceId() + "\">" + cti.getTableLabel() + "</a>");
+    }
+    out.println("        </select>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <td>Text from CDC</td>");
+    out.println("      <td><textarea name=\"" + PARAM_CDC_TEXT + "\" cols=\"20\" rows=\"3\"></textarea></td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <td colspan=\"2\">");
+    out.println("        <input type=\"submit\" name=\"action\" value=\"" + ACTION_LOAD_CODES + "\"/>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("  </table>");
+    out.println("  </form>");
+    out.println("  <br/>");
+  }
 }
