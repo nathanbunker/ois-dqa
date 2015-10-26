@@ -53,6 +53,13 @@ public class CodeMasterLogic
     dataSession.update(codeMaster);
     transaction.commit();
   }
+  
+  public static void addCodeMaster(CodeMaster codeMaster, Session dataSession)
+  {
+    Transaction transaction = dataSession.beginTransaction();
+    dataSession.save(codeMaster);
+    transaction.commit();
+  }
 
   public synchronized static void saveCodeMaster(CodeMaster codeMaster, Session dataSession)
   {
