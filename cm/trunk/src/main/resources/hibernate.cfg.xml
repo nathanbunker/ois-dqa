@@ -36,6 +36,8 @@
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/CodeTable.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/CodeTableInstance.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/ReleaseVersion.hbm.xml"/> 
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/Resource.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/SupportingInfo.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/User.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestConducted.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestMessage.hbm.xml"/>
