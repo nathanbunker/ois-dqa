@@ -14,13 +14,10 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.openimmunizationsoftware.dqa.cm.CentralControl;
-import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
-import org.openimmunizationsoftware.dqa.cm.logic.thread.UpdateCountThread;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
-import org.openimmunizationsoftware.dqa.cm.model.CodeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
@@ -28,6 +25,7 @@ import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
+import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 
 public abstract class BaseServlet extends HttpServlet {
 
@@ -178,6 +176,12 @@ public abstract class BaseServlet extends HttpServlet {
         out.println("     |");
         out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_TEST_MESSAGES
             + "\" class=\"menuLink\">tests</a>");
+        TestMessage testMessage = (TestMessage) webSession.getAttribute(ATTRIBUTE_TEST_MESSAGE);
+        if (testMessage != null) {
+          out.println("     |");
+          out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_FIELD_COMPARISON
+              + "\" class=\"menuLink\">fields</a>");
+        }
       }
     } else {
       out.println("     <a href=\"home\" class=\"menuLink\">home</a>");

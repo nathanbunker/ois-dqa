@@ -5,6 +5,10 @@ import java.text.SimpleDateFormat;
 public interface RecordServletInterface {
   public static final SimpleDateFormat VALUE_DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmmss+z");
 
+  public static final String VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE = "Certified Message:";
+  public static final String VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK = "Tolerance Check:";
+
+  
   public static final String VALUE_YES = "Y";
   public static final String VALUE_NO = "N";
 
