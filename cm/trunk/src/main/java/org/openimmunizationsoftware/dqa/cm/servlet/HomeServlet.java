@@ -2,6 +2,7 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import org.openimmunizationsoftware.dqa.cm.logic.CodeMasterLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.SupportingInfoLogic;
 import org.openimmunizationsoftware.dqa.cm.model.AcceptStatus;
 import org.openimmunizationsoftware.dqa.cm.model.AllowedValue;
 import org.openimmunizationsoftware.dqa.cm.model.ApplicationUser;
@@ -36,6 +38,8 @@ import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.PositionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
+import org.openimmunizationsoftware.dqa.cm.model.Resource;
+import org.openimmunizationsoftware.dqa.cm.model.SupportingInfo;
 import org.openimmunizationsoftware.dqa.cm.model.User;
 
 public class HomeServlet extends BaseServlet {
@@ -72,6 +76,15 @@ public class HomeServlet extends BaseServlet {
   protected static final String PARAM_CODE_STATUS = "codeStatus";
   protected static final String PARAM_HL7_CODE_TABLE = "hl7CodeTable";
   protected static final String PARAM_COMMENT_TEXT = "commentText";
+
+  protected static final String ACTION_ADD_SUPPORTING_INFO = "Add Supporting Info";
+  protected static final String PARAM_RESOURCE_ID = "resourceId";
+  protected static final String PARAM_RESOURCE_URL = "resourceUrl";
+  protected static final String PARAM_DISPLAY_LABEL = "displayLabel";
+  protected static final String PARAM_ABSTRACT_TEXT = "abstractText";
+  protected static final String PARAM_EFFECTIVE_DATE = "effectiveDate";
+
+  protected static final String ACTION_REMOVE_SUPPORTING_INFO = "Remove Supporting Info";
 
   protected static final String VIEW_DEFAULT = "default";
   protected static final String VIEW_SEARCH = "search";
@@ -209,6 +222,17 @@ public class HomeServlet extends BaseServlet {
             paramHl7CodeTable = "";
             paramCommentText = "";
           }
+        } else if (action.equals(ACTION_ADD_SUPPORTING_INFO))
+        {
+          int codeInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_INSTANCE_ID));
+          codeInstance = CodeInstanceLogic.getCodeInstance(codeInstanceId, dataSession);
+          
+          int resourceId = Integer.parseInt(req.getParameter(PARAM_RESOURCE_ID));
+          
+          // TODO
+        } else if (action.equals(ACTION_REMOVE_SUPPORTING_INFO))
+        {
+          // TODO
         }
       }
 
@@ -267,6 +291,7 @@ public class HomeServlet extends BaseServlet {
             out.println("<div class=\"rightColumn\">");
             printTopBoxForCode(codeInstance);
             printCodeAttributes(codeInstance, null, null, "home?" + PARAM_VIEW + "=" + VIEW_CODE + "&");
+            printSupportingInfo(codeInstance, codeTableInstance, null, view);
             out.println("</div>");
           }
         } else {
@@ -316,8 +341,8 @@ public class HomeServlet extends BaseServlet {
         if (codeInstance != null) {
           out.println("<div class=\"centerColumn\">");
           printTopBoxForCode(codeInstance);
-
           printCodeAttributes(codeInstance, attributeInstance, null, "home?" + PARAM_VIEW + "=" + VIEW_SEARCH + "&");
+          printSupportingInfo(codeInstance, null, null, view);
           out.println("</div>");
           if (attributeInstance != null) {
             out.println("<div class=\"rightColumn\">");
@@ -371,6 +396,7 @@ public class HomeServlet extends BaseServlet {
         out.println("<div class=\"centerColumn\">");
         printTopBoxForCode(codeInstance);
         printCodeAttributes(codeInstance, attributeInstance, null, "home?" + PARAM_VIEW + "=" + VIEW_CODE + "&");
+        printSupportingInfo(codeInstance, codeTableInstance, contextCodeInstance, view);
         out.println("</div>");
         if (attributeInstance != null) {
           out.println("<div class=\"rightColumn\">");
@@ -758,7 +784,105 @@ public class HomeServlet extends BaseServlet {
     out.println("</table>");
   }
 
+  public void printSupportingInfo(CodeInstance codeInstance, CodeTableInstance codeTableInstance, CodeInstance contextCodeInstance, String view)
+  {
+    List<SupportingInfo> supportingInfoList = SupportingInfoLogic.getSupportingInfoList(codeInstance.getCode(), dataSession);
+    if (supportingInfoList.size() > 0 || userSession.canEdit())
+    {
+      if (userSession.canEdit())
+      {
+        out.println("<form action=\"home\" method=\"POST\">");
+        out.println("<input type=\"hidden\" name=\"" + PARAM_CODE_TABLE_INSTANCE_ID + "\" value=\"" + codeTableInstance.getTableInstanceId() + "\"/>");
+        out.println("<input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"" + view + "\"/>");
+        if (contextCodeInstance != null)
+        {
+          out.println("<input type=\"hidden\" name=\"" + PARAM_CONTEXT_CODE_INSTANCE_ID + "\" value=\"" + contextCodeInstance.getCodeInstanceId()
+              + "\"/>");
+        }
+        out.println("<input type=\"hidden\" name=\"" + PARAM_CODE_INSTANCE_ID + "\" value=\"" + codeInstance.getCodeInstanceId() + "\"/>");
+      }
+      out.println("<br/>");
+      out.println("<table width=\"100%\">");
+      out.println("  <caption>Supporting Details</caption>");
+      out.println("  <tr>");
+      out.println("    <th>Date</th>");
+      out.println("    <th>Details</th>");
+      out.println("  </tr>");
+
+      for (SupportingInfo supportingInfo : supportingInfoList)
+      {
+        out.println("  <tr>");
+        out.println("    <td valign=\"top\">");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(supportingInfo.getEffectiveDate());
+        if (calendar.get(Calendar.DAY_OF_MONTH) > 1)
+        {
+          SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+          out.println(sdf.format(supportingInfo.getEffectiveDate()));
+        } else if (calendar.get(Calendar.MONTH) > 0)
+        {
+          SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy");
+          out.println(sdf.format(supportingInfo.getEffectiveDate()));
+        } else
+        {
+          SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+          out.println(sdf.format(supportingInfo.getEffectiveDate()));
+        }
+        out.println("    </td>");
+        out.println("    <td>");
+        out.println("      <a href=\"" + supportingInfo.getResource().getUrl() + "\">" + supportingInfo.getResource().getDisplayLabel()
+            + "</a>><br/>");
+        if (supportingInfo.getAbstractText() != null && supportingInfo.getAbstractText().length() > 0)
+        {
+          out.println("      Abstract:</br>");
+          out.println("      " + supportingInfo.getAbstractText() + "</br>");
+        }
+        if (supportingInfo.getCommentText() != null && supportingInfo.getCommentText().length() > 0)
+        {
+          out.println("      Comment:</br>");
+          out.println("      " + supportingInfo.getCommentText() + "</br>");
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        out.println("      " + supportingInfo.getUser().getUserName() + ": " + sdf.format(supportingInfo.getEntryDate()) + "</br>");
+        out.println("    </td>");
+        out.println("  </tr>");
+      }
+
+      if (userSession.canEdit())
+      {
+        out.println("  <tr>");
+        out.println("    <td valign=\"top\"><input type=\"text\" name=\"" + PARAM_EFFECTIVE_DATE + "\" value=\"\" size=\"10\"/></td>");
+        out.println("    <td>");
+        out.println("        Link<br/>");
+        out.println("        <select name=\"" + PARAM_RESOURCE_ID + "\"/>");
+        out.println("          <option value=\"\">--select--</option>");
+        List<Resource> resourceList = SupportingInfoLogic.getResourceList(dataSession);
+        for (Resource resource : resourceList)
+        {
+          out.println("          <option value=\"" + resource.getResourceId() + "\"" + (false ? " selected=\"true\"" : "") + ">"
+              + resource.getDisplayLabel() + "</option>");
+        }
+        out.println("          <option value=\"NEW\">--create new link--</option>");
+        out.println("        </select><br/>");
+        out.println("        Abstract<br/>");
+        out.println("        <textarea cols=\"30\" rows=\"3\" name=\"" + PARAM_ABSTRACT_TEXT + "\"></textarea><br/>");
+        out.println("        Comment<br/>");
+        out.println("        <textarea cols=\"30\" rows=\"3\" name=\"" + PARAM_COMMENT_TEXT + "\"></textarea><br/>");
+        out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_SUPPORTING_INFO + "\"/>");
+        out.println("    </td>");
+        out.println("  </tr>");
+      }
+      out.println("</table>");
+      if (userSession.canEdit())
+      {
+        out.println("</form>");
+      }
+    }
+
+  }
+
   public void printTopBoxForComments(AttributeInstance attributeInstance) {
+
     out.println("<div class=\"topBox\">");
     out.println("  <table width=\"100%\">");
     out.println("    <caption>" + attributeInstance.getValue().getAttributeType().getAttributeLabel() + "</caption>");
@@ -879,33 +1003,6 @@ public class HomeServlet extends BaseServlet {
     out.println("      <th>Code Id</th>");
     out.println("      <td>" + codeInstance.getCode().getCodeId() + "</td>");
     out.println("    </tr>");
-    // if (codeInstance.getContext() != null)
-    // {
-    // CodeInstance contextCodeInstance =
-    // CodeInstanceLogic.getCodeInstance(codeInstance.getContext(),
-    // userSession.getReleaseVersion(), dataSession);
-    // link = "home?" + PARAM_VIEW + "=" + VIEW_CODE + "&" +
-    // PARAM_CODE_INSTANCE_ID + "=" + contextCodeInstance.getCodeInstanceId();
-    // out.println("    <tr>");
-    // out.println("      <th>Context Code</th>");
-    // out.println("      <td><a href=\"" + link + "\">" +
-    // contextCodeInstance.getCodeLabel() + "</a></td>");
-    // out.println("    </tr>");
-    // }
-    // if (codeInstance.getIndicatesTable() != null)
-    // {
-    // CodeTableInstance indicatesCodeTableInstance =
-    // CodeTableLogic.getCodeTableInstance(codeInstance.getIndicatesTable(),
-    // userSession.getReleaseVersion(), dataSession);
-    // link = "home?" + PARAM_VIEW + "=" + VIEW_TABLE + "&" +
-    // PARAM_TABLE_INSTANCE_ID + "=" +
-    // indicatesCodeTableInstance.getTableInstanceId();
-    // out.println("    <tr>");
-    // out.println("      <th>Indicates Table</th>");
-    // out.println("      <td><a href=\"" + link + "\">" +
-    // indicatesCodeTableInstance.getTableLabel() + "</a></td>");
-    // out.println("    </tr>");
-    // }
     out.println("    <tr>");
     out.println("      <th>Inclusion Status</th>");
     out.println("      <td>" + codeInstance.getInclusionStatus() + "</td>");
@@ -1054,6 +1151,14 @@ public class HomeServlet extends BaseServlet {
           + "\"/>");
     }
     if (userSession.canEdit()) {
+      out.println("<form action=\"home\" method=\"POST\">");
+      out.println("<input type=\"hidden\" name=\"" + PARAM_CODE_TABLE_INSTANCE_ID + "\" value=\"" + codeTableInstance.getTableInstanceId() + "\"/>");
+      out.println("<input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"" + view + "\"/>");
+      if (contextCodeInstance != null)
+      {
+        out.println("<input type=\"hidden\" name=\"" + PARAM_CONTEXT_CODE_INSTANCE_ID + "\" value=\"" + contextCodeInstance.getCodeInstanceId()
+            + "\"/>");
+      }
       out.println("  <table width=\"100%\">");
       out.println("    <caption>Add New Code Value</caption>");
       out.println("    <tr>");
