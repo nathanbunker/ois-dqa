@@ -1,12 +1,15 @@
 package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
@@ -52,8 +55,11 @@ public class AdminServlet extends BaseServlet
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
     List<LoadResult> loadResultList = null;
-    setup(req, resp);
-    if (!isAdmin())
+    HttpSession webSession = setup(req, resp);
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    PrintWriter out = userSession.getOut();
+    if (!userSession.isAdmin())
     {
       sendToHome(req, resp);
       return;
@@ -90,15 +96,15 @@ public class AdminServlet extends BaseServlet
       }
     }
 
-    createHeader();
+    createHeader(webSession);
 
     out.println("<div class=\"leftColumn\">");
     out.println("</div>");
 
     out.println("<div class=\"centerColumn\">");
-    printReleaseMaintenance();
+    printReleaseMaintenance(out, dataSession);
 
-    printUpdateCdcTables();
+    printUpdateCdcTables(out, dataSession);
 
     out.println("</div>");
 
@@ -134,11 +140,11 @@ public class AdminServlet extends BaseServlet
     out.println("</div>");
 
     out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
-    createFooter();
+    createFooter(webSession);
 
   }
 
-  public void printReleaseMaintenance()
+  public void printReleaseMaintenance(PrintWriter out, Session dataSession)
   {
     out.println("  <form action=\"admin\" method=\"POST\">");
     out.println("  <table width=\"100%\">");
@@ -185,7 +191,7 @@ public class AdminServlet extends BaseServlet
     }
   }
 
-  public void printUpdateCdcTables()
+  public void printUpdateCdcTables(PrintWriter out, Session dataSession)
   {
     out.println("  <form action=\"admin\" method=\"POST\">");
     out.println("  <table width=\"100%\">");

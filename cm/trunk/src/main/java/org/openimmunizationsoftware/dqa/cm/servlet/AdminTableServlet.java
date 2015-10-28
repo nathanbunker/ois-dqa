@@ -1,12 +1,15 @@
 package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableInstanceLogic;
@@ -50,8 +53,11 @@ public class AdminTableServlet extends BaseServlet
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
-    setup(req, resp);
-    if (!isAdmin())
+    HttpSession webSession = setup(req, resp);
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    PrintWriter out = userSession.getOut();
+    if (!userSession.isAdmin())
     {
       sendToHome(req, resp);
       return;
@@ -73,7 +79,7 @@ public class AdminTableServlet extends BaseServlet
       {
         if (req.getParameter(PARAM_TABLE_LABEL).equals(""))
         {
-          messageError = "Table label must be specified";
+          userSession.setMessageError("Table label must be specified");
         } else
         {
           codeTableInstance.setTableLabel(req.getParameter(PARAM_TABLE_LABEL));
@@ -99,7 +105,7 @@ public class AdminTableServlet extends BaseServlet
       }
     }
 
-    createHeader();
+    createHeader(webSession);
 
     out.println("<div class=\"leftColumn\">");
 
@@ -137,13 +143,13 @@ public class AdminTableServlet extends BaseServlet
     out.println("  </form>");
     out.println("</div>");
 
-    printCodeTables(codeTableInstance, releaseVersion, "adminTable?");
+    printCodeTables(codeTableInstance, releaseVersion, "adminTable?", webSession);
     out.println("</div>");
 
     out.println("<div class=\"centerColumn\">");
     if (codeTableInstance != null)
     {
-      printTopBoxForTable(codeTableInstance);
+      printTopBoxForTable(codeTableInstance, userSession);
 
     }
     out.println("</div>");
@@ -153,12 +159,14 @@ public class AdminTableServlet extends BaseServlet
     out.println("</div>");
 
     out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
-    createFooter();
+    createFooter(webSession);
 
   }
 
-  public void printTopBoxForTable(CodeTableInstance codeTableInstance)
+  public void printTopBoxForTable(CodeTableInstance codeTableInstance, UserSession userSession)
   {
+    PrintWriter out = userSession.getOut();
+    Session dataSession = userSession.getDataSession();
     out.println("<div class=\"topBox\">");
     out.println("  <form action=\"adminTable\" method=\"POST\">");
     out.println("  <input type=\"hidden\" name=\"" + PARAM_CODE_TABLE_INSTANCE_ID + "\" value=\"" + codeTableInstance.getTableInstanceId() + "\"/>");

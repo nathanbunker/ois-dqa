@@ -1,7 +1,10 @@
 package org.openimmunizationsoftware.dqa.cm.servlet;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -17,12 +20,50 @@ import org.openimmunizationsoftware.dqa.cm.model.UserType;
 public class UserSession implements Serializable
 {
   private User user = null;
-  private transient Session dataSession = null;
   private ReleaseVersion releaseVersion = null;
   private CodeTableInstance codeTableInstance = null;
   protected List<CodeInstance> searchResultsWithCodeInstanceList = null;
   private String searchCodeValue = "";
   private String searchCodeLabel = "";
+  
+  private transient Session dataSession = null;
+  private transient PrintWriter out = null;
+  private transient String messageError = null;
+  private transient String messageConfirmation = null;
+  
+  public void setOut(PrintWriter out)
+  {
+    this.out = out;
+  }
+  public String getMessageError() {
+    return messageError;
+  }
+
+  public void setMessageError(String messageError) {
+    this.messageError = messageError;
+  }
+
+  public String getMessageConfirmation() {
+    return messageConfirmation;
+  }
+
+  public void setMessageConfirmation(String messageConfirmation) {
+    this.messageConfirmation = messageConfirmation;
+  }
+
+  public PrintWriter getOut() {
+    return out;
+  }
+
+  protected boolean isAdmin() {
+    return user != null && user.getApplicationUser() != null
+        && user.getApplicationUser().getUserType() == UserType.ADMIN;
+  }
+
+  protected boolean isLoggedIn() {
+    return user != null;
+  }
+
 
   public String getSearchCodeValue()
   {

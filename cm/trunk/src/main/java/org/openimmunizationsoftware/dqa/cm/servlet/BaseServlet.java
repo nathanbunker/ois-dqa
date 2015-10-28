@@ -23,12 +23,13 @@ import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
-import org.openimmunizationsoftware.dqa.cm.model.UserType;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 
-public abstract class BaseServlet extends HttpServlet {
+public abstract class BaseServlet extends HttpServlet
+{
 
+  public static final String USER_SESSION = "userSession";
   public static final String PARAM_CODE_TABLE_INSTANCE_ID = "codeTableInstanceId";
   public static final String PARAM_ATTRIBUTE_INSTANCE_ID = "attributeInstanceId";
   public static final String PARAM_ATTRIBUTE_TYPE_ID = "attributeTypeId";
@@ -38,60 +39,21 @@ public abstract class BaseServlet extends HttpServlet {
   public static final String ATTRIBUTE_TEST_MESSAGE = "testMessage";
 
   private String servletTitle = "";
-  protected HttpSession webSession = null;
-  protected UserSession userSession = null;
-  protected Session dataSession = null;
-  protected PrintWriter out = null;
-  protected String messageError = null;
-  protected String messageConfirmation = null;
 
-  public String getMessageError() {
-    return messageError;
-  }
-
-  public void setMessageError(String messageError) {
-    this.messageError = messageError;
-  }
-
-  public String getMessageConfirmation() {
-    return messageConfirmation;
-  }
-
-  public void setMessageConfirmation(String messageConfirmation) {
-    this.messageConfirmation = messageConfirmation;
-  }
-
-  public UserSession getUserSession() {
-    return userSession;
-  }
-
-  public Session getDataSession() {
-    return dataSession;
-  }
-
-  public PrintWriter getOut() {
-    return out;
-  }
-
-  protected boolean isAdmin() {
-    return userSession.getUser() != null && userSession.getUser().getApplicationUser() != null
-        && userSession.getUser().getApplicationUser().getUserType() == UserType.ADMIN;
-  }
-
-  protected boolean isLoggedIn() {
-    return userSession.getUser() != null;
-  }
-
-  protected void sendToHome(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void sendToHome(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+  {
     RequestDispatcher dispatcher = req.getRequestDispatcher("home");
     dispatcher.forward(req, resp);
   }
 
-  protected void sendToApplication(HttpServletRequest req, HttpServletResponse resp, Application application) throws ServletException, IOException {
-    if (application.isApplicationDqais()) {
+  protected void sendToApplication(HttpServletRequest req, HttpServletResponse resp, Application application) throws ServletException, IOException
+  {
+    if (application.isApplicationDqais())
+    {
       RequestDispatcher dispatcher = req.getRequestDispatcher("testReport?" + TestReportServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP);
       dispatcher.forward(req, resp);
-    } else {
+    } else
+    {
       RequestDispatcher dispatcher = req.getRequestDispatcher("home");
       dispatcher.forward(req, resp);
     }
@@ -101,52 +63,73 @@ public abstract class BaseServlet extends HttpServlet {
     this.servletTitle = servletTitle;
   }
 
-  protected void setup(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    webSession = req.getSession(true);
-    userSession = (UserSession) webSession.getAttribute("userSession");
-    if (userSession == null) {
-      initUserSession();
+  protected HttpSession setup(HttpServletRequest req, HttpServletResponse resp) throws IOException
+  {
+    HttpSession webSession = req.getSession(true);
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    if (userSession == null)
+    {
+      userSession = initUserSession(webSession);
     }
-    dataSession = userSession.getDataSession();
-    dataSession.clear();
+    userSession.getDataSession().clear();
+    userSession.setOut(new PrintWriter(resp.getOutputStream()));
     resp.setContentType("text/html");
-    out = new PrintWriter(resp.getOutputStream());
+    return webSession;
   }
 
-  public void initUserSession() {
-    userSession = new UserSession();
+  public UserSession initUserSession(HttpSession webSession)
+  {
+    UserSession userSession = new UserSession();
     SessionFactory factory = CentralControl.getSessionFactory();
-    dataSession = factory.openSession();
+    Session dataSession = factory.openSession();
     userSession.setDataSession(dataSession);
-    webSession.setAttribute("userSession", userSession);
+    webSession.setAttribute(USER_SESSION, userSession);
     userSession.setReleaseVersion(ReleaseVersionLogic.getCurrentReleaseVersion(dataSession));
+    return userSession;
   }
 
-  protected void logout() {
-    initUserSession();
+  protected void logout(HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    if (userSession != null)
+    {
+      webSession.removeAttribute(USER_SESSION);
+      userSession.getDataSession().close();
+    }
+    webSession.invalidate();
   }
 
-  protected void login(String userName, String password) {
-    User user = UserLogic.getUser(userName, dataSession);
-    if (user == null || !user.getPassword().equals(password)) {
-      messageError = "Unable to login, unrecognized user name or password";
-    } else {
-      messageConfirmation = "Welcome " + user.getUserName() + "!";
+  protected void login(String userName, String password, HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    User user = UserLogic.getUser(userName, userSession.getDataSession());
+    if (user == null || !user.getPassword().equals(password))
+    {
+      userSession.setMessageError("Unable to login, unrecognized user name or password");
+    } else
+    {
+      userSession.setMessageConfirmation("Welcome " + user.getUserName() + "!");
       userSession.setUser(user);
-      userSession.setReleaseVersion(ReleaseVersionLogic.getProposedReleaseVersion(dataSession));
+      userSession.setReleaseVersion(ReleaseVersionLogic.getProposedReleaseVersion(userSession.getDataSession()));
     }
   }
 
-  public int readInt(String param, HttpServletRequest req) {
+  public int readInt(String param, HttpServletRequest req)
+  {
     return Integer.parseInt(req.getParameter(param));
   }
 
-  protected void createHeader() {
+  protected void createHeader(HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    PrintWriter out = userSession.getOut();
     out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">");
     out.println("<html>");
     out.println("  <head>");
     Application application = (Application) dataSession.get(Application.class, 1);
-    if (userSession.getUser() != null && userSession.getUser().getApplicationUser() != null) {
+    if (userSession.getUser() != null && userSession.getUser().getApplicationUser() != null)
+    {
       application = userSession.getUser().getApplicationUser().getApplication();
     }
     out.println("    <title>" + application.getApplicationAcronym() + " - " + servletTitle + "</title>");
@@ -154,10 +137,12 @@ public abstract class BaseServlet extends HttpServlet {
     out.println("  </head>");
     out.println("  <body>");
     out.println("    <div class=\"menu\">");
-    if (application.isApplicationDqacm()) {
+    if (application.isApplicationDqacm())
+    {
       out.println("     |");
       out.println("     <a href=\"home?" + HomeServlet.PARAM_VIEW + "=" + HomeServlet.VIEW_SEARCH + "\" class=\"menuLink\">search</a>");
-      if (isAdmin()) {
+      if (userSession.isAdmin())
+      {
         out.println("     |");
         out.println("     <a href=\"adminUser\" class=\"menuLink\">users</a>");
         out.println("     |");
@@ -165,25 +150,29 @@ public abstract class BaseServlet extends HttpServlet {
         out.println("     |");
         out.println("     <a href=\"admin\" class=\"menuLink\">admin</a>");
       }
-    } else if (application.isApplicationDqais()) {
+    } else if (application.isApplicationDqais())
+    {
       out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_HOME + "\" class=\"menuLink\">home</a>");
       TestConducted testConducted = (TestConducted) webSession.getAttribute(ATTRIBUTE_TEST_CONDUCTED);
       out.println("     |");
       out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP + "\" class=\"menuLink\">dashboard</a>");
       out.println("     |");
       out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_REPORTS + "\" class=\"menuLink\">reports</a>");
-      if (testConducted != null) {
+      if (testConducted != null)
+      {
         out.println("     |");
         out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_TEST_MESSAGES
             + "\" class=\"menuLink\">tests</a>");
         TestMessage testMessage = (TestMessage) webSession.getAttribute(ATTRIBUTE_TEST_MESSAGE);
-        if (testMessage != null) {
+        if (testMessage != null)
+        {
           out.println("     |");
           out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_FIELD_COMPARISON
               + "\" class=\"menuLink\">fields</a>");
         }
       }
-    } else {
+    } else
+    {
       out.println("     <a href=\"home\" class=\"menuLink\">home</a>");
     }
 
@@ -192,19 +181,24 @@ public abstract class BaseServlet extends HttpServlet {
     out.println(application.getApplicationLabel());
     out.println("      </span>");
     out.println("    </div>");
-    if (messageError != null) {
-      out.println("<div class=\"messageError\">" + messageError + "</div>");
-      messageError = null;
+    if (userSession.getMessageError() != null)
+    {
+      out.println("<div class=\"messageError\">" + userSession.getMessageError() + "</div>");
+      userSession.setMessageError(null);
     }
-    if (messageConfirmation != null) {
-      out.println("<div class=\"messageConfirmation\">" + messageConfirmation + "</div>");
-      messageConfirmation = null;
+    if (userSession.getMessageConfirmation() != null)
+    {
+      out.println("<div class=\"messageConfirmation\">" + userSession.getMessageConfirmation() + "</div>");
+      userSession.setMessageConfirmation(null);
     }
     out.println("    <div class=\"contents\">");
 
   }
 
-  protected void createFooter() {
+  protected void createFooter(HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    PrintWriter out = userSession.getOut();
     out.println("    </div>");
     out.println("  </body>");
     out.println("</html>");
@@ -212,7 +206,11 @@ public abstract class BaseServlet extends HttpServlet {
     out = null;
   }
 
-  public void printCodeTables(CodeTableInstance codeTableInstance, ReleaseVersion releaseVersion, String baseLink) {
+  public void printCodeTables(CodeTableInstance codeTableInstance, ReleaseVersion releaseVersion, String baseLink, HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    PrintWriter out = userSession.getOut();
     out.println("<table width=\"100%\">");
     out.println("  <caption>Code Tables</caption>");
     out.println("  <tr>");
@@ -220,36 +218,47 @@ public abstract class BaseServlet extends HttpServlet {
     out.println("    <th>Name</th>");
     out.println("  </tr>");
     List<CodeTableInstance> codeTableInstanceList = CodeTableLogic.getCodeTables(releaseVersion, dataSession);
-    for (CodeTableInstance cti : codeTableInstanceList) {
+    for (CodeTableInstance cti : codeTableInstanceList)
+    {
       String includeStatusLabel = "";
-      if (releaseVersion.getReleaseStatus() != ReleaseStatus.PROPOSED) {
+      if (releaseVersion.getReleaseStatus() != ReleaseStatus.PROPOSED)
+      {
         // if release or deprecated do not show anything but current tables
-        if (cti.getInclusionStatus() != InclusionStatus.INCLUDE) {
+        if (cti.getInclusionStatus() != InclusionStatus.INCLUDE)
+        {
           continue;
         }
       }
-      if (cti.getInclusionStatus() == InclusionStatus.REMOVE) {
+      if (cti.getInclusionStatus() == InclusionStatus.REMOVE)
+      {
         includeStatusLabel = " <span class=\"inclusionStatusLabel\">removed</span>";
       }
-      if (cti.getInclusionStatus() == InclusionStatus.PROPOSED_INCLUDE) {
+      if (cti.getInclusionStatus() == InclusionStatus.PROPOSED_INCLUDE)
+      {
         includeStatusLabel = " <span class=\"inclusionStatusLabel\">proposed include</span>";
       }
-      if (cti.getInclusionStatus() == InclusionStatus.PROPOSED_REMOVE) {
+      if (cti.getInclusionStatus() == InclusionStatus.PROPOSED_REMOVE)
+      {
         includeStatusLabel = " <span class=\"inclusionStatusLabel\">proposed remove</span>";
       }
       String link = baseLink + PARAM_CODE_TABLE_INSTANCE_ID + "=" + cti.getTableInstanceId();
       String classString = "";
-      if (codeTableInstance != null && codeTableInstance.equals(cti)) {
+      if (codeTableInstance != null && codeTableInstance.equals(cti))
+      {
         classString = "selected";
       }
-      if (cti.getInclusionStatus() == InclusionStatus.REMOVE) {
+      if (cti.getInclusionStatus() == InclusionStatus.REMOVE)
+      {
         classString += " strike";
       }
       String issueCountLabel = "";
-      if (userSession.canEdit() && cti.getIssueCount() > 0) {
-        if (cti.getIssueCount() == 1) {
+      if (userSession.canEdit() && cti.getIssueCount() > 0)
+      {
+        if (cti.getIssueCount() == 1)
+        {
           issueCountLabel = " <span class=\"issueCountLabel\">" + cti.getIssueCount() + " issue</span>";
-        } else {
+        } else
+        {
           issueCountLabel = " <span class=\"issueCountLabel\">" + cti.getIssueCount() + " issues</span>";
         }
       }
