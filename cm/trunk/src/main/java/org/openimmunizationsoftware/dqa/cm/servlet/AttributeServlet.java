@@ -10,6 +10,7 @@ import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_US
 import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.getAttributeType;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,7 +19,9 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.CentralControl;
 import org.openimmunizationsoftware.dqa.cm.logic.AllowedValueLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeAssignedLogic;
@@ -76,8 +79,11 @@ public class AttributeServlet extends HomeServlet
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
-    setup(req, resp);
-    if (!isLoggedIn())
+    HttpSession webSession = setup(req, resp);
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    PrintWriter out = userSession.getOut();
+    if (!userSession.isLoggedIn())
     {
       sendToHome(req, resp);
       return;
@@ -132,7 +138,7 @@ public class AttributeServlet extends HomeServlet
                 paramValueNew = sdf.format(date);
               } catch (ParseException pe)
               {
-                messageError = "Invalid date format, must be MM/DD/YYYY";
+                userSession.setMessageError("Invalid date format, must be MM/DD/YYYY");
               }
               break;
             case FREE_TEXT:
@@ -147,7 +153,7 @@ public class AttributeServlet extends HomeServlet
                 Integer.parseInt(paramValueNew);
               } catch (NumberFormatException nfe)
               {
-                messageError = "Invalid format, must be a whole number";
+                userSession.setMessageError("Invalid format, must be a whole number");
               }
               break;
             case LONG_TEXT:
@@ -163,12 +169,12 @@ public class AttributeServlet extends HomeServlet
           {
             if (paramValueNew.equals(""))
             {
-              messageError = "Unable to add new code, value was not defined.";
+              userSession.setMessageError("Unable to add new code, value was not defined.");
             } else if (paramCommentTextNew.equals(""))
             {
-              messageError = "Unable to add new code, you did not indicate the reason for your position.";
+              userSession.setMessageError("Unable to add new code, you did not indicate the reason for your position.");
             }
-            if (messageError == null)
+            if (userSession.getMessageError() == null)
             {
               AttributeValue attributeValue = new AttributeValue();
               attributeValue.setAttributeType(attributeType);
@@ -198,24 +204,24 @@ public class AttributeServlet extends HomeServlet
 
           } else if (action.equals(ACTION_UPDATE))
           {
-            if (messageError == null)
+            if (userSession.getMessageError() == null)
             {
               if (paramPositionStatus.equals(""))
               {
-                messageError = "Unable to update your position, you did not indicate your position.";
+                userSession.setMessageError("Unable to update your position, you did not indicate your position.");
               } else if (paramCommentText.equals(""))
               {
-                messageError = "Unable to update your position, you did not indicate the reason for your position.";
+                userSession.setMessageError("Unable to update your position, you did not indicate the reason for your position.");
               } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff") && paramValueNew.equals(""))
               {
-                messageError = "Unable to update your position, you did not indicate the proposed value to use instead. ";
+                userSession.setMessageError("Unable to update your position, you did not indicate the proposed value to use instead. ");
               } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff")
                   && paramValueNew.equals(attributeInstance.getValue().getAttributeValue()))
               {
-                messageError = "Unable to update your position, your proposed value is the same as the current value. ";
+                userSession.setMessageError( "Unable to update your position, your proposed value is the same as the current value. ");
               } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff") && paramCommentTextNew.equals(""))
               {
-                messageError = "Unable to update new proposed value, you did not indicate the reason for the new proposed value.";
+                userSession.setMessageError( "Unable to update new proposed value, you did not indicate the reason for the new proposed value.");
               } else
               {
                 AttributeComment attributeComment = new AttributeComment();
@@ -272,14 +278,14 @@ public class AttributeServlet extends HomeServlet
           }
         }
       }
-      createHeader();
+      createHeader(webSession);
 
       if (attributeInstance == null)
       {
 
         out.println("<div class=\"leftColumn\">");
-        printTopBoxForCode(codeInstance);
-        printCodeAttributes(codeInstance, attributeInstance, attributeType, "attribute?");
+        printTopBoxForCode(codeInstance, userSession);
+        printCodeAttributes(codeInstance, attributeInstance, attributeType, "attribute?", userSession);
         out.println("</div>");
 
         out.println("<div class=\"centerColumn\">");
@@ -291,7 +297,7 @@ public class AttributeServlet extends HomeServlet
 
         out.println("    <table width=\"100%\">");
         out.println("      <caption>Add " + attributeType.getAttributeLabel() + "</caption>");
-        printProposedValueAndBecause(paramValueNew, attributeType, "");
+        printProposedValueAndBecause(paramValueNew, attributeType, "", userSession);
         out.println("    <tr>");
         out.println("      <td colspan=\"2\"><span class=\"formButtonFloat\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
             + ACTION_ADD + "\"/></span></td>");
@@ -311,19 +317,19 @@ public class AttributeServlet extends HomeServlet
       } else
       {
         out.println("<div class=\"leftColumn\">");
-        printTopBoxForCode(codeInstance);
-        printCodeAttributes(codeInstance, attributeInstance, null, "attribute?");
+        printTopBoxForCode(codeInstance, userSession);
+        printCodeAttributes(codeInstance, attributeInstance, null, "attribute?", userSession);
         out.println("</div>");
 
         out.println("<div class=\"centerColumn\">");
-        printTopBoxForComments(attributeInstance);
-        printComments(attributeInstance);
+        printTopBoxForComments(attributeInstance, userSession);
+        printComments(attributeInstance, userSession);
 
         out.println("</div>");
 
         out.println("<div class=\"rightColumn\">");
-        printTopBoxForCommentPosition(attributeInstance);
-        printCommentForm(attributeInstance, req);
+        printTopBoxForCommentPosition(attributeInstance, userSession);
+        printCommentForm(attributeInstance, req, userSession);
         out.println("</div>");
       }
     } catch (Exception e)
@@ -333,11 +339,12 @@ public class AttributeServlet extends HomeServlet
       e.printStackTrace(out);
       out.println("</pre>");
     }
-    createFooter();
+    createFooter(webSession);
   }
 
-  public void populateTableValuesFromAttributeInstance(CodeInstance codeInstance)
+  public void populateTableValuesFromAttributeInstance(CodeInstance codeInstance, UserSession userSession)
   {
+    Session dataSession = userSession.getDataSession();
     String contextCode = codeInstance.getAttributeValue(getAttributeType(AT_CONTEXT_CODE, dataSession));
     if (contextCode != null)
     {
@@ -408,9 +415,9 @@ public class AttributeServlet extends HomeServlet
     }
   }
 
-  public void printCommentForm(AttributeInstance attributeInstance, HttpServletRequest req)
+  public void printCommentForm(AttributeInstance attributeInstance, HttpServletRequest req, UserSession userSession)
   {
-
+    PrintWriter out = userSession.getOut();
     String value = attributeInstance.getValue().getAttributeValue();
 
     AttributeType at = attributeInstance.getValue().getAttributeType();
@@ -451,16 +458,16 @@ public class AttributeServlet extends HomeServlet
     out.println("    <caption>Edit " + at.getAttributeLabel() + "</caption>");
     out.println("    <tr>");
     out.println("      <th>Current Value</th>");
-    out.println("      <td>" + getValueLabel(attributeInstance) + "</td>");
+    out.println("      <td>" + getValueLabel(attributeInstance, userSession) + "</td>");
     out.println("    </tr>");
     out.println("    <tr>");
     out.println("      <th>My Position</th>");
     out.println("      <td>");
-    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.FOR, "I agree", "");
-    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.RESEARCH, "I think research is needed", "");
-    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.QUESTION, "I have a question", "");
-    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.PROBLEM, "I see a problem", "");
-    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.AGAINST, "I disagree", " onChange=\"openAgainst1()\"");
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.FOR, "I agree", "", out);
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.RESEARCH, "I think research is needed", "", out);
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.QUESTION, "I have a question", "", out);
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.PROBLEM, "I see a problem", "", out);
+    printRadioOptionForPositionStatus(paramPositionStatus, PositionStatus.AGAINST, "I disagree", " onChange=\"openAgainst1()\"", out);
     out.println("      </td>");
     out.println("    </tr>");
     out.println("    <tr>");
@@ -475,11 +482,11 @@ public class AttributeServlet extends HomeServlet
     out.println("    <tr" + hiddenAreaClass + " id=\"against1\">");
     out.println("      <th>Change to</th>");
     out.println("      <td>");
-    printRadioOptionForChangeTo(true, "Diff", "a different value", " onChange=\"openAgainst2(true)\"");
-    AttributeAssigned attributeAssigned = AttributeAssignedLogic.getAttributeAssigned(attributeInstance, at, dataSession);
+    printRadioOptionForChangeTo(true, "Diff", "a different value", " onChange=\"openAgainst2(true)\"", out);
+    AttributeAssigned attributeAssigned = AttributeAssignedLogic.getAttributeAssigned(attributeInstance, at, userSession.getDataSession());
     if (attributeAssigned.getAttributeStatus() != AttributeStatus.REQUIRED)
     {
-      printRadioOptionForChangeTo(false, "No Value", "no value", " onChange=\"openAgainst2(false)\"");
+      printRadioOptionForChangeTo(false, "No Value", "no value", " onChange=\"openAgainst2(false)\"", out);
     }
     out.println("      </td>");
     out.println("    </tr>");
@@ -487,7 +494,7 @@ public class AttributeServlet extends HomeServlet
     {
       hiddenAreaClass = " class=\"hiddenArea\"";
     }
-    printProposedValueAndBecause(value, at, hiddenAreaClass);
+    printProposedValueAndBecause(value, at, hiddenAreaClass, userSession);
     out.println("    <tr>");
     out.println("      <td colspan=\"2\"><span class=\"formButtonFloat\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
         + ACTION_UPDATE + "\"/></span></td>");
@@ -496,8 +503,10 @@ public class AttributeServlet extends HomeServlet
     out.println("</form>");
   }
 
-  public void printProposedValueAndBecause(String value, AttributeType at, String hiddenAreaClass)
+  public void printProposedValueAndBecause(String value, AttributeType at, String hiddenAreaClass, UserSession userSession)
   {
+    PrintWriter out = userSession.getOut();
+    Session dataSession = userSession.getDataSession();
     out.println("    <tr" + hiddenAreaClass + " id=\"against2\">");
     out.println("      <th>Proposed value</th>");
     out.println("      <td>");
@@ -578,26 +587,27 @@ public class AttributeServlet extends HomeServlet
     out.println("    </tr>");
   }
 
-  public void printRadioOptionForPositionStatus(String positionStatus, PositionStatus ps, String text, String extraOption)
+  public void printRadioOptionForPositionStatus(String positionStatus, PositionStatus ps, String text, String extraOption, PrintWriter out)
   {
     out.println("        <input type=\"radio\" name=\"" + PARAM_POSITION_STATUS + "\" value=\"" + ps.getId() + "\""
         + (positionStatus.equals(ps.getId()) ? " checked=\"true\"" : "") + extraOption + "/> " + text + " <br/>");
   }
 
-  public void printRadioOptionForChangeTo(boolean checked, String changeTo, String text, String extraOption)
+  public void printRadioOptionForChangeTo(boolean checked, String changeTo, String text, String extraOption, PrintWriter out)
   {
     out.println("        <input type=\"radio\" name=\"" + PARAM_CHANGE_TO + "\" value=\"" + changeTo + "\"" + (checked ? " checked=\"true\"" : "")
         + extraOption + "/> " + text + " <br/>");
   }
 
-  public void printTopBoxForComments(AttributeInstance attributeInstance)
+  public void printTopBoxForComments(AttributeInstance attributeInstance, UserSession userSession)
   {
+    PrintWriter out = userSession.getOut();
     out.println("<div class=\"topBox\">");
     out.println("  <table width=\"100%\">");
     out.println("    <caption>" + attributeInstance.getValue().getAttributeType().getAttributeLabel() + "</caption>");
     out.println("    <tr>");
     out.println("      <th>Value</th>");
-    out.println("      <td>" + getValueLabel(attributeInstance) + "</td>");
+    out.println("      <td>" + getValueLabel(attributeInstance, userSession) + "</td>");
     out.println("    </tr>");
     out.println("    <tr>");
     out.println("      <th>Accept Status</th>");
@@ -607,9 +617,10 @@ public class AttributeServlet extends HomeServlet
     out.println("</div>");
   }
 
-  public void printTopBoxForCommentPosition(AttributeInstance attributeInstance)
+  public void printTopBoxForCommentPosition(AttributeInstance attributeInstance, UserSession userSession)
   {
-    List<AttributeComment> attributeCommentList = AttributeCommentLogic.getAttributeCommentMostRecentList(attributeInstance, dataSession);
+    PrintWriter out = userSession.getOut();
+    List<AttributeComment> attributeCommentList = AttributeCommentLogic.getAttributeCommentMostRecentList(attributeInstance, userSession.getDataSession());
     out.println("<div class=\"topBox\">");
     out.println("  <table width=\"100%\">");
     out.println("    <caption>Position Summary</caption>");

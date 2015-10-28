@@ -1,6 +1,7 @@
 package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -8,9 +9,13 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.openimmunizationsoftware.dqa.cm.CentralControl;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
 import org.openimmunizationsoftware.dqa.tr.model.ComparisonField;
@@ -27,7 +32,9 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    setup(req, resp);
+    SessionFactory factory = CentralControl.getSessionFactory();
+    Session dataSession = factory.openSession();
+    PrintWriter out = new PrintWriter(resp.getOutputStream());
     resp.setContentType("text/plain");
     try {
       String organizationName = readValue(req, PARAM_TPAR_ORGANIZATION_NAME, 250);
@@ -185,28 +192,32 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                 ComparisonField comparisonField = null;
                 {
                   String priorityLabel = readValue(req, PARAM_C_PRIORITY_LABEL + position, 250);
-                  Query query = dataSession.createQuery("from ComparisonField where fieldName = ? and priorityLabel = ?");
-                  query.setParameter(0, fieldName);
-                  query.setParameter(1, priorityLabel);
-                  List<ComparisonField> comparisonFieldList = query.list();
-                  if (comparisonFieldList.size() > 0) {
-                    comparisonField = comparisonFieldList.get(0);
-                    String fieldLabel = readValue(req, PARAM_C_FIELD_LABEL + position, 250);
-                    if (!fieldLabel.equals(comparisonField.getFieldLabel())) {
-                      comparisonField.setFieldLabel(fieldLabel);
+                  if (!priorityLabel.equals(""))
+                  {
+                    Query query = dataSession.createQuery("from ComparisonField where fieldName = ? and priorityLabel = ?");
+                    query.setParameter(0, fieldName);
+                    query.setParameter(1, priorityLabel);
+                    List<ComparisonField> comparisonFieldList = query.list();
+                    if (comparisonFieldList.size() > 0) {
+                      comparisonField = comparisonFieldList.get(0);
+                      String fieldLabel = readValue(req, PARAM_C_FIELD_LABEL + position, 250);
+                      if (!fieldLabel.equals(comparisonField.getFieldLabel())) {
+                        comparisonField.setFieldLabel(fieldLabel);
+                        Transaction transaction = dataSession.beginTransaction();
+                        dataSession.update(comparisonField);
+                        transaction.commit();
+                      }
+                    } else {
+                      comparisonField = new ComparisonField();
+                      comparisonField.setFieldName(fieldName);
+                      comparisonField.setPriorityLabel(priorityLabel);
                       Transaction transaction = dataSession.beginTransaction();
-                      dataSession.update(comparisonField);
+                      dataSession.save(comparisonField);
                       transaction.commit();
                     }
-                  } else {
-                    comparisonField = new ComparisonField();
-                    comparisonField.setFieldName(fieldName);
-                    comparisonField.setPriorityLabel(priorityLabel);
-                    Transaction transaction = dataSession.beginTransaction();
-                    dataSession.save(comparisonField);
-                    transaction.commit();
                   }
                 }
+                
                 Comparison comparison = new Comparison();
                 comparison.setComparisonField(comparisonField);
                 comparison.setTestMessage(testMessage);
@@ -267,8 +278,11 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
       e.printStackTrace();
       throw new ServletException(e);
     }
+    finally
+    {
+      dataSession.close();
+    }
     out.close();
-    out = null;
   }
 
   private boolean readValueBoolean(HttpServletRequest req, String field) {
@@ -329,8 +343,11 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    setup(req, resp);
-    createHeader();
+    HttpSession webSession = setup(req, resp);
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    PrintWriter out = userSession.getOut();
+    createHeader(webSession);
     out.println("<form method=\"POST\" action=\"record\">");
 
     out.println("<div class=\"leftColumn\">");
@@ -381,7 +398,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     out.println("</div>");
 
     out.println("</form>");
-    createFooter();
+    createFooter(webSession);
   }
 
 }

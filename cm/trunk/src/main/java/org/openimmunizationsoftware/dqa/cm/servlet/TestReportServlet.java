@@ -2,6 +2,7 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -17,8 +18,10 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.hibernate.Query;
+import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
 import org.openimmunizationsoftware.dqa.tr.model.ComparisonField;
@@ -46,6 +49,7 @@ public class TestReportServlet extends HomeServlet {
   public static final String VIEW_FORECAST_PREP = RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST_PREP;
   public static final String VIEW_FORECAST = RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST;
   public static final String VIEW_CONFORMANCE = RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE;
+  public static final String VIEW_ONC_2015 = RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015;
 
   public static final String VIEW_HOME = "home";
   public static final String VIEW_REPORTS = "reports";
@@ -107,7 +111,10 @@ public class TestReportServlet extends HomeServlet {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    setup(req, resp);
+    HttpSession webSession = setup(req, resp);
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    PrintWriter out = userSession.getOut();
     if (userSession.getUser() == null || userSession.getUser().getApplicationUser() == null
         || !userSession.getUser().getApplicationUser().getApplication().isApplicationDqais()) {
       sendToHome(req, resp);
@@ -153,7 +160,7 @@ public class TestReportServlet extends HomeServlet {
     }
 
     if (testConducted == null && !connectionLabel.equals("")) {
-      testConducted = getLatestTestConducted(connectionLabel);
+      testConducted = getLatestTestConducted(connectionLabel, dataSession);
     }
 
     if (testConducted != null && testParticipantSelected != null) {
@@ -198,11 +205,11 @@ public class TestReportServlet extends HomeServlet {
     }
 
     try {
-      createHeader();
+      createHeader(webSession);
       if (view.equals(VIEW_HOME)) {
         out.println("<div class=\"leftColumn\">");
         out.println("<div class=\"topBox\">");
-        printLogin(userSession.getUser());
+        printLogin(userSession.getUser(), userSession);
         out.println("</div>");
         out.println("</div>");
       } else if (view.equals(VIEW_REPORTS)) {
@@ -235,10 +242,11 @@ public class TestReportServlet extends HomeServlet {
         }
         out.println("</div>");
 
-        printReport(connectionLabel, testConducted, VIEW_REPORTS);
+        printReport(connectionLabel, testConducted, VIEW_REPORTS, userSession);
       } else if (view.equals(VIEW_FIELD_COMPARISON) && testMessage != null) {
         out.println("<div class=\"leftColumn\">");
-        printTestConductedNavigationBox(testConducted);
+        printTestConductedNavigationBox(testConducted, userSession
+            );
 
         {
           Query query = dataSession.createQuery("from Comparison where testMessage = ? order by comparisonField.fieldName");
@@ -283,14 +291,15 @@ public class TestReportServlet extends HomeServlet {
         out.println("</div>");
         if (comparisonField != null) {
           out.println("<div class=\"rightFullColumn\">");
-          printComparisons(comparisonField, testMessage);
+          printComparisons(comparisonField, testMessage, userSession
+              );
           out.println("</div>");
         }
       } else if (view.equals(VIEW_TEST_MESSAGES)) {
         out.println("<div class=\"leftColumn\">");
-        printTestConductedNavigationBox(testConducted);
+        printTestConductedNavigationBox(testConducted, userSession);
 
-        Map<String, TestSection> testSectionMap = createTestSectionMap(testConducted);
+        Map<String, TestSection> testSectionMap = createTestSectionMap(testConducted, dataSession);
         for (String testSectionType : TEST_SECTIONS_TO_DISPLAY) {
           TestSection testSection = testSectionMap.get(testSectionType);
           if (testSection != null) {
@@ -454,7 +463,7 @@ public class TestReportServlet extends HomeServlet {
         out.println("</table>");
         out.println("</div>");
 
-        printReport(connectionLabel, testConducted, VIEW_DASHBOARD);
+        printReport(connectionLabel, testConducted, VIEW_DASHBOARD, userSession);
 
       } else if (view.equals(VIEW_MAP) || (view.equals(VIEW_DASHBOARD) && testParticipantSelected == null)) {
 
@@ -484,7 +493,7 @@ public class TestReportServlet extends HomeServlet {
         List<TestParticipant> testParticipantList = query.list();
         for (TestParticipant testParticipant : testParticipantList) {
           if (testParticipant.getMapCol() <= maxCols && testParticipant.getMapRow() <= maxRows) {
-            Map<String, String> filterValueMap = createFilterValueMap(testParticipant);
+            Map<String, String> filterValueMap = createFilterValueMap(testParticipant, dataSession);
             boolean okayToShow = true;
             for (int i = 0; i < MAP_STATUS.length; i++) {
               String mapStatus = MAP_STATUS[i];
@@ -635,7 +644,7 @@ public class TestReportServlet extends HomeServlet {
 
       } else if (view.equals(VIEW_CONNECTION)) {
         out.println("<div class=\"leftColumn\">");
-        printTestConductedNavigationBox(testConducted);
+        printTestConductedNavigationBox(testConducted, userSession);
         out.println("</div>");
 
         out.println("<div class=\"rightFullColumn\">");
@@ -661,7 +670,7 @@ public class TestReportServlet extends HomeServlet {
         out.println("</div>");
       } else if (view.equals(VIEW_STATUS)) {
         out.println("<div class=\"leftColumn\">");
-        printTestConductedNavigationBox(testConducted);
+        printTestConductedNavigationBox(testConducted, userSession);
         out.println("</div>");
         out.println("<div class=\"rightFullColumn\">");
         {
@@ -717,7 +726,7 @@ public class TestReportServlet extends HomeServlet {
         out.println("</div>");
       } else if (view.equals(VIEW_PERFORMANCE)) {
         out.println("<div class=\"leftColumn\">");
-        printTestConductedNavigationBox(testConducted);
+        printTestConductedNavigationBox(testConducted, userSession);
         out.println("</div>");
         out.println("<div class=\"centerColumn\">");
         {
@@ -747,13 +756,13 @@ public class TestReportServlet extends HomeServlet {
         out.println("</div>");
       } else if (view.equals(VIEW_INTEROP)) {
         out.println("<div class=\"leftColumn\">");
-        printTestConductedNavigationBox(testConducted);
+        printTestConductedNavigationBox(testConducted, userSession);
         TestSection testSection = null;
         String testSectionType = RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC;
         if (view.equals(VIEW_TOLERANCE)) {
           testSectionType = RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL;
         }
-        testSection = getTestSection(testConducted, testSection, testSectionType);
+        testSection = getTestSection(testConducted, testSection, testSectionType, dataSession);
         if (testSection != null) {
           Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
           query.setParameter(0, testSection);
@@ -796,14 +805,14 @@ public class TestReportServlet extends HomeServlet {
 
         out.println("</div>");
         out.println("<div class=\"rightFullColumn\">");
-        printTestMessageDetails(testMessage);
+        printTestMessageDetails(testMessage, userSession);
         out.println("</div>");
       } else if (view.equals(VIEW_TOLERANCE) || view.equals(VIEW_EHR)) {
         out.println("<div class=\"leftColumn\">");
-        printTestConductedNavigationBox(testConducted);
+        printTestConductedNavigationBox(testConducted, userSession);
         TestSection testSection = null;
         String testSectionType = RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL;
-        testSection = getTestSection(testConducted, testSection, testSectionType);
+        testSection = getTestSection(testConducted, testSection, testSectionType, dataSession);
         if (testSection != null) {
           Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
           query.setParameter(0, testSection);
@@ -855,14 +864,14 @@ public class TestReportServlet extends HomeServlet {
 
         out.println("</div>");
         out.println("<div class=\"rightFullColumn\">");
-        printTestMessageDetails(testMessage);
+        printTestMessageDetails(testMessage, userSession);
         out.println("</div>");
       } else if (view.equals(VIEW_CODED_VALUES)) {
         out.println("<div class=\"leftColumn\">");
-        printTestConductedNavigationBox(testConducted);
+        printTestConductedNavigationBox(testConducted, userSession);
         TestSection testSection = null;
         String testSectionType = RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE;
-        testSection = getTestSection(testConducted, testSection, testSectionType);
+        testSection = getTestSection(testConducted, testSection, testSectionType, dataSession);
         if (testSection != null) {
           Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
           query.setParameter(0, testSection);
@@ -924,24 +933,24 @@ public class TestReportServlet extends HomeServlet {
 
         out.println("</div>");
         out.println("<div class=\"rightFullColumn\">");
-        printTestMessageDetails(testMessage);
+        printTestMessageDetails(testMessage, userSession);
         out.println("</div>");
       } else if (view.equals(VIEW_BASIC) || view.equals(VIEW_INTERMEDIATE) || view.equals(VIEW_ADVANCED) || view.equals(VIEW_PROFILING)
-          || view.equals(VIEW_EXCEPTIONAL) || view.equals(VIEW_FORECAST_PREP) || view.equals(VIEW_FORECAST)) {
+          || view.equals(VIEW_EXCEPTIONAL) || view.equals(VIEW_FORECAST_PREP) || view.equals(VIEW_FORECAST)|| view.equals(VIEW_ONC_2015)) {
         out.println("<div class=\"leftColumn\">");
-        printTestConductedNavigationBox(testConducted);
+        printTestConductedNavigationBox(testConducted, userSession);
         TestSection testSection = null;
-        testSection = getTestSection(testConducted, testSection, view);
+        testSection = getTestSection(testConducted, testSection, view, dataSession);
         if (testSection != null) {
-          printMessages(view, testMessage, testSection, RecordServletInterface.VALUE_TEST_TYPE_PREP, "Prep Messages");
-          printMessages(view, testMessage, testSection, RecordServletInterface.VALUE_TEST_TYPE_UPDATE, "Update Messages");
-          printMessages(view, testMessage, testSection, RecordServletInterface.VALUE_TEST_TYPE_QUERY, "Query Messages");
+          printMessages(view, testMessage, testSection, RecordServletInterface.VALUE_TEST_TYPE_PREP, "Prep Messages", userSession);
+          printMessages(view, testMessage, testSection, RecordServletInterface.VALUE_TEST_TYPE_UPDATE, "Update Messages", userSession);
+          printMessages(view, testMessage, testSection, RecordServletInterface.VALUE_TEST_TYPE_QUERY, "Query Messages", userSession);
         }
 
         out.println("</div>");
         out.println("<div class=\"rightFullColumn\">");
         if (testMessage != null) {
-          printTestMessageDetails(testMessage);
+          printTestMessageDetails(testMessage, userSession);
         }
         out.println("</div>");
       }
@@ -952,10 +961,10 @@ public class TestReportServlet extends HomeServlet {
       e.printStackTrace(out);
       out.println("</pre>");
     }
-    createFooter();
+    createFooter(webSession);
   }
 
-  private TestSection getTestSection(TestConducted testConducted, TestSection testSection, String testSectionType) {
+  private TestSection getTestSection(TestConducted testConducted, TestSection testSection, String testSectionType, Session dataSession) {
     {
       Query query = dataSession.createQuery("from TestSection where testConducted = ? and testSectionType = ?");
       query.setParameter(0, testConducted);
@@ -968,7 +977,9 @@ public class TestReportServlet extends HomeServlet {
     return testSection;
   }
 
-  private void printComparisons(ComparisonField comparisonField, TestMessage testMessage) throws UnsupportedEncodingException {
+  private void printComparisons(ComparisonField comparisonField, TestMessage testMessage, UserSession userSession) throws UnsupportedEncodingException {
+    PrintWriter out = userSession.getOut();
+    Session dataSession = userSession.getDataSession();
     List<Comparison> comparisonList;
     {
       Query query = dataSession.createQuery("from Comparison where comparisonField = ? and testMessage.testSection.testConducted.latestTest = ? "
@@ -1017,7 +1028,7 @@ public class TestReportServlet extends HomeServlet {
     }
   }
 
-  private TestConducted getLatestTestConducted(String connectionLabel) {
+  private TestConducted getLatestTestConducted(String connectionLabel, Session dataSession) {
     TestConducted testConducted = null;
     List<TestConducted> testConductedList = null;
     Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and latestTest = ? order by testStartedTime desc");
@@ -1030,10 +1041,12 @@ public class TestReportServlet extends HomeServlet {
     return testConducted;
   }
 
-  private void printReport(String connectionLabel, TestConducted testConducted, String view) throws UnsupportedEncodingException {
+  private void printReport(String connectionLabel, TestConducted testConducted, String view, UserSession userSession) throws UnsupportedEncodingException {
+    PrintWriter out = userSession.getOut();
+    Session dataSession = userSession.getDataSession();
     {
       out.println("<div class=\"centerColumn\">");
-      printTestConductedNavigationBox(testConducted);
+      printTestConductedNavigationBox(testConducted, userSession);
       if (!connectionLabel.equals("")) {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm aa zz");
         List<TestConducted> testConductedList = null;
@@ -1071,12 +1084,12 @@ public class TestReportServlet extends HomeServlet {
 
     out.println("<div class=\"rightColumn\">");
     if (testConducted != null) {
-      printTestConductedOverview(testConducted);
+      printTestConductedOverview(testConducted, userSession);
     }
     out.println("</div>");
   }
 
-  private Map<String, String> createFilterValueMap(TestParticipant testParticipant) {
+  private Map<String, String> createFilterValueMap(TestParticipant testParticipant, Session dataSession) {
     Map<String, String> filterValueMap = new HashMap<String, String>();
     {
       filterValueMap.put(MAP_STATUS_PHASE1_PARTICIPATION, testParticipant.getPhase1Participation());
@@ -1091,7 +1104,7 @@ public class TestReportServlet extends HomeServlet {
       filterValueMap.put(MAP_STATUS_QUERY, testParticipant.getQuerySupport());
       if (testParticipant.getReportRunStatus().equals("")) {
 
-        TestConducted testConducted = getLatestTestConducted(testParticipant.getConnectionLabel());
+        TestConducted testConducted = getLatestTestConducted(testParticipant.getConnectionLabel(), dataSession);
         if (testConducted == null) {
           filterValueMap.put(MAP_STATUS_REPORT_RESULTS, "Never Ran");
         } else {
@@ -1123,8 +1136,9 @@ public class TestReportServlet extends HomeServlet {
     }
   }
 
-  private void printTestMessageDetails(TestMessage testMessage) throws IOException {
-    if (testMessage != null) {
+  private void printTestMessageDetails(TestMessage testMessage, UserSession userSession) throws IOException {
+    PrintWriter out = userSession.getOut();
+    Session dataSession = userSession.getDataSession();    if (testMessage != null) {
       out.println("<h3>" + testMessage.getTestCaseDescription() + "</h3>");
       out.println("<pre>" + addHovers(testMessage.getPrepMessageActual()) + "</pre>");
       if (testMessage.isResultAccepted()) {
@@ -1174,8 +1188,9 @@ public class TestReportServlet extends HomeServlet {
     }
   }
 
-  private void printMessages(String view, TestMessage testMessage, TestSection testSection, String testType, String label) {
-    Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
+  private void printMessages(String view, TestMessage testMessage, TestSection testSection, String testType, String label, UserSession userSession) {
+    PrintWriter out = userSession.getOut();
+    Session dataSession = userSession.getDataSession();    Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
     query.setParameter(0, testSection);
     query.setParameter(1, testType);
     List<TestMessage> testMessageList = query.list();
@@ -1217,7 +1232,9 @@ public class TestReportServlet extends HomeServlet {
     }
   }
 
-  private void printTestConductedNavigationBox(TestConducted testConducted) {
+  private void printTestConductedNavigationBox(TestConducted testConducted, UserSession userSession) {
+    PrintWriter out = userSession.getOut();
+    Session dataSession = userSession.getDataSession();
     out.println("<div class=\"topBox\">");
     if (testConducted != null) {
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm aa zz");
@@ -1253,11 +1270,12 @@ public class TestReportServlet extends HomeServlet {
       RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED,
       RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL,
       RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST_PREP, RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST,
-      RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE };
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015 };
 
-  private void printTestConductedOverview(TestConducted testConducted) {
-
-    Map<String, TestSection> testSectionMap = createTestSectionMap(testConducted);
+  private void printTestConductedOverview(TestConducted testConducted, UserSession userSession) {
+    PrintWriter out = userSession.getOut();
+    Session dataSession = userSession.getDataSession();
+    Map<String, TestSection> testSectionMap = createTestSectionMap(testConducted, dataSession);
     out.println("<table width=\"100%\">");
     out.println("  <caption>Test Areas</caption>");
     out.println("  <tr>");
@@ -1274,9 +1292,9 @@ public class TestReportServlet extends HomeServlet {
           String link = "testReport?" + PARAM_VIEW + "=" + testSectionType;
           out.println("    <td><a href=\"" + link + "\">" + testSection.getTestSectionType() + "</a></td>");
         }
-        printProgressOrScore(testSection.getProgressLevel1(), testSection.getScoreLevel1());
-        printProgressOrScore(testSection.getProgressLevel2(), testSection.getScoreLevel2());
-        printProgressOrScore(testSection.getProgressLevel3(), testSection.getScoreLevel3());
+        printProgressOrScore(testSection.getProgressLevel1(), testSection.getScoreLevel1(), out);
+        printProgressOrScore(testSection.getProgressLevel2(), testSection.getScoreLevel2(), out);
+        printProgressOrScore(testSection.getProgressLevel3(), testSection.getScoreLevel3(), out);
         out.println("  </tr>");
       }
     }
@@ -1291,12 +1309,12 @@ public class TestReportServlet extends HomeServlet {
     out.println("    <th>Problem</th>");
     out.println("    <th>Working</th>");
     out.println("  </tr>");
-    printScoreLine("Interoperability", testConducted.getScoreInterop(), VIEW_INTEROP);
-    printScoreLine("Coded Values", testConducted.getScoreCoded(), VIEW_CODED_VALUES);
-    printScoreLine("Tolerance", testConducted.getScoreTolerance(), VIEW_TOLERANCE);
-    printScoreLine("EHR Examples", testConducted.getScoreEhr(), VIEW_EHR);
-    printScoreLine("Performance", testConducted.getScorePerform(), VIEW_PERFORMANCE);
-    printScoreLine("Ack Conformance", testConducted.getScoreAck(), VIEW_CONFORMANCE);
+    printScoreLine("Interoperability", testConducted.getScoreInterop(), VIEW_INTEROP, out);
+    printScoreLine("Coded Values", testConducted.getScoreCoded(), VIEW_CODED_VALUES, out);
+    printScoreLine("Tolerance", testConducted.getScoreTolerance(), VIEW_TOLERANCE, out);
+    printScoreLine("EHR Examples", testConducted.getScoreEhr(), VIEW_EHR, out);
+    printScoreLine("Performance", testConducted.getScorePerform(), VIEW_PERFORMANCE, out);
+    printScoreLine("Ack Conformance", testConducted.getScoreAck(), VIEW_CONFORMANCE, out);
     out.println("</table>");
     out.println("<br/>");
 
@@ -1308,13 +1326,13 @@ public class TestReportServlet extends HomeServlet {
     out.println("    <th>Problem</th>");
     out.println("    <th>Working</th>");
     out.println("  </tr>");
-    printScoreLine("Local Requirement Implementation", testConducted.getScoreLocal(), VIEW_LOCAL);
-    printScoreLine("National Compatibility", testConducted.getScoreNational(), VIEW_NATIONAL);
+    printScoreLine("Local Requirement Implementation", testConducted.getScoreLocal(), VIEW_LOCAL, out);
+    printScoreLine("National Compatibility", testConducted.getScoreNational(), VIEW_NATIONAL, out);
     out.println("</table>");
 
   }
 
-  private Map<String, TestSection> createTestSectionMap(TestConducted testConducted) {
+  private Map<String, TestSection> createTestSectionMap(TestConducted testConducted, Session dataSession) {
     Map<String, TestSection> testSectionMap = new HashMap<String, TestSection>();
     {
       Query query = dataSession.createQuery("from TestSection where testConducted = ? and testEnabled = ?");
@@ -1328,7 +1346,7 @@ public class TestReportServlet extends HomeServlet {
     return testSectionMap;
   }
 
-  private void printProgressOrScore(int progress, int score) {
+  private void printProgressOrScore(int progress, int score, PrintWriter out) {
     String classStyle = "";
     String status = "-";
     if (progress == 100) {
@@ -1349,7 +1367,7 @@ public class TestReportServlet extends HomeServlet {
     out.println("    <td class=\"" + classStyle + "\">" + status + "</td>");
   }
 
-  private void printScoreLine(String label, int score, String view) {
+  private void printScoreLine(String label, int score, String view, PrintWriter out) {
     {
       out.println("  <tr>");
       {
