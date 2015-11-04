@@ -9,6 +9,7 @@ CREATE TABLE application (
 INSERT INTO application(application_id, application_label, application_acronym) VALUES (1, 'Data Quality Assurance - Code Manager', 'DQAcm');
 INSERT INTO application(application_id, application_label, application_acronym) VALUES (2, 'Eric''s Analysis Tool', 'EAT');
 
+update application set application_label = 'Aggregate Analysis Reporting Tool', application_acronym = 'AART' where application_id = 2;
 
 CREATE TABLE application_user (
   application_user_id   INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
