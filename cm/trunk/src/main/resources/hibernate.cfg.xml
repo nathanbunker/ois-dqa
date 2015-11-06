@@ -47,6 +47,8 @@
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestSection.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Comparison.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ComparisonField.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Assertion.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/AssertionField.hbm.xml"/>
 
   </session-factory>
 </hibernate-configuration>

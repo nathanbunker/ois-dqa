@@ -214,3 +214,16 @@ CREATE TABLE supporting_info (
   entry_date             DATETIME
 );
 
+CREATE TABLE assertion (
+  assertion_id           INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  assertion_field_id     INTEGER NOT NULL,
+  test_message_id        INTEGER NOT NULL,
+  assertion_result       VARCHAR(250),
+  location_path          VARCHAR(250)
+);
+
+CREATE TABLE assertion_field (
+  assertion_field_id    INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  assertion_type        VARCHAR(250),
+  assertion_description VARCHAR(1024)
+);

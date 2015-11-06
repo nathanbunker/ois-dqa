@@ -30,6 +30,7 @@ public class StartCMWebUI {
 		bb.setServer(server);
 		bb.setContextPath("/");
 		bb.setWar("src/main/webapp");
+		bb.setMaxFormContentSize(1000000);
 		
 //		org.openimmunizationsoftware.dqa.service.DqaServiceSOAPSkeleton skeleton = new org.openimmunizationsoftware.dqa.service.DqaServiceSOAPSkeleton();
 		
