@@ -139,6 +139,7 @@ public abstract class BaseServlet extends HttpServlet
     out.println("    <div class=\"menu\">");
     if (application.isApplicationDqacm())
     {
+      out.println("     <a href=\"home\" class=\"menuLink\">home</a>");
       out.println("     |");
       out.println("     <a href=\"home?" + HomeServlet.PARAM_VIEW + "=" + HomeServlet.VIEW_SEARCH + "\" class=\"menuLink\">search</a>");
       if (userSession.isAdmin())

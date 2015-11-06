@@ -23,6 +23,7 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.Assertion;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
 import org.openimmunizationsoftware.dqa.tr.model.ComparisonField;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
@@ -50,6 +51,7 @@ public class TestReportServlet extends HomeServlet
   public static final String VIEW_FORECAST_PREP = RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST_PREP;
   public static final String VIEW_FORECAST = RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST;
   public static final String VIEW_CONFORMANCE = RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE;
+  public static final String VIEW_CONFORMANCE_2015 = RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015;
   public static final String VIEW_ONC_2015 = RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015;
   public static final String VIEW_NOT_ACCEPTED = RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED;
 
@@ -92,6 +94,7 @@ public class TestReportServlet extends HomeServlet
       MAP_STATUS_REPORT_RESULTS };
 
   private static final Map<String, String[]> MAP_STATUS_PASSING_VALUES = new HashMap<String, String[]>();
+
   static
   {
     MAP_STATUS_PASSING_VALUES.put(MAP_STATUS_PHASE1_PARTICIPATION, new String[] { "Yes - Direct", "Yes - Report Only" });
@@ -374,10 +377,11 @@ public class TestReportServlet extends HomeServlet
         if (testMessage != null)
         {
           out.println("<h3>" + testMessage.getTestCaseDescription() + "</h3>");
-          out.println("<p>Here is an example of one of the messages that was submitted to each IIS. (Every IIS received the same message with slightly different data and perhaps additional modifications required by the IIS.)</p>");
+          out.println(
+              "<p>Here is an example of one of the messages that was submitted to each IIS. (Every IIS received the same message with slightly different data and perhaps additional modifications required by the IIS.)</p>");
           out.println("<pre>" + addHovers(testMessage.getPrepMessageActual()) + "</pre>");
-          Query query = dataSession
-              .createQuery("from TestMessage where testSection.testConducted.latestTest = ? and testCaseCategory = ? order by testSection.testConducted.connectionLabel");
+          Query query = dataSession.createQuery(
+              "from TestMessage where testSection.testConducted.latestTest = ? and testCaseCategory = ? order by testSection.testConducted.connectionLabel");
           query.setParameter(0, true);
           query.setParameter(1, testMessage.getTestCaseCategory());
           List<TestMessage> exampleTestMessageList = query.list();
@@ -394,8 +398,8 @@ public class TestReportServlet extends HomeServlet
             for (TestMessage exampleTm : exampleTestMessageList)
             {
               String link = "testReport?" + PARAM_VIEW + "=" + VIEW_BASIC + "&" + PARAM_CONNECTION_LABEL + "="
-                  + URLEncoder.encode(exampleTm.getTestSection().getTestConducted().getConnectionLabel(), "UTF-8") + "&" + PARAM_TEST_MESSAGE_ID
-                  + "=" + exampleTm.getTestMessageId();
+                  + URLEncoder.encode(exampleTm.getTestSection().getTestConducted().getConnectionLabel(), "UTF-8") + "&" + PARAM_TEST_MESSAGE_ID + "="
+                  + exampleTm.getTestMessageId();
               out.println("  <tr>");
               String label = exampleTm.getTestSection().getTestConducted().getConnectionLabel();
               out.println("    <td><a href=\"" + link + "\">" + label + "</a></td>");
@@ -1121,8 +1125,7 @@ public class TestReportServlet extends HomeServlet
     return testSection;
   }
 
-  private void printComparisons(ComparisonField comparisonField, TestMessage testMessage, UserSession userSession)
-      throws UnsupportedEncodingException
+  private void printComparisons(ComparisonField comparisonField, TestMessage testMessage, UserSession userSession) throws UnsupportedEncodingException
   {
     PrintWriter out = userSession.getOut();
     Session dataSession = userSession.getDataSession();
@@ -1323,6 +1326,39 @@ public class TestReportServlet extends HomeServlet
       }
       out.println("<pre>" + addHovers(testMessage.getResultMessageActual()) + "</pre>");
 
+      {
+        Query query = dataSession.createQuery("from Assertion where testMessage = ? order by location_path");
+        query.setParameter(0, testMessage);
+        List<Assertion> assertionList = query.list();
+        if (assertionList.size() > 0)
+        {
+          out.println("<table width=\"100%\">");
+          out.println("  <caption>ONC 2015 Validation of Response</caption>");
+          out.println("  <tr>");
+          out.println("    <th>Location</th>");
+          out.println("    <th>Result</th>");
+          out.println("    <th>Type</th>");
+          out.println("    <th>Description</th>");
+          out.println("  </tr>");
+          for (Assertion assertion : assertionList)
+          {
+            String classString = " class=\"pass\"";
+            if (assertion.getAssertionResult().equalsIgnoreCase("ERROR"))
+            {
+              classString = " class=\"fail\"";
+            }
+            out.println("  <tr>");
+            out.println("    <td" + classString + ">" + assertion.getLocationPath() + "</td>");
+            out.println("    <td" + classString + ">" + assertion.getAssertionResult() + "</td>");
+            out.println("    <td" + classString + ">" + assertion.getAssertionField().getAssertionType() + "</td>");
+            out.println("    <td" + classString + ">" + assertion.getAssertionField().getAssertionDescription() + "</td>");
+            out.println("  </tr>");
+          }
+          out.println("</table>");
+          out.println("<br/>");
+        }
+      }
+
       Query query = dataSession.createQuery("from Comparison where testMessage = ? order by comparisonField.fieldName");
       query.setParameter(0, testMessage);
       List<Comparison> comparisonList = query.list();
@@ -1463,7 +1499,7 @@ public class TestReportServlet extends HomeServlet
       RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED,
       RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL,
       RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST_PREP, RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST,
-      RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE };
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE, RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015 };
 
   private void printTestConductedOverview(TestConducted testConducted, UserSession userSession)
   {
@@ -1608,8 +1644,8 @@ public class TestReportServlet extends HomeServlet
         } else
         {
           out.println("    <td>");
-          out.println("<div style=\"width: " + ((int) ((100 - score)))
-              + "px; text-align: center; position: relative; float: right;\" class=\"fail\">" + message + "</div>");
+          out.println("<div style=\"width: " + ((int) ((100 - score))) + "px; text-align: center; position: relative; float: right;\" class=\"fail\">"
+              + message + "</div>");
           out.println("    </td>");
           out.println("    <td>&nbsp;</td>");
         }

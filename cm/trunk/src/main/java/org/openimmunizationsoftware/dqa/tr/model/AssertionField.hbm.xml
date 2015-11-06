@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="AssertionField" table="assertion_field">
+    <id name="assertionFieldId" column="assertion_field_id">
+      <generator class="native"/>
+    </id>
+    <property name="assertionType" column="assertion_type" type="string"/>
+    <property name="assertionDescription" column="assertion_description" type="string"/>
+  </class>
+</hibernate-mapping>

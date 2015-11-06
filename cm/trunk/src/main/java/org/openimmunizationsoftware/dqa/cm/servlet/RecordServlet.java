@@ -17,6 +17,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.cm.CentralControl;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.Assertion;
+import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
 import org.openimmunizationsoftware.dqa.tr.model.ComparisonField;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
@@ -24,35 +26,41 @@ import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class RecordServlet extends BaseServlet implements RecordServletInterface {
+public class RecordServlet extends BaseServlet implements RecordServletInterface
+{
 
   public RecordServlet() {
     super("Home");
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+  {
     SessionFactory factory = CentralControl.getSessionFactory();
     Session dataSession = factory.openSession();
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     resp.setContentType("text/plain");
-    try {
+    try
+    {
       String organizationName = readValue(req, PARAM_TPAR_ORGANIZATION_NAME, 250);
       String connectionLabel = readValue(req, PARAM_TC_CONNECTION_LABEL, 250);
       Date testStartedTime = readValueDate(req, PARAM_TC_TEST_STARTED_TIME);
-      if (!connectionLabel.equals("") && testStartedTime != null) {
+      if (!connectionLabel.equals("") && testStartedTime != null)
+      {
         TestConducted testConducted = null;
         {
           Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and testStartedTime = ?");
           query.setParameter(0, connectionLabel);
           query.setParameter(1, testStartedTime);
           List<TestConducted> testConductedList = query.list();
-          if (testConductedList.size() > 0) {
+          if (testConductedList.size() > 0)
+          {
             testConducted = testConductedList.get(0);
           }
         }
         {
-          if (testConducted == null) {
+          if (testConducted == null)
+          {
             testConducted = new TestConducted();
             testConducted.setConnectionLabel(connectionLabel);
             testConducted.setTestStartedTime(testStartedTime);
@@ -96,13 +104,16 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           dataSession.saveOrUpdate(testConducted);
           transaction.commit();
 
-          if (testConducted.isCompleteTest()) {
+          if (testConducted.isCompleteTest())
+          {
             Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and latestTest = ?");
             query.setParameter(0, testConducted.getConnectionLabel());
             query.setParameter(1, true);
             List<TestConducted> latestList = query.list();
-            for (TestConducted latest : latestList) {
-              if (latest != testConducted) {
+            for (TestConducted latest : latestList)
+            {
+              if (latest != testConducted)
+              {
                 latest.setLatestTest(false);
                 transaction = dataSession.beginTransaction();
                 dataSession.saveOrUpdate(testConducted);
@@ -112,7 +123,8 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           }
         }
         String testSectionType = readValue(req, PARAM_TS_TEST_SECTION_TYPE, 250);
-        if (!testSectionType.equals("")) {
+        if (!testSectionType.equals(""))
+        {
           TestSection testSection = null;
           {
             {
@@ -120,11 +132,13 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
               query.setParameter(0, testConducted);
               query.setParameter(1, testSectionType);
               List<TestSection> testSectionList = query.list();
-              if (testSectionList.size() > 0) {
+              if (testSectionList.size() > 0)
+              {
                 testSection = testSectionList.get(0);
               }
             }
-            if (testSection == null) {
+            if (testSection == null)
+            {
               testSection = new TestSection();
               testSection.setTestConducted(testConducted);
               testSection.setTestSectionType(testSectionType);
@@ -145,7 +159,8 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
             transaction.commit();
           }
           String testType = readValue(req, PARAM_TM_TEST_TYPE, 250);
-          if (!testType.equals("")) {
+          if (!testType.equals(""))
+          {
             TestMessage testMessage = new TestMessage();
             testMessage.setTestSection(testSection);
             testMessage.setTestPosition(readValueInt(req, PARAM_TM_TEST_POSITION));
@@ -188,7 +203,8 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
             {
               int position = 1;
               String fieldName = readValue(req, PARAM_C_FIELD_NAME + position, 250);
-              while (!fieldName.equals("")) {
+              while (!fieldName.equals(""))
+              {
                 ComparisonField comparisonField = null;
                 {
                   String priorityLabel = readValue(req, PARAM_C_PRIORITY_LABEL + position, 250);
@@ -198,16 +214,19 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                     query.setParameter(0, fieldName);
                     query.setParameter(1, priorityLabel);
                     List<ComparisonField> comparisonFieldList = query.list();
-                    if (comparisonFieldList.size() > 0) {
+                    if (comparisonFieldList.size() > 0)
+                    {
                       comparisonField = comparisonFieldList.get(0);
                       String fieldLabel = readValue(req, PARAM_C_FIELD_LABEL + position, 250);
-                      if (!fieldLabel.equals(comparisonField.getFieldLabel())) {
+                      if (!fieldLabel.equals(comparisonField.getFieldLabel()))
+                      {
                         comparisonField.setFieldLabel(fieldLabel);
                         Transaction transaction = dataSession.beginTransaction();
                         dataSession.update(comparisonField);
                         transaction.commit();
                       }
-                    } else {
+                    } else
+                    {
                       comparisonField = new ComparisonField();
                       comparisonField.setFieldName(fieldName);
                       comparisonField.setPriorityLabel(priorityLabel);
@@ -217,33 +236,85 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                     }
                   }
                 }
-                
-                Comparison comparison = new Comparison();
-                comparison.setComparisonField(comparisonField);
-                comparison.setTestMessage(testMessage);
-                comparison.setValueOriginal(readValue(req, PARAM_C_VALUE_ORIGINAL + position, 250));
-                comparison.setValueCompare(readValue(req, PARAM_C_VALUE_COMPARE + position, 250));
-                comparison.setComparisonStatus(readValue(req, PARAM_C_COMPARISON_STATUS + position, 250));
-                Transaction transaction = dataSession.beginTransaction();
-                dataSession.save(comparison);
-                transaction.commit();
+                if (comparisonField != null)
+                {
+                  Comparison comparison = new Comparison();
+                  comparison.setComparisonField(comparisonField);
+                  comparison.setTestMessage(testMessage);
+                  comparison.setValueOriginal(readValue(req, PARAM_C_VALUE_ORIGINAL + position, 250));
+                  comparison.setValueCompare(readValue(req, PARAM_C_VALUE_COMPARE + position, 250));
+                  comparison.setComparisonStatus(readValue(req, PARAM_C_COMPARISON_STATUS + position, 250));
+                  Transaction transaction = dataSession.beginTransaction();
+                  dataSession.save(comparison);
+                  transaction.commit();
+                }
                 position++;
                 fieldName = readValue(req, PARAM_C_FIELD_NAME + position, 250);
               }
             }
+
+            {
+              int position = 1;
+              String assertionResult = readValue(req, PARAM_A_ASSERTION_RESULT + position, 250);
+              while (!assertionResult.equals(""))
+              {
+                AssertionField assertionField = null;
+                {
+                  String assertionType = readValue(req, PARAM_A_ASSERTION_TYPE + position, 250);
+                  String assertionDescription = readValue(req, PARAM_A_ASSERTION_DESCRIPTION + position, 1024);
+                  if (!assertionType.equals("") && !assertionDescription.equals(""))
+                  {
+                    Query query = dataSession.createQuery("from AssertionField where assertionType = ? and assertionDescription = ?");
+                    query.setParameter(0, assertionType);
+                    query.setParameter(1, assertionDescription);
+                    List<AssertionField> assertionFieldList = query.list();
+                    if (assertionFieldList.size() > 0)
+                    {
+                      assertionField = assertionFieldList.get(0);
+                    } else
+                    {
+                      assertionField = new AssertionField();
+                      assertionField.setAssertionType(assertionType);
+                      assertionField.setAssertionDescription(assertionDescription);
+                      Transaction transaction = dataSession.beginTransaction();
+                      dataSession.save(assertionField);
+                      transaction.commit();
+                    }
+                  }
+                }
+
+                if (assertionField != null)
+                {
+                  String locationPath = readValue(req, PARAM_A_LOCATION_PATH + position, 250);
+                  Assertion assertion = new Assertion();
+                  assertion.setAssertionField(assertionField);
+                  assertion.setTestMessage(testMessage);
+                  assertion.setAssertionResult(assertionResult);
+                  assertion.setLocationPath(locationPath);
+                  Transaction transaction = dataSession.beginTransaction();
+                  dataSession.save(assertion);
+                  transaction.commit();
+                }
+                position++;
+                assertionResult = readValue(req, PARAM_A_ASSERTION_RESULT + position, 250);
+              }
+            }
           }
         }
-      } else if (!organizationName.equals("")) {
+      } else if (!organizationName.equals(""))
+      {
         TestParticipant testParticipant = null;
         {
           Query query = dataSession.createQuery("from TestParticipant where organizationName = ?");
           query.setParameter(0, organizationName);
           List<TestParticipant> testParticipantList = query.list();
-          if (testParticipantList.size() > 0) {
+          if (testParticipantList.size() > 0)
+          {
             testParticipant = testParticipantList.get(0);
           }
         }
-        if (testParticipant == null) {
+        if (testParticipant == null)
+        {
           testParticipant = new TestParticipant();
           testParticipant.setOrganizationName(organizationName);
         }
@@ -274,67 +345,82 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
       }
 
       out.println("ok");
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       e.printStackTrace();
       throw new ServletException(e);
-    }
-    finally
+    } finally
     {
       dataSession.close();
     }
     out.close();
   }
 
-  private boolean readValueBoolean(HttpServletRequest req, String field) {
+  private boolean readValueBoolean(HttpServletRequest req, String field)
+  {
     String value = req.getParameter(field);
-    if (value == null) {
+    if (value == null)
+    {
       return false;
     }
     return value.equals(VALUE_YES);
   }
 
-  private int readValueInt(HttpServletRequest req, String field) {
+  private int readValueInt(HttpServletRequest req, String field)
+  {
     String value = req.getParameter(field);
-    if (value == null) {
+    if (value == null)
+    {
       return 0;
     }
     return Integer.parseInt(value);
   }
 
-  private float readValueFloat(HttpServletRequest req, String field) {
+  private float readValueFloat(HttpServletRequest req, String field)
+  {
     String value = req.getParameter(field);
-    if (value == null) {
+    if (value == null)
+    {
       return 0;
     }
     return Float.parseFloat(value);
   }
 
-  private String readValue(HttpServletRequest req, String field) {
+  private String readValue(HttpServletRequest req, String field)
+  {
     String value = req.getParameter(field);
-    if (value == null) {
+    if (value == null)
+    {
       return "";
     }
     return value;
   }
 
-  private String readValue(HttpServletRequest req, String field, int length) {
+  private String readValue(HttpServletRequest req, String field, int length)
+  {
     String value = req.getParameter(field);
-    if (value == null) {
+    if (value == null)
+    {
       return "";
     }
-    if (value.length() > length) {
+    if (value.length() > length)
+    {
       return value.substring(0, length);
     }
     return value;
   }
 
-  private Date readValueDate(HttpServletRequest req, String field) {
+  private Date readValueDate(HttpServletRequest req, String field)
+  {
     String dateValue = req.getParameter(field);
     Date date = null;
-    if (dateValue != null && !dateValue.equals("")) {
-      try {
+    if (dateValue != null && !dateValue.equals(""))
+    {
+      try
+      {
         date = VALUE_DATE_FORMAT.parse(dateValue);
-      } catch (ParseException pe) {
+      } catch (ParseException pe)
+      {
         pe.printStackTrace();
       }
     }
@@ -342,7 +428,8 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
   }
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+  {
     HttpSession webSession = setup(req, resp);
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
     Session dataSession = userSession.getDataSession();
@@ -353,7 +440,8 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     out.println("<div class=\"leftColumn\">");
     out.println("<table width=\"100%\">");
     out.println("  <caption>Test Conducted</caption>");
-    for (String field : PARAMS_TC) {
+    for (String field : PARAMS_TC)
+    {
       out.println("  <tr>");
       out.println("    <td>" + field.substring(3) + "</td>");
       out.println("    <td><input type=\"text\" name=\"" + field + "\"/></td>");
@@ -363,7 +451,8 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     out.println("<br/>");
     out.println("<table width=\"100%\">");
     out.println("  <caption>Test Section</caption>");
-    for (String field : PARAMS_TS) {
+    for (String field : PARAMS_TS)
+    {
       out.println("  <tr>");
       out.println("    <td>" + field.substring(3) + "</td>");
       out.println("    <td><input type=\"text\" name=\"" + field + "\"/></td>");
@@ -375,7 +464,8 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     out.println("<div class=\"centerColumn\">");
     out.println("<table width=\"100%\">");
     out.println("  <caption>Test Message</caption>");
-    for (String field : PARAMS_TM) {
+    for (String field : PARAMS_TM)
+    {
       out.println("  <tr>");
       out.println("    <td>" + field.substring(3) + "</td>");
       out.println("    <td><input type=\"text\" name=\"" + field + "\"/></td>");
@@ -387,7 +477,8 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     out.println("<div class=\"rightColumn\">");
     out.println("<table width=\"100%\">");
     out.println("  <caption>Test Profile</caption>");
-    for (String field : PARAMS_TP) {
+    for (String field : PARAMS_TP)
+    {
       out.println("  <tr>");
       out.println("    <td>" + field.substring(3) + "</td>");
       out.println("    <td><input type=\"text\" name=\"" + field + "\"/></td>");

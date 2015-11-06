@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="Assertion" table="assertion">
+    <id name="assertionId" column="assertion_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="assertionField" column="assertion_field_id" class="AssertionField"/>
+    <many-to-one name="testMessage" column="test_message_id" class="TestMessage"/>
+    <property name="assertionResult" column="assertion_result" type="string"/>
+    <property name="locationPath" column="location_path" type="string"/>
+  </class>
+</hibernate-mapping>
