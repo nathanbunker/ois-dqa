@@ -159,7 +159,7 @@ public class HomeServlet extends BaseServlet
               if (applicationUser.getApplication().getApplicationId() == applicationId)
               {
                 userSession.getUser().setApplicationUser(applicationUser);
-                if (applicationUser.getApplication().isApplicationDqais())
+                if (applicationUser.getApplication().isApplicationAart())
                 {
                   sendToApplication(req, resp, applicationUser.getApplication());
                   return;

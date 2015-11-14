@@ -25,6 +25,7 @@ import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
+import org.openimmunizationsoftware.dqa.tr.profile.ProfileManager;
 
 public class AdminServlet extends BaseServlet
 {
@@ -46,6 +47,7 @@ public class AdminServlet extends BaseServlet
   public static final String ACTION_RELEASE_VERSION = "Release Version";
   public static final String ACTION_DELETE_VERSION = "Delete Version";
   public static final String ACTION_UPDATE_ISSUE_COUNTS = "Update Issue Counts";
+  public static final String ACTION_RECTIFY_PROFILE_FIELDS = "Rectify Profile Fields";
 
   private static ReleaseNewVersionThread releaseNewVersionThread = null;
   private static DeleteProposedVersionThread deleteProposedVersionThread = null;
@@ -92,7 +94,9 @@ public class AdminServlet extends BaseServlet
           String data = req.getParameter(PARAM_CDC_TEXT);
           loadResultList = LoadCdcDataLogic.loadCdcData(codeTableInstance, userSession.getUser(), data, dataSession);
         }
-
+      } else if (action.equals(ACTION_RECTIFY_PROFILE_FIELDS))
+      {
+        ProfileManager.rectifyProfileFields(dataSession);
       }
     }
 
@@ -137,6 +141,7 @@ public class AdminServlet extends BaseServlet
       out.println("</table>");
     }
     // out.println("<p><a href=\"setup\">Initial DQAcm Setup</a></p>");
+    out.println("<p><a href=\"admin?action=" + ACTION_RECTIFY_PROFILE_FIELDS + "\">Rectify Profile Field</a></p>");
     out.println("</div>");
 
     out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");

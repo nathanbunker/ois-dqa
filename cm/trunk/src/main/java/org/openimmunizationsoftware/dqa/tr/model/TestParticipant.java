@@ -30,6 +30,28 @@ public class TestParticipant implements Serializable {
   private String accessPasscode = "";
   private Map<String, String> filterValueMap = null;
   private String reportRunStatus = "";
+  private TestParticipant testParticipant = null;
+  private ProfileUsage profileUsage = null;
+
+  public ProfileUsage getProfileUsage()
+  {
+    return profileUsage;
+  }
+
+  public void setProfileUsage(ProfileUsage profileUsage)
+  {
+    this.profileUsage = profileUsage;
+  }
+
+  public TestParticipant getTestParticipant()
+  {
+    return testParticipant;
+  }
+
+  public void setTestParticipant(TestParticipant testParticipant)
+  {
+    this.testParticipant = testParticipant;
+  }
 
   public String getReportRunStatus() {
     return reportRunStatus;

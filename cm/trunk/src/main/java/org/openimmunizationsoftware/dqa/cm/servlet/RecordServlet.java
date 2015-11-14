@@ -1,7 +1,9 @@
 package org.openimmunizationsoftware.dqa.cm.servlet;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -21,13 +23,18 @@ import org.openimmunizationsoftware.dqa.tr.model.Assertion;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
 import org.openimmunizationsoftware.dqa.tr.model.ComparisonField;
+import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
+import org.openimmunizationsoftware.dqa.tr.model.Transform;
+import org.openimmunizationsoftware.dqa.tr.model.TransformField;
 
 public class RecordServlet extends BaseServlet implements RecordServletInterface
 {
+
+  private String[] expectedStarts = { "MSH-3=", "MSH-4=", "MSH-5=", "MSH-6=", "MSH-22=", "RXA-11.4=", "RXA-11.4*=" };
 
   public RecordServlet() {
     super("Home");
@@ -100,9 +107,77 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           testConducted.setPerUpdateMax(readValueInt(req, PARAM_TC_PER_UPDATE_MAX));
           testConducted.setPerUpdateStd(readValueFloat(req, PARAM_TC_PER_UPDATE_STD));
           testConducted.setLatestTest(testConducted.isCompleteTest());
-          Transaction transaction = dataSession.beginTransaction();
-          dataSession.saveOrUpdate(testConducted);
-          transaction.commit();
+          {
+            Transaction transaction = dataSession.beginTransaction();
+            dataSession.saveOrUpdate(testConducted);
+            transaction.commit();
+          }
+
+          {
+            int i = 1;
+            String transforms = readValue(req, PARAM_TC_TRANSFORMS + i);
+            while (transforms != null)
+            {
+              if (!transforms.equals(""))
+              {
+                BufferedReader customTransformsIn = new BufferedReader(new StringReader(transforms));
+                String transformText = "";
+                String[] expectedStarts = { "MSH-3=", "MSH-4=", "MSH-5=", "MSH-6=", "MSH-22=", "RXA-11.4=", "RXA-11.4*=" };
+                String scenarioName = customTransformsIn.readLine();
+                if (scenarioName != null)
+                {
+                  while ((transformText = customTransformsIn.readLine()) != null)
+                  {
+                    if (transformText.length() > 0)
+                    {
+                      TransformField transformField = null;
+                      {
+                        Query query = dataSession.createQuery("from TransformField where transformText = ?");
+                        query.setParameter(0, transformText);
+                        List<TransformField> transformFieldLIst = query.list();
+                        if (transformFieldLIst.size() == 0)
+                        {
+                          boolean transformExpected = false;
+                          for (String expectedStart : expectedStarts)
+                          {
+                            if (transformText.startsWith(expectedStart))
+                            {
+                              transformExpected = true;
+                              break;
+                            }
+                          }
+                          transformField = new TransformField();
+                          transformField.setTransformText(transformText);
+                          transformField.setTransformExpected(transformExpected);
+                          Transaction transaction = dataSession.beginTransaction();
+                          dataSession.save(transformField);
+                          transaction.commit();
+                        } else
+                        {
+                          transformField = transformFieldLIst.get(0);
+                        }
+                      }
+                      Query query = dataSession.createQuery("from Transform where transformField = ?");
+                      query.setParameter(0, transformField);
+                      List<Transform> transformList = query.list();
+                      if (transformList.size() == 0)
+                      {
+                        Transform transform = new Transform();
+                        transform.setTransformField(transformField);
+                        transform.setTestConducted(testConducted);
+                        transform.setScenarioName(scenarioName);
+                        Transaction transaction = dataSession.beginTransaction();
+                        dataSession.save(transform);
+                        transaction.commit();
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            i++;
+            transforms = readValue(req, PARAM_TC_TRANSFORMS + i);
+          }
 
           if (testConducted.isCompleteTest())
           {
@@ -115,7 +190,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
               if (latest != testConducted)
               {
                 latest.setLatestTest(false);
-                transaction = dataSession.beginTransaction();
+                Transaction transaction = dataSession.beginTransaction();
                 dataSession.saveOrUpdate(testConducted);
                 transaction.commit();
               }
@@ -339,6 +414,19 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
         testParticipant.setQuerySupport(readValue(req, PARAM_TPAR_QUERY_SUPPORT, 250));
         testParticipant.setNistStatus(readValue(req, PARAM_TPAR_NIST_STATUS, 250));
         testParticipant.setAccessPasscode(readValue(req, PARAM_TPAR_ACCESS_PASSCODE, 250));
+        if (!testParticipant.getGuideName().equals(""))
+        {
+          Query query = dataSession.createQuery("from ProfileUsage");
+          List<ProfileUsage> profileUsageList = query.list();
+          for (ProfileUsage profileUsage : profileUsageList)
+          {
+            if (profileUsage.getLabel().equalsIgnoreCase(testParticipant.toString()))
+            {
+              testParticipant.setProfileUsage(profileUsage);
+              break;
+            }
+          }
+        }
         Transaction transaction = dataSession.beginTransaction();
         dataSession.saveOrUpdate(testParticipant);
         transaction.commit();

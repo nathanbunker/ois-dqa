@@ -27,5 +27,6 @@
     <property name="querySupport" column="query_support" type="string"/>
     <property name="nistStatus" column="nist_status" type="string"/>
     <property name="accessPasscode" column="access_passcode" type="string"/>
+    <many-to-one name="profileUsage" column="profile_usage_id" class="ProfileUsage"/>
   </class>
 </hibernate-mapping>

@@ -7,7 +7,8 @@
     </id>
     <many-to-one name="testSection" column="test_section_id" class="TestSection"/>
     <property name="testProfileStatus" column="test_profile_status" type="string"/>
-    <property name="profileFieldPos" column="profile_field_pos" type="integer"/>
+    <many-to-one name="profileField" column="profile_field_id" class="ProfileField"/>
+    <many-to-one name="profileUsageValue" column="profile_usage_value_id" class="ProfileUsageValue"/>
     <property name="usageExpected" column="usage_expected" type="string"/>
     <property name="usageDetected" column="usage_detected" type="string"/>
     <property name="acceptExpected" column="accept_expected" type="string"/>

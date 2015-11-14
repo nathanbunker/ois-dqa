@@ -4,18 +4,14 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.openimmunizationsoftware.dqa.cm.CentralControl;
-import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.model.CodeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
+import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 
 public class UserSession implements Serializable
 {
@@ -30,7 +26,16 @@ public class UserSession implements Serializable
   private transient PrintWriter out = null;
   private transient String messageError = null;
   private transient String messageConfirmation = null;
+  private transient ProfileUsage profileUsageSelected = null;
   
+  public ProfileUsage getProfileUsageSelected()
+  {
+    return profileUsageSelected;
+  }
+  public void setProfileUsageSelected(ProfileUsage profileUsageSelected)
+  {
+    this.profileUsageSelected = profileUsageSelected;
+  }
   public void setOut(PrintWriter out)
   {
     this.out = out;

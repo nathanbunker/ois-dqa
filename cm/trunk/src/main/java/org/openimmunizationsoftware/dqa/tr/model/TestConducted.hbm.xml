@@ -11,6 +11,7 @@
     <property name="connectionAckType" column="connection_ack_type" type="string"/>
     <property name="connectionConfig" column="connection_config" type="string"/>
     <property name="latestTest" column="latest_test" type="yes_no"/>
+    <property name="completeTest" column="complete_test" type="yes_no"/>
     <property name="queryType" column="query_type" type="string"/>
     <property name="queryEnabled" column="query_enabled" type="string"/>
     <property name="queryPause" column="query_pause" type="string"/>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="ProfileUsage" table="profile_usage">
+    <id name="profileUsageId" column="profile_usage_id">
+      <generator class="native"/>
+    </id>
+    <property name="categoryString" column="category" type="string"/>
+    <property name="label" column="label" type="string"/>
+    <property name="version" column="version" type="string"/>
+  </class>
+</hibernate-mapping>
