@@ -48,7 +48,7 @@ public abstract class BaseServlet extends HttpServlet
 
   protected void sendToApplication(HttpServletRequest req, HttpServletResponse resp, Application application) throws ServletException, IOException
   {
-    if (application.isApplicationDqais())
+    if (application.isApplicationAart())
     {
       RequestDispatcher dispatcher = req.getRequestDispatcher("testReport?" + TestReportServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP);
       dispatcher.forward(req, resp);
@@ -151,7 +151,7 @@ public abstract class BaseServlet extends HttpServlet
         out.println("     |");
         out.println("     <a href=\"admin\" class=\"menuLink\">admin</a>");
       }
-    } else if (application.isApplicationDqais())
+    } else if (application.isApplicationAart())
     {
       out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_HOME + "\" class=\"menuLink\">home</a>");
       TestConducted testConducted = (TestConducted) webSession.getAttribute(ATTRIBUTE_TEST_CONDUCTED);
@@ -172,6 +172,8 @@ public abstract class BaseServlet extends HttpServlet
               + "\" class=\"menuLink\">fields</a>");
         }
       }
+      out.println("     |");
+      out.println("     <a href=\"profile\" class=\"menuLink\">profile</a>");
     } else
     {
       out.println("     <a href=\"home\" class=\"menuLink\">home</a>");

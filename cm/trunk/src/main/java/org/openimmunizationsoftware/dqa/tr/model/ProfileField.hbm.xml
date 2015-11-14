@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="ProfileField" table="profile_field">
+    <id name="profileFieldId" column="profile_field_id">
+      <generator class="native"/>
+    </id>
+    <property name="pos" column="pos" type="integer"/>
+    <many-to-one name="parent" column="profile_field_id_parent" class="ProfileField"/>
+    <property name="fieldName" column="field_name" type="string"/>
+    <property name="profileFieldType" column="profile_field_type" type="string"/>
+    <property name="segmentName" column="segment_name" type="string"/>
+    <property name="description" column="description" type="string"/>
+    <property name="codeValue" column="code_value" type="string"/>
+    <property name="codeLabel" column="code_label" type="string"/>
+    <property name="transformsPresent" column="transforms_present" type="string"/>
+    <property name="transformsAbsent" column="transforms_absent" type="string"/>
+    <property name="posInSegment" column="pos_in_segment" type="integer"/>
+    <property name="posInField" column="pos_in_field" type="integer"/>
+    <property name="posInSubField" column="pos_in_sub_field" type="integer"/>
+    <property name="specialName" column="special_name" type="string"/>
+    <property name="specialSection" column="special_section" type="string"/>
+    <property name="dataType" column="data_type" type="string"/>
+    <property name="tableName" column="table_name" type="string"/>
+    <property name="dataTypeDef" column="date_type_def" type="string"/>
+    <property name="dataTypePos" column="data_type_pos" type="integer"/>
+    <property name="testUsageString" column="test_usage" type="string"/>
+    <property name="baseUsage" column="base_usage" type="string"/>
+    <property name="conditionalPredicate" column="conditional_predicate" type="string"/>
+    <property name="length" column="length" type="string"/>
+    <property name="value" column="value_string" type="string"/>
+    <property name="comments" column="comments" type="string"/>
+  </class>
+</hibernate-mapping>

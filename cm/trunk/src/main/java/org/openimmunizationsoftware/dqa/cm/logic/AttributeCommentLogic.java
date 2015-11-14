@@ -10,6 +10,7 @@ import java.util.Map;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.immunizationsoftware.dqa.tester.manager.CompareManager;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeComment;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.User;

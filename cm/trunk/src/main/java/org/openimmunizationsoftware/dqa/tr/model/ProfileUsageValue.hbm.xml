@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="ProfileUsageValue" table="profile_usage_value">
+    <id name="profileUsageValueId" column="profile_usage_value_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="profileField" column="profile_field_id" class="ProfileField"/>
+    <many-to-one name="profileUsage" column="profile_usage_id" class="ProfileUsage"/>
+    <property name="fieldName" column="field_name" type="string"/>
+    <property name="usageString" column="test_usage" type="string"/>
+    <property name="usageDetectedString" column="value_string" type="string"/>
+    <property name="comments" column="comments" type="string"/>
+    <property name="notes" column="notes" type="string"/>
+    <property name="enforcementString" column="enforcement" type="string"/>
+    <property name="implementationString" column="implementation" type="string"/>
+    <property name="messageAcceptStatusString" column="message_accept_status" type="string"/>
+    <property name="messageAcceptStatusDetectedString" column="message_accept_status_detected" type="string"/>
+    <property name="messageAcceptStatusDebug" column="message_accept_status_debug" type="string"/>
+  </class>
+</hibernate-mapping>

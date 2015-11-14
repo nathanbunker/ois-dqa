@@ -6,8 +6,8 @@ public class TestProfile implements Serializable {
   private int testProfileId = 0;
   private TestSection testSection = null;
   private String testProfileStatus = "";
-  private int profileFieldPos = 0;
-  private String profileFieldName = "";
+  private ProfileField profileField = null;
+  private ProfileUsageValue profileUsageValue = null;
   private String usageExpected = "";
   private String usageDetected = "";
   private String acceptExpected = "";
@@ -16,6 +16,26 @@ public class TestProfile implements Serializable {
   private TestMessage testMessageAbsent = null;
   private String messageAcceptStatusDebug = "";
   private String compatibilityConformance = "";
+
+  public ProfileField getProfileField()
+  {
+    return profileField;
+  }
+
+  public void setProfileField(ProfileField profileField)
+  {
+    this.profileField = profileField;
+  }
+
+  public ProfileUsageValue getProfileUsageValue()
+  {
+    return profileUsageValue;
+  }
+
+  public void setProfileUsageValue(ProfileUsageValue profileUsageValue)
+  {
+    this.profileUsageValue = profileUsageValue;
+  }
 
   public int getTestProfileId() {
     return testProfileId;
@@ -39,22 +59,6 @@ public class TestProfile implements Serializable {
 
   public void setTestProfileStatus(String testProfileStatus) {
     this.testProfileStatus = testProfileStatus;
-  }
-
-  public int getProfileFieldPos() {
-    return profileFieldPos;
-  }
-
-  public void setProfileFieldPos(int profileFieldPos) {
-    this.profileFieldPos = profileFieldPos;
-  }
-
-  public String getProfileFieldName() {
-    return profileFieldName;
-  }
-
-  public void setProfileFieldName(String profileFieldName) {
-    this.profileFieldName = profileFieldName;
   }
 
   public String getUsageExpected() {

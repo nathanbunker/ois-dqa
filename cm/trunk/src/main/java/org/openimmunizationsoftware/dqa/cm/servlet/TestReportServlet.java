@@ -124,7 +124,7 @@ public class TestReportServlet extends HomeServlet
     Session dataSession = userSession.getDataSession();
     PrintWriter out = userSession.getOut();
     if (userSession.getUser() == null || userSession.getUser().getApplicationUser() == null
-        || !userSession.getUser().getApplicationUser().getApplication().isApplicationDqais())
+        || !userSession.getUser().getApplicationUser().getApplication().isApplicationAart())
     {
       sendToHome(req, resp);
       return;

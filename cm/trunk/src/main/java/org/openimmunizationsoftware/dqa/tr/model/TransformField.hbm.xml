@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TransformField" table="transformField">
+    <id name="transformFieldId" column="transform_field_id">
+      <generator class="native"/>
+    </id>
+    <property name="transformText" column="transform_text" type="string"/>
+    <property name="transformExpected" column="transform_expected" type="yes_no"/>
+  </class>
+</hibernate-mapping>

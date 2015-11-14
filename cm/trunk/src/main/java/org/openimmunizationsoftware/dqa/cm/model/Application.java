@@ -13,7 +13,7 @@ public class Application {
 	  return applicationId == APPLICATION_DQACM;
 	}
 
-    public boolean isApplicationDqais()
+    public boolean isApplicationAart()
     {
       return applicationId == APPLICATION_DQAIS;
     }
