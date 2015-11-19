@@ -502,15 +502,8 @@ public class ProfileServlet extends HomeServlet
             String usage = req.getParameter("usage" + i);
             if (usage != null && !usage.equals(""))
             {
-              ProfileUsageValue profileUsageValue;
-              Query query = dataSession.createQuery("from ProfileUsageValue where profileField = ? and profileUsage = ?");
-              query.setParameter(0, profileField);
-              query.setParameter(1, profileUsageSelected);
-              List<ProfileUsageValue> profileUsageValueList = query.list();
-              if (profileUsageValueList.size() > 0)
-              {
-                profileUsageValue = profileUsageValueList.get(0);
-              } else
+              ProfileUsageValue profileUsageValue = ProfileManager.getProfileUsageValue(dataSession, profileUsageSelected, profileField);
+              if (profileUsageValue == null)
               {
                 profileUsageValue = new ProfileUsageValue();
                 profileUsageValue.setProfileField(profileField);
@@ -752,6 +745,8 @@ public class ProfileServlet extends HomeServlet
     }
 
   }
+
+
 
   private void printEditTable(PrintWriter out, Session dataSession, ProfileUsageValue profileUsageValueSelected, ProfileField profileFieldCopyFrom)
       throws UnsupportedEncodingException

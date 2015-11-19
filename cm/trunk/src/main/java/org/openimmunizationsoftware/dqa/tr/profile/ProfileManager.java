@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.immunizationsoftware.dqa.transform.TestCaseMessage;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileField;
+import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsageValue;
 
 public class ProfileManager
@@ -205,10 +206,10 @@ public class ProfileManager
       profileFieldList = query.list();
       if (profileFieldList.size() > 1)
       {
-        System.out.println("--> Found problem: This field name is used more than once: " + profileUsageValue.getFieldName());
+        System.out.println("Found problem: This field name is used more than once: " + profileUsageValue.getFieldName());
       } else if (profileFieldList.size() == 0)
       {
-        System.out.println("--> Found problem: This field name not found: " + profileUsageValue.getFieldName());
+        System.out.println("Found problem: This field name not found: " + profileUsageValue.getFieldName());
       } else
       {
         Transaction transaction = dataSession.beginTransaction();
@@ -217,7 +218,6 @@ public class ProfileManager
         transaction.commit();
       }
     }
-    System.out.println("--> Complete ");
 
   }
 
@@ -364,41 +364,56 @@ public class ProfileManager
   public static String determineMessageAcceptStatus(ProfileUsageValue profileUsageValue, Session dataSession)
   {
     StringBuilder debug = new StringBuilder();
-    determineMessageAcceptStatus(profileUsageValue, debug, dataSession);
+    MessageAcceptStatus mas = determineMessageAcceptStatus(profileUsageValue.getProfileField(), profileUsageValue.getProfileUsage(),
+        profileUsageValue, debug, dataSession);
+    profileUsageValue.setMessageAcceptStatus(mas);
+    profileUsageValue.setMessageAcceptStatusDebug(debug.toString());
     return debug.toString();
   }
 
-  public static MessageAcceptStatus determineMessageAcceptStatus(ProfileUsageValue profileUsageValue, StringBuilder debug, Session dataSession)
+  public static MessageAcceptStatus determineMessageAcceptStatus(ProfileField profileField, ProfileUsage profileUsage,
+      ProfileUsageValue profileUsageValue, StringBuilder debug, Session dataSession)
   {
     MessageAcceptStatus masHigher;
-    if (profileUsageValue.getProfileField().getParent() == null)
+    if (profileField.getParent() == null)
     {
       masHigher = MessageAcceptStatus.ONLY_IF_PRESENT;
     } else
     {
       Query query = dataSession.createQuery("from ProfileUsageValue where profileField = ? and profileUsage = ?");
-      query.setParameter(0, profileUsageValue.getProfileField().getParent());
-      query.setParameter(1, profileUsageValue.getProfileUsage());
+      query.setParameter(0, profileField.getParent());
+      query.setParameter(1, profileUsage);
       List<ProfileUsageValue> profileUsageValueList = query.list();
       if (profileUsageValueList.size() == 0)
       {
-        masHigher = MessageAcceptStatus.IF_PRESENT_OR_ABSENT;
+        masHigher = determineMessageAcceptStatus(profileField.getParent(), profileUsage, null, debug, dataSession);
       } else
       {
-        masHigher = determineMessageAcceptStatus(profileUsageValueList.get(0), debug, dataSession);
+        masHigher = determineMessageAcceptStatus(profileField.getParent(), profileUsage, profileUsageValueList.get(0), debug, dataSession);
       }
     }
 
+    MessageAcceptStatus mas = null;
+    Usage usage = Usage.NOT_DEFINED;
+    if (profileUsageValue != null)
+    {
+      usage = profileUsageValue.getUsage();
+    }
+    mas = determineMas(debug, masHigher, profileField, usage);
+    return mas;
+  }
+
+  public static MessageAcceptStatus determineMas(StringBuilder debug, MessageAcceptStatus masHigher, ProfileField profileField, Usage usage)
+  {
+    MessageAcceptStatus mas;
     if (debug != null)
     {
-      debug.append("Determining accept status of concept " + profileUsageValue.getProfileField().getFieldName() + "\n");
+      debug.append("Determining accept status of concept " + profileField.getFieldName() + "\n");
     }
-    MessageAcceptStatus mas = null;
-    Usage usage = profileUsageValue.getUsage();
     debug.append(" + Usage = " + usage + " \n");
     if (usage == Usage.NOT_DEFINED)
     {
-      usage = profileUsageValue.getProfileField().getTestUsage();
+      usage = profileField.getTestUsage();
       if (debug != null)
       {
         debug.append(" + Usage is not defined, taking usage from base standard. Usage = " + usage + " \n");
@@ -807,6 +822,20 @@ public class ProfileManager
     default:
       return CompatibilityInteroperability.UNABLE_TO_DETERMINE;
     }
+  }
+
+  public static ProfileUsageValue getProfileUsageValue(Session dataSession, ProfileUsage profileUsageSelected, ProfileField profileField)
+  {
+    ProfileUsageValue profileUsageValue = null;
+    Query query = dataSession.createQuery("from ProfileUsageValue where profileField = ? and profileUsage = ?");
+    query.setParameter(0, profileField);
+    query.setParameter(1, profileUsageSelected);
+    List<ProfileUsageValue> profileUsageValueList = query.list();
+    if (profileUsageValueList.size() > 0)
+    {
+      profileUsageValue = profileUsageValueList.get(0);
+    }
+    return profileUsageValue;
   }
 
 }
