@@ -23,13 +23,19 @@ import org.openimmunizationsoftware.dqa.tr.model.Assertion;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
 import org.openimmunizationsoftware.dqa.tr.model.ComparisonField;
+import org.openimmunizationsoftware.dqa.tr.model.ProfileField;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
+import org.openimmunizationsoftware.dqa.tr.model.ProfileUsageValue;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
+import org.openimmunizationsoftware.dqa.tr.model.TestProfile;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 import org.openimmunizationsoftware.dqa.tr.model.Transform;
 import org.openimmunizationsoftware.dqa.tr.model.TransformField;
+import org.openimmunizationsoftware.dqa.tr.profile.MessageAcceptStatus;
+import org.openimmunizationsoftware.dqa.tr.profile.ProfileManager;
+import org.openimmunizationsoftware.dqa.tr.profile.Usage;
 
 public class RecordServlet extends BaseServlet implements RecordServletInterface
 {
@@ -116,71 +122,71 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           {
             int i = 1;
             String transforms = readValue(req, PARAM_TC_TRANSFORMS + i);
-            while (transforms != null)
+            while (!transforms.equals(""))
             {
-              if (!transforms.equals(""))
+              
+              BufferedReader customTransformsIn = new BufferedReader(new StringReader(transforms));
+              String transformText = "";
+              String[] expectedStarts = { "MSH-3=", "MSH-4=", "MSH-5=", "MSH-6=", "MSH-22=", "RXA-11.4=", "RXA-11.4*=" };
+              String scenarioName = customTransformsIn.readLine();
+              if (scenarioName != null)
               {
-                BufferedReader customTransformsIn = new BufferedReader(new StringReader(transforms));
-                String transformText = "";
-                String[] expectedStarts = { "MSH-3=", "MSH-4=", "MSH-5=", "MSH-6=", "MSH-22=", "RXA-11.4=", "RXA-11.4*=" };
-                String scenarioName = customTransformsIn.readLine();
-                if (scenarioName != null)
+                while ((transformText = customTransformsIn.readLine()) != null)
                 {
-                  while ((transformText = customTransformsIn.readLine()) != null)
+                  if (transformText.length() > 0)
                   {
-                    if (transformText.length() > 0)
+                    TransformField transformField = null;
                     {
-                      TransformField transformField = null;
+                      Query query = dataSession.createQuery("from TransformField where transformText = ?");
+                      query.setParameter(0, transformText);
+                      List<TransformField> transformFieldList = query.list();
+                      if (transformFieldList.size() == 0)
                       {
-                        Query query = dataSession.createQuery("from TransformField where transformText = ?");
-                        query.setParameter(0, transformText);
-                        List<TransformField> transformFieldLIst = query.list();
-                        if (transformFieldLIst.size() == 0)
+                        boolean transformExpected = false;
+                        for (String expectedStart : expectedStarts)
                         {
-                          boolean transformExpected = false;
-                          for (String expectedStart : expectedStarts)
+                          if (transformText.startsWith(expectedStart))
                           {
-                            if (transformText.startsWith(expectedStart))
-                            {
-                              transformExpected = true;
-                              break;
-                            }
+                            transformExpected = true;
+                            break;
                           }
-                          transformField = new TransformField();
-                          transformField.setTransformText(transformText);
-                          transformField.setTransformExpected(transformExpected);
-                          Transaction transaction = dataSession.beginTransaction();
-                          dataSession.save(transformField);
-                          transaction.commit();
-                        } else
-                        {
-                          transformField = transformFieldLIst.get(0);
                         }
-                      }
-                      Query query = dataSession.createQuery("from Transform where transformField = ?");
-                      query.setParameter(0, transformField);
-                      List<Transform> transformList = query.list();
-                      if (transformList.size() == 0)
-                      {
-                        Transform transform = new Transform();
-                        transform.setTransformField(transformField);
-                        transform.setTestConducted(testConducted);
-                        transform.setScenarioName(scenarioName);
+                        transformField = new TransformField();
+                        transformField.setTransformText(transformText);
+                        transformField.setTransformExpected(transformExpected);
                         Transaction transaction = dataSession.beginTransaction();
-                        dataSession.save(transform);
+                        dataSession.save(transformField);
                         transaction.commit();
+                      } else
+                      {
+                        transformField = transformFieldList.get(0);
                       }
+                    }
+                    Query query = dataSession.createQuery("from Transform where transformField = ? and testConducted = ? ");
+                    query.setParameter(0, transformField);
+                    query.setParameter(1, testConducted);
+                    List<Transform> transformList = query.list();
+                    if (transformList.size() == 0)
+                    {
+                      Transform transform = new Transform();
+                      transform.setTransformField(transformField);
+                      transform.setTestConducted(testConducted);
+                      transform.setScenarioName(scenarioName);
+                      Transaction transaction = dataSession.beginTransaction();
+                      dataSession.save(transform);
+                      transaction.commit();
                     }
                   }
                 }
               }
+              i++;
+              transforms = readValue(req, PARAM_TC_TRANSFORMS + i);
             }
-            i++;
-            transforms = readValue(req, PARAM_TC_TRANSFORMS + i);
           }
 
           if (testConducted.isCompleteTest())
           {
+
             Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and latestTest = ?");
             query.setParameter(0, testConducted.getConnectionLabel());
             query.setParameter(1, true);
@@ -200,6 +206,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
         String testSectionType = readValue(req, PARAM_TS_TEST_SECTION_TYPE, 250);
         if (!testSectionType.equals(""))
         {
+
           TestSection testSection = null;
           {
             {
@@ -233,161 +240,317 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
             dataSession.saveOrUpdate(testSection);
             transaction.commit();
           }
-          String testType = readValue(req, PARAM_TM_TEST_TYPE, 250);
-          if (!testType.equals(""))
+          int testPosition = readValueInt(req, PARAM_TM_TEST_POSITION);
+          TestMessage testMessage = null;
+          if (testPosition > 0)
           {
-            TestMessage testMessage = new TestMessage();
-            testMessage.setTestSection(testSection);
-            testMessage.setTestPosition(readValueInt(req, PARAM_TM_TEST_POSITION));
-            testMessage.setTestType(testType);
-            testMessage.setTestCaseSet(readValue(req, PARAM_TM_TEST_CASE_SET, 250));
-            testMessage.setTestCaseNumber(readValue(req, PARAM_TM_TEST_CASE_NUMBER, 250));
-            testMessage.setTestCaseCategory(readValue(req, PARAM_TM_TEST_CASE_CATEGORY, 250));
-            testMessage.setTestCaseDescription(readValue(req, PARAM_TM_TEST_CASE_DESCRIPTION, 250));
-            testMessage.setTestCaseAssertResult(readValue(req, PARAM_TM_TEST_CASE_ASSERT_RESULT, 250));
-            testMessage.setPrepPatientType(readValue(req, PARAM_TM_PREP_PATIENT_TYPE, 250));
-            testMessage.setPrepTransformsQuick(readValue(req, PARAM_TM_PREP_TRANSFORMS_QUICK));
-            testMessage.setPrepTransformsCustom(readValue(req, PARAM_TM_PREP_TRANSFORMS_CUSTOM));
-            testMessage.setPrepTransformsAddition(readValue(req, PARAM_TM_PREP_TRANSFORMS_ADDITION));
-            testMessage.setPrepTransformsCauseIssue(readValue(req, PARAM_TM_PREP_TRANSFORMS_CAUSE_ISSUE));
-            testMessage.setPrepCauseIssueNames(readValue(req, PARAM_TM_PREP_CAUSE_ISSUE_NAMES));
-            testMessage.setPrepHasIssue(readValue(req, PARAM_TM_PREP_HAS_ISSUE, 1));
-            testMessage.setPrepMajorChagnesMade(readValue(req, PARAM_TM_PREP_MAJOR_CHANGES_MADE, 1));
-            testMessage.setPrepNotExpectedToConform(readValue(req, PARAM_TM_PREP_NOT_EXPECTED_TO_CONFORM, 1));
-            testMessage.setPrepMessageAcceptStatusDebug(readValue(req, PARAM_TM_PREP_MESSAGE_ACCEPT_STATUS_DEBUG, 250));
-            testMessage.setPrepScenarioName(readValue(req, PARAM_TM_PREP_SCENARIO_NAME, 250));
-            testMessage.setPrepMessageDerivedFrom(readValue(req, PARAM_TM_PREP_MESSAGE_DERIVED_FROM));
-            testMessage.setPrepMessageOriginal(readValue(req, PARAM_TM_PREP_MESSAGE_ORIGINAL));
-            testMessage.setPrepMessageActual(readValue(req, PARAM_TM_PREP_MESSAGE_ACTUAL));
-            testMessage.setResultMessageActual(readValue(req, PARAM_TM_RESULT_MESSAGE_ACTUAL));
-            testMessage.setResultStatus(readValue(req, PARAM_TM_RESULT_STATUS, 250));
-            testMessage.setResultAccepted(readValueBoolean(req, PARAM_TM_RESULT_ACCEPTED));
-            testMessage.setResultExceptionText(readValue(req, PARAM_TM_RESULT_EXECEPTION_TEXT));
-            testMessage.setResultAcceptedMessage(readValue(req, PARAM_TM_RESULT_ACCEPTED_MESSAGE, 250));
-            testMessage.setResultResponseType(readValue(req, PARAM_TM_RESULT_RESPONSE_TYPE, 250));
-            testMessage.setResultAckType(readValue(req, PARAM_TM_RESULT_ACK_TYPE, 250));
-            testMessage.setForecastTestPanelCaseId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_CASE_ID));
-            testMessage.setForecastTestPanelId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_ID));
-
             {
-              Transaction transaction = dataSession.beginTransaction();
-              dataSession.save(testMessage);
-              transaction.commit();
-            }
-
-            {
-              int position = 1;
-              String fieldName = readValue(req, PARAM_C_FIELD_NAME + position, 250);
-              while (!fieldName.equals(""))
+              Query query = dataSession.createQuery("from TestMessage where testSection = ? and testPosition = ?");
+              query.setParameter(0, testSection);
+              query.setParameter(1, testPosition);
+              List<TestMessage> testMessageList = query.list();
+              if (testMessageList.size() > 0)
               {
-                ComparisonField comparisonField = null;
-                {
-                  String priorityLabel = readValue(req, PARAM_C_PRIORITY_LABEL + position, 250);
-                  if (!priorityLabel.equals(""))
-                  {
-                    Query query = dataSession.createQuery("from ComparisonField where fieldName = ? and priorityLabel = ?");
-                    query.setParameter(0, fieldName);
-                    query.setParameter(1, priorityLabel);
-                    List<ComparisonField> comparisonFieldList = query.list();
-                    if (comparisonFieldList.size() > 0)
-                    {
-                      comparisonField = comparisonFieldList.get(0);
-                      String fieldLabel = readValue(req, PARAM_C_FIELD_LABEL + position, 250);
-                      if (!fieldLabel.equals(comparisonField.getFieldLabel()))
-                      {
-                        comparisonField.setFieldLabel(fieldLabel);
-                        Transaction transaction = dataSession.beginTransaction();
-                        dataSession.update(comparisonField);
-                        transaction.commit();
-                      }
-                    } else
-                    {
-                      comparisonField = new ComparisonField();
-                      comparisonField.setFieldName(fieldName);
-                      comparisonField.setPriorityLabel(priorityLabel);
-                      Transaction transaction = dataSession.beginTransaction();
-                      dataSession.save(comparisonField);
-                      transaction.commit();
-                    }
-                  }
-                }
-                if (comparisonField != null)
-                {
-                  Comparison comparison = new Comparison();
-                  comparison.setComparisonField(comparisonField);
-                  comparison.setTestMessage(testMessage);
-                  comparison.setValueOriginal(readValue(req, PARAM_C_VALUE_ORIGINAL + position, 250));
-                  comparison.setValueCompare(readValue(req, PARAM_C_VALUE_COMPARE + position, 250));
-                  comparison.setComparisonStatus(readValue(req, PARAM_C_COMPARISON_STATUS + position, 250));
-                  Transaction transaction = dataSession.beginTransaction();
-                  dataSession.save(comparison);
-                  transaction.commit();
-                }
-                position++;
-                fieldName = readValue(req, PARAM_C_FIELD_NAME + position, 250);
+                testMessage = testMessageList.get(0);
               }
             }
-
+            if (testMessage == null)
             {
-              int position = 1;
-              String assertionResult = readValue(req, PARAM_A_ASSERTION_RESULT + position, 250);
-              while (!assertionResult.equals(""))
+              testMessage = new TestMessage();
+              testMessage.setTestSection(testSection);
+              testMessage.setTestPosition(testPosition);
+              testMessage.setTestType(readValue(req, PARAM_TM_TEST_TYPE, 250));
+              testMessage.setTestCaseSet(readValue(req, PARAM_TM_TEST_CASE_SET, 250));
+              testMessage.setTestCaseNumber(readValue(req, PARAM_TM_TEST_CASE_NUMBER, 250));
+              testMessage.setTestCaseCategory(readValue(req, PARAM_TM_TEST_CASE_CATEGORY, 250));
+              testMessage.setTestCaseDescription(readValue(req, PARAM_TM_TEST_CASE_DESCRIPTION, 250));
+              testMessage.setTestCaseAssertResult(readValue(req, PARAM_TM_TEST_CASE_ASSERT_RESULT, 250));
+              testMessage.setPrepPatientType(readValue(req, PARAM_TM_PREP_PATIENT_TYPE, 250));
+              testMessage.setPrepTransformsQuick(readValue(req, PARAM_TM_PREP_TRANSFORMS_QUICK));
+              testMessage.setPrepTransformsCustom(readValue(req, PARAM_TM_PREP_TRANSFORMS_CUSTOM));
+              testMessage.setPrepTransformsAddition(readValue(req, PARAM_TM_PREP_TRANSFORMS_ADDITION));
+              testMessage.setPrepTransformsCauseIssue(readValue(req, PARAM_TM_PREP_TRANSFORMS_CAUSE_ISSUE));
+              testMessage.setPrepCauseIssueNames(readValue(req, PARAM_TM_PREP_CAUSE_ISSUE_NAMES));
+              testMessage.setPrepHasIssue(readValue(req, PARAM_TM_PREP_HAS_ISSUE, 1));
+              testMessage.setPrepMajorChagnesMade(readValue(req, PARAM_TM_PREP_MAJOR_CHANGES_MADE, 1));
+              testMessage.setPrepNotExpectedToConform(readValue(req, PARAM_TM_PREP_NOT_EXPECTED_TO_CONFORM, 1));
+              testMessage.setPrepMessageAcceptStatusDebug(readValue(req, PARAM_TM_PREP_MESSAGE_ACCEPT_STATUS_DEBUG, 250));
+              testMessage.setPrepScenarioName(readValue(req, PARAM_TM_PREP_SCENARIO_NAME, 250));
+              testMessage.setPrepMessageDerivedFrom(readValue(req, PARAM_TM_PREP_MESSAGE_DERIVED_FROM));
+              testMessage.setPrepMessageOriginal(readValue(req, PARAM_TM_PREP_MESSAGE_ORIGINAL));
+              testMessage.setPrepMessageActual(readValue(req, PARAM_TM_PREP_MESSAGE_ACTUAL));
+              testMessage.setResultMessageActual(readValue(req, PARAM_TM_RESULT_MESSAGE_ACTUAL));
+              testMessage.setResultStatus(readValue(req, PARAM_TM_RESULT_STATUS, 250));
+              testMessage.setResultAccepted(readValueBoolean(req, PARAM_TM_RESULT_ACCEPTED));
+              testMessage.setResultExceptionText(readValue(req, PARAM_TM_RESULT_EXECEPTION_TEXT));
+              testMessage.setResultAcceptedMessage(readValue(req, PARAM_TM_RESULT_ACCEPTED_MESSAGE, 250));
+              testMessage.setResultResponseType(readValue(req, PARAM_TM_RESULT_RESPONSE_TYPE, 250));
+              testMessage.setResultAckType(readValue(req, PARAM_TM_RESULT_ACK_TYPE, 250));
+              testMessage.setForecastTestPanelCaseId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_CASE_ID));
+              testMessage.setForecastTestPanelId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_ID));
               {
-                AssertionField assertionField = null;
+                Transaction transaction = dataSession.beginTransaction();
+                dataSession.save(testMessage);
+                transaction.commit();
+              }
+
+              {
+
+                int position = 1;
+                String fieldName = readValue(req, PARAM_C_FIELD_NAME + position, 250);
+                while (!fieldName.equals(""))
                 {
-                  String assertionType = readValue(req, PARAM_A_ASSERTION_TYPE + position, 250);
-                  String assertionDescription = readValue(req, PARAM_A_ASSERTION_DESCRIPTION + position, 1024);
-                  if (!assertionType.equals("") && !assertionDescription.equals(""))
+                  ComparisonField comparisonField = null;
                   {
-                    Query query = dataSession.createQuery("from AssertionField where assertionType = ? and assertionDescription = ?");
-                    query.setParameter(0, assertionType);
-                    query.setParameter(1, assertionDescription);
-                    List<AssertionField> assertionFieldList = query.list();
-                    if (assertionFieldList.size() > 0)
+                    String priorityLabel = readValue(req, PARAM_C_PRIORITY_LABEL + position, 250);
+                    if (!priorityLabel.equals(""))
                     {
-                      assertionField = assertionFieldList.get(0);
+                      Query query = dataSession.createQuery("from ComparisonField where fieldName = ? and priorityLabel = ?");
+                      query.setParameter(0, fieldName);
+                      query.setParameter(1, priorityLabel);
+                      List<ComparisonField> comparisonFieldList = query.list();
+                      if (comparisonFieldList.size() > 0)
+                      {
+                        comparisonField = comparisonFieldList.get(0);
+                        String fieldLabel = readValue(req, PARAM_C_FIELD_LABEL + position, 250);
+                        if (!fieldLabel.equals(comparisonField.getFieldLabel()))
+                        {
+                          comparisonField.setFieldLabel(fieldLabel);
+                          Transaction transaction = dataSession.beginTransaction();
+                          dataSession.update(comparisonField);
+                          transaction.commit();
+                        }
+                      } else
+                      {
+                        comparisonField = new ComparisonField();
+                        comparisonField.setFieldName(fieldName);
+                        comparisonField.setPriorityLabel(priorityLabel);
+                        Transaction transaction = dataSession.beginTransaction();
+                        dataSession.save(comparisonField);
+                        transaction.commit();
+                      }
+                    }
+                  }
+                  if (comparisonField != null)
+                  {
+                    Comparison comparison = new Comparison();
+                    comparison.setComparisonField(comparisonField);
+                    comparison.setTestMessage(testMessage);
+                    comparison.setValueOriginal(readValue(req, PARAM_C_VALUE_ORIGINAL + position, 250));
+                    comparison.setValueCompare(readValue(req, PARAM_C_VALUE_COMPARE + position, 250));
+                    comparison.setComparisonStatus(readValue(req, PARAM_C_COMPARISON_STATUS + position, 250));
+                    Transaction transaction = dataSession.beginTransaction();
+                    dataSession.save(comparison);
+                    transaction.commit();
+                  }
+                  position++;
+                  fieldName = readValue(req, PARAM_C_FIELD_NAME + position, 250);
+                }
+              }
+
+              {
+
+                int position = 1;
+                String assertionResult = readValue(req, PARAM_A_ASSERTION_RESULT + position, 250);
+                while (!assertionResult.equals(""))
+                {
+                  AssertionField assertionField = null;
+                  {
+                    String assertionType = readValue(req, PARAM_A_ASSERTION_TYPE + position, 250);
+                    String assertionDescription = readValue(req, PARAM_A_ASSERTION_DESCRIPTION + position, 1024);
+                    if (!assertionType.equals("") && !assertionDescription.equals(""))
+                    {
+                      Query query = dataSession.createQuery("from AssertionField where assertionType = ? and assertionDescription = ?");
+                      query.setParameter(0, assertionType);
+                      query.setParameter(1, assertionDescription);
+                      List<AssertionField> assertionFieldList = query.list();
+                      if (assertionFieldList.size() > 0)
+                      {
+                        assertionField = assertionFieldList.get(0);
+                      } else
+                      {
+                        assertionField = new AssertionField();
+                        assertionField.setAssertionType(assertionType);
+                        assertionField.setAssertionDescription(assertionDescription);
+                        Transaction transaction = dataSession.beginTransaction();
+                        dataSession.save(assertionField);
+                        transaction.commit();
+                      }
+                    }
+                  }
+
+                  if (assertionField != null)
+                  {
+                    String locationPath = readValue(req, PARAM_A_LOCATION_PATH + position, 250);
+                    Assertion assertion = new Assertion();
+                    assertion.setAssertionField(assertionField);
+                    assertion.setTestMessage(testMessage);
+                    assertion.setAssertionResult(assertionResult);
+                    assertion.setLocationPath(locationPath);
+                    Transaction transaction = dataSession.beginTransaction();
+                    dataSession.save(assertion);
+                    transaction.commit();
+                  }
+                  position++;
+                  assertionResult = readValue(req, PARAM_A_ASSERTION_RESULT + position, 250);
+                }
+              }
+            }
+          }
+          if (testSection != null && testMessage != null)
+          {
+
+            String profileFieldName = readValue(req, PARAM_TP_PROFILE_FIELD_NAME, 250);
+            if (!profileFieldName.equals("") && !organizationName.equals(""))
+            {
+              TestParticipant testParticipant = getTestParticipant(dataSession, organizationName);
+              if (testParticipant != null && testParticipant.getProfileUsage() != null)
+              {
+                ProfileField profileField = null;
+                {
+                  Query query = dataSession.createQuery("from ProfileField where fieldName = ?");
+                  query.setParameter(0, profileFieldName);
+                  List<ProfileField> profileFieldList = query.list();
+                  if (profileFieldList.size() > 0)
+                  {
+                    profileField = profileFieldList.get(0);
+                  }
+                }
+                if (profileField != null)
+                {
+                  ProfileUsageValue profileUsageValue = null;
+                  TestProfile testProfile = null;
+                  {
+                    Query query = dataSession.createQuery("from TestProfile where profileField = ? and testSection = ?");
+                    query.setParameter(0, profileField);
+                    query.setParameter(1, testSection);
+                    List<TestProfile> testProfileList = query.list();
+                    if (testProfileList.size() > 0)
+                    {
+                      testProfile = testProfileList.get(0);
+                      profileUsageValue = testProfile.getProfileUsageValue();
+                    }
+                  }
+                  if (testProfile == null)
+                  {
+                    testProfile = new TestProfile();
+                    testProfile.setTestSection(testSection);
+                    testProfile.setProfileField(profileField);
+                    profileUsageValue = ProfileManager.getProfileUsageValue(dataSession, testParticipant.getProfileUsage(), profileField);
+                    if (profileUsageValue != null)
+                    {
+                      testProfile.setProfileUsageValue(profileUsageValue);
+                    }
+                  }
+                  if (profileUsageValue == null)
+                  {
+                    profileUsageValue = new ProfileUsageValue();
+                    profileUsageValue.setProfileUsage(testParticipant.getProfileUsage());
+                    profileUsageValue.setProfileField(profileField);
+                    profileUsageValue.setUsage(profileField.getTestUsage());
+                  }
+                  String profileFieldType = readValue(req, PARAM_TP_TEST_PROFILE_TYPE, 250);
+                  if (profileFieldType != null)
+                  {
+                    if (profileFieldType.equals(VALUE_PROFILE_TYPE_PRESENT))
+                    {
+                      testProfile.setTestMessagePresent(testMessage);
+                    } else if (profileFieldType.equals(VALUE_PROFILE_TYPE_ABSENT))
+                    {
+                      testProfile.setTestMessageAbsent(testMessage);
+                    }
+                    if (testProfile.getTestMessagePresent() == null || testProfile.getTestMessageAbsent() == null)
+                    {
+                      testProfile.setTestProfileStatus(TestProfile.TEST_PROFILE_STATUS_NOT_RUN);
                     } else
                     {
-                      assertionField = new AssertionField();
-                      assertionField.setAssertionType(assertionType);
-                      assertionField.setAssertionDescription(assertionDescription);
-                      Transaction transaction = dataSession.beginTransaction();
-                      dataSession.save(assertionField);
-                      transaction.commit();
+                      MessageAcceptStatus masDetected;
+                      TestMessage tmPresent = testProfile.getTestMessagePresent();
+                      TestMessage tmAbsent = testProfile.getTestMessageAbsent();
+                      if (tmPresent.isResultAccepted() && !tmAbsent.isResultAccepted())
+                      {
+                        masDetected = MessageAcceptStatus.ONLY_IF_PRESENT;
+                      } else if (!tmPresent.isResultAccepted() && tmAbsent.isResultAccepted())
+                      {
+                        masDetected = MessageAcceptStatus.ONLY_IF_ABSENT;
+                      } else
+                      {
+                        masDetected = MessageAcceptStatus.IF_PRESENT_OR_ABSENT;
+                      }
+                      String debug = ProfileManager.determineMessageAcceptStatus(profileUsageValue, dataSession);
+                      MessageAcceptStatus masExpected = profileUsageValue.getMessageAcceptStatus();
+                      Usage usageExpected = profileUsageValue.getUsage();
+                      Usage usageDetected = usageExpected;
+                      if (masDetected != masExpected)
+                      {
+                        if (masExpected == MessageAcceptStatus.ONLY_IF_PRESENT)
+                        {
+                          if (masDetected == MessageAcceptStatus.IF_PRESENT_OR_ABSENT)
+                          {
+                            usageDetected = Usage.R_NOT_ENFORCED;
+                          } else if (masDetected == MessageAcceptStatus.ONLY_IF_ABSENT)
+                          {
+                            usageDetected = Usage.X;
+                          }
+                        } else if (masExpected == MessageAcceptStatus.IF_PRESENT_OR_ABSENT)
+                        {
+                          if (masDetected == MessageAcceptStatus.ONLY_IF_PRESENT)
+                          {
+                            if (profileUsageValue.getUsage() == Usage.R)
+                            {
+                              usageDetected = Usage.R_SPECIAL;
+                            } else
+                            {
+                              usageDetected = Usage.R;
+                            }
+                          } else if (masDetected == MessageAcceptStatus.ONLY_IF_ABSENT)
+                          {
+                            usageDetected = Usage.X;
+                          }
+                        } else if (masExpected == MessageAcceptStatus.ONLY_IF_ABSENT)
+                        {
+                          if (masDetected == MessageAcceptStatus.ONLY_IF_PRESENT)
+                          {
+                            if (profileUsageValue.getUsage() == Usage.R)
+                            {
+                              usageDetected = Usage.R_SPECIAL;
+                            } else
+                            {
+                              usageDetected = Usage.R;
+                            }
+                          } else if (masDetected == MessageAcceptStatus.IF_PRESENT_OR_ABSENT)
+                          {
+                            usageDetected = Usage.X_NOT_ENFORCED;
+                          }
+                        }
+                      }
+
+                      if (usageDetected == usageExpected)
+                      {
+                        testProfile.setTestProfileStatus(TestProfile.TEST_PROFILE_STATUS_EXPECTED);
+                      } else
+                      {
+                        testProfile.setTestProfileStatus(TestProfile.TEST_PROFILE_STATUS_NOT_EXPECTED);
+                      }
+                      testProfile.setUsageExpected(usageExpected);
+                      testProfile.setUsageDetected(usageDetected);
+                      testProfile.setAcceptExpected(masExpected.toString());
+                      testProfile.setAcceptDetected(masDetected.toString());
                     }
+                    Transaction transaction = dataSession.beginTransaction();
+                    dataSession.saveOrUpdate(testProfile);
+                    transaction.commit();
                   }
                 }
 
-                if (assertionField != null)
-                {
-                  String locationPath = readValue(req, PARAM_A_LOCATION_PATH + position, 250);
-                  Assertion assertion = new Assertion();
-                  assertion.setAssertionField(assertionField);
-                  assertion.setTestMessage(testMessage);
-                  assertion.setAssertionResult(assertionResult);
-                  assertion.setLocationPath(locationPath);
-                  Transaction transaction = dataSession.beginTransaction();
-                  dataSession.save(assertion);
-                  transaction.commit();
-                }
-                position++;
-                assertionResult = readValue(req, PARAM_A_ASSERTION_RESULT + position, 250);
               }
             }
           }
         }
       } else if (!organizationName.equals(""))
       {
-        TestParticipant testParticipant = null;
-        {
-          Query query = dataSession.createQuery("from TestParticipant where organizationName = ?");
-          query.setParameter(0, organizationName);
-          List<TestParticipant> testParticipantList = query.list();
-          if (testParticipantList.size() > 0)
-          {
-            testParticipant = testParticipantList.get(0);
-          }
-        }
+
+        TestParticipant testParticipant = getTestParticipant(dataSession, organizationName);
         if (testParticipant == null)
         {
           testParticipant = new TestParticipant();
@@ -420,7 +583,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           List<ProfileUsage> profileUsageList = query.list();
           for (ProfileUsage profileUsage : profileUsageList)
           {
-            if (profileUsage.getLabel().equalsIgnoreCase(testParticipant.toString()))
+            if (profileUsage.toString().equalsIgnoreCase(testParticipant.getGuideName()))
             {
               testParticipant.setProfileUsage(profileUsage);
               break;
@@ -444,6 +607,21 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     out.close();
   }
 
+  public TestParticipant getTestParticipant(Session dataSession, String organizationName)
+  {
+    TestParticipant testParticipant = null;
+    {
+      Query query = dataSession.createQuery("from TestParticipant where organizationName = ?");
+      query.setParameter(0, organizationName);
+      List<TestParticipant> testParticipantList = query.list();
+      if (testParticipantList.size() > 0)
+      {
+        testParticipant = testParticipantList.get(0);
+      }
+    }
+    return testParticipant;
+  }
+
   private boolean readValueBoolean(HttpServletRequest req, String field)
   {
     String value = req.getParameter(field);
@@ -457,7 +635,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
   private int readValueInt(HttpServletRequest req, String field)
   {
     String value = req.getParameter(field);
-    if (value == null)
+    if (value == null || value.equals(""))
     {
       return 0;
     }

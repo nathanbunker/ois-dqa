@@ -82,13 +82,13 @@ CREATE TABLE test_profile (
   test_section_id                    INTEGER NOT NULL,
   test_profile_status                VARCHAR(250) NOT NULL,
   profile_field_id                   INTEGER NOT NULL,
-  profile_usage_value                INTEGER,
+  profile_usage_value_id             INTEGER,
   usage_expected                     VARCHAR(250),
   usage_detected                     VARCHAR(250),
   accept_expected                    VARCHAR(250),
   accept_detected                    VARCHAR(250),
-  test_message_present_id            INTEGER NOT NULL,
-  test_message_absent_id             INTEGER NOT NULL,
+  test_message_present_id            INTEGER,
+  test_message_absent_id             INTEGER,
   message_accept_status_debug        VARCHAR(250),
   compatibility_conformance          VARCHAR(250)
 );
