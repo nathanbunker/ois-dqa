@@ -80,6 +80,11 @@ public class TestReportServlet extends HomeServlet
   public static final String PARAM_MAP_STATUS = "mapStatus";
   public static final String PARAM_MAP_FILTER = "mapFilter";
 
+  public static final String PARAM_SHOW_DETAIL = "showDetail";
+
+  public static final String SHOW_DETAIL_VALIDATION = "validation";
+  public static final String SHOW_DETAIL_COMPARISON = "comparison";
+
   public static final String MAP_STATUS_PHASE1_PARTICIPATION = "Phase 1 Participation";
   public static final String MAP_STATUS_PHASE1_STATUS = "Phase 1 Status";
   public static final String MAP_STATUS_PHASE2_PARTICIPATION = "Phase 2 Participation";
@@ -556,9 +561,6 @@ public class TestReportServlet extends HomeServlet
         out.println("<p>Here are the connection details that were used to connect to IIS to create report. </p>");
         out.println("<table>");
         out.println("  <caption>Connection Setup</caption>");
-
-        out.println("<table width=\"100%\">");
-        out.println("  <caption>" + testParticipantSelected.getOrganizationName() + "</caption>");
         out.println("  <tr>");
         out.println("    <th>Platform</th>");
         out.println("    <td>" + testParticipantSelected.getPlatformLabel() + "</td>");
@@ -624,7 +626,11 @@ public class TestReportServlet extends HomeServlet
           query.setParameter(1, false);
           transformCustom = query.list();
         }
-        if (transformExpected.size() > 0 || transformCustom.size() > 0)
+        if (transformExpected.size() == 0 && transformCustom.size() == 0)
+        {
+          out.println("<h3>Custom Modifications</h3>");
+          out.println("<p>This interface did not require any modifications to the message in order for it to be accepted. </p>");
+        } else
         {
           out.println("<h3>Custom Modifications</h3>");
           out.println("<p>This interface requires customized Transformations to modify each message "
@@ -641,12 +647,11 @@ public class TestReportServlet extends HomeServlet
           if (transformCustom.size() > 0)
           {
             out.println("<h4>Unexpected Modifications</h4>");
-            out.println("<p>" + "These changes were not anticipated in the national standard or in "
+            out.println("<p>These changes were not anticipated in the national standard or in "
                 + "NIST testing. Please examine the need for these changes carefully as they are "
                 + "likely to result in significant effort by EHR-s and other trading partners to achieve interoperability.</p>");
             printTransforms(out, transformCustom);
           }
-
         }
         out.println("</div>");
 
@@ -1014,8 +1019,7 @@ public class TestReportServlet extends HomeServlet
 
         if (testSection != null)
         {
-          Query query = dataSession
-              .createQuery("from TestProfile where testSection = ? and testProfileStatus = ? order by profileField.fieldName");
+          Query query = dataSession.createQuery("from TestProfile where testSection = ? and testProfileStatus = ? order by profileField.fieldName");
           query.setParameter(0, testSection);
           query.setParameter(1, TestProfile.TEST_PROFILE_STATUS_NOT_EXPECTED);
           List<TestProfile> testProfileList = query.list();
@@ -1048,7 +1052,7 @@ public class TestReportServlet extends HomeServlet
           out.println("</table>");
         }
 
-        printTestMessageDetails(testMessage, userSession);
+        printTestMessageDetails(testMessage, userSession, req.getParameter(PARAM_SHOW_DETAIL), view);
         out.println("</div>");
       } else if (view.equals(VIEW_INTEROP))
       {
@@ -1109,7 +1113,7 @@ public class TestReportServlet extends HomeServlet
           out.println("</table>");
         }
 
-        printTestMessageDetails(testMessage, userSession);
+        printTestMessageDetails(testMessage, userSession, req.getParameter(PARAM_SHOW_DETAIL), view);
         out.println("</div>");
       } else if (view.equals(VIEW_TOLERANCE) || view.equals(VIEW_EHR))
       {
@@ -1180,7 +1184,7 @@ public class TestReportServlet extends HomeServlet
 
         out.println("</div>");
         out.println("<div class=\"rightFullColumn\">");
-        printTestMessageDetails(testMessage, userSession);
+        printTestMessageDetails(testMessage, userSession, req.getParameter(PARAM_SHOW_DETAIL), view);
         out.println("</div>");
       } else if (view.equals(VIEW_CODED_VALUES))
       {
@@ -1263,7 +1267,7 @@ public class TestReportServlet extends HomeServlet
           }
         }
 
-        printTestMessageDetails(testMessage, userSession);
+        printTestMessageDetails(testMessage, userSession, req.getParameter(PARAM_SHOW_DETAIL), view);
         out.println("</div>");
       } else if (view.equals(VIEW_BASIC) || view.equals(VIEW_INTERMEDIATE) || view.equals(VIEW_ADVANCED) || view.equals(VIEW_PROFILING)
           || view.equals(VIEW_EXCEPTIONAL) || view.equals(VIEW_FORECAST_PREP) || view.equals(VIEW_FORECAST) || view.equals(VIEW_ONC_2015)
@@ -1283,7 +1287,7 @@ public class TestReportServlet extends HomeServlet
         out.println("<div class=\"rightFullColumn\">");
         if (testMessage != null)
         {
-          printTestMessageDetails(testMessage, userSession);
+          printTestMessageDetails(testMessage, userSession, req.getParameter(PARAM_SHOW_DETAIL), view);
         }
         out.println("</div>");
       }
@@ -1680,7 +1684,7 @@ public class TestReportServlet extends HomeServlet
     }
   }
 
-  private void printTestMessageDetails(TestMessage testMessage, UserSession userSession) throws IOException
+  private void printTestMessageDetails(TestMessage testMessage, UserSession userSession, String showDetail, String view) throws IOException
   {
     PrintWriter out = userSession.getOut();
     Session dataSession = userSession.getDataSession();
@@ -1701,32 +1705,63 @@ public class TestReportServlet extends HomeServlet
         Query query = dataSession.createQuery("from Assertion where testMessage = ? order by location_path");
         query.setParameter(0, testMessage);
         List<Assertion> assertionList = query.list();
-        if (assertionList.size() > 0)
+        if (assertionList.size() == 0)
         {
-          out.println("<table width=\"100%\">");
-          out.println("  <caption>ONC 2015 Validation of Response</caption>");
-          out.println("  <tr>");
-          out.println("    <th>Location</th>");
-          out.println("    <th>Result</th>");
-          out.println("    <th>Type</th>");
-          out.println("    <th>Description</th>");
-          out.println("  </tr>");
-          for (Assertion assertion : assertionList)
+          out.println("<h3>Response Not Validated</h3>");
+          out.println("<p>Validation was not conducted.</p>");
+        } else
+        {
+          if (showDetail == null || !showDetail.equals(SHOW_DETAIL_VALIDATION))
           {
-            String classString = " class=\"pass\"";
-            if (assertion.getAssertionResult().equalsIgnoreCase("ERROR"))
-            {
-              classString = " class=\"fail\"";
-            }
-            out.println("  <tr>");
-            out.println("    <td" + classString + ">" + assertion.getLocationPath() + "</td>");
-            out.println("    <td" + classString + ">" + assertion.getAssertionResult() + "</td>");
-            out.println("    <td" + classString + ">" + assertion.getAssertionField().getAssertionType() + "</td>");
-            out.println("    <td" + classString + ">" + assertion.getAssertionField().getAssertionDescription() + "</td>");
-            out.println("  </tr>");
+            query = dataSession.createQuery("from Assertion where testMessage = ? and assertionResult = ? order by location_path");
+            query.setParameter(0, testMessage);
+            query.setParameter(1, "ERROR");
+            assertionList = query.list();
           }
-          out.println("</table>");
-          out.println("<br/>");
+          String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + testMessage.getTestMessageId() + "&"
+              + PARAM_SHOW_DETAIL + "=" + SHOW_DETAIL_VALIDATION;
+          if (assertionList.size() == 0)
+          {
+            out.println("<h3 class=\"pass\">Response Passes Validation</h3>");
+            out.println("<p>Validation found no errors. ");
+            if (showDetail == null || !showDetail.equals(SHOW_DETAIL_VALIDATION))
+            {
+              out.println("<a href=\"" + link + "\">See details.</a>");
+            }
+            out.println("</p>");
+          } else
+          {
+            out.println("<h3 class=\"fail\">Response Fails Validation</h3>");
+            out.println("<p>Validation found errors. ");
+            if (showDetail == null || !showDetail.equals(SHOW_DETAIL_VALIDATION))
+            {
+              out.println("<a href=\"" + link + "\">See details.</a>");
+            }
+            out.println("</p>");
+            out.println("<table width=\"100%\">");
+            out.println("  <caption>NIST 2015 Validation of Response</caption>");
+            out.println("  <tr>");
+            out.println("    <th>Location</th>");
+            out.println("    <th>Result</th>");
+            out.println("    <th>Type</th>");
+            out.println("    <th>Description</th>");
+            out.println("  </tr>");
+            for (Assertion assertion : assertionList)
+            {
+              String classString = " class=\"pass\"";
+              if (assertion.getAssertionResult().equalsIgnoreCase("ERROR"))
+              {
+                classString = " class=\"fail\"";
+              }
+              out.println("  <tr>");
+              out.println("    <td" + classString + ">" + assertion.getLocationPath() + "</td>");
+              out.println("    <td" + classString + ">" + assertion.getAssertionResult() + "</td>");
+              out.println("    <td" + classString + ">" + assertion.getAssertionField().getAssertionType() + "</td>");
+              out.println("    <td" + classString + ">" + assertion.getAssertionField().getAssertionDescription() + "</td>");
+              out.println("  </tr>");
+            }
+            out.println("</table>");
+          }
         }
       }
 
@@ -1735,38 +1770,71 @@ public class TestReportServlet extends HomeServlet
       List<Comparison> comparisonList = query.list();
       if (comparisonList.size() > 0)
       {
-        out.println("<table width=\"100%\">");
-        out.println("  <caption>Field Comparison</caption>");
-        out.println("  <tr>");
-        out.println("    <th>Field</th>");
-        out.println("    <th>HL7</th>");
-        out.println("    <th>Core Data</th>");
-        out.println("    <th>Original Value</th>");
-        out.println("    <th>Compare Value</th>");
-        out.println("    <th>Status</th>");
-        out.println("  </tr>");
-        for (Comparison comparison : comparisonList)
+        if (showDetail == null || !showDetail.equals(SHOW_DETAIL_COMPARISON))
         {
-          String link = "testReport?" + PARAM_VIEW + "=" + VIEW_FIELD_COMPARISON + "&" + PARAM_COMPARISON_FIELD_ID + "="
-              + comparison.getComparisonField().getComparisonFieldId();
-          String classString = "";
-          if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_FAIL))
-          {
-            classString = " class=\"fail\"";
-          } else if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_PASS))
-          {
-            classString = " class=\"pass\"";
-          }
-          out.println("  <tr>");
-          out.println("    <td" + classString + "><a href=\"" + link + "\">" + comparison.getComparisonField().getFieldLabel() + "</a></td>");
-          out.println("    <td" + classString + ">" + comparison.getComparisonField().getFieldName() + "</td>");
-          out.println("    <td" + classString + ">" + comparison.getComparisonField().getPriorityLabel() + "</td>");
-          out.println("    <td" + classString + ">" + comparison.getValueOriginal() + "</td>");
-          out.println("    <td" + classString + ">" + comparison.getValueCompare() + "</td>");
-          out.println("    <td" + classString + ">" + comparison.getComparisonStatus() + "</td>");
-          out.println("  </tr>");
+          query = dataSession.createQuery("from Comparison where testMessage = ? and comparisonStatus = ? order by comparisonField.fieldName");
+          query.setParameter(0, testMessage);
+          query.setParameter(1, RecordServletInterface.VALUE_COMPARISON_STATUS_FAIL);
+          comparisonList = query.list();
         }
-        out.println("</table>");
+        String detailLink = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + testMessage.getTestMessageId() + "&"
+            + PARAM_SHOW_DETAIL + "=" + SHOW_DETAIL_COMPARISON;
+        if (comparisonList.size() == 0)
+        {
+          out.println("<h3 class=\"pass\">Request Message Not Changed</h3>");
+          out.println("<p>Submitted message contains essentially the same data as the original test case. "
+              + "If there were any custom modifications they made no substantial changes. ");
+          if (showDetail == null || !showDetail.equals(SHOW_DETAIL_COMPARISON))
+          {
+            out.println("<a href=\"" + detailLink + "\">See details.</a>");
+          }
+          out.println("</p>");
+        } else
+        {
+          out.println("<h3 class=\"fail\">Request Message Changed</h3>");
+          out.println("<p> <a href=\"" + detailLink
+              + "\">See details.</a></p>");
+          out.println("<p>Submitted message does not contain the same data as the original test case. "
+              + "Some custom modifications were made in the process of preparing the test message for submission."
+              + "These custom modifications were necessary to ensure IIS accepted the test message. ");
+          if (showDetail == null || !showDetail.equals(SHOW_DETAIL_COMPARISON))
+          {
+            out.println("<a href=\"" + detailLink + "\">See details.</a>");
+          }
+          out.println("</p>");
+          out.println("<table width=\"100%\">");
+          out.println("  <caption>Field Comparison</caption>");
+          out.println("  <tr>");
+          out.println("    <th>Field</th>");
+          out.println("    <th>HL7</th>");
+          out.println("    <th>Core Data</th>");
+          out.println("    <th>Original Value</th>");
+          out.println("    <th>Compare Value</th>");
+          out.println("    <th>Status</th>");
+          out.println("  </tr>");
+          for (Comparison comparison : comparisonList)
+          {
+            String link = "testReport?" + PARAM_VIEW + "=" + VIEW_FIELD_COMPARISON + "&" + PARAM_COMPARISON_FIELD_ID + "="
+                + comparison.getComparisonField().getComparisonFieldId();
+            String classString = "";
+            if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_FAIL))
+            {
+              classString = " class=\"fail\"";
+            } else if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_PASS))
+            {
+              classString = " class=\"pass\"";
+            }
+            out.println("  <tr>");
+            out.println("    <td" + classString + "><a href=\"" + link + "\">" + comparison.getComparisonField().getFieldLabel() + "</a></td>");
+            out.println("    <td" + classString + ">" + comparison.getComparisonField().getFieldName() + "</td>");
+            out.println("    <td" + classString + ">" + comparison.getComparisonField().getPriorityLabel() + "</td>");
+            out.println("    <td" + classString + ">" + comparison.getValueOriginal() + "</td>");
+            out.println("    <td" + classString + ">" + comparison.getValueCompare() + "</td>");
+            out.println("    <td" + classString + ">" + comparison.getComparisonStatus() + "</td>");
+            out.println("  </tr>");
+          }
+          out.println("</table>");
+        }
       }
 
       String link = "testReport?" + PARAM_VIEW + "=" + VIEW_TEST_MESSAGES + "&" + PARAM_TEST_MESSAGE_ID + "=" + testMessage.getTestMessageId();
