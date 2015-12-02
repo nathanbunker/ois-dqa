@@ -746,8 +746,6 @@ public class ProfileServlet extends HomeServlet
 
   }
 
-
-
   private void printEditTable(PrintWriter out, Session dataSession, ProfileUsageValue profileUsageValueSelected, ProfileField profileFieldCopyFrom)
       throws UnsupportedEncodingException
   {
@@ -799,24 +797,19 @@ public class ProfileServlet extends HomeServlet
         List<ProfileUsageValue> profileUsageValueCopyList = null;
         if (profileFieldCopyFrom.getType() == ProfileFieldType.SEGMENT)
         {
-          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField.parent = ? and posInSegment = ?");
+          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField.parent = ? and profileField.posInSegment = ?");
           query.setParameter(0, profileUsage);
           query.setParameter(1, profileFieldCopyFrom);
           query.setParameter(2, profileField.getPosInSegment());
           profileUsageValueCopyList = query.list();
         } else if (profileFieldCopyFrom.getType() == ProfileFieldType.FIELD)
         {
-          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField.parent = ? and posInField = ?");
+          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField.parent = ? and profileField.posInField = ?");
           query.setParameter(0, profileUsage);
           query.setParameter(1, profileFieldCopyFrom);
           query.setParameter(2, profileField.getPosInField());
-        } else if (profileFieldCopyFrom.getType() == ProfileFieldType.FIELD)
-        {
-          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField.parent = ? and posInSubField = ?");
-          query.setParameter(0, profileUsage);
-          query.setParameter(1, profileFieldCopyFrom);
-          query.setParameter(2, profileField.getPosInSubField());
-        }
+          profileUsageValueCopyList = query.list();
+        } 
         if (profileUsageValueCopyList != null && profileUsageValueCopyList.size() > 0)
         {
           profileUsageValueCopyFrom = profileUsageValueCopyList.get(0);
@@ -924,10 +917,24 @@ public class ProfileServlet extends HomeServlet
     }
     out.println("</table>");
     List<ProfileUsageValue> copyFromList = null;
-    if (profileFieldCopyFrom != null)
+    ProfileField profileField = profileUsageValueSelected.getProfileField();
+    if (profileField.getType() == ProfileFieldType.SEGMENT)
     {
-      Query query = dataSession.createQuery("from ProfileField where parent = ? order by pos");
-      query.setParameter(0, profileFieldCopyFrom);
+      Query query = dataSession.createQuery(
+          "from ProfileUsageValue where profileUsage = ? and profileField.profileFieldType = ? and profileField.segmentName = ? and profileField <> ? order by pos");
+      query.setParameter(0, profileUsage);
+      query.setParameter(1, ProfileFieldType.SEGMENT.toString());
+      query.setParameter(2, profileField.getSegmentName());
+      query.setParameter(3, profileField);
+      copyFromList = query.list();
+    } else if (profileField.getType() == ProfileFieldType.FIELD)
+    {
+      Query query = dataSession.createQuery(
+          "from ProfileUsageValue where profileUsage = ? and profileField.profileFieldType = ? and profileField.dataType = ? and profileField <> ? order by pos");
+      query.setParameter(0, profileUsage);
+      query.setParameter(1, ProfileFieldType.FIELD.toString());
+      query.setParameter(2, profileField.getDataType());
+      query.setParameter(3, profileField);
       copyFromList = query.list();
     }
 
@@ -939,14 +946,14 @@ public class ProfileServlet extends HomeServlet
 
     if (copyFromList != null && copyFromList.size() > 0)
     {
-      out.println("      <select name=\"copyFrom\">");
-      out.println("        <option value=\"\">select</option>");
+      out.println("<select name=\"" + PARAM_PROFILE_FIELD_ID_COPY_FROM + "\">");
+      out.println("  <option value=\"\">select</option>");
       for (ProfileUsageValue profileUsageValue : copyFromList)
       {
-        out.println("        <option value=\"" + profileUsageValue.getProfileField().getProfileFieldId() + "\">"
+        out.println("  <option value=\"" + profileUsageValue.getProfileField().getProfileFieldId() + "\">"
             + profileUsageValue.getProfileField().getFieldName() + "</option>");
       }
-      out.println("      </select>");
+      out.println("  </select>");
       out.println("<input type=\"submit\" name=\"action\" value=\"Copy\"/>");
     }
     out.println("</form>");

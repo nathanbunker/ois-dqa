@@ -9,9 +9,10 @@
     <many-to-one name="profileUsage" column="profile_usage_id" class="ProfileUsage"/>
     <property name="fieldName" column="field_name" type="string"/>
     <property name="usageString" column="test_usage" type="string"/>
-    <property name="usageDetectedString" column="value_string" type="string"/>
+    <property name="value" column="value_string" type="string"/>
     <property name="comments" column="comments" type="string"/>
     <property name="notes" column="notes" type="string"/>
+    <property name="usageDetectedString" column="usage_detected" type="string"/>
     <property name="enforcementString" column="enforcement" type="string"/>
     <property name="implementationString" column="implementation" type="string"/>
     <property name="messageAcceptStatusString" column="message_accept_status" type="string"/>
