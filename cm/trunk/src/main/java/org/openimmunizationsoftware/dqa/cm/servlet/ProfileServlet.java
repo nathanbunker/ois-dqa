@@ -817,7 +817,7 @@ public class ProfileServlet extends HomeServlet
       }
 
       out.println("  <tr>");
-      if (profileUsageValue == null || (profileField.getType() != ProfileFieldType.FIELD && profileField.getType() != ProfileFieldType.FIELD_PART))
+      if (profileUsageValue == null || profileUsageValue.getUsage() == Usage.NOT_DEFINED || (profileField.getType() != ProfileFieldType.FIELD && profileField.getType() != ProfileFieldType.FIELD_PART))
       {
         out.println("    <td>" + profileField.getFieldName() + "</td>");
         out.println("    <td>" + profileField.getDescription() + "</td>");
