@@ -40,6 +40,10 @@
     <servlet-name>ProfileServlet</servlet-name>
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.ProfileServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>PentagonServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.PentagonServlet</servlet-class>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>AdminServlet</servlet-name>
@@ -76,6 +80,10 @@
   <servlet-mapping>
     <servlet-name>ProfileServlet</servlet-name>
     <url-pattern>/profile</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>PentagonServlet</servlet-name>
+    <url-pattern>/pentagon</url-pattern>
   </servlet-mapping>
 
 
