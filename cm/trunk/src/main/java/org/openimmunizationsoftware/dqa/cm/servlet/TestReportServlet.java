@@ -1978,6 +1978,8 @@ public class TestReportServlet extends HomeServlet
       out.println("<br/>");
       String link = "testReport?" + PARAM_VIEW + "=" + VIEW_FULL_REPORT + "&" + PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId();
       out.println("<p><a href=\"" + link + "\">Full Test Report</a></p>");
+      link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId();
+      out.println("<p><a href=\"" + link + "\">Pentagon Report</a></p>");
     } else
     {
       out.println("<p><em>Full Test Report is Not Available<em/></p>");
