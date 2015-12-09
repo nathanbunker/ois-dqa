@@ -158,7 +158,7 @@ public class PentagonServlet extends HomeServlet
     int[] centerPointBig = { 425, 438 };
     int[][] pointsBig = new int[5][2];
     setupPointsBig(pointsBig);
-    printPentagon(out, pointsBig, "#cccccc");
+    printPentagon(out, pointsBig, "#cccccc", "2");
 
     {
       int[][] scorePoints = new int[5][2];
@@ -169,14 +169,14 @@ public class PentagonServlet extends HomeServlet
           scorePoints[i][0] = pointsBig[i][0] - ((int) ((pointsBig[i][0] - centerPointBig[0]) * ((100 - scores[i]) / 100.0)));
           scorePoints[i][1] = pointsBig[i][1] - ((int) ((pointsBig[i][1] - centerPointBig[1]) * ((100 - scores[i]) / 100.0)));
         }
-        printPentagon(out, scorePoints, "#9b0d28");
+        printPentagon(out, scorePoints, "#9b0d28", "2");
       }
     }
 
     int[] centerPointSmall = { 85, 88 };
     int[][] pointsSmall = new int[5][2];
     setupPointsSmall(pointsSmall);
-    printPentagon(out, pointsSmall, "#eeeeee");
+    printPentagon(out, pointsSmall, "#eeeeee", "0.5");
 
     {
       int[][] scorePoints = new int[5][2];
@@ -187,25 +187,30 @@ public class PentagonServlet extends HomeServlet
           scorePoints[i][0] = pointsSmall[i][0] - ((int) ((pointsSmall[i][0] - centerPointSmall[0]) * ((100 - scores[i]) / 100.0)));
           scorePoints[i][1] = pointsSmall[i][1] - ((int) ((pointsSmall[i][1] - centerPointSmall[1]) * ((100 - scores[i]) / 100.0)));
         }
-        printPentagon(out, scorePoints, "#cccccc");
+        printPentagon(out, scorePoints, "#cccccc", "0.5");
       }
     }
 
-    out.println("  <rect fill=\"#83bbe5\" stroke=\"black\" stroke-width=\"2\" x=\"175\" y=\"125\" width=\"500\" height=\"25\"/>");
-    out.println("  <rect fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" x=\"125\" y=\"150\" width=\"25\" height=\"500\"/>");
-    out.println("  <rect fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" x=\"700\" y=\"150\" width=\"25\" height=\"500\"/>");
-    out.println("  <rect fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" x=\"25\" y=\"675\" width=\"488\" height=\"25\"/>");
-    out.println("  <rect fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" x=\"538\" y=\"675\" width=\"287\" height=\"25\"/>");
-    out.println(
-        "  <circle fill=\"#83bbe5\" stroke=\"black\" stroke-width=\"2\" cx=\"" + pointsBig[0][0] + "\" cy=\"" + pointsBig[0][1] + "\" r=\"40\"/>");
-    out.println(
-        "  <circle fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" cx=\"" + pointsBig[1][0] + "\" cy=\"" + pointsBig[1][1] + "\" r=\"40\"/>");
-    out.println(
-        "  <circle fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" cx=\"" + pointsBig[2][0] + "\" cy=\"" + pointsBig[2][1] + "\" r=\"40\"/>");
-    out.println(
-        "  <circle fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" cx=\"" + pointsBig[3][0] + "\" cy=\"" + pointsBig[3][1] + "\" r=\"40\"/>");
-    out.println(
-        "  <circle fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" cx=\"" + pointsBig[4][0] + "\" cy=\"" + pointsBig[4][1] + "\" r=\"40\"/>");
+    out.println("  <rect fill=\"#83bbe5\" stroke=\"black\" stroke-width=\"2\" x=\"175\" y=\"138\" width=\"500\" height=\"27\"/>");
+    out.println("  <rect fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" x=\"125\" y=\"150\" width=\"40\" height=\"500\"/>");
+    out.println("  <rect fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" x=\"685\" y=\"150\" width=\"40\" height=\"500\"/>");
+    out.println("  <rect fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" x=\"25\" y=\"660\" width=\"488\" height=\"27\"/>");
+    out.println("  <rect fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" x=\"533\" y=\"660\" width=\"292\" height=\"27\"/>");
+    // out.println(
+    // " <circle fill=\"#83bbe5\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
+    // pointsBig[0][0] + "\" cy=\"" + pointsBig[0][1] + "\" r=\"40\"/>");
+    // out.println(
+    // " <circle fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
+    // pointsBig[1][0] + "\" cy=\"" + pointsBig[1][1] + "\" r=\"40\"/>");
+    // out.println(
+    // " <circle fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
+    // pointsBig[2][0] + "\" cy=\"" + pointsBig[2][1] + "\" r=\"40\"/>");
+    // out.println(
+    // " <circle fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
+    // pointsBig[3][0] + "\" cy=\"" + pointsBig[3][1] + "\" r=\"40\"/>");
+    // out.println(
+    // " <circle fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
+    // pointsBig[4][0] + "\" cy=\"" + pointsBig[4][1] + "\" r=\"40\"/>");
 
     PentagonBox[] pentagonBoxesConfidence = createPentagonBoxesOfConfidence(pentagonReport);
     PentagonBox[] pentagonBoxesUpdateFunctionality = createPentagonBoxesOfUpdateFunctionality(pentagonReport);
@@ -217,7 +222,7 @@ public class PentagonServlet extends HomeServlet
     prepare(pentagonBoxesUpdateFunctionality, 500);
     prepare(pentagonBoxesUpdateConformance, 488);
     prepare(pentagonBoxesQueryFunctionality, 500);
-    prepare(pentagonBoxesQueryConformance, 287);
+    prepare(pentagonBoxesQueryConformance, 292);
 
     {
       int posX = 175;
@@ -226,8 +231,8 @@ public class PentagonServlet extends HomeServlet
       for (PentagonBox pentagonBox : pentagonBoxesConfidence)
       {
         out.println("  <rect id=\"r_c" + i + "\" fill=\"#99d2f2\" stroke=\"black\" stroke-width=\"2\" x=\"" + posX + "\" y=\"" + posY + "\" width=\""
-            + pentagonBox.getSize() + "\" height=\"63\"/>");
-        printScoreChartMini(out, pentagonBox.getScore(), ((int) (pentagonBox.getSize() - 10)) / 2 + posX, posY + 40, 10, "#83bbe5");
+            + pentagonBox.getSize() + "\" height=\"76\"/>");
+        printScoreChartMini(out, pentagonBox.getScore(), ((int) (pentagonBox.getSize() - 38)) / 2 + posX, posY + 36, 18, "#83bbe5", "#99d2f2");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -240,30 +245,33 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <rect id=\"r_uf" + i + "\" fill=\"#a3d977\" stroke=\"black\" stroke-width=\"2\" x=\"" + posX + "\" y=\"" + posY
             + "\" width=\"100\" height=\"" + pentagonBox.getSize() + "\"/>");
+        printScoreChartMini(out, pentagonBox.getScore(), posX + 31, ((pentagonBox.getSize() - 38) - 2) + posY, 18, "#7ab648", "#a3d977");
         posY += pentagonBox.getSize();
         i++;
       }
     }
     {
       int posX = 25;
-      int posY = 700;
+      int posY = 688;
       int i = 0;
       for (PentagonBox pentagonBox : pentagonBoxesUpdateConformance)
       {
         out.println("  <rect id=\"r_uc" + i + "\" fill=\"#a3d977\" stroke=\"black\" stroke-width=\"2\" x=\"" + posX + "\" y=\"" + posY + "\" width=\""
-            + pentagonBox.getSize() + "\" height=\"63\"/>");
+            + pentagonBox.getSize() + "\" height=\"82\"/>");
+        printScoreChartMini(out, pentagonBox.getScore(), ((int) (pentagonBox.getSize() - 38)) / 2 + posX, posY + 3, 18, "#7ab648", "#a3d977");
         posX += pentagonBox.getSize();
         i++;
       }
     }
     {
-      int posX = 538;
-      int posY = 700;
+      int posX = 533;
+      int posY = 688;
       int i = 0;
       for (PentagonBox pentagonBox : pentagonBoxesQueryConformance)
       {
         out.println("  <rect id=\"r_qc" + i + "\" fill=\"#ffdf71\" stroke=\"black\" stroke-width=\"2\" x=\"" + posX + "\" y=\"" + posY + "\" width=\""
-            + pentagonBox.getSize() + "\" height=\"63\"/>");
+            + pentagonBox.getSize() + "\" height=\"82\"/>");
+        printScoreChartMini(out, pentagonBox.getScore(), ((int) (pentagonBox.getSize() - 38)) / 2 + posX, posY + 3, 18, "#fcc438", "#ffdf71");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -277,6 +285,7 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <rect id=\"r_qf" + i + "\" fill=\"#ffdf71\" stroke=\"black\" stroke-width=\"2\" x=\"" + posX + "\" y=\"" + posY
             + "\" width=\"100\" height=\"" + pentagonBox.getSize() + "\"/>");
+        printScoreChartMini(out, pentagonBox.getScore(), posX + 31, ((pentagonBox.getSize() - 38) - 2) + posY, 18, "#fcc438", "#ffdf71");
         posY += pentagonBox.getSize();
         i++;
       }
@@ -326,7 +335,6 @@ public class PentagonServlet extends HomeServlet
     out.println("    hideReport('uc1'); ");
     out.println("    hideReport('uc2'); ");
     out.println("    hideReport('uc3'); ");
-    out.println("    hideReport('uc4'); ");
     out.println("    hideReport('qf0'); ");
     out.println("    hideReport('qf1'); ");
     out.println("    hideReport('qf2'); ");
@@ -364,38 +372,40 @@ public class PentagonServlet extends HomeServlet
     }
 
     {
-      int posX = 387;
-      int posY = 163;
-      out.println("  <span style=\"font-size: 13px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-          + (posX + offsetX) + "px; width: 74px; height: 50px; \">Confidence</span>");
+      int posX = 350;
+      int posY = 137;
+      out.println("  <span style=\"font-size: 18px; font-weight: bold; text-align: center; position: absolute; top: " + (posY + offsetY)
+          + "px; left: " + (posX + offsetX) + "px; width: 150px; height: 50px; color: #1a4982;\">Confidence</span>");
     }
 
     {
-      int posX = 138;
+      int posX = -15;
       int posY = 330;
-      out.println("  <span style=\"font-size: 13px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-          + (posX + offsetX) + "px; width: 74px; height: 50px; \">Update Functionality</span>");
+      out.println(
+          "  <span style=\"font-size: 18px; font-weight: bold; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
+              + (posX + offsetX) + "px; width: 300px; height: 50px;  color: #00624f; transform: rotate(90deg); \">Update Functionality</span>");
     }
 
     {
-      int posX = 639;
+      int posX = 544;
       int posY = 330;
-      out.println("  <span style=\"font-size: 13px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-          + (posX + offsetX) + "px; width: 74px; height: 50px; \">Query Functionality</span>");
+      out.println(
+          "  <span style=\"font-size: 18px; font-weight: bold; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
+              + (posX + offsetX) + "px; width: 300px; height: 50px;  color: #9b0d28; transform: rotate(90deg); \">Query Functionality</span>");
     }
 
     {
-      int posX = 232;
-      int posY = 625;
-      out.println("  <span style=\"font-size: 13px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-          + (posX + offsetX) + "px; width: 74px; height: 50px; \">Update Conformance</span>");
+      int posX = 135;
+      int posY = 660;
+      out.println("  <span style=\"font-size: 18px; font-weight: bold; text-align: center; position: absolute; top: " + (posY + offsetY)
+          + "px; left: " + (posX + offsetX) + "px; width: 300px; height: 50px;  color: #00624f;\">Update Conformance</span>");
     }
 
     {
-      int posX = 542;
-      int posY = 625;
-      out.println("  <span style=\"font-size: 13px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-          + (posX + offsetX) + "px; width: 74px; height: 50px; \">Query Conformance</span>");
+      int posX = 516;
+      int posY = 660;
+      out.println("  <span style=\"font-size: 18px; font-weight: bold; text-align: center; position: absolute; top: " + (posY + offsetY)
+          + "px; left: " + (posX + offsetX) + "px; width: 300px; height: 50px;  color: #9b0d28;\">Query Conformance</span>");
     }
 
     {
@@ -431,8 +441,9 @@ public class PentagonServlet extends HomeServlet
       for (PentagonBox pentagonBox : pentagonBoxesUpdateConformance)
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-            + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 100px;\" onmouseout=\"flashOffGreen('r_uc" + i
-            + "')\" onmouseover=\"flashOnGreen('r_uc" + i + "')\" onClick=\"showReport('uc" + i + "')\">" + pentagonBox.getLabel() + "</span>");
+            + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 70px;\" onmouseout=\"flashOffGreen('r_uc" + i
+            + "')\" onmouseover=\"flashOnGreen('r_uc" + i + "')\" onClick=\"showReport('uc" + i + "')\"><br/><br/>" + pentagonBox.getLabel()
+            + "</span>");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -444,8 +455,9 @@ public class PentagonServlet extends HomeServlet
       for (PentagonBox pentagonBox : pentagonBoxesQueryConformance)
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-            + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 100px;\" onmouseout=\"flashOffOrange('r_qc" + i
-            + "')\" onmouseover=\"flashOnOrange('r_qc" + i + "')\" onClick=\"showReport('qc" + i + "')\">" + pentagonBox.getLabel() + "</span>");
+            + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 70px;\" onmouseout=\"flashOffOrange('r_qc" + i
+            + "')\" onmouseover=\"flashOnOrange('r_qc" + i + "')\" onClick=\"showReport('qc" + i + "')\"><br/><br/>" + pentagonBox.getLabel()
+            + "</span>");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -530,19 +542,18 @@ public class PentagonServlet extends HomeServlet
     out.println("</svg>");
   }
 
-  public void printScoreChartMini(PrintWriter out, int score, int cornerX, int cornerY, int radius, String color)
+  public void printScoreChartMini(PrintWriter out, int score, int cornerX, int cornerY, int radius, String colorPass, String colorFail)
   {
     int padding = 1;
     if (score == 100)
     {
-      out.println("  <circle fill=\"#9b0d28\" stroke=\"black\" stroke-width=\"2\" cx=\"" + (cornerX + radius + padding) + "\" cy=\""
+      out.println("  <circle fill=\"" + colorPass + "\" stroke=\"black\" stroke-width=\"0.5\" cx=\"" + (cornerX + radius + padding) + "\" cy=\""
           + (cornerY + radius + padding) + "\" r=\"" + radius + "\"/>");
-      out.println("  <text x=\"" + cornerX + "\" y=\"" + (cornerY + radius + padding)
-          + "\" font-size=\"5\" fill=\"white\" font-weight=\"bold\">COMPLETE</text>");
+      out.println("  <text x=\"" + (cornerX + 6) + "\" y=\"" + (cornerY + radius + padding + 2) + "\" font-size=\"10\" fill=\"black\">100%</text>");
     } else
     {
-      out.println("  <circle fill=\"#cccccc\" stroke=\"black\" stroke-width=\"0.5\" cx=\"" + (cornerX + radius + padding) + "\" cy=\""
-          + (radius + padding) + "\" r=\"" + radius + "\"/>");
+      out.println(" <circle fill=\"" + colorFail + "\" stroke=\"black\" stroke-width=\"0.5\" cx=\"" + (cornerX + radius + padding) + "\" cy=\""
+          + (cornerY + radius + padding) + "\" r=\"" + radius + "\"/>");
       if (score > 0)
       {
         int posX = (cornerX + radius + padding) + (int) Math.round(radius * Math.sin(Math.toRadians(360.0 * score / 100.0)));
@@ -550,17 +561,26 @@ public class PentagonServlet extends HomeServlet
         if (score <= 50)
         {
           out.println("   <path d=\"M" + (cornerX + radius + padding) + "," + (cornerY + radius + padding) + " L" + (cornerX + radius + padding) + ","
-              + (padding + cornerY) + " A47,47 0 0,1 " + posX + "," + posY + " z\" fill=\"#9b0d28\" stroke=\"black\" stroke-width=\"1\"/>");
+              + (padding + cornerY) + " A" + radius + "," + radius + " 0 0,1 " + posX + "," + posY + " z\" fill=\"" + colorPass
+              + "\" stroke=\"black\" stroke-width=\"0.5\"/>");
         } else
         {
           out.println("   <path d=\"M" + (cornerX + radius + padding) + "," + (cornerY + radius + padding) + " L" + (cornerX + radius + padding) + ","
-              + (padding + cornerY) + " A47,47 0 1,1 " + posX + "," + posY + " z\" fill=\"#9b0d28\" stroke=\"black\" stroke-width=\"1\"/>");
+              + (padding + cornerY) + " A" + radius + "," + radius + " 0 1,1 " + posX + "," + posY + " z\" fill=\"" + colorPass
+              + "\" stroke=\"black\" stroke-width=\"0.5\"/>");
         }
-      }
-      if (score < 0)
+      } else if (score == 0)
       {
-        // out.println(" <path d=\"M19,16 L81,78 z\" fill=\"#9b0d28\"
-        // stroke=\"black\" stroke-width=\"0.5\"/>");
+        out.println("  <text x=\"" + (cornerX + 13) + "\" y=\"" + (cornerY + radius + padding + 2) + "\" font-size=\"10\" fill=\"black\">0%</text>");
+
+      } else if (score < 0)
+      {
+        int posX1 = (cornerX + radius + padding) + (int) Math.round(radius * Math.sin(Math.toRadians(315)));
+        int posY1 = (cornerY + radius + padding) - (int) Math.round(radius * Math.cos(Math.toRadians(315)));
+        int posX2 = (cornerX + radius + padding) + (int) Math.round(radius * Math.sin(Math.toRadians(135)));
+        int posY2 = (cornerY + radius + padding) - (int) Math.round(radius * Math.cos(Math.toRadians(135)));
+        out.println(
+            " <path d=\"M" + posX1 + "," + posY1 + " L" + posX2 + "," + posY2 + " z\" fill=\"#9b0d28\" stroke=\"black\" stroke-width=\"0.5\"/>");
       }
     }
   }
@@ -602,14 +622,14 @@ public class PentagonServlet extends HomeServlet
     points[4][1] = 71;
   }
 
-  public void printPentagon(PrintWriter out, int[][] points, String color)
+  public void printPentagon(PrintWriter out, int[][] points, String color, String strokeWidth)
   {
     String makePoints = "";
     for (int i = 0; i < points.length; i++)
     {
       makePoints += points[i][0] + "," + points[i][1] + " ";
     }
-    out.println("  <polygon fill=\"" + color + "\" stroke=\"black\" stroke-width=\"2\" points=\"" + makePoints + "\" onClick=\"showReport('')\"/>");
+    out.println("  <polygon fill=\"" + color + "\" stroke=\"black\" stroke-width=\"" + strokeWidth + "\" points=\"" + makePoints + "\" onClick=\"showReport('')\"/>");
   }
 
   private void prepare(PentagonBox[] pentagonBoxes, int totalSize)
@@ -899,8 +919,8 @@ public class PentagonServlet extends HomeServlet
     pb[0].setWeight(20);
     pb[1].setWeight(20);
     pb[2].setWeight(20);
-    pb[3].setWeight(18);
-    pb[4].setWeight(12);
+    pb[3].setWeight(20);
+    pb[4].setWeight(20);
 
     pb[0].setScore(pentagonReport.getScoreCAckConform());
     pb[1].setScore(pentagonReport.getScoreCGoodMessages());
@@ -1097,29 +1117,29 @@ public class PentagonServlet extends HomeServlet
       }
     };
 
-    pb[0].setTitle("NIST 2014 VXU Messages Accepted");
-    pb[1].setTitle("NIST 2015 VXU Messages Accepted");
-    pb[2].setTitle("Sensitive to Issues");
+    pb[0].setTitle("NIST 2014 VXU Accepted");
+    pb[1].setTitle("NIST 2015 VXU Accepted");
+    pb[2].setTitle("Sensitive");
     pb[3].setTitle("Coded Values");
     pb[4].setTitle("Tolerant");
     pb[5].setTitle("EHR Examples");
     pb[6].setTitle("Performance");
 
-    pb[0].setLabel("NIST 2014<br/>VXU Messages<br/>Accepted");
-    pb[1].setLabel("NIST 2015<br/>VXU Messages<br/>Accepted");
-    pb[2].setLabel("Sensitive to Issues");
+    pb[0].setLabel("NIST 2014<br/>VXU Accepted");
+    pb[1].setLabel("NIST 2015<br/>VXU Accepted");
+    pb[2].setLabel("Sensitive");
     pb[3].setLabel("Coded Values");
     pb[4].setLabel("Tolerant");
     pb[5].setLabel("EHR Examples");
     pb[6].setLabel("Performance");
 
-    pb[0].setWeight(35);
-    pb[1].setWeight(25);
+    pb[0].setWeight(20);
+    pb[1].setWeight(20);
     pb[2].setWeight(12);
-    pb[3].setWeight(10);
-    pb[4].setWeight(8);
-    pb[5].setWeight(5);
-    pb[6].setWeight(5);
+    pb[3].setWeight(12);
+    pb[4].setWeight(12);
+    pb[5].setWeight(12);
+    pb[6].setWeight(12);
 
     pb[0].setScore(pentagonReport.getScoreUFVxu2014());
     pb[1].setScore(pentagonReport.getScoreUFVxu2015());
@@ -1135,7 +1155,7 @@ public class PentagonServlet extends HomeServlet
   private PentagonBox[] createPentagonBoxesOfUpdateConformance(PentagonReport pentagonReport)
   {
 
-    PentagonBox[] pb = new PentagonBox[5];
+    PentagonBox[] pb = new PentagonBox[4];
 
     pb[0] = new PentagonBox() {
       @Override
@@ -1197,44 +1217,25 @@ public class PentagonServlet extends HomeServlet
       }
     };
 
-    pb[4] = new PentagonBox() {
-      @Override
-      public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
-      {
-        // TODO Auto-generated method stub
-
-      }
-
-      @Override
-      public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
-      {
-        // TODO Auto-generated method stub
-      }
-    };
-
-    pb[0].setTitle("No Major Conflicts");
+    pb[0].setTitle("No Modifications");
     pb[1].setTitle("No Conflicts");
-    pb[2].setTitle("No Major Constraints");
-    pb[3].setTitle("No Constraints");
-    pb[4].setTitle("Acks Conform");
+    pb[2].setTitle("No Constraints");
+    pb[3].setTitle("Acks Conform");
 
-    pb[0].setLabel("No Major<br/>Conflicts");
-    pb[1].setLabel("No Conflicts");
-    pb[2].setLabel("No Major<br/>Constraints");
-    pb[3].setLabel("No Constraints");
-    pb[4].setLabel("Acks Conform");
+    pb[0].setLabel("No<br/>Modifications");
+    pb[1].setLabel("No<br/>Conflicts");
+    pb[2].setLabel("No<br/>Constraints");
+    pb[3].setLabel("Acks<br/>Conform");
 
-    pb[0].setWeight(25);
+    pb[0].setWeight(20);
     pb[1].setWeight(20);
     pb[2].setWeight(20);
-    pb[3].setWeight(15);
-    pb[4].setWeight(20);
+    pb[3].setWeight(20);
 
-    pb[0].setScore(pentagonReport.getScoreUCMajorConflicts());
+    pb[0].setScore(pentagonReport.getScoreUCModifications());
     pb[1].setScore(pentagonReport.getScoreUCConflicts());
-    pb[2].setScore(pentagonReport.getScoreUCMajorConstraints());
-    pb[3].setScore(pentagonReport.getScoreUCUnexpConstraints());
-    pb[4].setScore(pentagonReport.getScoreUCAcksConform());
+    pb[2].setScore(pentagonReport.getScoreUCConstraints());
+    pb[3].setScore(pentagonReport.getScoreUCAcksConform());
 
     return pb;
   }
@@ -1339,21 +1340,21 @@ public class PentagonServlet extends HomeServlet
     pb[2].setTitle("Deduplication Engaged");
     pb[3].setTitle("Forecaster Engaged");
     pb[4].setTitle("Performance");
-    pb[5].setTitle("Minimum Query Data Check");
+    pb[5].setTitle("Query Check");
 
     pb[0].setLabel("NIST 2015<br/>QBP Supported");
     pb[1].setLabel("Data is Available");
     pb[2].setLabel("Deduplication Engaged");
     pb[3].setLabel("Forecaster Engaged");
     pb[4].setLabel("Performance");
-    pb[5].setLabel("Minimum Query Data Check");
+    pb[5].setLabel("Query Check");
 
-    pb[0].setWeight(30);
+    pb[0].setWeight(20);
     pb[1].setWeight(20);
     pb[2].setWeight(15);
     pb[3].setWeight(15);
-    pb[4].setWeight(10);
-    pb[5].setWeight(10);
+    pb[4].setWeight(15);
+    pb[5].setWeight(15);
 
     pb[0].setScore(pentagonReport.getScoreQFQbp2015());
     pb[1].setScore(pentagonReport.getScoreQFDataAvailable());
@@ -1403,11 +1404,11 @@ public class PentagonServlet extends HomeServlet
     pb[0].setTitle("Responses Conform");
     pb[1].setTitle("CDC WSDL Conforms");
 
-    pb[0].setLabel("Responses Conform");
+    pb[0].setLabel("Responses<br/>Conform");
     pb[1].setLabel("CDC WSDL<br/>Conforms");
 
-    pb[0].setWeight(60);
-    pb[1].setWeight(40);
+    pb[0].setWeight(50);
+    pb[1].setWeight(50);
 
     pb[0].setScore(pentagonReport.getScoreQCResponsesConform());
     pb[1].setScore(pentagonReport.getScoreQCSoapConforms());

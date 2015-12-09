@@ -11,6 +11,7 @@ import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
+import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
 public class PentagonReportLogic
 {
@@ -28,7 +29,7 @@ public class PentagonReportLogic
     PentagonReport pentagonReport = new PentagonReport();
     pentagonReport.setTestConducted(testConducted);
 
-    Map<String, TestSection> testSectionMap = new HashMap<>();
+    Map<String, TestSection> testSectionMap = new HashMap<String, TestSection>();
     {
       Query query = dataSession.createQuery("from TestSection where testConducted = ?");
       query.setParameter(0, testConducted);
@@ -55,6 +56,11 @@ public class PentagonReportLogic
       TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015);
       pentagonReport.setScoreUFVxu2015(testSection.getScoreLevel1());
     }
+    if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED) != null)
+    {
+      TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED);
+      pentagonReport.setScoreUFSensitive(testSection.getScoreLevel1());
+    }
     pentagonReport.setScoreUFCodedValues(testConducted.getScoreCoded());
     pentagonReport.setScoreUFTolerant(testConducted.getScoreTolerance());
     pentagonReport.setScoreUFEhrExamples(testConducted.getScoreEhr());
@@ -63,6 +69,79 @@ public class PentagonReportLogic
     {
       TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015);
       pentagonReport.setScoreUCAcksConform(testSection.getScoreLevel1());
+    }
+
+    {
+      Query query = dataSession.createQuery("from Transform where testConducted = ?");
+      query.setParameter(0, testConducted);
+      List<Transform> transformList = query.list();
+      int countExpected = 0;
+      for (Transform transform : transformList)
+      {
+        if (transform.getTransformField().isTransformExpected())
+        {
+          countExpected++;
+        }
+      }
+      int countUnexpected = transformList.size() - countExpected;
+      int totalScore = 0;
+      if (countUnexpected == 0)
+      {
+        totalScore += 70;
+      } else if (countUnexpected == 1)
+      {
+        totalScore += 50;
+      } else if (countUnexpected == 2)
+      {
+        totalScore += 30;
+      }
+      if (countExpected <= 5)
+      {
+        totalScore += 30;
+      } else if (countExpected <= 7)
+      {
+        totalScore += 15;
+      }
+      pentagonReport.setScoreUCModifications(totalScore);
+
+    }
+
+    {
+      int perUpdateCount = testConducted.getPerUpdateCount();
+      int perUpdateTotal = testConducted.getPerUpdateTotal();
+      if (perUpdateTotal > 0)
+      {
+        int millisecondsPerUpdate = Math.round(((float) perUpdateTotal) / perUpdateCount);
+        if (millisecondsPerUpdate < 3000)
+        {
+          pentagonReport.setScoreUFPerformance(100);
+        } else if (millisecondsPerUpdate > 6000)
+        {
+          pentagonReport.setScoreUFPerformance(0);
+        } else
+        {
+          pentagonReport.setScoreUFPerformance(Math.round(100 * ((millisecondsPerUpdate - 3000) / 3000)));
+        }
+      }
+    }
+
+    {
+      int perQueryCount = testConducted.getPerQueryCount();
+      int perQueryTotal = testConducted.getPerQueryTotal();
+      if (perQueryTotal > 0)
+      {
+        int millisecondsPerQuery = Math.round(((float) perQueryTotal) / perQueryCount);
+        if (millisecondsPerQuery < 6000)
+        {
+          pentagonReport.setScoreQFPerformance(100);
+        } else if (millisecondsPerQuery > 12000)
+        {
+          pentagonReport.setScoreQFPerformance(0);
+        } else
+        {
+          pentagonReport.setScoreQFPerformance(Math.round(100 * ((millisecondsPerQuery - 6000) / 6000)));
+        }
+      }
     }
 
     {
@@ -87,10 +166,9 @@ public class PentagonReportLogic
     }
     {
       int scoreUC = 0;
-      scoreUC = addWeightToScore(scoreUC, 30, pentagonReport.getScoreUCMajorConflicts());
-      scoreUC = addWeightToScore(scoreUC, 20, pentagonReport.getScoreUCConflicts());
-      scoreUC = addWeightToScore(scoreUC, 20, pentagonReport.getScoreUCMajorConstraints());
-      scoreUC = addWeightToScore(scoreUC, 10, pentagonReport.getScoreUCUnexpConstraints());
+      scoreUC = addWeightToScore(scoreUC, 30, pentagonReport.getScoreUCModifications());
+      scoreUC = addWeightToScore(scoreUC, 30, pentagonReport.getScoreUCConflicts());
+      scoreUC = addWeightToScore(scoreUC, 20, pentagonReport.getScoreUCConstraints());
       scoreUC = addWeightToScore(scoreUC, 20, pentagonReport.getScoreUCAcksConform());
       pentagonReport.setScoreUC(scoreUC / 100);
     }

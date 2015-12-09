@@ -29,10 +29,9 @@
     <property name="scoreQFForecaster" column="score_qf_forecaster" type="integer"/>
     <property name="scoreQFPerformance" column="score_qf_performance" type="integer"/>
     <property name="scoreQFMinimumQuery" column="score_qf_minimum_query" type="integer"/>
-    <property name="scoreUCMajorConflicts" column="score_uc_major_conflicts" type="integer"/>
+    <property name="scoreUCModifications" column="score_uc_modifications" type="integer"/>
     <property name="scoreUCConflicts" column="score_uc_conflicts" type="integer"/>
-    <property name="scoreUCMajorConstraints" column="score_uc_major_constraints" type="integer"/>
-    <property name="scoreUCUnexpConstraints" column="score_uc_unexp_constraints" type="integer"/>
+    <property name="scoreUCConstraints" column="score_uc_constraints" type="integer"/>
     <property name="scoreUCAcksConform" column="score_uc_acks_conform" type="integer"/>
     <property name="scoreQCResponsesConform" column="score_qc_responses_conform" type="integer"/>
     <property name="scoreQCSoapConforms" column="score_qc_soap_conforms" type="integer"/>

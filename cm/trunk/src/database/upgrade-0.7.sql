@@ -24,10 +24,9 @@ CREATE TABLE pentagon_report (
   score_qf_forecaster         INTEGER NOT NULL,
   score_qf_performance        INTEGER NOT NULL,
   score_qf_minimum_query      INTEGER NOT NULL,
-  score_uc_major_conflicts    INTEGER NOT NULL,
+  score_uc_modifications      INTEGER NOT NULL,
   score_uc_conflicts          INTEGER NOT NULL,
-  score_uc_major_constraints  INTEGER NOT NULL,
-  score_uc_unexp_constraints  INTEGER NOT NULL,
+  score_uc_constraints        INTEGER NOT NULL,
   score_uc_acks_conform       INTEGER NOT NULL,
   score_qc_responses_conform  INTEGER NOT NULL,
   score_qc_soap_conforms      INTEGER NOT NULL
