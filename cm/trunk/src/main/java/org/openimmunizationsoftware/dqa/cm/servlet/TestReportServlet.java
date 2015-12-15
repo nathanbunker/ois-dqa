@@ -1462,7 +1462,7 @@ public class TestReportServlet extends HomeServlet
     out.println("</div>");
   }
 
-  public void printTransforms(PrintWriter out, List<Transform> transformExpected)
+  public static void printTransforms(PrintWriter out, List<Transform> transformExpected)
   {
     out.println("<ul>");
     for (Transform transform : transformExpected)
@@ -2128,7 +2128,7 @@ public class TestReportServlet extends HomeServlet
     out.println("  </tr>");
   }
 
-  private String createTime(double ms)
+  public static String createTime(double ms)
   {
     if (ms < 500)
     {
@@ -2156,7 +2156,7 @@ public class TestReportServlet extends HomeServlet
     return "";
   }
 
-  private static String addHovers(String message) throws IOException
+  public static String addHovers(String message) throws IOException
   {
     StringBuilder sb = new StringBuilder();
     BufferedReader reader = new BufferedReader(new StringReader(message));

@@ -3,7 +3,7 @@
 
   <groupId>org.openimmunizationsoftware.dqa</groupId>
   <artifactId>ois-dqa-codeManager</artifactId>
-  <version>0.3</version>
+  <version>0.8</version>
   <packaging>war</packaging>
 
   <name>ois-dqa-codeManager</name>

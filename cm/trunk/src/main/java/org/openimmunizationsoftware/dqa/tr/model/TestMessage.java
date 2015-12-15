@@ -33,8 +33,19 @@ public class TestMessage implements Serializable {
   private String resultAcceptedMessage = "";
   private String resultResponseType = "";
   private String resultAckType = "";
+  private String resultAckConformance = "";
   private int forecastTestPanelCaseId = 0;
   private int forecastTestPanelId = 0;
+
+  public String getResultAckConformance()
+  {
+    return resultAckConformance;
+  }
+
+  public void setResultAckConformance(String resultAckConformance)
+  {
+    this.resultAckConformance = resultAckConformance;
+  }
 
   public boolean isResultAccepted() {
     return resultAccepted;

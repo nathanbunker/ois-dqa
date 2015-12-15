@@ -349,8 +349,7 @@ p.pentagon {color:#9b0d28; font-size: 10pt; margin-right: 5px; margin-left: 5px;
 	background-color: #9b0d28;
 }
 
-
-.pentagonTestMessagePass {
+.pentagonTestMessageSaved {
 	border-color: black;
 	border-width: 1px;
 	border-style:inset;
@@ -362,3 +361,25 @@ p.pentagon {color:#9b0d28; font-size: 10pt; margin-right: 5px; margin-left: 5px;
 	font-weight: bold;
 	background-color: #00624f;
 }
+
+
+.pentagonTestMessagePass {
+	border-color: black;
+	border-width: 1px;
+	border-style:inset;
+	padding-left: 4px;
+	padding-right: 4px;
+	font-size: 10pt;
+	margin: 2px;
+	color: #ffdf71;
+	font-weight: bold;
+	background-color: #9b0d28;
+}
+
+pre.pentagon {
+	padding-left: 5px;
+   font-size: 11px;
+   width: 100%;
+   overflow: auto;
+ }
+ 
