@@ -61,7 +61,7 @@ public class PentagonReportLogic
       TestSection testSectionNotAccepted = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
       Query query = dataSession.createQuery("from TestMessage where testSection = ? or testSection = ?");
       query.setParameter(0, testSectionBasic);
-      query.setParameter(0, testSectionNotAccepted);
+      query.setParameter(1, testSectionNotAccepted);
       List<TestMessage> testMessageList = query.list();
       for (TestMessage testMessage : testMessageList)
       {
@@ -142,7 +142,7 @@ public class PentagonReportLogic
       if (perUpdateTotal > 0)
       {
         int millisecondsPerUpdate = Math.round(((float) perUpdateTotal) / perUpdateCount);
-        if (millisecondsPerUpdate < 1000)
+        if (millisecondsPerUpdate < 1050)
         {
           pentagonReport.setScoreUFPerformance(100);
         } else if (millisecondsPerUpdate > 2000)
@@ -150,7 +150,7 @@ public class PentagonReportLogic
           pentagonReport.setScoreUFPerformance(0);
         } else
         {
-          pentagonReport.setScoreUFPerformance(Math.round(100 * ((millisecondsPerUpdate - 1000) / 1000)));
+          pentagonReport.setScoreUFPerformance((int) Math.round(-100 * ((millisecondsPerUpdate - 2000.0) / 1000)));
         }
       }
     }
@@ -161,7 +161,7 @@ public class PentagonReportLogic
       if (perQueryTotal > 0)
       {
         int millisecondsPerQuery = Math.round(((float) perQueryTotal) / perQueryCount);
-        if (millisecondsPerQuery < 1000)
+        if (millisecondsPerQuery < 1050)
         {
           pentagonReport.setScoreQFPerformance(100);
         } else if (millisecondsPerQuery > 2000)
@@ -169,7 +169,7 @@ public class PentagonReportLogic
           pentagonReport.setScoreQFPerformance(0);
         } else
         {
-          pentagonReport.setScoreQFPerformance(Math.round(100 * ((millisecondsPerQuery - 1000) / 1000)));
+          pentagonReport.setScoreQFPerformance((int) Math.round(-100 * ((millisecondsPerQuery - 2000.0) / 1000)));
         }
       }
     }
