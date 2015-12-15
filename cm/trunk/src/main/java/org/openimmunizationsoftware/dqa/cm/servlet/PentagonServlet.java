@@ -18,15 +18,17 @@ import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
+import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
 public class PentagonServlet extends HomeServlet
 {
 
-  private static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
-  private static final String PARAM_CONNECTION_LABEL = "connectionLabel";
-  private static final String PARAM_TEST_MESSAGE_ID = "testMessageId";
-  private static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
-  private static final String PARAM_COMPARISON_FIELD_ID = "comparisonFieldId";
+  public static final String SHOW_DETAIL_CLOSE_BUTTON = "<a style=\"float: right; display:inline-block; padding: 2px 5px; background:white; \" onclick=\"hideReport('details')\">Close</a>";
+  public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
+  public static final String PARAM_CONNECTION_LABEL = "connectionLabel";
+  public static final String PARAM_TEST_MESSAGE_ID = "testMessageId";
+  public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
+  public static final String PARAM_COMPARISON_FIELD_ID = "comparisonFieldId";
 
   private static final String VIEW_CONFORMANCE1 = "c1";
 
@@ -294,6 +296,20 @@ public class PentagonServlet extends HomeServlet
     out.println("</svg>");
 
     out.println("<script>");
+    out.println("  function loadDetails(testMessageId) { ");
+    out.println("    var xhttp = new XMLHttpRequest(); ");
+    out.println("    xhttp.onreadystatechange = function() { ");
+    out.println("      if (xhttp.readyState == XMLHttpRequest.DONE) { ");
+    out.println("        if (xhttp.status == 200) { ");
+    out.println("          var e = document.getElementById('details');");
+    out.println("          e.innerHTML = xhttp.responseText; ");
+    out.println("          e.style.display = 'block';");
+    out.println("        }");
+    out.println("      }");
+    out.println("    }");
+    out.println("    xhttp.open('GET', 'pentagonContent?" + PARAM_TEST_MESSAGE_ID + "=' + testMessageId, true); ");
+    out.println("    xhttp.send(null);");
+    out.println("  }");
     out.println("  function flashOnGreen(id) { ");
     out.println("    var e = document.getElementById(id); ");
     out.println("    e.style.fill = '#7ab648'");
@@ -365,10 +381,11 @@ public class PentagonServlet extends HomeServlet
 
     {
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-      int posX = 700;
-      int posY = 80;
+      int posX = 720;
+      int posY = 50;
       out.println("  <span style=\"font-size: 16px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-          + (posX + offsetX) + "px; width: 100px; height: 50px; \">" + sdf.format(testConducted.getTestStartedTime()) + "</span>");
+          + (posX + offsetX) + "px; width: 100px; height: 50px; border-width: 1px; border-style: solid; \">Report Run<br/>"
+          + sdf.format(testConducted.getTestStartedTime()) + "</span>");
     }
 
     {
@@ -481,6 +498,16 @@ public class PentagonServlet extends HomeServlet
     printContents(webSession, userSession, dataSession, out, testConducted, offsetY, offsetX, "uc", pentagonBoxesUpdateConformance);
     printContents(webSession, userSession, dataSession, out, testConducted, offsetY, offsetX, "qf", pentagonBoxesQueryFunctionality);
     printContents(webSession, userSession, dataSession, out, testConducted, offsetY, offsetX, "qc", pentagonBoxesQueryConformance);
+
+    {
+      int posX = 0;
+      int posY = 50;
+      out.println("<div id=\"details\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
+          + "px; height: 700px; width: 850px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; \">");
+      out.println(SHOW_DETAIL_CLOSE_BUTTON);
+      out.println("</div>");
+    }
+
     createFooter(webSession);
   }
 
@@ -587,11 +614,11 @@ public class PentagonServlet extends HomeServlet
 
   public void startDiv(PrintWriter out, String id, int offsetX, int offsetY)
   {
-    int posX = 134;
-    int posY = 133;
+    int posX = 124;
+    int posY = 135;
 
     out.println("<div id=\"" + id + "\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
-        + "px; height: 553px; width: 577px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; \">");
+        + "px; height: 548px; width: 597px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; \">");
   }
 
   public void setupPointsBig(int[][] points)
@@ -629,7 +656,8 @@ public class PentagonServlet extends HomeServlet
     {
       makePoints += points[i][0] + "," + points[i][1] + " ";
     }
-    out.println("  <polygon fill=\"" + color + "\" stroke=\"black\" stroke-width=\"" + strokeWidth + "\" points=\"" + makePoints + "\" onClick=\"showReport('')\"/>");
+    out.println("  <polygon fill=\"" + color + "\" stroke=\"black\" stroke-width=\"" + strokeWidth + "\" points=\"" + makePoints
+        + "\" onClick=\"showReport('')\"/>");
   }
 
   private void prepare(PentagonBox[] pentagonBoxes, int totalSize)
@@ -744,7 +772,7 @@ public class PentagonServlet extends HomeServlet
       out.println("<ul>");
       for (TestMessage testMessage : testMessageList)
       {
-        out.println("<li><span class=\"pentagonTestMessageFail\">" + testMessage.getTestCaseDescription() + "</span></li>");
+        out.println("<li><a class=\"pentagonTestMessageFail\"> onclick=\"loadDetails('" + testMessage.getTestMessageId() + "');\">" + testMessage.getTestCaseDescription() + "</a></li>");
       }
       out.println("</ul>");
     }
@@ -754,7 +782,7 @@ public class PentagonServlet extends HomeServlet
       out.println("<ul>");
       for (TestMessage testMessage : testMessageList)
       {
-        out.println("<li><span class=\"pentagonTestMessagePass\">" + testMessage.getTestCaseDescription() + "</span></li>");
+        out.println("<li><a class=\"pentagonTestMessagePass\" onclick=\"loadDetails('" + testMessage.getTestMessageId() + "');\">" + testMessage.getTestCaseDescription() + "</a></li>");
       }
       out.println("</ul>");
     }
@@ -1076,14 +1104,39 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
-
+        out.println("<p class=\"pentagon\">HL7 requires that receiving systems, such as IIS, give a certain amount of tolerance to received message. "
+            + "Ideally IIS would always receive perfect and consistent messages, but when it does not, it should still try its best to process"
+            + "messages with minor issues. The test examples in section all have minor issues that do not directly affect data quality and which "
+            + "IIS would be expected to cope with. Still this test does not assert that IIS ought to accept every tolerant message proposed here. "
+            + "A few of these messages may not be accepted by IIS for good reasons. IIS should review closely the ones they do not accept and "
+            + "determine if is possible to be tolerant of these issues. </p>");
       }
 
       @Override
       public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
+        if (score < 100)
+        {
+          out.println("<h3 class=\"pentagon\">Fail - Message Was Not Accepted</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testCaseDescription like ? order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
+          query.setParameter(1, testConducted);
+          query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListFail(out, testMessageList);
+        }
+        if (score > 0)
+        {
+          out.println("<h3 class=\"pentagon\">Pass - Message Was Accepted</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testCaseDescription like ?  order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
+          query.setParameter(1, testConducted);
+          query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListPass(out, testMessageList);
+        }
       }
     };
 
@@ -1091,14 +1144,39 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
+        out.println("<p class=\"pentagon\">Certified EHR systems are able to produce messages that meet NIST standards, but may contain minor variations "
+            + "that are not seen in the NIST examples. This section contains examples from EHR systems. While an attempt has been made to ensure that "
+            + "these are good messages, this test does not assert that an IIS ought to be able accept all of these. Rather an IIS should use "
+            + "this test to help find issues that were not identified in any of the other testing scenarios. In addition this test list will "
+            + "grow as additional examples are found.  </p>");
 
       }
 
       @Override
       public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
+        if (score < 100)
+        {
+          out.println("<h3 class=\"pentagon\">Fail - EHR Example Was Not Accepted</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testCaseDescription like ? order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
+          query.setParameter(1, testConducted);
+          query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListFail(out, testMessageList);
+        }
+        if (score > 0)
+        {
+          out.println("<h3 class=\"pentagon\">Pass - EHR Example Was Accepted</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testCaseDescription like ?  order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
+          query.setParameter(1, testConducted);
+          query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListPass(out, testMessageList);
+        }
       }
     };
 
@@ -1106,14 +1184,24 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
-
+        out.println("<p class=\"pentagon\">Ideally IIS should respond quickly to updates received. Rapid response reduces transmission times for large amounts"
+            + "of data and provides good support for systems as they increase their integration with IIS. "
+            + "This report includes a performance measure mostly because the information is available when testing and it has some "
+            + "impact on the perception of how well the IIS is working. However, please note that performance makes a very small "
+            + "contribution to the overall score.   </p>");
       }
 
       @Override
       public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
+        int average = (int) (((double) testConducted.getPerUpdateTotal()) / testConducted.getPerUpdateCount() + 0.5);
+        out.println("<h3>Response Time</h3>");
+        out.println("<ul>");
+        out.println("  <li>Average: " + TestReportServlet.createTime(average) + "</li>");
+        out.println("  <li>Minimum: " + TestReportServlet.createTime(testConducted.getPerUpdateMin()) + "</li>");
+        out.println("  <li>Maximum: " + TestReportServlet.createTime(testConducted.getPerUpdateMax()) + "</li>");
+        out.println("  <li>Std Dev: " + TestReportServlet.createTime(testConducted.getPerUpdateStd()) + "</li>");
+        out.println("</ul>");
       }
     };
 
@@ -1161,14 +1249,59 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
-
+        out.println("<p class=\"pentagon\">Modifications are changes made to each test message to meet local IIS standards. Some of these"
+            + "modifications are for fields that would be expected to be changed, such as identification parameters in the MSH segment. "
+            + "Others are to meet local requirements for form or content. Thus these modifications are identified as either"
+            + "expected or unexpected modifications. IIS should work to reduce the unexpected modifications as much as possible as "
+            + "these are likely to be off-standard or at the very least a difference from the national implementation guide.   </p>");
       }
 
       @Override
       public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
+        List<Transform> transformExpected = null;
+        {
+          Query query = dataSession
+              .createQuery("from Transform where testConducted = ? and transformField.transformExpected = ? order by transformField.transformText");
+          query.setParameter(0, testConducted);
+          query.setParameter(1, true);
+          transformExpected = query.list();
+        }
+        List<Transform> transformCustom = null;
+        {
+          Query query = dataSession
+              .createQuery("from Transform where testConducted = ? and transformField.transformExpected = ? order by transformField.transformText");
+          query.setParameter(0, testConducted);
+          query.setParameter(1, false);
+          transformCustom = query.list();
+        }
+        if (transformExpected.size() == 0 && transformCustom.size() == 0)
+        {
+          out.println("<h3 class=\"pentagon\">Custom Modifications</h3>");
+          out.println("<p class=\"pentagon\">This interface did not require any modifications to the message in order for it to be accepted. </p>");
+        } else
+        {
+          out.println("<h3 class=\"pentagon\">Custom Modifications</h3>");
+          out.println("<p class=\"pentagon\">This interface requires customized Transformations to modify each message "
+              + "before transmitting them to the IIS. These transformations can range from setting "
+              + "the correct submitter facility in the message header to modifying the structure of "
+              + "the HL7 message to meet local requirements. </p>");
+          if (transformExpected.size() > 0)
+          {
+            out.println("<h4 class=\"pentagon\">Expected Modifications</h4>");
+            out.println("<p class=\"pentagon\">" + "Changes to certain fields such as MSH-4 and RXA-11.4 are expected "
+                + "as IIS may request specific values in these fields.  </p>");
+            TestReportServlet.printTransforms(out, transformExpected);
+          }
+          if (transformCustom.size() > 0)
+          {
+            out.println("<h4 class=\"pentagon\">Unexpected Modifications</h4>");
+            out.println("<p class=\"pentagon\">These changes were not anticipated in the national standard or in "
+                + "NIST testing. Please examine the need for these changes carefully as they are "
+                + "likely to result in significant effort by EHR-s and other trading partners to achieve interoperability.</p>");
+            TestReportServlet.printTransforms(out, transformCustom);
+          }
+        }
       }
     };
 

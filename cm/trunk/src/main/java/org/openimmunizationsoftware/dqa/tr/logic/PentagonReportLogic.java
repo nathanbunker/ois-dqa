@@ -10,6 +10,7 @@ import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
+import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
@@ -51,6 +52,35 @@ public class PentagonReportLogic
       pentagonReport.setScoreUFVxu2014(testSection.getScoreLevel1());
       pentagonReport.setScoreCGoodMessages(testSection.getScoreLevel1());
     }
+    if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC) != null
+        && testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED) != null)
+    {
+      int countOk = 0;
+      int countTotal = 0;
+      TestSection testSectionBasic = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
+      TestSection testSectionNotAccepted = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
+      Query query = dataSession.createQuery("from TestMessage where testSection = ? or testSection = ?");
+      query.setParameter(0, testSectionBasic);
+      query.setParameter(0, testSectionNotAccepted);
+      List<TestMessage> testMessageList = query.list();
+      for (TestMessage testMessage : testMessageList)
+      {
+        if (testMessage.getResultAckConformance() != null
+            && !testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_NOT_RUN))
+        {
+          countTotal++;
+          if (testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_OK))
+          {
+            countOk++;
+          }
+        }
+      }
+      if (countTotal != 0)
+      {
+        pentagonReport.setScoreCAckConform(((int) 100.0 * countOk / countTotal));
+      }
+    }
+
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015) != null)
     {
       TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015);
@@ -112,15 +142,15 @@ public class PentagonReportLogic
       if (perUpdateTotal > 0)
       {
         int millisecondsPerUpdate = Math.round(((float) perUpdateTotal) / perUpdateCount);
-        if (millisecondsPerUpdate < 3000)
+        if (millisecondsPerUpdate < 1000)
         {
           pentagonReport.setScoreUFPerformance(100);
-        } else if (millisecondsPerUpdate > 6000)
+        } else if (millisecondsPerUpdate > 2000)
         {
           pentagonReport.setScoreUFPerformance(0);
         } else
         {
-          pentagonReport.setScoreUFPerformance(Math.round(100 * ((millisecondsPerUpdate - 3000) / 3000)));
+          pentagonReport.setScoreUFPerformance(Math.round(100 * ((millisecondsPerUpdate - 1000) / 1000)));
         }
       }
     }
@@ -131,15 +161,15 @@ public class PentagonReportLogic
       if (perQueryTotal > 0)
       {
         int millisecondsPerQuery = Math.round(((float) perQueryTotal) / perQueryCount);
-        if (millisecondsPerQuery < 6000)
+        if (millisecondsPerQuery < 1000)
         {
           pentagonReport.setScoreQFPerformance(100);
-        } else if (millisecondsPerQuery > 12000)
+        } else if (millisecondsPerQuery > 2000)
         {
           pentagonReport.setScoreQFPerformance(0);
         } else
         {
-          pentagonReport.setScoreQFPerformance(Math.round(100 * ((millisecondsPerQuery - 6000) / 6000)));
+          pentagonReport.setScoreQFPerformance(Math.round(100 * ((millisecondsPerQuery - 1000) / 1000)));
         }
       }
     }

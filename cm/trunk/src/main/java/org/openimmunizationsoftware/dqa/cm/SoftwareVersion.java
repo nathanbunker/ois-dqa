@@ -2,5 +2,5 @@ package org.openimmunizationsoftware.dqa.cm;
 
 public class SoftwareVersion
 {
-  public static String VERSION = "0.7.0";
+  public static String VERSION = "0.8.0";
 }

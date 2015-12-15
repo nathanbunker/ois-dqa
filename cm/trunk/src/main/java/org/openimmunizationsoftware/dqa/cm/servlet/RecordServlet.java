@@ -286,6 +286,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
               testMessage.setResultAcceptedMessage(readValue(req, PARAM_TM_RESULT_ACCEPTED_MESSAGE, 250));
               testMessage.setResultResponseType(readValue(req, PARAM_TM_RESULT_RESPONSE_TYPE, 250));
               testMessage.setResultAckType(readValue(req, PARAM_TM_RESULT_ACK_TYPE, 250));
+              testMessage.setResultAckConformance(readValue(req, PARAM_TM_RESULT_ACK_CONFORMANCE, 250));
               testMessage.setForecastTestPanelCaseId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_CASE_ID));
               testMessage.setForecastTestPanelId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_ID));
               {
