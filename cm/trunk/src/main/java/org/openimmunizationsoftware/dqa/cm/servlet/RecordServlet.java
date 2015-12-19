@@ -278,6 +278,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
               testMessage.setPrepScenarioName(readValue(req, PARAM_TM_PREP_SCENARIO_NAME, 250));
               testMessage.setPrepMessageDerivedFrom(readValue(req, PARAM_TM_PREP_MESSAGE_DERIVED_FROM));
               testMessage.setPrepMessageOriginal(readValue(req, PARAM_TM_PREP_MESSAGE_ORIGINAL));
+              testMessage.setPrepMessageOriginalResponse(readValue(req, PARAM_TM_PREP_MESSAGE_ORIGINAL_RESPONSE));
               testMessage.setPrepMessageActual(readValue(req, PARAM_TM_PREP_MESSAGE_ACTUAL));
               testMessage.setResultMessageActual(readValue(req, PARAM_TM_RESULT_MESSAGE_ACTUAL));
               testMessage.setResultStatus(readValue(req, PARAM_TM_RESULT_STATUS, 250));
@@ -287,6 +288,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
               testMessage.setResultResponseType(readValue(req, PARAM_TM_RESULT_RESPONSE_TYPE, 250));
               testMessage.setResultAckType(readValue(req, PARAM_TM_RESULT_ACK_TYPE, 250));
               testMessage.setResultAckConformance(readValue(req, PARAM_TM_RESULT_ACK_CONFORMANCE, 250));
+              testMessage.setResultStoreStatus(readValue(req, PARAM_TM_RESULT_ACK_STORE_STATUS, 250));
               testMessage.setForecastTestPanelCaseId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_CASE_ID));
               testMessage.setForecastTestPanelId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_ID));
               {

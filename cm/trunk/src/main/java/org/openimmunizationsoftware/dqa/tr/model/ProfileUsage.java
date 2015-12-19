@@ -55,7 +55,7 @@ public class ProfileUsage
   
   @Override
   public String toString() {
-    if (version.equals("")) {
+    if (version == null || version.equals("")) {
       return category + " - " + label;
     }
     return category + " - " + label + " - " + version;

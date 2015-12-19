@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TransportOther" table="transport_other">
+    <id name="transportWsdlOtherId" column="transport_other_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="transportAnalysis" column="transport_analysis_id" class="TransportAnalysis"/>
+    <property name="clientCertificate" column="client_certificate" type="string"/>
+    <property name="operation" column="operation" type="string"/>
+    <property name="username" column="username" type="string"/>
+    <property name="password" column="password" type="string"/>
+    <property name="facilityid" column="facilityid" type="string"/>
+    <property name="otherParameter" column="other_parameter" type="string"/>
+    <property name="hl7Message" column="hl7_message" type="string"/>
+    <property name="couldUseCdcWsdl" column="could_use_cdc_wsdl" type="string"/>
+    <property name="findingsReport" column="findings_report" type="string"/>
+  </class>
+</hibernate-mapping>

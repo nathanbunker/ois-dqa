@@ -13,9 +13,17 @@ import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 import org.openimmunizationsoftware.dqa.tr.model.Transform;
+import org.openimmunizationsoftware.dqa.tr.model.TransportAnalysis;
+import org.openimmunizationsoftware.dqa.tr.model.TransportWsdlCdc;
 
 public class PentagonReportLogic
 {
+
+  private static final String[] DATA_AVAILABLE_SECTIONS = { RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC,
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED,
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL, RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING,
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED };
+
   public static PentagonReport createOrReturnPentagonReport(TestConducted testConducted, Session dataSession)
   {
     {
@@ -78,6 +86,68 @@ public class PentagonReportLogic
       if (countTotal != 0)
       {
         pentagonReport.setScoreCAckConform(((int) 100.0 * countOk / countTotal));
+      }
+    }
+
+    {
+      int count = 0;
+      int countPass = 0;
+      for (String sectionNames : new String[] { RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC,
+          RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED })
+      {
+        TestSection testSection = testSectionMap.get(sectionNames);
+        Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'query'");
+        query.setParameter(0, testSection);
+        List<TestMessage> testMessageList = query.list();
+        for (TestMessage testMessage : testMessageList)
+        {
+          if (testMessage.getResultStoreStatus() != null)
+          {
+            if (testMessage.getResultStoreStatus().equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_ACCEPTED_RETURNED))
+            {
+              count++;
+              countPass++;
+            } else if (testMessage.getResultStoreStatus().equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_ACCEPTED_NOT_RETURNED))
+            {
+              count++;
+            }
+          }
+        }
+      }
+      if (count > 0)
+      {
+        pentagonReport.setScoreCGoodData((int) (100.0 * countPass / count));
+      }
+    }
+
+    {
+      int count = 0;
+      int countPass = 0;
+      for (String sectionNames : new String[] { RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC,
+          RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED })
+      {
+        TestSection testSection = testSectionMap.get(sectionNames);
+        Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'query'");
+        query.setParameter(0, testSection);
+        List<TestMessage> testMessageList = query.list();
+        for (TestMessage testMessage : testMessageList)
+        {
+          if (testMessage.getResultStoreStatus() != null)
+          {
+            if (testMessage.getResultStoreStatus().equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_NOT_ACCEPTED_RETURNED))
+            {
+              count++;
+            } else if (testMessage.getResultStoreStatus().equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_NOT_ACCEPTED_NOT_RETURNED))
+            {
+              count++;
+              countPass++;
+            }
+          }
+        }
+      }
+      if (count > 0)
+      {
+        pentagonReport.setScoreCBadData((int) (100.0 * countPass / count));
       }
     }
 
@@ -202,6 +272,40 @@ public class PentagonReportLogic
       scoreUC = addWeightToScore(scoreUC, 20, pentagonReport.getScoreUCAcksConform());
       pentagonReport.setScoreUC(scoreUC / 100);
     }
+    if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT) != null)
+    {
+      TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT);
+      pentagonReport.setScoreQFQbp2015(testSection.getScoreLevel2());
+    }
+    {
+      int count = 0;
+      int countPass = 0;
+      for (String sectionNames : DATA_AVAILABLE_SECTIONS)
+      {
+        TestSection testSection = testSectionMap.get(sectionNames);
+        Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'query'");
+        query.setParameter(0, testSection);
+        List<TestMessage> testMessageList = query.list();
+        for (TestMessage testMessage : testMessageList)
+        {
+          if (testMessage.getResultStoreStatus() != null)
+          {
+            if (testMessage.getResultStoreStatus().equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_ACCEPTED_RETURNED))
+            {
+              count++;
+              countPass++;
+            } else if (testMessage.getResultStoreStatus().equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_ACCEPTED_NOT_RETURNED))
+            {
+              count++;
+            }
+          }
+        }
+      }
+      if (count > 0)
+      {
+        pentagonReport.setScoreQFDataAvailable((int) (100.0 * countPass / count));
+      }
+    }
     {
       int scoreQF = 0;
       scoreQF = addWeightToScore(scoreQF, 30, pentagonReport.getScoreQFQbp2015());
@@ -217,6 +321,47 @@ public class PentagonReportLogic
       scoreQC = addWeightToScore(scoreQC, 60, pentagonReport.getScoreQCResponsesConform());
       scoreQC = addWeightToScore(scoreQC, 40, pentagonReport.getScoreQCSoapConforms());
       pentagonReport.setScoreQC(scoreQC / 100);
+    }
+
+    if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015) != null)
+    {
+      TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015);
+      pentagonReport.setScoreQCResponsesConform(testSection.getScoreLevel2());
+    }
+
+    {
+      TransportWsdlCdc transportWsdlCdc = null;
+      {
+        Query query = dataSession.createQuery("from TransportWsdlCdc where transportAnalysis.connectionLabel = ?");
+        query.setParameter(0, testConducted.getConnectionLabel());
+        List<TransportWsdlCdc> transportWsdlCdcList = query.list();
+        if (transportWsdlCdcList.size() > 0)
+        {
+          transportWsdlCdc = transportWsdlCdcList.get(0);
+        }
+      }
+      if (transportWsdlCdc != null)
+      {
+        TransportAnalysis transportAnalysis = transportWsdlCdc.getTransportAnalysis();
+        if (transportAnalysis.getTransportType().equalsIgnoreCase("CDC WSDL") && transportAnalysis.getReportComplete().equalsIgnoreCase("Yes"))
+        {
+          int score = 0;
+          if (transportWsdlCdc.getSsmConforms().equalsIgnoreCase("Yes"))
+          {
+            score += 70;
+          }
+          if (transportWsdlCdc.getCtConforms().equalsIgnoreCase("Yes"))
+          {
+            score += 20;
+          }
+          if (transportWsdlCdc.getSfConforms().equalsIgnoreCase("Yes"))
+          {
+            score += 10;
+          }
+          pentagonReport.setScoreQCSoapConforms(score);
+        }
+      }
+
     }
 
     Transaction transaction = dataSession.beginTransaction();

@@ -2,7 +2,8 @@ package org.openimmunizationsoftware.dqa.tr.model;
 
 import java.io.Serializable;
 
-public class TestMessage implements Serializable {
+public class TestMessage implements Serializable
+{
   private int testMessageId = 0;
   private TestSection testSection = null;
   private int testPosition = 0;
@@ -25,17 +26,39 @@ public class TestMessage implements Serializable {
   private String prepScenarioName = "";
   private String prepMessageDerivedFrom = "";
   private String prepMessageOriginal = "";
+  private String prepMessageOriginalResponse = "";
   private String prepMessageActual = "";
   private String resultMessageActual = "";
   private String resultStatus = "";
-  private boolean resultAccepted = false; 
+  private boolean resultAccepted = false;
   private String resultExceptionText = "";
   private String resultAcceptedMessage = "";
   private String resultResponseType = "";
   private String resultAckType = "";
   private String resultAckConformance = "";
+  private String resultStoreStatus = "";
   private int forecastTestPanelCaseId = 0;
   private int forecastTestPanelId = 0;
+
+  public String getPrepMessageOriginalResponse()
+  {
+    return prepMessageOriginalResponse;
+  }
+
+  public void setPrepMessageOriginalResponse(String prepMessageOriginalResponse)
+  {
+    this.prepMessageOriginalResponse = prepMessageOriginalResponse;
+  }
+
+  public String getResultStoreStatus()
+  {
+    return resultStoreStatus;
+  }
+
+  public void setResultStoreStatus(String resultStoreStatus)
+  {
+    this.resultStoreStatus = resultStoreStatus;
+  }
 
   public String getResultAckConformance()
   {
@@ -47,259 +70,323 @@ public class TestMessage implements Serializable {
     this.resultAckConformance = resultAckConformance;
   }
 
-  public boolean isResultAccepted() {
+  public boolean isResultAccepted()
+  {
     return resultAccepted;
   }
 
-  public void setResultAccepted(boolean resultAccepted) {
+  public void setResultAccepted(boolean resultAccepted)
+  {
     this.resultAccepted = resultAccepted;
   }
 
-  public int getTestMessageId() {
+  public int getTestMessageId()
+  {
     return testMessageId;
   }
 
-  public void setTestMessageId(int testMessageId) {
+  public void setTestMessageId(int testMessageId)
+  {
     this.testMessageId = testMessageId;
   }
 
-  public TestSection getTestSection() {
+  public TestSection getTestSection()
+  {
     return testSection;
   }
 
-  public void setTestSection(TestSection testSection) {
+  public void setTestSection(TestSection testSection)
+  {
     this.testSection = testSection;
   }
 
-  public int getTestPosition() {
+  public int getTestPosition()
+  {
     return testPosition;
   }
 
-  public void setTestPosition(int testPosition) {
+  public void setTestPosition(int testPosition)
+  {
     this.testPosition = testPosition;
   }
 
-  public String getTestType() {
+  public String getTestType()
+  {
     return testType;
   }
 
-  public void setTestType(String testType) {
+  public void setTestType(String testType)
+  {
     this.testType = testType;
   }
 
-  public String getTestCaseSet() {
+  public String getTestCaseSet()
+  {
     return testCaseSet;
   }
 
-  public void setTestCaseSet(String testCaseSet) {
+  public void setTestCaseSet(String testCaseSet)
+  {
     this.testCaseSet = testCaseSet;
   }
 
-  public String getTestCaseNumber() {
+  public String getTestCaseNumber()
+  {
     return testCaseNumber;
   }
 
-  public void setTestCaseNumber(String testCaseNumber) {
+  public void setTestCaseNumber(String testCaseNumber)
+  {
     this.testCaseNumber = testCaseNumber;
   }
 
-  public String getTestCaseCategory() {
+  public String getTestCaseCategory()
+  {
     return testCaseCategory;
   }
 
-  public void setTestCaseCategory(String testCaseCategory) {
+  public void setTestCaseCategory(String testCaseCategory)
+  {
     this.testCaseCategory = testCaseCategory;
   }
 
-  public String getTestCaseDescription() {
+  public String getTestCaseDescription()
+  {
     return testCaseDescription;
   }
 
-  public void setTestCaseDescription(String testCaseDescription) {
+  public void setTestCaseDescription(String testCaseDescription)
+  {
     this.testCaseDescription = testCaseDescription;
   }
 
-  public String getTestCaseAssertResult() {
+  public String getTestCaseAssertResult()
+  {
     return testCaseAssertResult;
   }
 
-  public void setTestCaseAssertResult(String testCaseAssertResult) {
+  public void setTestCaseAssertResult(String testCaseAssertResult)
+  {
     this.testCaseAssertResult = testCaseAssertResult;
   }
 
-  public String getPrepPatientType() {
+  public String getPrepPatientType()
+  {
     return prepPatientType;
   }
 
-  public void setPrepPatientType(String prepPatientType) {
+  public void setPrepPatientType(String prepPatientType)
+  {
     this.prepPatientType = prepPatientType;
   }
 
-  public String getPrepTransformsQuick() {
+  public String getPrepTransformsQuick()
+  {
     return prepTransformsQuick;
   }
 
-  public void setPrepTransformsQuick(String prepTransformsQuick) {
+  public void setPrepTransformsQuick(String prepTransformsQuick)
+  {
     this.prepTransformsQuick = prepTransformsQuick;
   }
 
-  public String getPrepTransformsCustom() {
+  public String getPrepTransformsCustom()
+  {
     return prepTransformsCustom;
   }
 
-  public void setPrepTransformsCustom(String prepTransformsCustom) {
+  public void setPrepTransformsCustom(String prepTransformsCustom)
+  {
     this.prepTransformsCustom = prepTransformsCustom;
   }
 
-  public String getPrepTransformsAddition() {
+  public String getPrepTransformsAddition()
+  {
     return prepTransformsAddition;
   }
 
-  public void setPrepTransformsAddition(String prepTransformsAddition) {
+  public void setPrepTransformsAddition(String prepTransformsAddition)
+  {
     this.prepTransformsAddition = prepTransformsAddition;
   }
 
-  public String getPrepTransformsCauseIssue() {
+  public String getPrepTransformsCauseIssue()
+  {
     return prepTransformsCauseIssue;
   }
 
-  public void setPrepTransformsCauseIssue(String prepTransformsCauseIssue) {
+  public void setPrepTransformsCauseIssue(String prepTransformsCauseIssue)
+  {
     this.prepTransformsCauseIssue = prepTransformsCauseIssue;
   }
 
-  public String getPrepCauseIssueNames() {
+  public String getPrepCauseIssueNames()
+  {
     return prepCauseIssueNames;
   }
 
-  public void setPrepCauseIssueNames(String prepCauseIssueNames) {
+  public void setPrepCauseIssueNames(String prepCauseIssueNames)
+  {
     this.prepCauseIssueNames = prepCauseIssueNames;
   }
 
-  public String getPrepHasIssue() {
+  public String getPrepHasIssue()
+  {
     return prepHasIssue;
   }
 
-  public void setPrepHasIssue(String prepHasIssue) {
+  public void setPrepHasIssue(String prepHasIssue)
+  {
     this.prepHasIssue = prepHasIssue;
   }
 
-  public String getPrepMajorChagnesMade() {
+  public String getPrepMajorChagnesMade()
+  {
     return prepMajorChagnesMade;
   }
 
-  public void setPrepMajorChagnesMade(String prepMajorChagnesMade) {
+  public void setPrepMajorChagnesMade(String prepMajorChagnesMade)
+  {
     this.prepMajorChagnesMade = prepMajorChagnesMade;
   }
 
-  public String getPrepNotExpectedToConform() {
+  public String getPrepNotExpectedToConform()
+  {
     return prepNotExpectedToConform;
   }
 
-  public void setPrepNotExpectedToConform(String prepNotExpectedToConform) {
+  public void setPrepNotExpectedToConform(String prepNotExpectedToConform)
+  {
     this.prepNotExpectedToConform = prepNotExpectedToConform;
   }
 
-  public String getPrepMessageAcceptStatusDebug() {
+  public String getPrepMessageAcceptStatusDebug()
+  {
     return prepMessageAcceptStatusDebug;
   }
 
-  public void setPrepMessageAcceptStatusDebug(String prepMessageAcceptStatusDebug) {
+  public void setPrepMessageAcceptStatusDebug(String prepMessageAcceptStatusDebug)
+  {
     this.prepMessageAcceptStatusDebug = prepMessageAcceptStatusDebug;
   }
 
-  public String getPrepScenarioName() {
+  public String getPrepScenarioName()
+  {
     return prepScenarioName;
   }
 
-  public void setPrepScenarioName(String prepScenarioName) {
+  public void setPrepScenarioName(String prepScenarioName)
+  {
     this.prepScenarioName = prepScenarioName;
   }
 
-  public String getPrepMessageDerivedFrom() {
+  public String getPrepMessageDerivedFrom()
+  {
     return prepMessageDerivedFrom;
   }
 
-  public void setPrepMessageDerivedFrom(String prepMessageDerivedFrom) {
+  public void setPrepMessageDerivedFrom(String prepMessageDerivedFrom)
+  {
     this.prepMessageDerivedFrom = prepMessageDerivedFrom;
   }
 
-  public String getPrepMessageOriginal() {
+  public String getPrepMessageOriginal()
+  {
     return prepMessageOriginal;
   }
 
-  public void setPrepMessageOriginal(String prepMessageOriginal) {
+  public void setPrepMessageOriginal(String prepMessageOriginal)
+  {
     this.prepMessageOriginal = prepMessageOriginal;
   }
 
-  public String getPrepMessageActual() {
+  public String getPrepMessageActual()
+  {
     return prepMessageActual;
   }
 
-  public void setPrepMessageActual(String prepMessageActual) {
+  public void setPrepMessageActual(String prepMessageActual)
+  {
     this.prepMessageActual = prepMessageActual;
   }
 
-  public String getResultMessageActual() {
+  public String getResultMessageActual()
+  {
     return resultMessageActual;
   }
 
-  public void setResultMessageActual(String resultMessageActual) {
+  public void setResultMessageActual(String resultMessageActual)
+  {
     this.resultMessageActual = resultMessageActual;
   }
 
-  public String getResultStatus() {
+  public String getResultStatus()
+  {
     return resultStatus;
   }
 
-  public void setResultStatus(String resultStatus) {
+  public void setResultStatus(String resultStatus)
+  {
     this.resultStatus = resultStatus;
   }
 
-  public String getResultExceptionText() {
+  public String getResultExceptionText()
+  {
     return resultExceptionText;
   }
 
-  public void setResultExceptionText(String resultExceptionText) {
+  public void setResultExceptionText(String resultExceptionText)
+  {
     this.resultExceptionText = resultExceptionText;
   }
 
-  public String getResultAcceptedMessage() {
+  public String getResultAcceptedMessage()
+  {
     return resultAcceptedMessage;
   }
 
-  public void setResultAcceptedMessage(String resultAcceptedMessage) {
+  public void setResultAcceptedMessage(String resultAcceptedMessage)
+  {
     this.resultAcceptedMessage = resultAcceptedMessage;
   }
 
-  public String getResultResponseType() {
+  public String getResultResponseType()
+  {
     return resultResponseType;
   }
 
-  public void setResultResponseType(String resultResponseType) {
+  public void setResultResponseType(String resultResponseType)
+  {
     this.resultResponseType = resultResponseType;
   }
 
-  public String getResultAckType() {
+  public String getResultAckType()
+  {
     return resultAckType;
   }
 
-  public void setResultAckType(String resultAckType) {
+  public void setResultAckType(String resultAckType)
+  {
     this.resultAckType = resultAckType;
   }
 
-  public int getForecastTestPanelCaseId() {
+  public int getForecastTestPanelCaseId()
+  {
     return forecastTestPanelCaseId;
   }
 
-  public void setForecastTestPanelCaseId(int forecastTestPanelCaseId) {
+  public void setForecastTestPanelCaseId(int forecastTestPanelCaseId)
+  {
     this.forecastTestPanelCaseId = forecastTestPanelCaseId;
   }
 
-  public int getForecastTestPanelId() {
+  public int getForecastTestPanelId()
+  {
     return forecastTestPanelId;
   }
 
-  public void setForecastTestPanelId(int forecastTestPanelId) {
+  public void setForecastTestPanelId(int forecastTestPanelId)
+  {
     this.forecastTestPanelId = forecastTestPanelId;
   }
 
