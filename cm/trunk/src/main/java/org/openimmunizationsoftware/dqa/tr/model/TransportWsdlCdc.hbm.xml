@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TransportWsdlCdc" table="transport_wsdl_cdc">
+    <id name="transportWsdlCdcId" column="transport_wsdl_cdc_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="transportAnalysis" column="transport_analysis_id" class="TransportAnalysis"/>
+    <property name="transportStatus" column="transport_status" type="string"/>
+    <property name="transportNotes" column="transport_notes" type="string"/>
+    <property name="passEyeTest" column="pass_eye_test" type="string"/>
+    <property name="clientCertificate" column="client_certificate" type="string"/>
+    <property name="ctSupports" column="ct_supports" type="string"/>
+    <property name="ctConforms" column="ct_conforms" type="string"/>
+    <property name="ctFailure_reason" column="ct_failure_reason" type="string"/>
+    <property name="ssmSupports" column="ssm_supports" type="string"/>
+    <property name="ssmConforms" column="ssm_conforms" type="string"/>
+    <property name="ssmFailureReason" column="ssm_failure_reason" type="string"/>
+    <property name="sfSupports" column="sf_supports" type="string"/>
+    <property name="sfConforms" column="sf_conforms" type="string"/>
+    <property name="sfFailureReason" column="sf_failure_reason" type="string"/>
+  </class>
+</hibernate-mapping>

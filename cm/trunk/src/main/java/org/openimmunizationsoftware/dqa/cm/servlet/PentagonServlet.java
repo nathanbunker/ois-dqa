@@ -19,6 +19,9 @@ import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 import org.openimmunizationsoftware.dqa.tr.model.Transform;
+import org.openimmunizationsoftware.dqa.tr.model.TransportAnalysis;
+import org.openimmunizationsoftware.dqa.tr.model.TransportOther;
+import org.openimmunizationsoftware.dqa.tr.model.TransportWsdlCdc;
 
 public class PentagonServlet extends HomeServlet
 {
@@ -503,7 +506,7 @@ public class PentagonServlet extends HomeServlet
       int posX = 0;
       int posY = 50;
       out.println("<div id=\"details\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
-          + "px; height: 700px; width: 850px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; \">");
+          + "px; height: 700px; width: 850px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; overflow: auto;\">");
       out.println(SHOW_DETAIL_CLOSE_BUTTON);
       out.println("</div>");
     }
@@ -519,7 +522,7 @@ public class PentagonServlet extends HomeServlet
     {
       startDiv(out, id + i, offsetX, offsetY);
       out.println("<h2 class=\"pentagon\">" + pentagonBox.getTitle() + "</h2>");
-      out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px;\">");
+      out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
       printScoreChart(out, pentagonBox.getScore());
       out.println("</span>");
       pentagonBox.printDescription(out, dataSession, testConducted, webSession, userSession);
@@ -618,7 +621,7 @@ public class PentagonServlet extends HomeServlet
     int posY = 135;
 
     out.println("<div id=\"" + id + "\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
-        + "px; height: 548px; width: 597px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; \">");
+        + "px; height: 548px; width: 597px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; overflow: auto;\">");
   }
 
   public void setupPointsBig(int[][] points)
@@ -772,7 +775,8 @@ public class PentagonServlet extends HomeServlet
       out.println("<ul>");
       for (TestMessage testMessage : testMessageList)
       {
-        out.println("<li><a class=\"pentagonTestMessageFail\" onclick=\"loadDetails('" + testMessage.getTestMessageId() + "');\">" + testMessage.getTestCaseDescription() + "</a></li>");
+        out.println("<li><a class=\"pentagonTestMessageFail\" onclick=\"loadDetails('" + testMessage.getTestMessageId() + "');\">"
+            + testMessage.getTestCaseDescription() + "</a></li>");
       }
       out.println("</ul>");
     }
@@ -782,7 +786,8 @@ public class PentagonServlet extends HomeServlet
       out.println("<ul>");
       for (TestMessage testMessage : testMessageList)
       {
-        out.println("<li><a class=\"pentagonTestMessagePass\" onclick=\"loadDetails('" + testMessage.getTestMessageId() + "');\">" + testMessage.getTestCaseDescription() + "</a></li>");
+        out.println("<li><a class=\"pentagonTestMessagePass\" onclick=\"loadDetails('" + testMessage.getTestMessageId() + "');\">"
+            + testMessage.getTestCaseDescription() + "</a></li>");
       }
       out.println("</ul>");
     }
@@ -819,7 +824,7 @@ public class PentagonServlet extends HomeServlet
         {
           out.println("<h3 class=\"pentagon\">Fail - Good Message Was Not Accepted</h3>");
           Query query = dataSession.createQuery(
-              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' order by testCaseCategory");
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testType = 'update' order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
           query.setParameter(1, testConducted);
           List<TestMessage> testMessageList = query.list();
@@ -829,7 +834,7 @@ public class PentagonServlet extends HomeServlet
         {
           out.println("<h3 class=\"pentagon\">Pass - Good Message Was Accepted</h3>");
           Query query = dataSession.createQuery(
-              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' order by testCaseCategory");
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
           query.setParameter(1, testConducted);
           List<TestMessage> testMessageList = query.list();
@@ -864,7 +869,7 @@ public class PentagonServlet extends HomeServlet
         {
           out.println("<h3 class=\"pentagon\">Fail - Bad Message Was Accepted</h3>");
           Query query = dataSession.createQuery(
-              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' order by testCaseCategory");
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testType = 'update' order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
           query.setParameter(1, testConducted);
           List<TestMessage> testMessageList = query.list();
@@ -874,7 +879,7 @@ public class PentagonServlet extends HomeServlet
         {
           out.println("<h3 class=\"pentagon\">Pass - Bad Message Was Not Accepted</h3>");
           Query query = dataSession.createQuery(
-              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' order by testCaseCategory");
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
           query.setParameter(1, testConducted);
           List<TestMessage> testMessageList = query.list();
@@ -906,14 +911,40 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
-
+        out.println(
+            "<p class=\"pentagon\">Messages that were accepted by the IIS should return that data when queried. This test verifies that patient "
+                + "was accepted and that all the vaccinations submitted are returned. It does not check every field submitted, rather "
+                + "it verifies basic patient information is returned and that basic vaccination information was returned. "
+                + "This measure helps to determine if the positive acknowledgement is accurate or not. </p> ");
       }
 
       @Override
       public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
+        if (score < 100)
+        {
+          out.println("<h3 class=\"pentagon\">Fail - Data NOT Returned for Accepted Message</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where (testSection.testSectionType = ? or testSection.testSectionType = ?) and testSection.testConducted = ? "
+                  + "and resultStoreStatus = 'a-nr' and testType = 'query' order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
+          query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
+          query.setParameter(2, testConducted);
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListFail(out, testMessageList);
+        }
+        if (score > 0)
+        {
+          out.println("<h3 class=\"pentagon\">Pass - Data Returned for Accepted Message</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where (testSection.testSectionType = ? or testSection.testSectionType = ?) and testSection.testConducted = ? "
+                  + "and resultStoreStatus = 'a-r' and testType = 'query' order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
+          query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
+          query.setParameter(2, testConducted);
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListPass(out, testMessageList);
+        }
       }
     };
 
@@ -921,14 +952,40 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
-
+        out.println("<p class=\"pentagon\">Messages that were NOT accepted by the IIS are not expected to return that all data when queried. "
+            + " This test expects that something important, like the a vaccine or patient information is not stored in the IIS. "
+            + "This test has practical limitations as an IIS may indicate a message was not accepted, but accept it anyways. "
+            + "However, doing this reduces the confidence in the meaning of an acknowledgement. Ideally an IIS "
+            + "should use the ACK to provide a view of what data was really accept.  </p> ");
       }
 
       @Override
       public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
+        if (score < 100)
+        {
+          out.println("<h3 class=\"pentagon\">Fail - Data Returned for NOT Accepted Message</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where (testSection.testSectionType = ? or testSection.testSectionType = ?) and testSection.testConducted = ? "
+                  + "and resultStoreStatus = 'na-r' and testType = 'query' order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
+          query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
+          query.setParameter(2, testConducted);
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListFail(out, testMessageList);
+        }
+        if (score > 0)
+        {
+          out.println("<h3 class=\"pentagon\">Pass - Data NOT Returned for NOT Accepted Message</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where (testSection.testSectionType = ? or testSection.testSectionType = ?) and testSection.testConducted = ? "
+                  + "and resultStoreStatus = 'na-nr' and testType = 'query' order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
+          query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
+          query.setParameter(2, testConducted);
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListPass(out, testMessageList);
+        }
       }
     };
 
@@ -996,7 +1053,7 @@ public class PentagonServlet extends HomeServlet
         {
           out.println("<h3 class=\"pentagon\">Fail - NIST 2014 Example Was Not Accepted</h3>");
           Query query = dataSession.createQuery(
-              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' order by testCaseCategory");
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testType = 'update' order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
           query.setParameter(1, testConducted);
           List<TestMessage> testMessageList = query.list();
@@ -1006,7 +1063,7 @@ public class PentagonServlet extends HomeServlet
         {
           out.println("<h3 class=\"pentagon\">Pass - NIST 2014 Example Was Accepted</h3>");
           Query query = dataSession.createQuery(
-              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' order by testCaseCategory");
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
           query.setParameter(1, testConducted);
           List<TestMessage> testMessageList = query.list();
@@ -1023,7 +1080,8 @@ public class PentagonServlet extends HomeServlet
         {
           out.println("<p class=\"pentagon\">NIST 2015 certified systems must be able to create seven test messages in order to pass certification. "
               + "NIST created these messages by carefully reading the requirements in the CDC Implementation Guide release 1.4. IIS should "
-              + "be prepared to receive all of these messages. <br/><br/> </p>");
+              + "be prepared to receive all of these messages. These messages are new and not all IIS yet support them. They are included "
+              + "here in order for IIS to see what changes may need to be made to support these new messages. <br/><br/> </p>");
         } else if (score == 100)
         {
           out.println("<p class=\"pentagon\">NIST 2015 certified systems must be able to create seven test messages in order to pass certification. "
@@ -1047,7 +1105,7 @@ public class PentagonServlet extends HomeServlet
         {
           out.println("<h3 class=\"pentagon\">Fail - NIST 2015 VXU Example Was Not Accepted</h3>");
           Query query = dataSession.createQuery(
-              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' order by testCaseCategory");
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testType = 'update' order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015);
           query.setParameter(1, testConducted);
           List<TestMessage> testMessageList = query.list();
@@ -1057,7 +1115,7 @@ public class PentagonServlet extends HomeServlet
         {
           out.println("<h3 class=\"pentagon\">Pass - NIST 2015 VXU Example Was Accepted</h3>");
           Query query = dataSession.createQuery(
-              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' order by testCaseCategory");
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015);
           query.setParameter(1, testConducted);
           List<TestMessage> testMessageList = query.list();
@@ -1089,14 +1147,35 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
-
+        out.println("<p class=\"pentagon\">The CDC Implementation Guide defines coded values that must be supported by conformant systems. "
+            + "This section tests whether these coded values can be placed in messages without causing messages to NOT be accepted. "
+            + "It is important to note that the IIS is not being tested to see if the actual coded value is stored and supported by the IIS "
+            + "but rather that a sending system may use this code when submitting data. </p>");
       }
 
       @Override
       public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
+        if (score < 100)
+        {
+          out.println("<h3 class=\"pentagon\">Fail - Message Was Not Accepted</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE);
+          query.setParameter(1, testConducted);
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListFail(out, testMessageList);
+        }
+        if (score > 0)
+        {
+          out.println("<h3 class=\"pentagon\">Pass - Message Was Accepted</h3>");
+          Query query = dataSession.createQuery(
+              "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' order by testCaseCategory");
+          query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE);
+          query.setParameter(1, testConducted);
+          List<TestMessage> testMessageList = query.list();
+          printTestMessageListPass(out, testMessageList);
+        }
       }
     };
 
@@ -1122,7 +1201,7 @@ public class PentagonServlet extends HomeServlet
               "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testCaseDescription like ? order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
           query.setParameter(1, testConducted);
-          query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
+          query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK + "%");
           List<TestMessage> testMessageList = query.list();
           printTestMessageListFail(out, testMessageList);
         }
@@ -1133,7 +1212,7 @@ public class PentagonServlet extends HomeServlet
               "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testCaseDescription like ?  order by testCaseCategory");
           query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
           query.setParameter(1, testConducted);
-          query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
+          query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK + "%");
           List<TestMessage> testMessageList = query.list();
           printTestMessageListPass(out, testMessageList);
         }
@@ -1144,11 +1223,12 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        out.println("<p class=\"pentagon\">Certified EHR systems are able to produce messages that meet NIST standards, but may contain minor variations "
-            + "that are not seen in the NIST examples. This section contains examples from EHR systems. While an attempt has been made to ensure that "
-            + "these are good messages, this test does not assert that an IIS ought to be able accept all of these. Rather an IIS should use "
-            + "this test to help find issues that were not identified in any of the other testing scenarios. In addition this test list will "
-            + "grow as additional examples are found.  </p>");
+        out.println(
+            "<p class=\"pentagon\">Certified EHR systems are able to produce messages that meet NIST standards, but may contain minor variations "
+                + "that are not seen in the NIST examples. This section contains examples from EHR systems. While an attempt has been made to ensure that "
+                + "these are good messages, this test does not assert that an IIS ought to be able accept all of these. Rather an IIS should use "
+                + "this test to help find issues that were not identified in any of the other testing scenarios. In addition this test list will "
+                + "grow as additional examples are found.  </p>");
 
       }
 
@@ -1184,11 +1264,12 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        out.println("<p class=\"pentagon\">Ideally IIS should respond quickly to updates received. Rapid response reduces transmission times for large amounts"
-            + "of data and provides good support for systems as they increase their integration with IIS. "
-            + "This report includes a performance measure mostly because the information is available when testing and it has some "
-            + "impact on the perception of how well the IIS is working. However, please note that performance makes a very small "
-            + "contribution to the overall score.   </p>");
+        out.println(
+            "<p class=\"pentagon\">Ideally IIS should respond quickly to updates received. Rapid response reduces transmission times for large amounts"
+                + "of data and provides good support for systems as they increase their integration with IIS. "
+                + "This report includes a performance measure mostly because the information is available when testing and it has some "
+                + "impact on the perception of how well the IIS is working. However, please note that performance makes a very small "
+                + "contribution to the overall score.   </p>");
       }
 
       @Override
@@ -1455,7 +1536,7 @@ public class PentagonServlet extends HomeServlet
       public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
         int average = (int) (((double) testConducted.getPerQueryTotal()) / testConducted.getPerQueryCount() + 0.5);
-        out.println("<h3>Response Time</h3>");
+        out.println("<h3 class=\"pentagon\">Response Time</h3>");
         out.println("<ul>");
         out.println("  <li>Average: " + TestReportServlet.createTime(average) + "</li>");
         out.println("  <li>Minimum: " + TestReportServlet.createTime(testConducted.getPerQueryMin()) + "</li>");
@@ -1535,13 +1616,104 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
+        out.println("<p class=\"pentagon\">In 2015, AIRA launched an Interoperability Testing Project to determine the level of alignment between "
+            + "current Immunization Information Systems (IIS) and the community’s interoperability standards. The testing process connects with "
+            + "IIS directly and submits sample messages to IIS development platforms. When any two systems connect to exchange data, they must "
+            + "use an agreed upon transport layer to connect. To this end, a CDC-led expert panel was tasked with selecting transport layer and "
+            + "defining a technical specification. In 2011, the panel selected Soap  and defined a formal specification known as a \"CDC WSDL.\" </p>");
 
       }
 
       @Override
       public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
+        TransportWsdlCdc transportWsdlCdc = null;
+        {
+          Query query = dataSession.createQuery("from TransportWsdlCdc where transportAnalysis.connectionLabel = ?");
+          query.setParameter(0, testConducted.getConnectionLabel());
+          List<TransportWsdlCdc> transportWsdlCdcList = query.list();
+          if (transportWsdlCdcList.size() > 0)
+          {
+            transportWsdlCdc = transportWsdlCdcList.get(0);
+          }
+        }
+        TransportOther transportOther = null;
+        {
+          Query query = dataSession.createQuery("from TransportOther where transportAnalysis.connectionLabel = ?");
+          query.setParameter(0, testConducted.getConnectionLabel());
+          List<TransportOther> transportOtherList = query.list();
+          if (transportOtherList.size() > 0)
+          {
+            transportOther = transportOtherList.get(0);
+          }
+        }
+        TransportAnalysis transportAnalysis = null;
+        if (transportWsdlCdc != null)
+        {
+          transportAnalysis = transportWsdlCdc.getTransportAnalysis();
+        } else if (transportOther != null)
+        {
+          transportAnalysis = transportOther.getTransportAnalysis();
+        }
+        if (transportAnalysis == null)
+        {
+          out.println("<h3 class=\"pentagon\">Transport Analysis</h3>");
+          out.println("<p class=\"pentagon\">Not completed</p>");
+        } else if (transportWsdlCdc != null)
+        {
+          out.println("<h3 class=\"pentagon\">CDC WSDL Analysis</h3>");
+          if (!transportAnalysis.getReportComplete().equalsIgnoreCase("Yes"))
+          {
+            out.println("<p class=\"pentagon\">Report is not complete yet. </p>");
+          } else if (transportAnalysis.getTransportType().equalsIgnoreCase("Non-participator CDC WSDL"))
+          {
+            out.println("<p class=\"pentagon\">Did not participate in status check project.</p>");
+          } else if (transportAnalysis.getTransportType().equalsIgnoreCase("CDC WSDL"))
+          {
+            if (!transportWsdlCdc.getTransportStatus().equalsIgnoreCase("Done"))
+            {
+              out.println("<p class=\"pentagon\">Report is not done yet.</p>");
+            } else if (transportWsdlCdc.getPassEyeTest().equalsIgnoreCase("No"))
+            {
+              out.println("<p class=\"pentagon\">WSDL does not look like CDC WSDL. No further analysis could be performed. </p>");
+            } else
+            {
+              out.println("<table class=\"pentagon\">");
+              out.println("  <tr>");
+              out.println("    <th>Connectivity Test</th>");
+              out.println("    <th>Submit Single Message</th>");
+              out.println("    <th>Security Fault</th>");
+              out.println("  </tr>");
+              out.println("  <tr>");
+              if (transportWsdlCdc.getCtConforms().equalsIgnoreCase("Yes"))
+              {
+                out.println("    <td class=\"pass\" style=\"text-align: center;\">Pass</td>");
+              } else
+              {
+                out.println("    <td class=\"fail\" style=\"text-align: center;\">Fail</td>");
+              }
+              if (transportWsdlCdc.getSsmConforms().equalsIgnoreCase("Yes"))
+              {
+                out.println("    <td class=\"pass\" style=\"text-align: center;\">Pass</td>");
+              } else
+              {
+                out.println("    <td class=\"fail\" style=\"text-align: center;\">Fail</td>");
+              }
+              if (transportWsdlCdc.getSfConforms().equalsIgnoreCase("Yes"))
+              {
+                out.println("    <td class=\"pass\" style=\"text-align: center;\">Pass</td>");
+              } else
+              {
+                out.println("    <td class=\"fail\" style=\"text-align: center;\">Fail</td>");
+              }
+              out.println("  </tr>");
+              out.println("</table>");
+            }
+          }
+        } else if (transportOther != null)
+        {
+          out.println("<h3 class=\"pentagon\">Other Transport Analysis</h3>");
+        }
         // TODO Auto-generated method stub
       }
     };

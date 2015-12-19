@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TransportAnalysis" table="transport_analysis">
+    <id name="transportAnalysisId" column="transport_analysis_id">
+      <generator class="native"/>
+    </id>
+    <property name="connectionLabel" column="connection_label" type="string"/>
+    <property name="transportType" column="transport_type" type="string"/>
+    <property name="analysisNotes" column="analysis_notes" type="string"/>
+    <property name="reportComplete" column="report_complete" type="string"/>
+  </class>
+</hibernate-mapping>
