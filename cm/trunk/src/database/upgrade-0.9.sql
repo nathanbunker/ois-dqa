@@ -1,3 +1,5 @@
+delete from pentagon_report;
+
 ALTER TABLE test_message ADD COLUMN prep_message_original_response TEXT;
 ALTER TABLE test_message ADD COLUMN result_store_status VARCHAR(250);
 

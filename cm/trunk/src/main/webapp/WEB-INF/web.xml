@@ -41,6 +41,14 @@
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.ProfileServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>GuideServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.GuideServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>GuideImageServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.GuideImageServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>PentagonServlet</servlet-name>
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.PentagonServlet</servlet-class>
   </servlet>
@@ -84,6 +92,14 @@
   <servlet-mapping>
     <servlet-name>ProfileServlet</servlet-name>
     <url-pattern>/profile</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GuideServlet</servlet-name>
+    <url-pattern>/guide</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>GuideImageServlet</servlet-name>
+    <url-pattern>/guideImage</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>PentagonServlet</servlet-name>

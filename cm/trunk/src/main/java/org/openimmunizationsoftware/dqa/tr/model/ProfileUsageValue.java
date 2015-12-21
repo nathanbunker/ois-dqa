@@ -22,6 +22,50 @@ public class ProfileUsageValue
   private MessageAcceptStatus messageAcceptStatusDetected = null;
   private String messageAcceptStatusDebug = "";
   private transient ProfileUsageValue profileUsageValueCompare = null;
+  private String linkDefinition = "";
+  private String linkDetail = "";
+  private String linkClarification = "";
+  private String linkSupplement = "";
+
+  public String getLinkDefinition()
+  {
+    return linkDefinition;
+  }
+
+  public void setLinkDefinition(String linkDefinition)
+  {
+    this.linkDefinition = linkDefinition;
+  }
+
+  public String getLinkDetail()
+  {
+    return linkDetail;
+  }
+
+  public void setLinkDetail(String linkDetail)
+  {
+    this.linkDetail = linkDetail;
+  }
+
+  public String getLinkClarification()
+  {
+    return linkClarification;
+  }
+
+  public void setLinkClarification(String linkClarification)
+  {
+    this.linkClarification = linkClarification;
+  }
+
+  public String getLinkSupplement()
+  {
+    return linkSupplement;
+  }
+
+  public void setLinkSupplement(String linkSupplement)
+  {
+    this.linkSupplement = linkSupplement;
+  }
 
   public ProfileUsageValue getProfileUsageValueCompare()
   {
