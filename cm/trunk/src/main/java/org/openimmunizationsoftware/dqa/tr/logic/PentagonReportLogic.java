@@ -316,12 +316,6 @@ public class PentagonReportLogic
       scoreQF = addWeightToScore(scoreQF, 10, pentagonReport.getScoreQFMinimumQuery());
       pentagonReport.setScoreQF(scoreQF / 100);
     }
-    {
-      int scoreQC = 0;
-      scoreQC = addWeightToScore(scoreQC, 60, pentagonReport.getScoreQCResponsesConform());
-      scoreQC = addWeightToScore(scoreQC, 40, pentagonReport.getScoreQCSoapConforms());
-      pentagonReport.setScoreQC(scoreQC / 100);
-    }
 
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015) != null)
     {
@@ -362,6 +356,13 @@ public class PentagonReportLogic
         }
       }
 
+    }
+
+    {
+      int scoreQC = 0;
+      scoreQC = addWeightToScore(scoreQC, 60, pentagonReport.getScoreQCResponsesConform());
+      scoreQC = addWeightToScore(scoreQC, 40, pentagonReport.getScoreQCSoapConforms());
+      pentagonReport.setScoreQC(scoreQC / 100);
     }
 
     Transaction transaction = dataSession.beginTransaction();

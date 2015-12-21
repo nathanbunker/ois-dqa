@@ -76,6 +76,18 @@ public abstract class BaseServlet extends HttpServlet
     resp.setContentType("text/html");
     return webSession;
   }
+  
+  protected HttpSession setupSkinny(HttpServletRequest req, HttpServletResponse resp) throws IOException
+  {
+    HttpSession webSession = req.getSession(true);
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    if (userSession == null)
+    {
+      userSession = initUserSession(webSession);
+    }
+    userSession.getDataSession().clear();
+    return webSession;
+  }
 
   public UserSession initUserSession(HttpSession webSession)
   {

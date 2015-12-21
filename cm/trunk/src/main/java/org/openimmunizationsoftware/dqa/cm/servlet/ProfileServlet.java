@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +84,7 @@ public class ProfileServlet extends HomeServlet
 
       ProfileUsage profileUsageSelected = null;
       int profileUsageId = 0;
-      if (req.getParameter(PARAM_PROFILE_USAGE_ID) != null)
+      if (req.getParameter(PARAM_PROFILE_USAGE_ID) != null && !req.getParameter(PARAM_PROFILE_USAGE_ID).equals(""))
       {
         profileUsageId = Integer.parseInt(req.getParameter(PARAM_PROFILE_USAGE_ID));
         profileUsageSelected = (ProfileUsage) dataSession.get(ProfileUsage.class, profileUsageId);
@@ -355,6 +356,7 @@ public class ProfileServlet extends HomeServlet
               out.println("    <th>Description</th>");
               out.println("    <th>Type</th>");
               out.println("    <th>Usage</th>");
+              out.println("    <th>Links</th>");
               out.println("  </tr>");
             }
             out.println("  <tr>");
@@ -368,6 +370,7 @@ public class ProfileServlet extends HomeServlet
             }
             out.println("    <td>" + profileField.getType() + "</td>");
             out.println("    <td>" + profileUsageValue.getUsage() + "</td>");
+            printLink(out, profileUsageValue);
             out.println("  </tr>");
             lastDataTypeDef = profileField.getDataTypeDef();
           }
@@ -406,6 +409,7 @@ public class ProfileServlet extends HomeServlet
                 out.println("    <th>Description</th>");
                 out.println("    <th>Type</th>");
                 out.println("    <th>Usage</th>");
+                out.println("    <th>Links</th>");
                 out.println("    <th>Expect Error</th>");
                 out.println("    <th>Test Cases</th>");
                 out.println("  </tr>");
@@ -423,6 +427,7 @@ public class ProfileServlet extends HomeServlet
               }
               out.println("    <td>" + profileField.getType() + "</td>");
               out.println("    <td>" + profileUsageValue.getUsage() + "</td>");
+              printLink(out, profileUsageValue);
               if (profileUsageValue.getMessageAcceptStatus() == MessageAcceptStatus.ONLY_IF_PRESENT)
               {
                 out.println("    <td>If Empty</td>");
@@ -514,12 +519,20 @@ public class ProfileServlet extends HomeServlet
               String value = req.getParameter("value" + i);
               String comments = req.getParameter("comments" + i);
               String notes = req.getParameter("notes" + i);
+              String linkDefinition = req.getParameter("linkDefinition" + i);
+              String linkDetail = req.getParameter("linkDetail" + i);
+              String linkClarification = req.getParameter("linkClarification" + i);
+              String linkSupplement = req.getParameter("linkSupplement" + i);
               profileUsageValue.setUsage(Usage.readUsage(usage));
               profileUsageValue.setEnforcement(Enforcement.readEnforcement(enforcement));
               profileUsageValue.setImplementation(Implementation.readImplementation(implementation));
               profileUsageValue.setValue(value);
               profileUsageValue.setComments(comments);
               profileUsageValue.setNotes(notes);
+              profileUsageValue.setLinkDefinition(linkDefinition);
+              profileUsageValue.setLinkDetail(linkDetail);
+              profileUsageValue.setLinkClarification(linkClarification);
+              profileUsageValue.setLinkSupplement(linkSupplement);
               String debug = ProfileManager.determineMessageAcceptStatus(profileUsageValue, dataSession);
               profileUsageValue.setMessageAcceptStatusDebug(debug);
               Transaction transaction = dataSession.beginTransaction();
@@ -746,6 +759,27 @@ public class ProfileServlet extends HomeServlet
 
   }
 
+  public void printLink(PrintWriter out, ProfileUsageValue profileUsageValue) throws UnsupportedEncodingException
+  {
+    String link = "guide?" + GuideServlet.PARAM_PROFILE_USAGE_ID + "=" + profileUsageValue.getProfileUsage().getProfileUsageId() + "&"
+        + GuideServlet.PARAM_PROFILE_USAGE_VALUE_ID + "=" + profileUsageValue.getProfileUsageValueId() + "&" + GuideServlet.PARAM_LOCATION
+        + "=";
+    out.println("    <td>");
+    printLink(out, link, "Definition", profileUsageValue.getLinkDefinition());
+    printLink(out, link, "Detail", profileUsageValue.getLinkDetail());
+    printLink(out, link, "Clarification", profileUsageValue.getLinkClarification());
+    printLink(out, link, "Supplement", profileUsageValue.getLinkSupplement());
+    out.println("    </td>");
+  }
+
+  public void printLink(PrintWriter out, String link, String label, String location) throws UnsupportedEncodingException
+  {
+    if (location != null && !location.equals(""))
+    {
+      out.println("<a href=\"" + link + URLEncoder.encode(location, "UTF-8") + "\" target=\"guide\">" + label + "</a> ");
+    }
+  }
+
   private void printEditTable(PrintWriter out, Session dataSession, ProfileUsageValue profileUsageValueSelected, ProfileField profileFieldCopyFrom)
       throws UnsupportedEncodingException
   {
@@ -757,6 +791,7 @@ public class ProfileServlet extends HomeServlet
     out.println("    <th colspan=\"3\">US Base Standard</th>");
     out.println("    <th colspan=\"5\">Local Standard</th>");
     out.println("    <td><input type=\"submit\" name=\"action\" value=\"Save\"/><input type=\"submit\" name=\"action\" value=\"Return\"/></td>");
+    out.println("    <th colspan=\"4\">Links</th>");
     out.println("  </tr>");
     out.println("  <tr>");
     out.println("    <th>Field Name</th>");
@@ -768,6 +803,10 @@ public class ProfileServlet extends HomeServlet
     out.println("    <th>Value</th>");
     out.println("    <th>Comments</th>");
     out.println("    <th>Testing Notes</th>");
+    out.println("    <th>Definition</th>");
+    out.println("    <th>Detail</th>");
+    out.println("    <th>Clarification</th>");
+    out.println("    <th>Supplement</th>");
     out.println("  </tr>");
     List<ProfileField> profileFieldSelectedList;
     {
@@ -797,19 +836,21 @@ public class ProfileServlet extends HomeServlet
         List<ProfileUsageValue> profileUsageValueCopyList = null;
         if (profileFieldCopyFrom.getType() == ProfileFieldType.SEGMENT)
         {
-          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField.parent = ? and profileField.posInSegment = ?");
+          Query query = dataSession
+              .createQuery("from ProfileUsageValue where profileUsage = ? and profileField.parent = ? and profileField.posInSegment = ?");
           query.setParameter(0, profileUsage);
           query.setParameter(1, profileFieldCopyFrom);
           query.setParameter(2, profileField.getPosInSegment());
           profileUsageValueCopyList = query.list();
         } else if (profileFieldCopyFrom.getType() == ProfileFieldType.FIELD)
         {
-          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField.parent = ? and profileField.posInField = ?");
+          Query query = dataSession
+              .createQuery("from ProfileUsageValue where profileUsage = ? and profileField.parent = ? and profileField.posInField = ?");
           query.setParameter(0, profileUsage);
           query.setParameter(1, profileFieldCopyFrom);
           query.setParameter(2, profileField.getPosInField());
           profileUsageValueCopyList = query.list();
-        } 
+        }
         if (profileUsageValueCopyList != null && profileUsageValueCopyList.size() > 0)
         {
           profileUsageValueCopyFrom = profileUsageValueCopyList.get(0);
@@ -817,7 +858,8 @@ public class ProfileServlet extends HomeServlet
       }
 
       out.println("  <tr>");
-      if (profileUsageValue == null || profileUsageValue.getUsage() == Usage.NOT_DEFINED || (profileField.getType() != ProfileFieldType.FIELD && profileField.getType() != ProfileFieldType.FIELD_PART))
+      if (profileUsageValue == null || profileUsageValue.getUsage() == Usage.NOT_DEFINED
+          || (profileField.getType() != ProfileFieldType.FIELD && profileField.getType() != ProfileFieldType.FIELD_PART))
       {
         out.println("    <td>" + profileField.getFieldName() + "</td>");
         out.println("    <td>" + profileField.getDescription() + "</td>");
@@ -834,6 +876,10 @@ public class ProfileServlet extends HomeServlet
       Implementation selectedImplementation = Implementation.NOT_DEFINED;
       String comments = "";
       String notes = "";
+      String linkDefinition = "";
+      String linkDetail = "";
+      String linkClarification = "";
+      String linkSupplement = "";
       if (profileUsageValue != null)
       {
         selectedUsage = profileUsageValue.getUsage();
@@ -842,6 +888,10 @@ public class ProfileServlet extends HomeServlet
         selectedImplementation = profileUsageValue.getImplementation();
         comments = profileUsageValue.getComments();
         notes = profileUsageValue.getNotes();
+        linkDefinition = n(profileUsageValue.getLinkDefinition());
+        linkDetail = n(profileUsageValue.getLinkDetail());
+        linkClarification = n(profileUsageValue.getLinkClarification());
+        linkSupplement = n(profileUsageValue.getLinkSupplement());
       }
       if (profileUsageValueCopyFrom != null)
       {
@@ -851,6 +901,10 @@ public class ProfileServlet extends HomeServlet
         usageValue = profileUsageValueCopyFrom.getValue();
         comments = profileUsageValueCopyFrom.getComments();
         notes = profileUsageValueCopyFrom.getNotes();
+        linkDefinition = n(profileUsageValueCopyFrom.getLinkDefinition());
+        linkDetail = n(profileUsageValueCopyFrom.getLinkDetail());
+        linkClarification = n(profileUsageValueCopyFrom.getLinkClarification());
+        linkSupplement = n(profileUsageValueCopyFrom.getLinkSupplement());
       }
       String classType = "";
       if (selectedUsage != Usage.NOT_DEFINED)
@@ -910,6 +964,10 @@ public class ProfileServlet extends HomeServlet
       out.println("    <td><input type=\"text\" size=\"5\" name=\"value" + i + "\" value=\"" + usageValue + "\"/></td>");
       out.println("    <td><input type=\"text\" size=\"20\" name=\"comments" + i + "\" value=\"" + comments + "\"/></td>");
       out.println("    <td><input type=\"text\" size=\"20\" name=\"notes" + i + "\" value=\"" + notes + "\"/>");
+      out.println("    <td><input type=\"text\" size=\"15\" name=\"linkDefinition" + i + "\" value=\"" + linkDefinition + "\"/>");
+      out.println("    <td><input type=\"text\" size=\"15\" name=\"linkDetail" + i + "\" value=\"" + linkDetail + "\"/>");
+      out.println("    <td><input type=\"text\" size=\"15\" name=\"linkClarification" + i + "\" value=\"" + linkClarification + "\"/>");
+      out.println("    <td><input type=\"text\" size=\"15\" name=\"linkSupplement" + i + "\" value=\"" + linkSupplement + "\"/>");
       out.println("    <input type=\"hidden\" name=\"" + PARAM_PROFILE_FIELD_ID + i + "\" value=\"" + profileField.getProfileFieldId() + "\"/></td>");
 
       out.println("  </tr>");
@@ -969,6 +1027,7 @@ public class ProfileServlet extends HomeServlet
     out.println("    <th colspan=\"3\">US Base Standard</th>");
     out.println("    <th colspan=\"5\">Local Standard</th>");
     out.println("    <td><input type=\"submit\" name=\"action\" value=\"Save\"/></td>");
+    out.println("    <th colspan=\"4\">Links</th>");
     out.println("  </tr>");
     out.println("  <tr>");
     out.println("    <th>Field Name</th>");
@@ -980,6 +1039,10 @@ public class ProfileServlet extends HomeServlet
     out.println("    <th>Value</th>");
     out.println("    <th>Comments</th>");
     out.println("    <th>Testing Notes</th>");
+    out.println("    <th>Definition</th>");
+    out.println("    <th>Detail</th>");
+    out.println("    <th>Clarification</th>");
+    out.println("    <th>Supplement</th>");
     out.println("  </tr>");
     List<ProfileField> profileFieldList;
     {
@@ -1081,6 +1144,13 @@ public class ProfileServlet extends HomeServlet
         out.println("    <td><input type=\"text\" size=\"5\" name=\"value" + i + "\" value=\"" + profileUsageValue.getValue() + "\"/></td>");
         out.println("    <td><input type=\"text\" size=\"20\" name=\"comments" + i + "\" value=\"" + profileUsageValue.getComments() + "\"/></td>");
         out.println("    <td><input type=\"text\" size=\"20\" name=\"notes" + i + "\" value=\"" + profileUsageValue.getNotes() + "\"/>");
+        out.println(
+            "    <td><input type=\"text\" size=\"15\" name=\"linkDefinition" + i + "\" value=\"" + n(profileUsageValue.getLinkDefinition()) + "\"/>");
+        out.println("    <td><input type=\"text\" size=\"15\" name=\"linkDetail" + i + "\" value=\"" + n(profileUsageValue.getLinkDetail()) + "\"/>");
+        out.println("    <td><input type=\"text\" size=\"15\" name=\"linkClarification" + i + "\" value=\""
+            + n(profileUsageValue.getLinkClarification()) + "\"/>");
+        out.println(
+            "    <td><input type=\"text\" size=\"15\" name=\"linkSupplement" + i + "\" value=\"" + n(profileUsageValue.getLinkSupplement()) + "\"/>");
         out.println(
             "    <input type=\"hidden\" name=\"" + PARAM_PROFILE_FIELD_ID + i + "\" value=\"" + profileField.getProfileFieldId() + "\"/></td>");
         out.println("  </tr>");
@@ -1324,6 +1394,15 @@ public class ProfileServlet extends HomeServlet
       }
       out.println("</table>");
     }
+  }
+
+  private static String n(String s)
+  {
+    if (s == null)
+    {
+      return "";
+    }
+    return s;
   }
 
 }

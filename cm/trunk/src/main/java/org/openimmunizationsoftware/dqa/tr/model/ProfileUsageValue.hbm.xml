@@ -18,5 +18,9 @@
     <property name="messageAcceptStatusString" column="message_accept_status" type="string"/>
     <property name="messageAcceptStatusDetectedString" column="message_accept_status_detected" type="string"/>
     <property name="messageAcceptStatusDebug" column="message_accept_status_debug" type="string"/>
+    <property name="linkDefinition" column="link_definition" type="string"/>
+    <property name="linkDetail" column="link_detail" type="string"/>
+    <property name="linkClarification" column="link_clarification" type="string"/>
+    <property name="linkSupplement" column="link_supplement" type="string"/>
   </class>
 </hibernate-mapping>
