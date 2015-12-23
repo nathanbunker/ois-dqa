@@ -24,8 +24,6 @@ import org.openimmunizationsoftware.dqa.tr.profile.Implementation;
 import org.openimmunizationsoftware.dqa.tr.profile.ProfileCategory;
 import org.openimmunizationsoftware.dqa.tr.profile.Usage;
 
-import com.sun.xml.internal.messaging.saaj.util.transform.EfficientStreamingTransformer;
-
 public class GuideServlet extends HomeServlet
 {
   public static final String PARAM_FIELD_NAME = "fieldName";
