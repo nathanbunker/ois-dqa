@@ -26,6 +26,7 @@ import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.Assertion;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
 import org.openimmunizationsoftware.dqa.tr.model.ComparisonField;
+import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
@@ -1792,8 +1793,7 @@ public class TestReportServlet extends HomeServlet
         } else
         {
           out.println("<h3 class=\"fail\">Request Message Changed</h3>");
-          out.println("<p> <a href=\"" + detailLink
-              + "\">See details.</a></p>");
+          out.println("<p> <a href=\"" + detailLink + "\">See details.</a></p>");
           out.println("<p>Submitted message does not contain the same data as the original test case. "
               + "Some custom modifications were made in the process of preparing the test message for submission."
               + "These custom modifications were necessary to ensure IIS accepted the test message. ");
@@ -1934,11 +1934,13 @@ public class TestReportServlet extends HomeServlet
   }
 
   private static final String[] TEST_SECTIONS_TO_DISPLAY = { RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC,
-      RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED,
       RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED,
-      RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL,
-      RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST_PREP, RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST,
-      RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE, RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015 };
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL, RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECAST,
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015, RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING,
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED,
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT, RecordServletInterface.VALUE_TEST_SECTION_TYPE_TRANSFORM,
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXTRA, RecordServletInterface.VALUE_TEST_SECTION_TYPE_DEDUPLICATION_ENGAGED,
+      RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECASTER_ENGAGED };
 
   private void printTestConductedOverview(TestConducted testConducted, UserSession userSession)
   {
@@ -2158,6 +2160,11 @@ public class TestReportServlet extends HomeServlet
 
   public static String addHovers(String message) throws IOException
   {
+    return addHovers(message, null);
+  }
+
+  public static String addHovers(String message, ProfileUsage profileUsage) throws IOException
+  {
     StringBuilder sb = new StringBuilder();
     BufferedReader reader = new BufferedReader(new StringReader(message));
     String line;
@@ -2186,7 +2193,15 @@ public class TestReportServlet extends HomeServlet
             }
           }
           fieldCount++;
-          sb.append("<a class=\"hl7\" title=\"" + segmentName + "-" + fieldCount + "\">");
+          if (profileUsage != null)
+          {
+            String link = "guide?" + GuideServlet.PARAM_PROFILE_USAGE_ID + "=" + profileUsage.getProfileUsageId() + "&"
+                + GuideServlet.PARAM_FIELD_NAME + "=" + segmentName + "-" + fieldCount;
+            sb.append("<a class=\"hl7\" title=\"" + segmentName + "-" + fieldCount + "\" href=\"" + link + "\" target=\"guide\">");
+          } else
+          {
+            sb.append("<a class=\"hl7\" title=\"" + segmentName + "-" + fieldCount + "\">");
+          }
         }
         sb.append(line.charAt(i));
       }

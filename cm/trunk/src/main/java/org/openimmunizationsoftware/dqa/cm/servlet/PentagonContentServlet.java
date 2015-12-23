@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -14,6 +13,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
+import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 
@@ -46,6 +46,20 @@ public class PentagonContentServlet extends PentagonServlet
     {
       testConducted = (TestConducted) dataSession.get(TestConducted.class, testConnectedId);
     }
+    ProfileUsage profileUsage = null;
+    {
+      String profileUsageIdString = req.getParameter(PARAM_PROFILE_USAGE_ID);
+      if (profileUsageIdString != null && !profileUsageIdString.equals(""))
+      {
+        int profileUsageId = Integer.parseInt(profileUsageIdString);
+        profileUsage = (ProfileUsage) dataSession.get(ProfileUsage.class, profileUsageId);
+      }
+    }
+    
+    if (profileUsage == null)
+    {
+      profileUsage = ProfileUsage.getBaseProfileUsage(dataSession);
+    }
 
     TestMessage testMessage = null;
     int testMessageId = 0;
@@ -65,7 +79,7 @@ public class PentagonContentServlet extends PentagonServlet
       if (testMessage.getTestType().equals("prep") || testMessage.getTestType().equals("update"))
       {
         out.println("<h2 class=\"pentagon\">" + testMessage.getTestCaseDescription() + "</h3>");
-        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual()) + "</pre>");
+        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual(), profileUsage) + "</pre>");
         if (testMessage.isResultAccepted())
         {
           out.println("<h3 class=\"pentagon\">Accepted</h3>");
@@ -73,11 +87,11 @@ public class PentagonContentServlet extends PentagonServlet
         {
           out.println("<h3 class=\"pentagon\">NOT Accepted</h3>");
         }
-        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual()) + "</pre>");
+        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual(), profileUsage) + "</pre>");
       } else if (testMessage.getTestType().equals("query"))
       {
         out.println("<h2 class=\"pentagon\">" + testMessage.getTestCaseDescription() + "</h3>");
-        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual()) + "</pre>");
+        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual(), profileUsage) + "</pre>");
         if (testMessage.getResultStoreStatus().equals("a-r") || testMessage.getResultStoreStatus().equals("na-r"))
         {
           out.println("<h3 class=\"pentagon\">Data Returned</h3>");
@@ -88,7 +102,7 @@ public class PentagonContentServlet extends PentagonServlet
         {
           out.println("<h3 class=\"pentagon\">Response</h3>");
         }
-        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual()) + "</pre>");
+        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual(), profileUsage) + "</pre>");
         if (!testMessage.getPrepMessageOriginal().equals(""))
         {
           if (testMessage.getResultStoreStatus().equals("a-r") || testMessage.getResultStoreStatus().equals("a-nr"))
@@ -101,7 +115,7 @@ public class PentagonContentServlet extends PentagonServlet
           {
             out.println("<h3 class=\"pentagon\">Original Request</h3>");
           }
-          out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageOriginal()) + "</pre>");
+          out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageOriginal(), profileUsage) + "</pre>");
         }
         Query query = dataSession.createQuery("from Comparison where testMessage = ? order by comparisonField.fieldName");
         query.setParameter(0, testMessage);
@@ -143,4 +157,6 @@ public class PentagonContentServlet extends PentagonServlet
     }
     out.close();
   }
+
+  
 }
