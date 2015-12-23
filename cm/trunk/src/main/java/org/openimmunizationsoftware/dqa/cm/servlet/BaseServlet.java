@@ -209,6 +209,31 @@ public abstract class BaseServlet extends HttpServlet
     out.println("    <div class=\"contents\">");
 
   }
+  
+  protected void createHeaderForGuide(HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    PrintWriter out = userSession.getOut();
+    out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">");
+    out.println("<html>");
+    out.println("  <head>");
+    out.println("    <link rel=\"stylesheet\" type=\"text/css\" href=\"index.css\">");
+    out.println("  </head>");
+    out.println("  <body class=\"guideContents\">");
+    if (userSession.getMessageError() != null)
+    {
+      out.println("<div class=\"messageError\">" + userSession.getMessageError() + "</div>");
+      userSession.setMessageError(null);
+    }
+    if (userSession.getMessageConfirmation() != null)
+    {
+      out.println("<div class=\"messageConfirmation\">" + userSession.getMessageConfirmation() + "</div>");
+      userSession.setMessageConfirmation(null);
+    }
+    out.println("    <div>");
+
+  }
 
   protected void createFooter(HttpSession webSession)
   {

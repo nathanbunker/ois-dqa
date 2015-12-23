@@ -1,5 +1,9 @@
 package org.openimmunizationsoftware.dqa.tr.model;
 
+import java.util.List;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.tr.profile.ProfileCategory;
 
 public class ProfileUsage
@@ -8,6 +12,18 @@ public class ProfileUsage
   private ProfileCategory category = null;
   private String label = "";
   private String version = "";
+  
+  public static ProfileUsage getBaseProfileUsage(Session dataSession)
+  {
+    ProfileUsage baseProfileUsage = null;
+    Query query = dataSession.createQuery("from ProfileUsage where category = 'US' and label = 'Base'");
+    List<ProfileUsage> profileUsageList = query.list();
+    if (profileUsageList.size() > 0)
+    {
+      baseProfileUsage = profileUsageList.get(0);
+    }
+    return baseProfileUsage;
+  }
   
   public String getCategoryString()
   {

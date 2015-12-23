@@ -389,3 +389,48 @@ table.pentagon {
 	margin-left: 5px;
 	margin-right: 5px;
 }
+
+.guideContents {  
+	background-color: #C0C0C0;
+}
+
+
+
+table.guide {
+	border-collapse: collapse;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #553700;
+}
+caption.guide {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #061739;
+	background-color: #152B55;
+	color: #E0E0E0;	
+}
+th.guide {
+	background-color: #2D4471;
+	color: #E0E0E0;	
+	text-align: left; 
+	padding-left: 4px; 
+	padding-right: 8px; 
+	padding-bottom: 3px; 
+	padding-top: 3px; 
+	border-width: 1px; 
+	border-style: solid; 
+	border-color: #061739;
+	font-size: smaller;
+}
+td.guide {
+	background-color: #B0B0B0;
+	padding: 2px; 
+	padding-left: 4px; 
+	padding-right: 4px; 
+	padding-bottom: 3px; 
+	padding-top: 3px; 
+	border-width: 1px; 
+	border-style: solid; 
+	border-color: #061739; 
+	color: #000;
+}

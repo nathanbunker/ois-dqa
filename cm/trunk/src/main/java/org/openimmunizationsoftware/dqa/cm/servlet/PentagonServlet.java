@@ -32,6 +32,7 @@ public class PentagonServlet extends HomeServlet
   public static final String PARAM_TEST_MESSAGE_ID = "testMessageId";
   public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
   public static final String PARAM_COMPARISON_FIELD_ID = "comparisonFieldId";
+  public static final String PARAM_PROFILE_USAGE_ID = "profileUsageId";
 
   private static final String VIEW_CONFORMANCE1 = "c1";
 
@@ -310,7 +311,17 @@ public class PentagonServlet extends HomeServlet
     out.println("        }");
     out.println("      }");
     out.println("    }");
-    out.println("    xhttp.open('GET', 'pentagonContent?" + PARAM_TEST_MESSAGE_ID + "=' + testMessageId, true); ");
+    String link;
+    if (testParticipantSelected.getProfileUsage() == null)
+    {
+      link = "'pentagonContent?" + PARAM_TEST_MESSAGE_ID + "=' + testMessageId";
+    } else
+    {
+      link = "'pentagonContent?" + PARAM_PROFILE_USAGE_ID + "=" + testParticipantSelected.getProfileUsage().getProfileUsageId() + "&"
+          + PARAM_TEST_MESSAGE_ID + "=' + testMessageId";
+    }
+
+    out.println("    xhttp.open('GET', " + link + ", true); ");
     out.println("    xhttp.send(null);");
     out.println("  }");
     out.println("  function flashOnGreen(id) { ");
@@ -1420,8 +1431,7 @@ public class PentagonServlet extends HomeServlet
       @Override
       public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
       {
-        // TODO Auto-generated method stub
-
+        out.println("<p class=\"pentagon\"></p>");
       }
 
       @Override

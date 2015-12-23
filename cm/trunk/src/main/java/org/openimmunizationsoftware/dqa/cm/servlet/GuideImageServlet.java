@@ -20,7 +20,8 @@ public class GuideImageServlet extends HomeServlet
   public static final String PARAM_PROFILE_USAGE_ID = "profileUsageId";
   public static final String PARAM_LOCATION = "location";
 
-  private static final String DIR = "C:/test/guides";
+  private static final String DIR1 = "C:/test/guides";
+  private static final String DIR2 = "/home/oisptorg/ois-pt.org/data/guides";
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -52,7 +53,11 @@ public class GuideImageServlet extends HomeServlet
   public static File getImageFile(String location, ProfileUsage profileUsage)
   {
     File file;
-    File dir = new File(DIR);
+    File dir = new File(DIR2);
+    if (!dir.exists())
+    {
+      dir = new File(DIR1);
+    }
     dir = new File(dir, profileUsage.getCategory().toString());
     dir = new File(dir, profileUsage.getLabel());
     if (!profileUsage.getVersion().equals(""))
