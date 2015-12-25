@@ -317,10 +317,10 @@ td {
   border-color: #061739; 
 }
 
-a:link.hl7 {    background: #F7F3E8; text-decoration:none;  border-style: solid; border-color: #F7F3E8; border-width: 1px; color: #000;}
-a:visited.hl7 { background: #F7F3E8; text-decoration:none;  border-style: solid; border-color: #F7F3E8; border-width: 1px; color: #000;}
+a:link.hl7 {    background: #eeeeee; text-decoration:none;  border-style: solid; border-color: #F7F3E8; border-width: 1px; color: #000;}
+a:visited.hl7 { background: #eeeeee; text-decoration:none;  border-style: solid; border-color: #F7F3E8; border-width: 1px; color: #000;}
 a:hover.hl7 {   background: #77BED2; text-decoration:none;  border-style: solid; border-color: #2B3E42; border-width: 1px; color: #2B3E42;}
-a:active.hl7 {  background: #F7F3E8; text-decoration:none;  border-style: solid; border-color: #F7F3E8; border-width: 1px; color: #000;}
+a:active.hl7 {  background: #eeeeee; text-decoration:none;  border-style: solid; border-color: #F7F3E8; border-width: 1px; color: #000;}
 
 
 
@@ -337,20 +337,58 @@ a:active.pentagon {text-decoration:none;  }
 
 p.pentagon {color:#9b0d28; font-size: 10pt; margin-right: 5px; margin-left: 5px;}
 
-.pentagonTestMessageFail {
+a:link.pentagonTestMessageFail {
 	border-color: black;
-	border-width: 1px;
-	border-style:inset;
-	padding-left: 4px;
-	padding-right: 4px;
+	border-width: 0px;
+	border-style: none;
+	padding-left: 0px;
+	padding-right: 0px;
 	font-size: 10pt;
-	margin: 2px;
-	color: #ffdf71;
-	font-weight: bold;
-	background-color: #9b0d28;
+	margin: 0px;
+	color: #9b0d28;
+	font-weight: normal;
+	background-color: #eeeeee;
 }
 
-.pentagonTestMessageSaved {
+a:visited.pentagonTestMessageFail {
+	border-color: black;
+	border-width: 0px;
+	border-style: none;
+	padding-left: 0px;
+	padding-right: 0px;
+	font-size: 10pt;
+	margin: 0px;
+	color: #9b0d28;
+	font-weight: bold;
+	background-color: #eeeeee;
+}
+
+a:hover.pentagonTestMessageFail {
+	border-color: black;
+	border-width: 0px;
+	border-style: none;
+	padding-left: 0px;
+	padding-right: 0px;
+	font-size: 10pt;
+	margin: 0px;
+	color: #000000;
+	font-weight: normal;
+	background-color: #eeeeee;
+}
+
+a:active.pentagonTestMessageFail {
+	border-color: black;
+	border-width: 0px;
+	border-style: none;
+	padding-left: 0px;
+	padding-right: 0px;
+	font-size: 10pt;
+	margin: 0px;
+	color: #9b0d28;
+	font-weight: normal;
+	background-color: #eeeeee;
+}
+a:link.pentagonTestMessageSaved {
 	border-color: black;
 	border-width: 1px;
 	border-style:inset;
@@ -358,23 +396,101 @@ p.pentagon {color:#9b0d28; font-size: 10pt; margin-right: 5px; margin-left: 5px;
 	padding-right: 4px;
 	font-size: 10pt;
 	margin: 2px;
-	color: #ffdf71;
+	color: #9b0d28;
+	font-weight: bold;
+	background-color: #00624f;
+}
+
+a:visited.pentagonTestMessageSaved {
+	border-color: black;
+	border-width: 1px;
+	border-style:inset;
+	padding-left: 4px;
+	padding-right: 4px;
+	font-size: 10pt;
+	margin: 2px;
+	color: #9b0d28;
+	font-weight: bold;
+	background-color: #00624f;
+}
+
+a:hover.pentagonTestMessageSaved {
+	border-color: black;
+	border-width: 1px;
+	border-style:inset;
+	padding-left: 4px;
+	padding-right: 4px;
+	font-size: 10pt;
+	margin: 2px;
+	color: #9b0d28;
+	font-weight: bold;
+	background-color: #00624f;
+}
+
+a:active.pentagonTestMessageSaved {
+	border-color: black;
+	border-width: 1px;
+	border-style:inset;
+	padding-left: 4px;
+	padding-right: 4px;
+	font-size: 10pt;
+	margin: 2px;
+	color: #9b0d28;
 	font-weight: bold;
 	background-color: #00624f;
 }
 
 
-.pentagonTestMessagePass {
+a:link.pentagonTestMessagePass {
 	border-color: black;
-	border-width: 1px;
-	border-style:inset;
-	padding-left: 4px;
-	padding-right: 4px;
+	border-width: 0px;
+	border-style: none;
+	padding-left: 0px;
+	padding-right: 0px;
 	font-size: 10pt;
-	margin: 2px;
-	color: #ffdf71;
+	margin: 0px;
+	color: #9b0d28;
+	font-weight: normal;
+	background-color: #eeeeee;
+}
+
+a:visited.pentagonTestMessagePass {
+	border-color: black;
+	border-width: 0px;
+	border-style: none;
+	padding-left: 0px;
+	padding-right: 0px;
+	font-size: 10pt;
+	margin: 0px;
+	color: #9b0d28;
 	font-weight: bold;
-	background-color: #9b0d28;
+	background-color: #eeeeee;
+}
+
+a:hover.pentagonTestMessagePass {
+	border-color: black;
+	border-width: 0px;
+	border-style: none;
+	padding-left: 0px;
+	padding-right: 0px;
+	font-size: 10pt;
+	margin: 0px;
+	color: #000000;
+	font-weight: normal;
+	background-color: #eeeeee;
+}
+
+a:active.pentagonTestMessagePass {
+	border-color: black;
+	border-width: 0px;
+	border-style: none;
+	padding-left: 0px;
+	padding-right: 0px;
+	font-size: 10pt;
+	margin: 0px;
+	color: #9b0d28;
+	font-weight: normal;
+	background-color: #eeeeee;
 }
 
 pre.pentagon {
@@ -386,15 +502,40 @@ pre.pentagon {
  }
  
 table.pentagon {
+	border-color: #9b0d28;
 	margin-left: 5px;
 	margin-right: 5px;
 }
 
-.guideContents {  
-	background-color: #C0C0C0;
+th.pentagon {
+	border-color: #9b0d28;
+	font-size: 10pt; 
+    background-color: #9b0d28;
+    color: #FFFFFF;
+}
+
+td.pentagon {
+    	border-color: #9b0d28;
+    font-size: 10pt; 
+    color: #9b0d28;
+}
+
+td.pentagonPass {
+    	border-color: #9b0d28;
+    font-size: 10pt; 
+    color: #9b0d28;
+}
+
+td.pentagonFail {
+    	border-color: #9b0d28;
+    font-size: 10pt; 
+    color: #9b0d28;
 }
 
 
+table.guideContents {  
+	background-color: #C0C0C0;
+}
 
 table.guide {
 	border-collapse: collapse;

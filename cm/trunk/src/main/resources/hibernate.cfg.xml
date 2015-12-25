@@ -9,8 +9,8 @@
     <property name="hibernate.connection.username">oisptorg_cm_web</property>
     <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
     <property name="connection.password">SavvyTrainPendedMucked81</property>
-
  -->
+
     <property name="hibernate.connection.url">jdbc:mysql://localhost/dqacm</property>
     <property name="hibernate.connection.username">dqacm_web</property>
     <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>

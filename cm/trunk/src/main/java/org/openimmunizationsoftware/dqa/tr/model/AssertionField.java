@@ -7,6 +7,17 @@ public class AssertionField implements Serializable
   private int assertionFieldId = 0;
   private String assertionType = "";
   private String assertionDescription = "";
+  transient private int count = 0;
+
+  public int getCount()
+  {
+    return count;
+  }
+
+  public void setCount(int count)
+  {
+    this.count = count;
+  }
 
   public int getAssertionFieldId()
   {
