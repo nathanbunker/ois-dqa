@@ -337,7 +337,7 @@ public class GuideServlet extends HomeServlet
         + profileField.getProfileFieldId();
     if (pu.getCategory() == ProfileCategory.IIS)
     {
-      if (pu.getVersion().equals(""))
+      if (pu.getVersion() == null || pu.getVersion().equals(""))
       {
         out.println("<a href=\"" + link + "\">" + pu.getLabel() + "</a>");
       } else
