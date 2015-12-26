@@ -14,6 +14,10 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UFPerformance extends PentagonBox
 {
+  public UFPerformance()
+  {
+    super("UFPerformance");
+  }
 
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)

@@ -3,6 +3,8 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,13 +23,14 @@ import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 public class PentagonServlet extends HomeServlet
 {
 
-  public static final String SHOW_DETAIL_CLOSE_BUTTON = "<a style=\"float: right; display:inline-block; padding: 2px 5px; background:white; \" onclick=\"hideReport('details')\">Close</a>";
+  public static final String SHOW_DETAIL_CLOSE_BUTTON = "<a style=\"float: right; display:inline-block; padding: 2px 5px; margin-right: 5px; margin-top: 5 px;  border-style: solid; border-width: 1px; \" onclick=\"hideReport('details')\" href=\"javascript: void(); \">Close</a>";
   public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
   public static final String PARAM_CONNECTION_LABEL = "connectionLabel";
   public static final String PARAM_TEST_MESSAGE_ID = "testMessageId";
   public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
   public static final String PARAM_COMPARISON_FIELD_ID = "comparisonFieldId";
   public static final String PARAM_PROFILE_USAGE_ID = "profileUsageId";
+  public static final String PARAM_BOX_NAME = "boxName";
 
   private static final String VIEW_CONFORMANCE1 = "c1";
 
@@ -295,30 +298,50 @@ public class PentagonServlet extends HomeServlet
     out.println("</svg>");
 
     out.println("<script>");
-    out.println("  function loadDetails(testMessageId) { ");
-    out.println("    var xhttp = new XMLHttpRequest(); ");
-    out.println("    xhttp.onreadystatechange = function() { ");
-    out.println("      if (xhttp.readyState == XMLHttpRequest.DONE) { ");
-    out.println("        if (xhttp.status == 200) { ");
-    out.println("          var e = document.getElementById('details');");
-    out.println("          e.innerHTML = xhttp.responseText; ");
-    out.println("          e.style.display = 'block';");
-    out.println("        }");
-    out.println("      }");
-    out.println("    }");
-    String link;
-    if (testParticipantSelected.getProfileUsage() == null)
     {
-      link = "'pentagonContent?" + PARAM_TEST_MESSAGE_ID + "=' + testMessageId";
-    } else
-    {
-      link = "'pentagonContent?" + PARAM_PROFILE_USAGE_ID + "=" + testParticipantSelected.getProfileUsage().getProfileUsageId() + "&"
-          + PARAM_TEST_MESSAGE_ID + "=' + testMessageId";
-    }
+      out.println("  function loadDetails(testMessageId) { ");
+      out.println("    var xhttp = new XMLHttpRequest(); ");
+      out.println("    xhttp.onreadystatechange = function() { ");
+      out.println("      if (xhttp.readyState == XMLHttpRequest.DONE) { ");
+      out.println("        if (xhttp.status == 200) { ");
+      out.println("          var e = document.getElementById('details');");
+      out.println("          e.innerHTML = xhttp.responseText; ");
+      out.println("          e.style.display = 'block';");
+      out.println("        }");
+      out.println("      }");
+      out.println("    }");
+      String link;
+      if (testParticipantSelected.getProfileUsage() == null)
+      {
+        link = "'pentagonContent?" + PARAM_TEST_MESSAGE_ID + "=' + testMessageId";
+      } else
+      {
+        link = "'pentagonContent?" + PARAM_PROFILE_USAGE_ID + "=" + testParticipantSelected.getProfileUsage().getProfileUsageId() + "&"
+            + PARAM_TEST_MESSAGE_ID + "=' + testMessageId";
+      }
 
-    out.println("    xhttp.open('GET', " + link + ", true); ");
-    out.println("    xhttp.send(null);");
-    out.println("  }");
+      out.println("    xhttp.open('GET', " + link + ", true); ");
+      out.println("    xhttp.send(null);");
+      out.println("  }");
+    }
+    {
+      out.println("  function loadBoxContents(boxName) { ");
+      out.println("    var e = document.getElementById('boxContents');");
+      out.println("    e.innerHTML = '<p class=\"pentagon\">Loading...</p><p  class=\"pentagon\">(Please be patient, this may take a minute.)</p>'; ");
+      out.println("    e.style.display = 'block';");
+      out.println("    var xhttp = new XMLHttpRequest(); ");
+      out.println("    xhttp.onreadystatechange = function() { ");
+      out.println("      if (xhttp.readyState == XMLHttpRequest.DONE) { ");
+      out.println("        if (xhttp.status == 200) { ");
+      out.println("          e.innerHTML = xhttp.responseText; ");
+      out.println("        }");
+      out.println("      }");
+      out.println("    }");
+      String link = "'pentagonContent?" + PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId() + "&" + PARAM_BOX_NAME + "=' + boxName";
+      out.println("    xhttp.open('GET', " + link + ", true); ");
+      out.println("    xhttp.send(null);");
+      out.println("  }");
+    }
     out.println("  function flashOnGreen(id) { ");
     out.println("    var e = document.getElementById(id); ");
     out.println("    e.style.fill = '#7ab648'");
@@ -344,31 +367,7 @@ public class PentagonServlet extends HomeServlet
     out.println("    e.style.fill = '#ffdf71'");
     out.println("  }");
     out.println("  function showReport(id) { ");
-    out.println("    hideReport('c0'); ");
-    out.println("    hideReport('c1'); ");
-    out.println("    hideReport('c2'); ");
-    out.println("    hideReport('c3'); ");
-    out.println("    hideReport('c4'); ");
-    out.println("    hideReport('uf0'); ");
-    out.println("    hideReport('uf1'); ");
-    out.println("    hideReport('uf2'); ");
-    out.println("    hideReport('uf3'); ");
-    out.println("    hideReport('uf4'); ");
-    out.println("    hideReport('uf5'); ");
-    out.println("    hideReport('uf6'); ");
-    out.println("    hideReport('uc0'); ");
-    out.println("    hideReport('uc1'); ");
-    out.println("    hideReport('uc2'); ");
-    out.println("    hideReport('uc3'); ");
-    out.println("    hideReport('qf0'); ");
-    out.println("    hideReport('qf1'); ");
-    out.println("    hideReport('qf2'); ");
-    out.println("    hideReport('qf3'); ");
-    out.println("    hideReport('qf4'); ");
-    out.println("    hideReport('qf5'); ");
-    out.println("    hideReport('qf5'); ");
-    out.println("    hideReport('qc0'); ");
-    out.println("    hideReport('qc1'); ");
+    out.println("    if (id != 'boxContents') { hideReport('boxContents'); } ");
     out.println("    var e = document.getElementById(id)");
     out.println("    e.style.display = 'block'; ");
     out.println("  }");
@@ -442,7 +441,8 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 100px;\" onmouseout=\"flashOffBlue('r_c" + i
-            + "')\" onmouseover=\"flashOnBlue('r_c" + i + "')\"  onClick=\"showReport('c" + i + "')\">" + pentagonBox.getLabel() + "</span>");
+            + "')\" onmouseover=\"flashOnBlue('r_c" + i + "')\"  onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "')\">"
+            + pentagonBox.getLabel() + "</span>");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -455,7 +455,8 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; height: " + pentagonBox.getSize() + "px; width: 100px; \" onmouseout=\"flashOffGreen('r_uf" + i
-            + "')\" onmouseover=\"flashOnGreen('r_uf" + i + "')\" onClick=\"showReport('uf" + i + "')\">" + pentagonBox.getLabel() + "</span>");
+            + "')\" onmouseover=\"flashOnGreen('r_uf" + i + "')\" onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "')\">"
+            + pentagonBox.getLabel() + "</span>");
         posY += pentagonBox.getSize();
         i++;
       }
@@ -468,8 +469,8 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 70px;\" onmouseout=\"flashOffGreen('r_uc" + i
-            + "')\" onmouseover=\"flashOnGreen('r_uc" + i + "')\" onClick=\"showReport('uc" + i + "')\"><br/><br/>" + pentagonBox.getLabel()
-            + "</span>");
+            + "')\" onmouseover=\"flashOnGreen('r_uc" + i + "')\" onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "')\"><br/><br/>"
+            + pentagonBox.getLabel() + "</span>");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -482,8 +483,8 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 70px;\" onmouseout=\"flashOffOrange('r_qc" + i
-            + "')\" onmouseover=\"flashOnOrange('r_qc" + i + "')\" onClick=\"showReport('qc" + i + "')\"><br/><br/>" + pentagonBox.getLabel()
-            + "</span>");
+            + "')\" onmouseover=\"flashOnOrange('r_qc" + i + "')\" onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "')\"><br/><br/>"
+            + pentagonBox.getLabel() + "</span>");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -496,17 +497,20 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; height: " + pentagonBox.getSize() + "px; width: 100px; \" onmouseout=\"flashOffOrange('r_qf" + i
-            + "')\" onmouseover=\"flashOnOrange('r_qf" + i + "')\" onClick=\"showReport('qf" + i + "')\">" + pentagonBox.getLabel() + "</span>");
+            + "')\" onmouseover=\"flashOnOrange('r_qf" + i + "')\" onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "')\">"
+            + pentagonBox.getLabel() + "</span>");
         posY += pentagonBox.getSize();
         i++;
       }
     }
 
-    printContents(webSession, userSession, dataSession, out, testConducted, offsetY, offsetX, "c", pentagonRowConfidence);
-    printContents(webSession, userSession, dataSession, out, testConducted, offsetY, offsetX, "uf", pentagonRowsUpdateFunctionality);
-    printContents(webSession, userSession, dataSession, out, testConducted, offsetY, offsetX, "uc", pentagonRowUpdateConformance);
-    printContents(webSession, userSession, dataSession, out, testConducted, offsetY, offsetX, "qf", pentagonRowQueryFunctionality);
-    printContents(webSession, userSession, dataSession, out, testConducted, offsetY, offsetX, "qc", pentagonRowQueryConformance);
+    {
+      int posX = 124;
+      int posY = 135;
+      out.println("<div id=\"boxContents\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
+          + "px; height: 548px; width: 597px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; overflow: auto;\">");
+      out.println("</div>");
+    }
 
     {
       int posX = 0;

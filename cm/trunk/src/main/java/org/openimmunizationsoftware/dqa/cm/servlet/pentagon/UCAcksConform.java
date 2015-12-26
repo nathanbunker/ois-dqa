@@ -22,7 +22,10 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UCAcksConform extends PentagonBox
 {
-
+  public UCAcksConform()
+  {
+    super("UCAcksConform");
+  }
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {
@@ -40,42 +43,50 @@ public class UCAcksConform extends PentagonBox
       out.println("<h3 class=\"pentagon\">All Acks Conform</h3>");
     } else
     {
-      out.println("<h3 class=\"pentagon\">Conformance Problems Found</h3>");
-      List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted);
-      Map<AssertionField, TestMessage> assertionFieldToTestMessageMap = AssertionFieldLogic.getAssertionFieldToTestMessageMap(dataSession,
-          testConducted, assertionFieldList);
-      out.println("<table class=\"pentagon\">");
-      out.println("  <tr class=\"pentagon\">");
-      out.println("    <th class=\"pentagon\">Count</th>");
-      out.println("    <th class=\"pentagon\">Description</th>");
-      out.println("  </tr>");
-      for (AssertionField assertionField : assertionFieldList)
-      {
-        out.println("  <tr class=\"pentagon\">");
-        out.println("    <td class=\"pentagon\">" + assertionField.getCount() + "</td>");
-        TestMessage testMessage = assertionFieldToTestMessageMap.get(assertionField);
-        if (testMessage == null)
-        {
-          out.println("    <td class=\"pentagon\">" + assertionField.getAssertionDescription() + "</td>");
-        } else
-        {
-          out.println("    <td class=\"pentagon\"><a class=\"pentagonTestMessageFail\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
-              + testMessage.getTestMessageId() + "');\">" + assertionField.getAssertionDescription() + "</a></td>");
-        }
-        out.println("  </tr>");
-
-      }
-      out.println("</table>");
+      printContentsConformanceProblems(out, dataSession, testConducted);
     }
+  }
+  protected static void printContentsConformanceProblems(PrintWriter out, Session dataSession, TestConducted testConducted)
+  {
+    out.println("<h3 class=\"pentagon\">Conformance Problems Found</h3>");
+    List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted);
+    Map<AssertionField, TestMessage> assertionFieldToTestMessageMap = AssertionFieldLogic.getAssertionFieldToTestMessageMap(dataSession,
+        testConducted, assertionFieldList);
+    out.println("<table class=\"pentagon\">");
+    out.println("  <tr class=\"pentagon\">");
+    out.println("    <th class=\"pentagon\">Count</th>");
+    out.println("    <th class=\"pentagon\">Description</th>");
+    out.println("  </tr>");
+    for (AssertionField assertionField : assertionFieldList)
+    {
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <td class=\"pentagon\">" + assertionField.getCount() + "</td>");
+      TestMessage testMessage = assertionFieldToTestMessageMap.get(assertionField);
+      if (testMessage == null)
+      {
+        out.println("    <td class=\"pentagon\">" + assertionField.getAssertionDescription() + "</td>");
+      } else
+      {
+        out.println("    <td class=\"pentagon\"><a class=\"pentagonTestMessageFail\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
+            + testMessage.getTestMessageId() + "');\">" + assertionField.getAssertionDescription() + "</a></td>");
+      }
+      out.println("  </tr>");
+
+    }
+    out.println("</table>");
   }
 
   @Override
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
+    String testType = "update";
+    printScoreExplanation(out, dataSession, testConducted, testType);
+  }
+  public static void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, String testType)
+  {
     out.println("<p class=\"pentagon\">The score is determined by evaluation the number of errors identified by the NIST validator. </p>");
     out.println("<h4 class=\"pentagon\">Step 1: Set Maximum Score Possible</h4>");
-    String testType = "update";
     ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(testConducted, dataSession, testType);
     out.println("<p class=\"pentagon\"> Determine the percentage of tests where conformance was checked. </p>");
     out.println("<table class=\"pentagon\">");
@@ -162,7 +173,7 @@ public class UCAcksConform extends PentagonBox
         + "% which is rounded down to the nearest whole number for a final score of " + ((int) scoreDouble) + "%.</p>");
     out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
     out.println("<p class=\"pentagon\">Update the IIS ACK message so that it conforms to the CDC Guide. "
-        + "Focus on the errors that appear the most often. Be sure to verify ACK messages using the " + "NIST test site. </p>");
+        + "Focus on the errors that appear the most often. Be sure to verify the response messages using the " + "NIST test site. </p>");
   }
 
   @Override
@@ -171,28 +182,32 @@ public class UCAcksConform extends PentagonBox
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015) != null)
     {
       String testType = "update";
-      ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(testConducted, dataSession, testType);
-      if (conformanceCount.getCountTotal() > 0)
+      calculateScore(testConducted, dataSession, pentagonReport, testType);
+    }
+  }
+  public static void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, String testType)
+  {
+    ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(testConducted, dataSession, testType);
+    if (conformanceCount.getCountTotal() > 0)
+    {
+      double scoreDouble = 100.0;
+      if (conformanceCount.getCountNotRun() > 0)
       {
-        double scoreDouble = 100.0;
-        if (conformanceCount.getCountNotRun() > 0)
-        {
-          scoreDouble = scoreDouble
-              * ((conformanceCount.getCountTotal() - conformanceCount.getCountNotRun()) / (double) conformanceCount.getCountTotal());
-        }
-        List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted);
-        for (AssertionField assertionField : assertionFieldList)
-        {
-          double percentage = 1.0;
-          if (assertionField.getCount() < conformanceCount.getCountTotal())
-          {
-            percentage = assertionField.getCount() / (double) conformanceCount.getCountTotal();
-          }
-          double deduction = percentage * 0.2 * scoreDouble;
-          scoreDouble = scoreDouble - deduction;
-        }
-        pentagonReport.setScoreUCAcksConform(((int) scoreDouble));
+        scoreDouble = scoreDouble
+            * ((conformanceCount.getCountTotal() - conformanceCount.getCountNotRun()) / (double) conformanceCount.getCountTotal());
       }
+      List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted);
+      for (AssertionField assertionField : assertionFieldList)
+      {
+        double percentage = 1.0;
+        if (assertionField.getCount() < conformanceCount.getCountTotal())
+        {
+          percentage = assertionField.getCount() / (double) conformanceCount.getCountTotal();
+        }
+        double deduction = percentage * 0.2 * scoreDouble;
+        scoreDouble = scoreDouble - deduction;
+      }
+      pentagonReport.setScoreUCAcksConform(((int) scoreDouble));
     }
   }
 }

@@ -17,6 +17,29 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class CBadMessage extends PentagonBox
 {
+  public CBadMessage()
+  {
+    super("CBadMessage");
+  }
+
+  @Override
+  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  {
+    if (score == 100)
+    {
+      out.println(
+          "<p class=\"pentagon\">All clearly bad messages were not accepted by the IIS. This means that the IIS identified the issue, messaged it back "
+              + "for this report, and this report was able to understand that there was a problem. This means that this report can place "
+              + "higher confidence on the status of data submitted based on the acknowledgment message. </p>");
+    } else
+    {
+      out.println(
+          "<p class=\"pentagon\">Messages that have severe data quality or format issues that should prevent them from being read and properly saved by most IIS "
+              + "are considered to be bad messages. While there may be some exceptions in certain cases most IIS should be identifying and "
+              + "acknowledging the problems in these messages when replying. This score reflects the ability of the IIS to identify and communicate "
+              + "issues that are present in bad messages or the ability of this report to understanda the not accept message from the IIS.</p> ");
+    }
+  }
 
   @Override
   public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
@@ -40,25 +63,6 @@ public class CBadMessage extends PentagonBox
       query.setParameter(1, testConducted);
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPass(out, testMessageList);
-    }
-  }
-
-  @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
-  {
-    if (score == 100)
-    {
-      out.println(
-          "<p class=\"pentagon\">All clearly bad messages were not accepted by the IIS. This means that the IIS identified the issue, messaged it back "
-              + "for this report, and this report was able to understand that there was a problem. This means that this report can place "
-              + "higher confidence on the status of data submitted based on the acknowledgment message. </p>");
-    } else
-    {
-      out.println(
-          "<p class=\"pentagon\">Messages that have severe data quality or format issues that should prevent them from being read and properly saved by most IIS "
-              + "are considered to be bad messages. While there may be some exceptions in certain cases most IIS should be identifying and "
-              + "acknowledging the problems in these messages when replying. This score reflects the ability of the IIS to identify and communicate "
-              + "issues that are present in bad messages or the ability of this report to understanda the not accept message from the IIS.</p> ");
     }
   }
 

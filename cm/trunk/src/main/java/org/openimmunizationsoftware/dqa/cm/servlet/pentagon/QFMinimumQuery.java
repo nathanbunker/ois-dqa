@@ -13,6 +13,11 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class QFMinimumQuery extends PentagonBox
 {
+  public QFMinimumQuery()
+  {
+    super("QFMinimumQuery");
+  }
+
 
   @Override
   public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)

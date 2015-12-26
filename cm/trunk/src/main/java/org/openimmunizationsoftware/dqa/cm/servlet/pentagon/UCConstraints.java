@@ -13,6 +13,10 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UCConstraints extends PentagonBox
 {
+  public UCConstraints()
+  {
+    super("UCConstraints");
+  }
 
   @Override
   public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)

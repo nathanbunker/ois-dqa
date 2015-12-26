@@ -17,6 +17,10 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UFVxu2014 extends PentagonBox
 {
+  public UFVxu2014()
+  {
+    super("UFVxu2014");
+  }
 
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)

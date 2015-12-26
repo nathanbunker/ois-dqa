@@ -14,27 +14,38 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class QCResponsesConform extends PentagonBox
 {
+  public QCResponsesConform() {
+    super("QCResponsesConform");
+  }
 
   @Override
   public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {
-    // TODO Auto-generated method stub
+    if (score >= 100)
+    {
+      out.println("<h3 class=\"pentagon\">All Acks Conform</h3>");
+    } else
+    {
+      UCAcksConform.printContentsConformanceProblems(out, dataSession, testConducted);
+    }
 
   }
 
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {
-    // TODO Auto-generated method stub
-
+    out.println("<p class=\"pentagon\">The National Institute of Standards and Technology (NIST) has an Immunization Test Suite "
+        + "for testing and verifying the format of HL7 messages used in immunization message. In cooperation with CDC and AIRA, "
+        + "NIST has carefully reviewed the HL7 Standards and the CDC Guide to identify exactly how query response messags should "
+        + "be formatted. This score reflects how many error level issues were identified in each response received. </p>");
   }
-  
+
   @Override
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
-    // TODO Auto-generated method stub
-    
+    String testType = "query";
+    UCAcksConform.printScoreExplanation(out, dataSession, testConducted, testType);
   }
 
   @Override
@@ -42,10 +53,8 @@ public class QCResponsesConform extends PentagonBox
   {
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015) != null)
     {
-      TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015);
-      pentagonReport.setScoreQCResponsesConform(testSection.getScoreLevel2());
+      String testType = "update";
+      UCAcksConform.calculateScore(testConducted, dataSession, pentagonReport, testType);
     }
-
-    
   }
 }

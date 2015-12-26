@@ -18,6 +18,11 @@ import org.openimmunizationsoftware.dqa.tr.model.TransportWsdlCdc;
 
 public class QCSoapConforms extends PentagonBox
 {
+  public QCSoapConforms()
+  {
+    super("QCSoapConforms");
+  }
+
 
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)

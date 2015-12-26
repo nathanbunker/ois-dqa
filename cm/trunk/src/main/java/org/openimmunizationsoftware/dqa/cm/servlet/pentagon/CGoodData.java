@@ -17,15 +17,17 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class CGoodData extends PentagonBox
 {
+  public CGoodData() {
+    super("CGoodData");
+  }
 
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {
-    out.println(
-        "<p class=\"pentagon\">Messages that were accepted by the IIS should return that data when queried. This test verifies that patient "
-            + "was accepted and that all the vaccinations submitted are returned. It does not check every field submitted, rather "
-            + "it verifies basic patient information is returned and that basic vaccination information was returned. "
-            + "This measure helps to determine if the positive acknowledgement is accurate or not. </p> ");
+    out.println("<p class=\"pentagon\">Messages that were accepted by the IIS should return that data when queried. This test verifies that patient "
+        + "was accepted and that all the vaccinations submitted are returned. It does not check every field submitted, rather "
+        + "it verifies basic patient information is returned and that basic vaccination information was returned. "
+        + "This measure helps to determine if the positive acknowledgement is accurate or not. </p> ");
   }
 
   @Override
@@ -56,13 +58,41 @@ public class CGoodData extends PentagonBox
       printTestMessageListPass(out, testMessageList);
     }
   }
-  
+
   @Override
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
-    // TODO Auto-generated method stub
-    
+    out.println("<p class=\"pentagon\">This test is based on the premise that the primary responsibility of an IIS is to store "
+        + "patient and vaccination history in order to capture a complete picture of a patient. IIS have many other functions that "
+        + "go beyond this primary responsibility. However this test verifies that if the IIS indicated positive acceptance that the "
+        + "basic patient and vaccination information was accepted and can be returned in a query. </p>");
+    out.println("<p class=\"pentagon\">To verify this, the testing process compares the original update message with the query response and "
+        + "confirms that certain fields are returned. As IIS have varying standards and policies for what data is actually returned, this "
+        + "comparison is only done on a few core fields that would reasonably be expected to be returned. The following fields are " + "used: </p>");
+    out.println("<ul class=\"pentagon\">");
+    out.println("  <li class=\"pentagon\">Patient");
+    out.println("    <ul class=\"pentagon\">");
+    out.println("      <li class=\"pentagon\">Last Name</li>");
+    out.println("      <li class=\"pentagon\">First Name</li>");
+    out.println("      <li class=\"pentagon\">Middle Name (only if sent and also returned)</li>");
+    out.println("      <li class=\"pentagon\">Date of Birth</li>");
+    out.println("    </ul>");
+    out.println("  </li>");
+    out.println("  <li class=\"pentagon\">Vaccination (only fully administered, ignoring refusals and history-of-disease, etc.) ");
+    out.println("    <ul class=\"pentagon\">");
+    out.println("      <li class=\"pentagon\">Administration Date</li>");
+    out.println("      <li class=\"pentagon\">Vaccination Code (CVX or NDC)</li>");
+    out.println("    </ul>");
+    out.println("  </li>");
+    out.println("</ul>");
+    out.println("<p class=\"pentagon\">The score is the percentage of accepted messages (whether good or bad) "
+        + "that could retrieved via a query and had the basic data as shown above.</p>");
+    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
+    out.println("<p class=\"pentagon\">Review process for acknowledging messages to ensure that if important vaccination or patient information is "
+        + "not accepted by the IIS that this is reflected in the acknowledgement message when possible. The test cases selected for this section "
+        + "were especially chosen as ones that either ought to be accepted or had such problems that it is reasonable to assume that an IIS should "
+        + "identify these upon receipt and return an acknowledgment indicating the message that the submitter should correct and resend. </p>");
   }
 
   @Override
@@ -95,6 +125,6 @@ public class CGoodData extends PentagonBox
     if (count > 0)
     {
       pentagonReport.setScoreCGoodData((int) (100.0 * countPass / count));
-    }    
+    }
   }
 }

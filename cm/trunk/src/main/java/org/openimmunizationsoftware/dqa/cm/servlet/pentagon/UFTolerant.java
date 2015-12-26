@@ -17,6 +17,11 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UFTolerant extends PentagonBox
 {
+  public UFTolerant()
+  {
+    super("UFTolerant");
+  }
+
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {

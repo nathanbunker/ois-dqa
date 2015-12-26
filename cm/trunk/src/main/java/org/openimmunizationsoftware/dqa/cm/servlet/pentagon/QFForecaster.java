@@ -13,6 +13,11 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class QFForecaster extends PentagonBox
 {
+  public QFForecaster()
+  {
+    super("QFForecaster");
+  }
+
 
   @Override
   public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)

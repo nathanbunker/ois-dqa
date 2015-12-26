@@ -17,6 +17,11 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class QFDataAvailable extends PentagonBox
 {
+  public QFDataAvailable()
+  {
+    super("QFDataAvailable");
+  }
+
 
   @Override
   public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
