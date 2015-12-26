@@ -15,6 +15,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public abstract class PentagonBox
 {
+  private String boxName = "";
   protected String label = "";
   protected String title = "";
   protected int weight = 0;
@@ -22,6 +23,21 @@ public abstract class PentagonBox
   protected int poxY = 0;
   protected int size = 0;
   protected int score = 0;
+  
+  public PentagonBox(String boxName)
+  {
+    this.boxName = boxName;
+  }
+
+  public String getBoxName()
+  {
+    return boxName;
+  }
+
+  public void setBoxName(String boxName)
+  {
+    this.boxName = boxName;
+  }
 
   public int getScore()
   {

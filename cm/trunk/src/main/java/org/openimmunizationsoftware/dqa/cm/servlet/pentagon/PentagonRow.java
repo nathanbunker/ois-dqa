@@ -67,4 +67,17 @@ public abstract class PentagonRow extends ArrayList<PentagonBox>
     return new UF_Row(pentagonReport);
   }
 
+  public PentagonBox getPentegonBox(String boxName)
+  {
+    for (PentagonBox pentagonBox : this)
+    {
+      if (pentagonBox.getBoxName().equals(boxName))
+      {
+        return pentagonBox;
+      }
+    }
+    return null;
+  }
+
+
 }

@@ -51,7 +51,7 @@ public class QF_Row extends PentagonRow
       this.add(pentagonBox);
     }
   }
-  
+
   @Override
   public void calculateScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap)
@@ -67,6 +67,5 @@ public class QF_Row extends PentagonRow
     pentagonReport.setScoreQF(scoreQF / 100);
 
   }
-  
 
 }

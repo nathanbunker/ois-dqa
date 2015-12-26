@@ -15,7 +15,7 @@ public class UF_Row extends PentagonRow
     
     PentagonBox[] pb = new PentagonBox[7];
 
-    pb[0] = new UFVxu2015();
+    pb[0] = new UFVxu2014();
     pb[1] = new UFVxu2015();
     pb[2] = new UFSensitive();
     pb[3] = new UFCodedValues();

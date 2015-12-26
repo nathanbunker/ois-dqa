@@ -17,6 +17,10 @@ import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
 public class UCModifications extends PentagonBox
 {
+  public UCModifications()
+  {
+    super("UCModifications");
+  }
 
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)

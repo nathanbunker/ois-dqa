@@ -15,6 +15,12 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 public class QFQbp2015 extends PentagonBox
 {
 
+  public QFQbp2015()
+  {
+    super("QFQbp2015");
+  }
+
+
   @Override
   public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {

@@ -173,7 +173,7 @@ public class GuideServlet extends HomeServlet
                       + link + (page - 1) + "\">Previous</a>");
             }
             out.println("<a style=\"text-align: center; position: fixed;  top: 15px; left: " + (width - 75 + 325 - 5)
-                + "px; width: 75px; border-style: solid; border-width: 1px\" href=\"" + link + (page + 1) + "\">Next</a>");
+                + "px; width: 75px; border-style: solid; border-width: 1px;\" href=\"" + link + (page + 1) + "\">Next</a>");
           }
           out.println("<h2 style=\"text-align: center; position: fixed;  top: 15px; left: " + ((width - 300) / 2 + 325) + "px; width: 300px;\">"
               + profileUsage + "</h2>");

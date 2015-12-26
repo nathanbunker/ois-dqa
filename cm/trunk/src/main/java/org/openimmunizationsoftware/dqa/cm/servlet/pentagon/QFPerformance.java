@@ -14,6 +14,11 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class QFPerformance extends PentagonBox
 {
+  public QFPerformance()
+  {
+    super("QFPerformance");
+  }
+
 
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)

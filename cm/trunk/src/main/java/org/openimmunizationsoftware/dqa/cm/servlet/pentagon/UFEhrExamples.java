@@ -17,6 +17,10 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UFEhrExamples extends PentagonBox
 {
+  public UFEhrExamples()
+  {
+    super("UFEhrExamples");
+  }
 
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
