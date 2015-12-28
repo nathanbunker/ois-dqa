@@ -39,13 +39,13 @@ public class UF_Row extends PentagonRow
     pb[5].setLabel("EHR Examples");
     pb[6].setLabel("Performance");
 
-    pb[0].setWeight(20);
-    pb[1].setWeight(20);
-    pb[2].setWeight(12);
-    pb[3].setWeight(12);
-    pb[4].setWeight(12);
-    pb[5].setWeight(12);
-    pb[6].setWeight(12);
+    pb[0].setWeight(15);
+    pb[1].setWeight(15);
+    pb[2].setWeight(14);
+    pb[3].setWeight(14);
+    pb[4].setWeight(14);
+    pb[5].setWeight(14);
+    pb[6].setWeight(14);
 
     pb[0].setScore(pentagonReport.getScoreUFVxu2014());
     pb[1].setScore(pentagonReport.getScoreUFVxu2015());
