@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="Forecast" table="forecast">
+    <id name="forecastId" column="forecast_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="forecastField" column="forecast_field_id" class="ForecastField"/>
+    <many-to-one name="testMessage" column="test_message_id" class="TestMessage"/>
+    <property name="forecastType" column="forecast_type" type="string"/>
+    <property name="scheduleName" column="schedule_name" type="string"/>
+    <property name="seriesName" column="series_name" type="string"/>
+    <property name="seriesDoseCount" column="series_dose_count" type="string"/>
+    <property name="doseNumber" column="dose_number" type="string"/>
+    <property name="dateEarliest" column="date_earliest" type="date"/>
+    <property name="dateDue" column="date_due" type="date"/>
+    <property name="dateOverdue" column="date_overdue" type="date"/>
+    <property name="dateLatest" column="date_latest" type="date"/>
+    <property name="seriesStatus" column="series_status" type="string"/>
+    <property name="reasonCode" column="reason_code" type="string"/>
+  </class>
+</hibernate-mapping>

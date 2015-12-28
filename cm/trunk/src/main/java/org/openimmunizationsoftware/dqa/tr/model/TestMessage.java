@@ -2,6 +2,8 @@ package org.openimmunizationsoftware.dqa.tr.model;
 
 import java.io.Serializable;
 
+import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+
 public class TestMessage implements Serializable
 {
   private int testMessageId = 0;
@@ -36,9 +38,32 @@ public class TestMessage implements Serializable
   private String resultResponseType = "";
   private String resultAckType = "";
   private String resultAckConformance = "";
+  private String resultQueryType = "";
   private String resultStoreStatus = "";
-  private int forecastTestPanelCaseId = 0;
+  private String resultForecastStatus = "";
   private int forecastTestPanelId = 0;
+  private int forecastTestPanelCaseId = 0;
+
+  public String getResultForecastStatus()
+  {
+    return resultForecastStatus;
+  }
+
+  public void setResultForecastStatus(String resultForecastStatus)
+  {
+    this.resultForecastStatus = resultForecastStatus;
+  }
+
+
+  public String getResultQueryType()
+  {
+    return resultQueryType;
+  }
+
+  public void setResultQueryType(String resultQueryType)
+  {
+    this.resultQueryType = resultQueryType;
+  }
 
   public String getPrepMessageOriginalResponse()
   {
@@ -54,6 +79,35 @@ public class TestMessage implements Serializable
   {
     return resultStoreStatus;
   }
+
+  
+  public String getResultStoreStatusForDisplay()
+  {
+    return getResultStoreStatusForDisplay(resultStoreStatus);
+  }
+  
+  public static String getResultStoreStatusForDisplay(String resultStoreStatus)
+  {
+    if (resultStoreStatus.equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_ACCEPTED_NOT_RETURNED))
+    {
+      return "Accepted but Not Returned";
+    }
+    if (resultStoreStatus.equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_ACCEPTED_RETURNED))
+    {
+      return "Accepted and Returned";
+    }
+    if (resultStoreStatus.equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_NOT_ACCEPTED_RETURNED))
+    {
+      return "Not Accepted but Returned";
+    }
+    if (resultStoreStatus.equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_NOT_ACCEPTED_NOT_RETURNED))
+    {
+      return "Not Accepted and Not Returned";
+    }
+    return resultStoreStatus;
+  }
+  
+  
 
   public void setResultStoreStatus(String resultStoreStatus)
   {

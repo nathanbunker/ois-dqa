@@ -23,6 +23,10 @@ import org.openimmunizationsoftware.dqa.tr.model.Assertion;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
 import org.openimmunizationsoftware.dqa.tr.model.ComparisonField;
+import org.openimmunizationsoftware.dqa.tr.model.Evaluation;
+import org.openimmunizationsoftware.dqa.tr.model.EvaluationField;
+import org.openimmunizationsoftware.dqa.tr.model.Forecast;
+import org.openimmunizationsoftware.dqa.tr.model.ForecastField;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileField;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsageValue;
@@ -71,6 +75,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
             testConducted = testConductedList.get(0);
           }
         }
+        if (req.getParameter(PARAM_TC_CONNECTION_TYPE) != null)
         {
           if (testConducted == null)
           {
@@ -124,7 +129,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
             String transforms = readValue(req, PARAM_TC_TRANSFORMS + i);
             while (!transforms.equals(""))
             {
-              
+
               BufferedReader customTransformsIn = new BufferedReader(new StringReader(transforms));
               String transformText = "";
               String[] expectedStarts = { "MSH-3=", "MSH-4=", "MSH-5=", "MSH-6=", "MSH-22=", "RXA-11.4=", "RXA-11.4*=" };
@@ -186,7 +191,6 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
 
           if (testConducted.isCompleteTest())
           {
-
             Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and latestTest = ?");
             query.setParameter(0, testConducted.getConnectionLabel());
             query.setParameter(1, true);
@@ -219,26 +223,29 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                 testSection = testSectionList.get(0);
               }
             }
-            if (testSection == null)
+            if (req.getParameter(PARAM_TS_TEST_ENABLED) != null)
             {
-              testSection = new TestSection();
-              testSection.setTestConducted(testConducted);
-              testSection.setTestSectionType(testSectionType);
-            }
-            testSection.setTestEnabled(readValueBoolean(req, PARAM_TS_TEST_ENABLED));
-            testSection.setScoreLevel1(readValueInt(req, PARAM_TS_SCORE_LEVEL1));
-            testSection.setScoreLevel2(readValueInt(req, PARAM_TS_SCORE_LEVEL2));
-            testSection.setScoreLevel3(readValueInt(req, PARAM_TS_SCORE_LEVEL3));
-            testSection.setProgressLevel1(readValueInt(req, PARAM_TS_PROGRESS_LEVEL1));
-            testSection.setProgressLevel2(readValueInt(req, PARAM_TS_PROGRESS_LEVEL2));
-            testSection.setProgressLevel3(readValueInt(req, PARAM_TS_PROGRESS_LEVEL3));
-            testSection.setCountLevel1(readValueInt(req, PARAM_TS_COUNT_LEVEL1));
-            testSection.setCountLevel2(readValueInt(req, PARAM_TS_COUNT_LEVEL2));
-            testSection.setCountLevel3(readValueInt(req, PARAM_TS_COUNT_LEVEL3));
+              if (testSection == null)
+              {
+                testSection = new TestSection();
+                testSection.setTestConducted(testConducted);
+                testSection.setTestSectionType(testSectionType);
+              }
+              testSection.setTestEnabled(readValueBoolean(req, PARAM_TS_TEST_ENABLED));
+              testSection.setScoreLevel1(readValueInt(req, PARAM_TS_SCORE_LEVEL1));
+              testSection.setScoreLevel2(readValueInt(req, PARAM_TS_SCORE_LEVEL2));
+              testSection.setScoreLevel3(readValueInt(req, PARAM_TS_SCORE_LEVEL3));
+              testSection.setProgressLevel1(readValueInt(req, PARAM_TS_PROGRESS_LEVEL1));
+              testSection.setProgressLevel2(readValueInt(req, PARAM_TS_PROGRESS_LEVEL2));
+              testSection.setProgressLevel3(readValueInt(req, PARAM_TS_PROGRESS_LEVEL3));
+              testSection.setCountLevel1(readValueInt(req, PARAM_TS_COUNT_LEVEL1));
+              testSection.setCountLevel2(readValueInt(req, PARAM_TS_COUNT_LEVEL2));
+              testSection.setCountLevel3(readValueInt(req, PARAM_TS_COUNT_LEVEL3));
 
-            Transaction transaction = dataSession.beginTransaction();
-            dataSession.saveOrUpdate(testSection);
-            transaction.commit();
+              Transaction transaction = dataSession.beginTransaction();
+              dataSession.saveOrUpdate(testSection);
+              transaction.commit();
+            }
           }
           int testPosition = readValueInt(req, PARAM_TM_TEST_POSITION);
           TestMessage testMessage = null;
@@ -288,7 +295,9 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
               testMessage.setResultResponseType(readValue(req, PARAM_TM_RESULT_RESPONSE_TYPE, 250));
               testMessage.setResultAckType(readValue(req, PARAM_TM_RESULT_ACK_TYPE, 250));
               testMessage.setResultAckConformance(readValue(req, PARAM_TM_RESULT_ACK_CONFORMANCE, 250));
+              testMessage.setResultQueryType(readValue(req, PARAM_TM_RESULT_QUERY_TYPE, 250));
               testMessage.setResultStoreStatus(readValue(req, PARAM_TM_RESULT_ACK_STORE_STATUS, 250));
+              testMessage.setResultForecastStatus(readValue(req, PARAM_TM_RESULT_FORECAST_STATUS, 250));
               testMessage.setForecastTestPanelCaseId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_CASE_ID));
               testMessage.setForecastTestPanelId(readValueInt(req, PARAM_TM_FORECAST_TEST_PANEL_ID));
               {
@@ -396,6 +405,110 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                   }
                   position++;
                   assertionResult = readValue(req, PARAM_A_ASSERTION_RESULT + position, 250);
+                }
+              }
+            }
+            if (testMessage != null)
+            {
+              {
+                int position = 1;
+                String componentCode = readValue(req, PARAM_E_COMPONENT_CODE + position, 250);
+                while (!componentCode.equals(""))
+                {
+                  EvaluationField evaluationField = null;
+                  {
+                    String vaccineCode = readValue(req, PARAM_E_VACCINE_CODE + position, 250);
+                    String vaccineDate = readValue(req, PARAM_E_VACCINE_DATE + position, 250);
+                    if (!vaccineCode.equals("") && !vaccineDate.equals(""))
+                    {
+                      Query query = dataSession.createQuery("from EvaluationField where componentCode = ? and vaccineCode = ? and vaccineDate = ?");
+                      query.setParameter(0, componentCode);
+                      query.setParameter(1, vaccineCode);
+                      query.setParameter(2, vaccineDate);
+                      List<EvaluationField> evaluationFieldList = query.list();
+                      if (evaluationFieldList.size() > 0)
+                      {
+                        evaluationField = evaluationFieldList.get(0);
+                      } else
+                      {
+                        evaluationField = new EvaluationField();
+                        evaluationField.setComponentCode(componentCode);
+                        evaluationField.setVaccineCode(vaccineCode);
+                        evaluationField.setVaccineDate(vaccineDate);
+                        Transaction transaction = dataSession.beginTransaction();
+                        dataSession.save(evaluationField);
+                        transaction.commit();
+                      }
+                    }
+                  }
+
+                  if (evaluationField != null)
+                  {
+                    Evaluation evaluation = new Evaluation();
+                    evaluation.setEvaluationField(evaluationField);
+                    evaluation.setTestMessage(testMessage);
+                    evaluation.setEvaluationType(readValue(req, PARAM_E_EVALUATION_TYPE + position, 250));
+                    evaluation.setScheduleName(readValue(req, PARAM_E_SCHEDULE_NAME + position, 250));
+                    evaluation.setDoseNumber(readValue(req, PARAM_E_DOSE_NUMBER + position, 250));
+                    evaluation.setDoseValidity(readValue(req, PARAM_E_DOSE_VALIDITY + position, 250));
+                    evaluation.setSeriesName(readValue(req, PARAM_E_SERIES_NAME + position, 250));
+                    evaluation.setSeriesDoseCount(readValue(req, PARAM_E_SERIES_DOSE_COUNT + position, 250));
+                    evaluation.setSeriesStatus(readValue(req, PARAM_E_SERIES_STATUS + position, 250));
+                    evaluation.setReasonCode(readValue(req, PARAM_E_REASON_CODE + position, 250));
+                    Transaction transaction = dataSession.beginTransaction();
+                    dataSession.save(evaluation);
+                    transaction.commit();
+                  }
+                  position++;
+                  componentCode = readValue(req, PARAM_E_COMPONENT_CODE + position, 250);
+                }
+              }
+
+              {
+                int position = 1;
+                String vaccineCode = readValue(req, PARAM_F_VACCINE_CODE + position, 250);
+                while (!vaccineCode.equals(""))
+                {
+                  ForecastField forecastField = null;
+                  {
+                    Query query = dataSession.createQuery("from ForecastField where vaccineCode = ?");
+                    query.setParameter(0, vaccineCode);
+                    List<ForecastField> forecastFieldList = query.list();
+                    if (forecastFieldList.size() > 0)
+                    {
+                      forecastField = forecastFieldList.get(0);
+                    } else
+                    {
+                      forecastField = new ForecastField();
+                      forecastField.setVaccineCode(vaccineCode);
+                      Transaction transaction = dataSession.beginTransaction();
+                      dataSession.save(forecastField);
+                      transaction.commit();
+                    }
+                  }
+
+                  if (forecastField != null)
+                  {
+                    Forecast evaluation = new Forecast();
+                    evaluation.setForecastField(forecastField);
+                    evaluation.setTestMessage(testMessage);
+                    evaluation.setForecastType(readValue(req, PARAM_F_FORECAST_TYPE + position, 250));
+                    evaluation.setScheduleName(readValue(req, PARAM_F_SCHEDULE_NAME + position, 250));
+                    evaluation.setSeriesName(readValue(req, PARAM_F_SERIES_NAME + position, 250));
+                    evaluation.setSeriesDoseCount(readValue(req, PARAM_F_SERIES_DOSE_COUNT + position, 250));
+                    evaluation.setDoseNumber(readValue(req, PARAM_F_DOSE_NUMBER + position, 250));
+                    evaluation.setDateEarliest(readValueDateNoTime(req, PARAM_F_DATE_EARLIEST + position));
+                    evaluation.setDateDue(readValueDateNoTime(req, PARAM_F_DATE_DUE + position));
+                    evaluation.setDateOverdue(readValueDateNoTime(req, PARAM_F_DATE_OVERDUE + position));
+                    evaluation.setDateLatest(readValueDateNoTime(req, PARAM_F_DATE_LATEST + position));
+                    evaluation.setSeriesStatus(readValue(req, PARAM_F_SERIES_STATUS + position, 250));
+                    evaluation.setReasonCode(readValue(req, PARAM_F_REASON_CODE + position, 250));
+                    Transaction transaction = dataSession.beginTransaction();
+                    dataSession.save(evaluation);
+                    transaction.commit();
+                  }
+                  position++;
+                  vaccineCode = readValue(req, PARAM_F_VACCINE_CODE + position, 250);
                 }
               }
             }
@@ -688,6 +801,23 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
       try
       {
         date = VALUE_DATE_FORMAT.parse(dateValue);
+      } catch (ParseException pe)
+      {
+        pe.printStackTrace();
+      }
+    }
+    return date;
+  }
+
+  private Date readValueDateNoTime(HttpServletRequest req, String field)
+  {
+    String dateValue = req.getParameter(field);
+    Date date = null;
+    if (dateValue != null && !dateValue.equals(""))
+    {
+      try
+      {
+        date = VALUE_DATE_NO_TIME_FORMAT.parse(dateValue);
       } catch (ParseException pe)
       {
         pe.printStackTrace();

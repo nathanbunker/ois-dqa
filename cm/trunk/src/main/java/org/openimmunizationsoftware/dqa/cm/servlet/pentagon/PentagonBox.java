@@ -166,5 +166,42 @@ public abstract class PentagonBox
       out.println("</table>");
     }
   }
+  
+  public void printTestMessageListFailForQuery(PrintWriter out, List<TestMessage> testMessageList)
+  {
+    String classString = "pentagonTestMessageFail";
+    printTestMessageListFailForQuery(out, testMessageList, classString);
+  }
+
+  public void printTestMessageListFailForQuery(PrintWriter out, List<TestMessage> testMessageList, String classString)
+  {
+    if (testMessageList.size() > 0)
+    {
+      out.println("<table class=\"pentagon\">");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Status</th>");
+      out.println("    <th class=\"pentagon\">Response</th>");
+      out.println("    <th class=\"pentagon\">Store Status</th>");
+      out.println("    <th class=\"pentagon\">Description</th>");
+      out.println("  </tr>");
+      for (TestMessage testMessage : testMessageList)
+      {
+        out.println("  <tr class=\"pentagon\">");
+        out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultStatus() + "</td>");
+        out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultQueryType() + "</td>");
+        out.println("    <td class=\"pentagon\">" + testMessage.getResultStoreStatusForDisplay() + "</td>");
+        out.println("    <td class=\"pentagon\"><a class=\"" + classString + "\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
+            + testMessage.getTestMessageId() + "');\">" + testMessage.getTestCaseDescription() + "</a></td>");
+        out.println("  </tr>");
+      }
+      out.println("</table>");
+    }
+  }
+
+  public void printTestMessageListPassForQuery(PrintWriter out, List<TestMessage> testMessageList)
+  {
+    String classString = "pentagonTestMessagePass";
+    printTestMessageListFailForQuery(out, testMessageList, classString);
+  }
 
 }

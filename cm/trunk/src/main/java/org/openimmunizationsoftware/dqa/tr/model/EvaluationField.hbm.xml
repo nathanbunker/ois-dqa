@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="EvaluationField" table="evaluation_field">
+    <id name="evaluationFieldId" column="evaluation_field_id">
+      <generator class="native"/>
+    </id>
+    <property name="componentCode" column="component_code" type="string"/>
+    <property name="vaccineCode" column="vaccine_code" type="string"/>
+    <property name="vaccineDate" column="vaccine_date" type="string"/>
+  </class>
+</hibernate-mapping>

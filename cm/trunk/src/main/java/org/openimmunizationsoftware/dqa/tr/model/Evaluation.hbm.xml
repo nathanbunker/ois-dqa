@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="Evaluation" table="evaluation">
+    <id name="evaluationdId" column="evaluation_id">
+      <generator class="native" />
+    </id>
+    <many-to-one name="evaluationField" column="evaluation_field_id" class="EvaluationField" />
+    <many-to-one name="testMessage" column="test_message_id" class="TestMessage" />
+    <property name="evaluationType" column="evaluation_type" type="string" />
+    <property name="scheduleName" column="schedule_name" type="string" />
+    <property name="doseNumber" column="dose_number" type="string" />
+    <property name="doseValidity" column="dose_validity" type="string" />
+    <property name="seriesName" column="series_name" type="string" />
+    <property name="seriesDoseCount" column="series_dose_count" type="string" />
+    <property name="seriesStatus" column="series_status" type="string" />
+    <property name="reasonCode" column="reason_code" type="string" />    
+  </class>
+</hibernate-mapping>
