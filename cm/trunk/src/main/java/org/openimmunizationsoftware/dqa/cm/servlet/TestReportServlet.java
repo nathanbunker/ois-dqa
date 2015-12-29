@@ -176,7 +176,6 @@ public class TestReportServlet extends HomeServlet
         }
       }
     }
-
     TestParticipant testParticipantSelected = (TestParticipant) webSession.getAttribute(ATTRIBUTE_TEST_PARTICIPANT);
     if (req.getParameter(PARAM_TEST_PARTICIPANT_ID) != null)
     {

@@ -19,7 +19,7 @@ public class CBadData extends PentagonBox
 {
 
   public CBadData() {
-    super("CBadData");
+    super(BOX_NAME_C_BAD_DATA);
   }
 
   @Override

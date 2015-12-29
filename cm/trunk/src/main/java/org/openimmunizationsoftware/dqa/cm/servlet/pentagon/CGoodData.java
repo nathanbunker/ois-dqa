@@ -18,7 +18,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 public class CGoodData extends PentagonBox
 {
   public CGoodData() {
-    super("CGoodData");
+    super(BOX_NAME_C_GOOD_DATA);
   }
 
   @Override

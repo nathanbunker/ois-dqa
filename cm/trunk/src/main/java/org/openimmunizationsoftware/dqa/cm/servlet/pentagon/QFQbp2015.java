@@ -19,7 +19,7 @@ public class QFQbp2015 extends PentagonBox
 {
 
   public QFQbp2015() {
-    super("QFQbp2015");
+    super(BOX_NAME_QF_QBP2015);
   }
 
   @Override
@@ -38,7 +38,7 @@ public class QFQbp2015 extends PentagonBox
     {
       out.println("<h3 class=\"pentagon\">Fail - Match Not Found</h3>");
       Query query = dataSession
-          .createQuery("from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' "
+          .createQuery("from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' "
               + "and testType = 'query' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT);
       query.setParameter(1, testConducted);
@@ -80,25 +80,28 @@ public class QFQbp2015 extends PentagonBox
   @Override
   public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
   {
-    int countTotal = 0;
-    int countPass = 0;
-    Query query = dataSession.createQuery(
-        "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and testType = 'query' order by testCaseCategory");
-    query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT);
-    query.setParameter(1, testConducted);
-    List<TestMessage> testMessageList = query.list();
-    for (TestMessage testMessage : testMessageList)
+    if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT) != null)
     {
-      countTotal++;
-      if (testMessage.getResultStatus().equalsIgnoreCase("PASS"))
+      int countTotal = 0;
+      int countPass = 0;
+      Query query = dataSession.createQuery(
+          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and testType = 'query' order by testCaseCategory");
+      query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT);
+      query.setParameter(1, testConducted);
+      List<TestMessage> testMessageList = query.list();
+      for (TestMessage testMessage : testMessageList)
       {
-        countPass++;
+        countTotal++;
+        if (testMessage.getResultStatus().equalsIgnoreCase("PASS"))
+        {
+          countPass++;
+        }
       }
-    }
 
-    if (countTotal > 0)
-    {
-      pentagonReport.setScoreQFQbp2015(((int) 100.0 * countPass / countTotal));
+      if (countTotal > 0)
+      {
+        pentagonReport.setScoreQFQbp2015(((int) 100.0 * countPass / countTotal));
+      }
     }
   }
 }

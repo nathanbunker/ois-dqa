@@ -16,13 +16,14 @@ import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 
 public class AssertionFieldLogic
 {
-  public static List<AssertionField> getAssertionFieldListForErrors(Session dataSession, TestConducted testConducted)
+  public static List<AssertionField> getAssertionFieldListForErrors(Session dataSession, TestConducted testConducted, String testType)
   {
     Query query = dataSession
         .createQuery("select a.assertionField, count(a.assertionField) " + "from Assertion a " + "where a.testMessage.testSection.testConducted = ? "
-            + "and a.testMessage.testType = 'update' " + "and a.testMessage.prepNotExpectedToConform = 'N' " + "and a.assertionResult = 'error' "
+            + "and a.testMessage.testType = ? " + "and a.testMessage.prepNotExpectedToConform = 'N' " + "and a.assertionResult = 'error' "
             + "group by a.assertionField " + "order by count(a.assertionField) desc ");
     query.setParameter(0, testConducted);
+    query.setParameter(1, testType);
     List<Object[]> objectsList = query.list();
     List<AssertionField> assertionFieldList = new ArrayList<AssertionField>();
     for (Object[] objects : objectsList)

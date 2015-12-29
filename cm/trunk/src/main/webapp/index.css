@@ -131,7 +131,7 @@ a:active.menuLink {text-decoration:none; color: #FFE1AA; }
  
  pre {
    width: 100%;
-   overflow: auto;
+   overflow-x: auto;
  }
  
 .topBox 
@@ -523,6 +523,7 @@ pre.pentagon {
    font-size: 11px;
    width: 100%;
    overflow: auto;
+   overflow-y: hidden;
  }
  
 table.pentagon {

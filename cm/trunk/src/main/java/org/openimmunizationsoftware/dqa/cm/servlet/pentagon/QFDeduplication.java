@@ -18,7 +18,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 public class QFDeduplication extends PentagonBox
 {
   public QFDeduplication() {
-    super("QFDeduplication");
+    super(BOX_NAME_QF_DEDUPLICATION);
   }
 
   @Override

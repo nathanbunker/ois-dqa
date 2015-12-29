@@ -19,7 +19,7 @@ public class UFEhrExamples extends PentagonBox
 {
   public UFEhrExamples()
   {
-    super("UFEhrExamples");
+    super(BOX_NAME_UF_EHR_EXAMPLES);
   }
 
   @Override
@@ -41,7 +41,7 @@ public class UFEhrExamples extends PentagonBox
     {
       out.println("<h3 class=\"pentagon\">Fail - EHR Example Was Not Accepted</h3>");
       Query query = dataSession.createQuery(
-          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testCaseDescription like ? order by testCaseCategory");
+          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testCaseDescription like ? order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
       query.setParameter(1, testConducted);
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
@@ -65,8 +65,10 @@ public class UFEhrExamples extends PentagonBox
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
-    // TODO Auto-generated method stub
-    
+    out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages that returned a postive response from the IIS. </p>");
+    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
+    out.println("<p class=\"pentagon\">Review the messages and determine if there are any changes needed to how the IIS processes these messages. "
+        + "These messages were collected from certified EHR systems. </p>");
   }
 
   

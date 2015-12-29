@@ -15,7 +15,7 @@ public class QFMinimumQuery extends PentagonBox
 {
   public QFMinimumQuery()
   {
-    super("QFMinimumQuery");
+    super(BOX_NAME_QF_MINIMUM_QUERY);
   }
 
 

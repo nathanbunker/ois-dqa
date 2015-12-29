@@ -19,7 +19,7 @@ public class UFVxu2015 extends PentagonBox
 {
   public UFVxu2015()
   {
-    super("UFVxu2015");
+    super(BOX_NAME_UF_VXU2015);
   }
 
   @Override
@@ -55,7 +55,7 @@ public class UFVxu2015 extends PentagonBox
     {
       out.println("<h3 class=\"pentagon\">Fail - NIST 2015 VXU Example Was Not Accepted</h3>");
       Query query = dataSession.createQuery(
-          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testType = 'update' order by testCaseCategory");
+          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015);
       query.setParameter(1, testConducted);
       List<TestMessage> testMessageList = query.list();
@@ -77,8 +77,12 @@ public class UFVxu2015 extends PentagonBox
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
-    // TODO Auto-generated method stub
-    
+    out.println("<p class=\"pentagon\">The score is calculated as the percentage of NIST 2015 VXU messages were accepted. </p>");
+    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
+    out.println("<p class=\"pentagon\">Ensure IIS is able to understand and properly accept NIST 2015 test messages. "
+        + "These new test cases may be a challenge to some IIS, as the foremost change is that administered vaccinations now use"
+        + "NDC instead of CVX codes. While IIS are not yet receiving these type of messages they need to begin the process now "
+        + "to work towards supporting NDC if sent. </p>");
   }
 
 

@@ -1,5 +1,7 @@
 package org.openimmunizationsoftware.dqa.tr.model;
 
+import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonBox;
+
 public class PentagonReport
 {
   private int pentagonReportId = 0;
@@ -43,6 +45,108 @@ public class PentagonReport
     scores[3] = scoreUC < 0 ? 0 : scoreUC;
     scores[4] = scoreUF < 0 ? 0 : scoreUF;
     return scores;
+  }
+
+  public int getScore(String boxName)
+  {
+    if (boxName.equals(PentagonBox.BOX_NAME_C_GOOD_MESSAGE))
+    {
+      return getScoreCGoodMessages();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_C_GOOD_DATA))
+    {
+      return getScoreCGoodData();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_C_BAD_MESSAGE))
+    {
+      return getScoreCBadMessages();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_C_BAD_DATA))
+    {
+      return getScoreCBadData();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_C_ACK_CONFORM))
+    {
+      return getScoreCAckConform();
+    }
+    ;
+    if (boxName.equals(PentagonBox.BOX_NAME_QC_SOAP_CONFORMS))
+    {
+      return getScoreQCSoapConforms();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_QC_RESPONSES_CONFORM))
+    {
+      return getScoreQCResponsesConform();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_QF_QBP2015))
+    {
+      return getScoreQFQbp2015();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_QF_PERFORMANCE))
+    {
+      return getScoreQFPerformance();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_QF_MINIMUM_QUERY))
+    {
+      return getScoreQFMinimumQuery();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_QF_FORECASTER))
+    {
+      return getScoreQFForecaster();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_QF_DEDUPLICATION))
+    {
+      return getScoreQFDeduplication();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_QF_DATA_AVAILABLE))
+    {
+      return getScoreQFDataAvailable();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UC_MODIFICATIONS))
+    {
+      return getScoreUCModifications();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UC_CONFLICTS))
+    {
+      return getScoreUCConflicts();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UC_CONSTRAINTS))
+    {
+      return getScoreUCConstraints();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UC_ACKS_CONFORM))
+    {
+      return getScoreUCAcksConform();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UF_VXU2015))
+    {
+      return getScoreUFVxu2015();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UF_VXU2014))
+    {
+      return getScoreUFVxu2014();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UF_TOLERANT))
+    {
+      return getScoreUFTolerant();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UF_SENSITIVE))
+    {
+      return getScoreUFSensitive();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UF_PERFORMANCE))
+    {
+      return getScoreUFPerformance();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UF_EHR_EXAMPLES))
+    {
+      return getScoreUFEhrExamples();
+    }
+    if (boxName.equals(PentagonBox.BOX_NAME_UF_CODED_VALUES))
+    {
+      return getScoreUFCodedValues();
+    }
+    return 0;
   }
 
   public int getScoreUCModifications()

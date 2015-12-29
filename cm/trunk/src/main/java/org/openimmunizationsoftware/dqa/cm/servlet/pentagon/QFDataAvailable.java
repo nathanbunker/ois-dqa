@@ -18,11 +18,11 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 public class QFDataAvailable extends PentagonBox
 {
   public QFDataAvailable() {
-    super("QFDataAvailable");
+    super(BOX_NAME_QF_DATA_AVAILABLE);
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Submitting systems depend on the IIS to store all data submitted and return it when queried. "
         + "IIS that do not return data when queried will lose the confidence and support of submitters which will lead to further "
@@ -32,7 +32,7 @@ public class QFDataAvailable extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {
     if (score < 100)
     {
@@ -46,7 +46,7 @@ public class QFDataAvailable extends PentagonBox
     if (score > 0)
     {
       out.println("<h3 class=\"pentagon\">Pass - Data Returned</h3>");
-      out.println("<p>Test cases where data was returned are not shown. </p>");
+      out.println("<p class=\"pentagon\">Test cases where data was returned are not shown. </p>");
     }
 
   }
@@ -71,8 +71,10 @@ public class QFDataAvailable extends PentagonBox
       out.println("  </tr>");
       for (Object[] objects : objectsList)
       {
+        out.println("  <tr class=\"pentagon\">");
         out.println("    <td class=\"pentagon\">" + TestMessage.getResultStoreStatusForDisplay((String) objects[0]) + "</td>");
         out.println("    <td class=\"pentagon\">" + (long) objects[1] + "</td>");
+        out.println("  </tr>");
       }
       out.println("</table>");
     }

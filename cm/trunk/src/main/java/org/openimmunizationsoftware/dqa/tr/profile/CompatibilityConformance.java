@@ -24,4 +24,41 @@ public enum CompatibilityConformance {
     }
     return super.toString();
   };
+  
+  public static CompatibilityConformance readCompatibilityConformance(String compatibilityConformanceString)
+  {
+    if (compatibilityConformanceString == null || compatibilityConformanceString.equals(""))
+    {
+      return NOT_DEFINED;
+    }
+    if (compatibilityConformanceString.equals("Allowance"))
+    {
+      return ALLOWANCE;
+    }
+    if (compatibilityConformanceString.equals("Compatible"))
+    {
+      return COMPATIBLE;
+    }
+    if (compatibilityConformanceString.equals("Conflict"))
+    {
+      return CONFLICT;
+    }
+    if (compatibilityConformanceString.equals("Constraint"))
+    {
+      return CONSTRAINT;
+    }
+    if (compatibilityConformanceString.equals("Major Conflict"))
+    {
+      return MAJOR_CONFLICT;
+    }
+    if (compatibilityConformanceString.equals("Major Constraint"))
+    {
+      return MAJOR_CONSTRAINT;
+    }
+    if (compatibilityConformanceString.equals("Unable to Determine"))
+    {
+      return UNABLE_TO_DETERMINE;
+    }
+    return NOT_DEFINED;
+  }
 }

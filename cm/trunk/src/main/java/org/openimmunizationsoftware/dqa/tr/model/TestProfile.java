@@ -2,6 +2,7 @@ package org.openimmunizationsoftware.dqa.tr.model;
 
 import java.io.Serializable;
 
+import org.openimmunizationsoftware.dqa.tr.profile.CompatibilityConformance;
 import org.openimmunizationsoftware.dqa.tr.profile.Usage;
 
 public class TestProfile implements Serializable {
@@ -22,7 +23,17 @@ public class TestProfile implements Serializable {
   private TestMessage testMessagePresent = null;
   private TestMessage testMessageAbsent = null;
   private String messageAcceptStatusDebug = "";
-  private String compatibilityConformance = "";
+  private CompatibilityConformance compatibilityConformance;
+
+  public CompatibilityConformance getCompatibilityConformance()
+  {
+    return compatibilityConformance;
+  }
+
+  public void setCompatibilityConformance(CompatibilityConformance compatibilityConformance)
+  {
+    this.compatibilityConformance = compatibilityConformance;
+  }
 
   public Usage getUsageExpected()
   {
@@ -149,11 +160,11 @@ public class TestProfile implements Serializable {
     this.messageAcceptStatusDebug = messageAcceptStatusDebug;
   }
 
-  public String getCompatibilityConformance() {
-    return compatibilityConformance;
+  public String getCompatibilityConformanceString() {
+    return compatibilityConformance == null ? "" : compatibilityConformance.toString();
   }
 
-  public void setCompatibilityConformance(String compatibilityConformance) {
-    this.compatibilityConformance = compatibilityConformance;
+  public void setCompatibilityConformanceString(String compatibilityConformanceString) {
+    this.compatibilityConformance = CompatibilityConformance.readCompatibilityConformance(compatibilityConformanceString);
   }
 }

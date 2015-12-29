@@ -22,10 +22,10 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UCAcksConform extends PentagonBox
 {
-  public UCAcksConform()
-  {
-    super("UCAcksConform");
+  public UCAcksConform() {
+    super(BOX_NAME_UC_ACKS_CONFORM);
   }
+
   @Override
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {
@@ -43,13 +43,14 @@ public class UCAcksConform extends PentagonBox
       out.println("<h3 class=\"pentagon\">All Acks Conform</h3>");
     } else
     {
-      printContentsConformanceProblems(out, dataSession, testConducted);
+      printContentsConformanceProblems(out, dataSession, testConducted, "update");
     }
   }
-  protected static void printContentsConformanceProblems(PrintWriter out, Session dataSession, TestConducted testConducted)
+
+  protected static void printContentsConformanceProblems(PrintWriter out, Session dataSession, TestConducted testConducted, String testType)
   {
     out.println("<h3 class=\"pentagon\">Conformance Problems Found</h3>");
-    List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted);
+    List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted, testType);
     Map<AssertionField, TestMessage> assertionFieldToTestMessageMap = AssertionFieldLogic.getAssertionFieldToTestMessageMap(dataSession,
         testConducted, assertionFieldList);
     out.println("<table class=\"pentagon\">");
@@ -83,6 +84,7 @@ public class UCAcksConform extends PentagonBox
     String testType = "update";
     printScoreExplanation(out, dataSession, testConducted, testType);
   }
+
   public static void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, String testType)
   {
     out.println("<p class=\"pentagon\">The score is determined by evaluation the number of errors identified by the NIST validator. </p>");
@@ -150,7 +152,7 @@ public class UCAcksConform extends PentagonBox
     }
     NumberFormat formatter1 = new DecimalFormat("#0.0");
     NumberFormat formatter2 = new DecimalFormat("#0.000");
-    List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted);
+    List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted, testType);
     for (AssertionField assertionField : assertionFieldList)
     {
       double percentage = 1.0;
@@ -185,6 +187,7 @@ public class UCAcksConform extends PentagonBox
       calculateScore(testConducted, dataSession, pentagonReport, testType);
     }
   }
+
   public static void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, String testType)
   {
     ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(testConducted, dataSession, testType);
@@ -196,7 +199,7 @@ public class UCAcksConform extends PentagonBox
         scoreDouble = scoreDouble
             * ((conformanceCount.getCountTotal() - conformanceCount.getCountNotRun()) / (double) conformanceCount.getCountTotal());
       }
-      List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted);
+      List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted, testType);
       for (AssertionField assertionField : assertionFieldList)
       {
         double percentage = 1.0;
@@ -207,7 +210,13 @@ public class UCAcksConform extends PentagonBox
         double deduction = percentage * 0.2 * scoreDouble;
         scoreDouble = scoreDouble - deduction;
       }
-      pentagonReport.setScoreUCAcksConform(((int) scoreDouble));
+      if (testType.equals("query"))
+      {
+        pentagonReport.setScoreUCAcksConform(((int) scoreDouble));
+      } else
+      {
+        pentagonReport.setScoreQCResponsesConform(((int) scoreDouble));
+      }
     }
   }
 }

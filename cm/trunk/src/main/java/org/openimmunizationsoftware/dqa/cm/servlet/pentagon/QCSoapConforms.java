@@ -20,7 +20,7 @@ public class QCSoapConforms extends PentagonBox
 {
   public QCSoapConforms()
   {
-    super("QCSoapConforms");
+    super(BOX_NAME_QC_SOAP_CONFORMS);
   }
 
 

@@ -28,6 +28,7 @@ public class PentagonReportLogic
         return pentagonReportList.get(0);
       }
     }
+    
     PentagonReport pentagonReport = new PentagonReport();
     pentagonReport.setTestConducted(testConducted);
 

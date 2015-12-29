@@ -19,7 +19,7 @@ public class UFVxu2014 extends PentagonBox
 {
   public UFVxu2014()
   {
-    super("UFVxu2014");
+    super(BOX_NAME_UF_VXU2014);
   }
 
   @Override
@@ -53,7 +53,7 @@ public class UFVxu2014 extends PentagonBox
     {
       out.println("<h3 class=\"pentagon\">Fail - NIST 2014 Example Was Not Accepted</h3>");
       Query query = dataSession.createQuery(
-          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testType = 'update' order by testCaseCategory");
+          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
       query.setParameter(1, testConducted);
       List<TestMessage> testMessageList = query.list();
@@ -75,8 +75,14 @@ public class UFVxu2014 extends PentagonBox
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
-    // TODO Auto-generated method stub
-    
+    out.println("<p class=\"pentagon\">The score is calculated as the percentage of NIST 2014 VXU messages were accepted. </p>");
+    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
+    out.println("<p class=\"pentagon\">Ensure IIS is able to understand and properly accept NIST 2014 test messages. "
+        + "Even if IIS does not accept Refusals or History-of-Disease it should not return an error. An error causes this test "
+        + "to fail and indicates to the sender to correct and resend. However in this case senders who comply with NIST 2014 "
+        + "certification should not be asked to correct and resend when their messages contain good data and conform to the "
+        + "national stanard. The IIS may return a Warning or Informational error indicating that certain non-critical data was not "
+        + "processed, but it should not return an error. </p>");
   }
 
   
