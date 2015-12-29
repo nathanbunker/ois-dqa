@@ -16,7 +16,7 @@ public class UFPerformance extends PentagonBox
 {
   public UFPerformance()
   {
-    super("UFPerformance");
+    super(BOX_NAME_UF_PERFORMANCE);
   }
 
   @Override
@@ -34,12 +34,12 @@ public class UFPerformance extends PentagonBox
   public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {
     int average = (int) (((double) testConducted.getPerUpdateTotal()) / testConducted.getPerUpdateCount() + 0.5);
-    out.println("<h3>Response Time</h3>");
-    out.println("<ul>");
-    out.println("  <li>Average: " + TestReportServlet.createTime(average) + "</li>");
-    out.println("  <li>Minimum: " + TestReportServlet.createTime(testConducted.getPerUpdateMin()) + "</li>");
-    out.println("  <li>Maximum: " + TestReportServlet.createTime(testConducted.getPerUpdateMax()) + "</li>");
-    out.println("  <li>Std Dev: " + TestReportServlet.createTime(testConducted.getPerUpdateStd()) + "</li>");
+    out.println("<h3 class=\"pentagon\">Response Time</h3>");
+    out.println("<ul class=\"pentagon\">");
+    out.println("  <li class=\"pentagon\">Average: " + TestReportServlet.createTime(average) + "</li>");
+    out.println("  <li class=\"pentagon\">Minimum: " + TestReportServlet.createTime(testConducted.getPerUpdateMin()) + "</li>");
+    out.println("  <li class=\"pentagon\">Maximum: " + TestReportServlet.createTime(testConducted.getPerUpdateMax()) + "</li>");
+    out.println("  <li class=\"pentagon\">Std Dev: " + TestReportServlet.createTime(testConducted.getPerUpdateStd()) + "</li>");
     out.println("</ul>");
   }
 
@@ -48,8 +48,20 @@ public class UFPerformance extends PentagonBox
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
-    // TODO Auto-generated method stub
-    
+    out.println("<ul class=\"pentagon\">");
+    out.println("  <li class=\"pentagon\">If the average response time for updates is less than 1.05 seconds then a score of 100% is given.</li>");
+    out.println("  <li class=\"pentagon\">If the average response time for updates is less than 2.00 seconds then the score is negation of the average response time"
+        + "minus 2 seconds and then divided by 1 second. </li>");
+    out.println("  <li class=\"pentagon\">If the average response time is 2.00 seconds or more, the score is set to 0.</li>");
+    out.println("</ul>");
+    out.println("<p class=\"pentagon\">For example, if the average response time is 1.25 seconds the score is calculated as follows: "
+        + "-((1.25 - 2.00) / 1.00) = 0.75 = 75%</p>");
+    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
+    out.println("<p class=\"pentagon\">Performance is a relatively insignificant part of the final score for this "
+        + "section. Faster response times are helpful but not critical for update functionality. Improvement in performance requires "
+        + "a thorough review of current processing procedure to determine what is happening to delay the processing of this message. In "
+        + "some cases the delays may be architectural and can not be avoided, in others they may be due to how the test system is "
+        + "configured. The meaning and importance of this section is thus left to the IIS to determine. </p>");
   }
 
   

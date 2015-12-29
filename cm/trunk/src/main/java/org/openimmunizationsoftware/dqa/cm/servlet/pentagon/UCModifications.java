@@ -19,7 +19,7 @@ public class UCModifications extends PentagonBox
 {
   public UCModifications()
   {
-    super("UCModifications");
+    super(BOX_NAME_UC_MODIFICATIONS);
   }
 
   @Override

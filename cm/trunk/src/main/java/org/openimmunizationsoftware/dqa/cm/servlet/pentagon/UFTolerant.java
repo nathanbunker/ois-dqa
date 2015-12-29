@@ -19,7 +19,7 @@ public class UFTolerant extends PentagonBox
 {
   public UFTolerant()
   {
-    super("UFTolerant");
+    super(BOX_NAME_UF_TOLERANT);
   }
 
   @Override
@@ -40,7 +40,7 @@ public class UFTolerant extends PentagonBox
     {
       out.println("<h3 class=\"pentagon\">Fail - Message Was Not Accepted</h3>");
       Query query = dataSession.createQuery(
-          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testCaseDescription like ? order by testCaseCategory");
+          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testCaseDescription like ? order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
       query.setParameter(1, testConducted);
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK + "%");
@@ -64,8 +64,12 @@ public class UFTolerant extends PentagonBox
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
-    // TODO Auto-generated method stub
-    
+    out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages that returned a postive response from the IIS. </p>");
+    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
+    out.println("<p class=\"pentagon\">An IIS's primary goal should be to improve the quality of data being submitted. Many of the issues in these test "
+        + "messages are not related to data quality and most IIS should be able to still process them. However, this list is not definitive and there is not "
+        + "agreement with which issues the IIS should be tolerant. For this reason it is expected that IIS will be tolerant to most if not all issues "
+        + "listed here. </p>");
   }
 
   

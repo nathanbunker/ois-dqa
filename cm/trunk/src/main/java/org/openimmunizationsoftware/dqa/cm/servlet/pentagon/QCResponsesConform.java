@@ -15,7 +15,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 public class QCResponsesConform extends PentagonBox
 {
   public QCResponsesConform() {
-    super("QCResponsesConform");
+    super(BOX_NAME_QC_RESPONSES_CONFORM);
   }
 
   @Override
@@ -26,7 +26,7 @@ public class QCResponsesConform extends PentagonBox
       out.println("<h3 class=\"pentagon\">All Acks Conform</h3>");
     } else
     {
-      UCAcksConform.printContentsConformanceProblems(out, dataSession, testConducted);
+      UCAcksConform.printContentsConformanceProblems(out, dataSession, testConducted, "query");
     }
 
   }
@@ -44,8 +44,7 @@ public class QCResponsesConform extends PentagonBox
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
-    String testType = "query";
-    UCAcksConform.printScoreExplanation(out, dataSession, testConducted, testType);
+    UCAcksConform.printScoreExplanation(out, dataSession, testConducted, "query");
   }
 
   @Override
@@ -53,8 +52,7 @@ public class QCResponsesConform extends PentagonBox
   {
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015) != null)
     {
-      String testType = "update";
-      UCAcksConform.calculateScore(testConducted, dataSession, pentagonReport, testType);
+      UCAcksConform.calculateScore(testConducted, dataSession, pentagonReport, "query");
     }
   }
 }

@@ -16,6 +16,6 @@
     <many-to-one name="testMessagePresent" column="test_message_present_id" class="TestMessage"/>
     <many-to-one name="testMessageAbsent" column="test_message_absent_id" class="TestMessage"/>
     <property name="messageAcceptStatusDebug" column="message_accept_status_debug" type="string"/>
-    <property name="compatibilityConformance" column="compatibility_conformance" type="string"/>
+    <property name="compatibilityConformanceString" column="compatibility_conformance" type="string"/>
   </class>
 </hibernate-mapping>

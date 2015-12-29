@@ -18,7 +18,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 public class QFForecaster extends PentagonBox
 {
   public QFForecaster() {
-    super("QFForecaster");
+    super(BOX_NAME_QF_FORECASTER);
   }
 
   @Override
@@ -73,7 +73,7 @@ public class QFForecaster extends PentagonBox
     }
     if (count > 0)
     {
-      pentagonReport.setScoreQFDeduplication((int) (100.0 * countPass / count));
+      pentagonReport.setScoreQFForecaster((int) (100.0 * countPass / count));
     }
 
   }

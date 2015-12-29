@@ -19,6 +19,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.cm.CentralControl;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.logic.ProfileUsageValueLogic;
 import org.openimmunizationsoftware.dqa.tr.model.Assertion;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
 import org.openimmunizationsoftware.dqa.tr.model.Comparison;
@@ -37,6 +38,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestProfile;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 import org.openimmunizationsoftware.dqa.tr.model.Transform;
 import org.openimmunizationsoftware.dqa.tr.model.TransformField;
+import org.openimmunizationsoftware.dqa.tr.profile.CompatibilityConformance;
 import org.openimmunizationsoftware.dqa.tr.profile.MessageAcceptStatus;
 import org.openimmunizationsoftware.dqa.tr.profile.ProfileManager;
 import org.openimmunizationsoftware.dqa.tr.profile.Usage;
@@ -595,7 +597,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                       }
                       String debug = ProfileManager.determineMessageAcceptStatus(profileUsageValue, dataSession);
                       MessageAcceptStatus masExpected = profileUsageValue.getMessageAcceptStatus();
-                      Usage usageExpected = profileUsageValue.getUsage();
+                      Usage usageExpected = ProfileUsageValueLogic.rectifyUsageForDetection(profileUsageValue);
                       Usage usageDetected = usageExpected;
                       if (masDetected != masExpected)
                       {
@@ -652,6 +654,15 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                       testProfile.setUsageDetected(usageDetected);
                       testProfile.setAcceptExpected(masExpected.toString());
                       testProfile.setAcceptDetected(masDetected.toString());
+                      
+                      ProfileUsage profileUsageBase = ProfileUsage.getBaseProfileUsage(dataSession);
+                      ProfileUsageValue profileUsageValueBase = ProfileManager.getProfileUsageValue(dataSession, profileUsageBase, profileField);
+                      if (profileUsageValueBase != null)
+                      {
+                        Usage usageCompare =  ProfileUsageValueLogic.rectifyUsageForDetection(profileUsageValueBase);
+                        CompatibilityConformance compatibilityConformance = ProfileUsageValueLogic.getCompatibilityConformance(usageDetected, usageCompare);
+                        testProfile.setCompatibilityConformance(compatibilityConformance);
+                      }
                     }
                     Transaction transaction = dataSession.beginTransaction();
                     dataSession.saveOrUpdate(testProfile);
@@ -723,7 +734,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     out.close();
   }
 
-  public TestParticipant getTestParticipant(Session dataSession, String organizationName)
+  public static TestParticipant getTestParticipant(Session dataSession, String organizationName)
   {
     TestParticipant testParticipant = null;
     {

@@ -20,7 +20,7 @@ public class CGoodMessage extends PentagonBox
   
   public CGoodMessage()
   {
-    super("CGoodMessage");
+    super(BOX_NAME_C_GOOD_MESSAGE);
   }
 
   @Override
@@ -48,7 +48,7 @@ public class CGoodMessage extends PentagonBox
     {
       out.println("<h3 class=\"pentagon\">Fail - Good Message Was Not Accepted</h3>");
       Query query = dataSession.createQuery(
-          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'FAIL' and testType = 'update' order by testCaseCategory");
+          "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
       query.setParameter(1, testConducted);
       List<TestMessage> testMessageList = query.list();
