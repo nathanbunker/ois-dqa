@@ -60,7 +60,7 @@ public class QFDataAvailable extends PentagonBox
     out.println("  <li class=\"pentagon\">The original VXU message(s) were accepted, and </li>");
     out.println("  <li class=\"pentagon\">The query test case expected to receive back an exact match, and </p>");
     out.println("  <li class=\"pentagon\">The IIS returned the essential patient and vaccination information submitted </p>");
-    out.println("</li>");
+    out.println("</ul>");
     List<Object[]> objectsList = doCounts(testConducted, dataSession);
     if (objectsList.size() > 0)
     {
@@ -73,7 +73,8 @@ public class QFDataAvailable extends PentagonBox
       {
         out.println("  <tr class=\"pentagon\">");
         out.println("    <td class=\"pentagon\">" + TestMessage.getResultStoreStatusForDisplay((String) objects[0]) + "</td>");
-        out.println("    <td class=\"pentagon\">" + (long) objects[1] + "</td>");
+        Long l = (Long) objects[1];
+        out.println("    <td class=\"pentagon\">" + l + "</td>");
         out.println("  </tr>");
       }
       out.println("</table>");
@@ -91,18 +92,18 @@ public class QFDataAvailable extends PentagonBox
   {
     List<Object[]> objectsList = doCounts(testConducted, dataSession);
     long countTotal = 0;
-    long countNoMatch = 0;
+    long countMatch = 0;
     for (Object[] objects : objectsList)
     {
-      if (((String) objects[0]).equals("a-nr"))
+      if (((String) objects[0]).equals("a-r"))
       {
-        countNoMatch = (long) objects[1];
+        countMatch = (Long) objects[1];
       }
-      countTotal += (long) objects[1];
+      countTotal += (Long) objects[1];
     }
     if (countTotal > 0)
     {
-      pentagonReport.setScoreQFDataAvailable((int)( 100.0 * countNoMatch / countTotal));
+      pentagonReport.setScoreQFDataAvailable((int)( 100.0 * countMatch / countTotal));
     }
 
   }

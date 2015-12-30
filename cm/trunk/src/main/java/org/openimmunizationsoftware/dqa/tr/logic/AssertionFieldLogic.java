@@ -31,7 +31,7 @@ public class AssertionFieldLogic
       if (objects.length == 2)
       {
         AssertionField assertionField = (AssertionField) objects[0];
-        long count = (long) objects[1];
+        long count = (Long) objects[1];
         assertionField.setCount((int) count);
         assertionFieldList.add(assertionField);
       }
@@ -42,7 +42,7 @@ public class AssertionFieldLogic
   public static Map<AssertionField, TestMessage> getAssertionFieldToTestMessageMap(Session dataSession, TestConducted testConducted,
       List<AssertionField> assertionFieldList)
   {
-    Map<AssertionField, TestMessage> assertionFieldToTestMessageMap = new HashMap<>();
+    Map<AssertionField, TestMessage> assertionFieldToTestMessageMap = new HashMap<AssertionField, TestMessage>();
     for (AssertionField assertionField : assertionFieldList)
     {
       Query query = dataSession

@@ -216,7 +216,8 @@ public class UCConflicts extends PentagonBox
     {
       CompatibilityConformanceCount compatibilityConformanceCount = new CompatibilityConformanceCount();
       compatibilityConformanceCount.setCompatibilityConformance(CompatibilityConformance.readCompatibilityConformance((String) objects[0]));
-      compatibilityConformanceCount.setCount((long) objects[1]);
+      Long l = (Long) objects[1];
+      compatibilityConformanceCount.setCount(l);
       compatibilityConformanceCountList.add(compatibilityConformanceCount);
     }
     return compatibilityConformanceCountList;
