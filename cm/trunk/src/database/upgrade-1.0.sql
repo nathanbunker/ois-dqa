@@ -50,3 +50,10 @@ CREATE TABLE forecast (
     series_status           VARCHAR(250),
     reason_code             VARCHAR(250)
 );
+
+CREATE INDEX test_message_test_section_id ON test_message(test_section_id);
+CREATE INDEX test_message_test_type ON test_message(test_type);
+CREATE INDEX assertion_test_message_id ON assertion (test_message_id);
+CREATE INDEX forecast_test_message_id ON forecast (test_message_id);
+CREATE INDEX evaluation_test_message_id ON evaluation (test_message_id);
+CREATE INDEX comparison_test_message_id ON comparison (test_message_id);

@@ -531,9 +531,7 @@ public class PentagonServlet extends HomeServlet
       int posY = 50;
       out.println("<div id=\"details\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
           + "px; height: 700px; width: 850px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; overflow: auto;\">");
-      out.println("<a style=\"position: fixed; left: 800px; top: " + (posY + offsetY + 3)
-          + "px; display:inline-block; padding: 2px 5px; margin-right: 5px; margin-top: 5 px;  border-style: solid; border-width: 1px; \" onclick=\"hideReport('details')\" href=\"javascript: void(); \">Close</a>");
-      out.println("</div>");
+      out.println("</div>"); 
     }
 
     createFooter(webSession);
