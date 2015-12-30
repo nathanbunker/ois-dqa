@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
+import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
@@ -173,22 +174,49 @@ public abstract class PentagonBox
   {
     if (testMessageList.size() > 0)
     {
-      out.println("<table class=\"pentagon\">");
-      out.println("  <tr class=\"pentagon\">");
-      out.println("    <th class=\"pentagon\">Status</th>");
-      out.println("    <th class=\"pentagon\">Accepted</th>");
-      out.println("    <th class=\"pentagon\">Description</th>");
-      out.println("  </tr>");
-      for (TestMessage testMessage : testMessageList)
+      if (testMessageList.get(0).getTestType().equals(RecordServletInterface.VALUE_TEST_TYPE_QUERY))
       {
+        out.println("<table class=\"pentagon\">");
         out.println("  <tr class=\"pentagon\">");
-        out.println("    <td class=\"pentagon\" style=\"text-align: center;\">Pass</td>");
-        out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + (testMessage.isResultAccepted() ? "Yes" : "No") + "</td>");
-        String testMessageLink = createLink(testMessage);
-        out.println("    <td class=\"pentagon\">" + testMessageLink + "</td>");
+        out.println("    <th class=\"pentagon\">Status</th>");
+        out.println("    <th class=\"pentagon\">Result</th>");
+        out.println("    <th class=\"pentagon\">Store Status</th>");
+        out.println("    <th class=\"pentagon\">Forecast Status</th>");
+        out.println("    <th class=\"pentagon\">Description</th>");
         out.println("  </tr>");
+        for (TestMessage testMessage : testMessageList)
+        {
+          out.println("  <tr class=\"pentagon\">");
+          out.println("    <td class=\"pentagon\" style=\"text-align: center;\">Pass</td>");
+          out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultQueryType() + "</td>");
+          out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultStoreStatusForDisplay() + "</td>");
+          out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultForecastStatus() + "</td>");
+          String testMessageLink = createLink(testMessage);
+          out.println("    <td class=\"pentagon\">" + testMessageLink + "</td>");
+          out.println("  </tr>");
+        }
+        out.println("</table>");
       }
-      out.println("</table>");
+      else
+      {
+        out.println("<table class=\"pentagon\">");
+        out.println("  <tr class=\"pentagon\">");
+        out.println("    <th class=\"pentagon\">Status</th>");
+        out.println("    <th class=\"pentagon\">Accepted</th>");
+        out.println("    <th class=\"pentagon\">Description</th>");
+        out.println("  </tr>");
+        for (TestMessage testMessage : testMessageList)
+        {
+          out.println("  <tr class=\"pentagon\">");
+          out.println("    <td class=\"pentagon\" style=\"text-align: center;\">Pass</td>");
+          out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + (testMessage.isResultAccepted() ? "Yes" : "No") + "</td>");
+          String testMessageLink = createLink(testMessage);
+          out.println("    <td class=\"pentagon\">" + testMessageLink + "</td>");
+          out.println("  </tr>");
+        }
+        out.println("</table>");
+
+      }
     }
   }
 
