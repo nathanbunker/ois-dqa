@@ -28,7 +28,7 @@ public class PentagonReportLogic
         return pentagonReportList.get(0);
       }
     }
-    
+
     PentagonReport pentagonReport = new PentagonReport();
     pentagonReport.setTestConducted(testConducted);
 
@@ -59,9 +59,9 @@ public class PentagonReportLogic
   {
     ConformanceCount conformanceCount = new ConformanceCount();
     {
-      int countTotal = 0;
+      long countTotal = 0;
       int countNotRun = 0;
-      int countOk = 0;
+      long countOk = 0;
       int countError = 0;
       Query query = dataSession.createQuery("select tm.resultAckConformance, count(tm.resultAckConformance) from TestMessage tm "
           + "where tm.testSection.testConducted = ? and tm.testType = ? group by tm.resultAckConformance");
@@ -71,28 +71,28 @@ public class PentagonReportLogic
       for (Object[] object : objectsList)
       {
         String resultAckConformance = (String) object[0];
-        long count = (long) object[1];
+        Long count = (Long) object[1];
         if (resultAckConformance != null)
         {
           if (resultAckConformance.equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_OK))
           {
-            countOk += (int) count;
-            countTotal += (int) count;
+            countOk += (long) count;
+            countTotal += (long) count;
           } else if (resultAckConformance.equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_ERROR))
           {
-            countError += (int) count;
-            countTotal += (int) count;
+            countError += (long) count;
+            countTotal += (long) count;
           } else if (resultAckConformance.equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_NOT_RUN))
           {
-            countTotal += (int) count;
-            countNotRun += (int) count;
+            countTotal += (long) count;
+            countNotRun += (long) count;
           }
         }
       }
-      conformanceCount.setCountTotal(countTotal);
+      conformanceCount.setCountTotal((int) countTotal);
       conformanceCount.setCountNotRun(countNotRun);
       conformanceCount.setCountError(countError);
-      conformanceCount.setCountOk(countOk);
+      conformanceCount.setCountOk((int) countOk);
     }
     return conformanceCount;
   }
