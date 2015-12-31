@@ -22,7 +22,7 @@ public class QFDeduplication extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">IIS must be able to merge patient and vaccination data together in order to create a consolidated "
         + "patient and vaccination history. This is a major and critical function for an IIS. This test set does not measure "
@@ -32,13 +32,13 @@ public class QFDeduplication extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\"></p>");
@@ -46,8 +46,9 @@ public class QFDeduplication extends PentagonBox
   }
 
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore( Session dataSession, PentagonReport pentagonReport)
   {
+    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
     int count = 0;
     int countPass = 0;
     {

@@ -64,7 +64,6 @@ public class PentagonContentServlet extends PentagonServlet
     {
       if (boxName.equals(BOX_NAME_REPORT_SELECT))
       {
-        out.println("<h2 class=\"pentagon\">All Reports for " + testConducted.getConnectionLabel() + "</h2>");
         {
           List<TestConducted> testConductedList = getTestConductedList(dataSession, testConducted);
           printReportsRun(dataSession, out, testConductedList);
@@ -169,13 +168,13 @@ public class PentagonContentServlet extends PentagonServlet
               out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
               printScoreChart(out, pentagonBox.getScore());
               out.println("</span>");
-              pentagonBox.printDescription(out, dataSession, testConducted, webSession, userSession);
-              pentagonBox.printContents(out, dataSession, testConducted, webSession, userSession);
+              pentagonBox.printDescription(out, dataSession, pentagonReport, webSession, userSession);
+              pentagonBox.printContents(out, dataSession, pentagonReport, webSession, userSession);
               out.println("</div>");
             }
             {
               out.println("<div id=\"boxDetailsCalculation\" style=\"display:none; \">");
-              pentagonBox.printScoreExplanation(out, dataSession, testConducted, webSession, userSession);
+              pentagonBox.printScoreExplanation(out, dataSession, pentagonReport, webSession, userSession);
               out.println("</div>");
             }
             {

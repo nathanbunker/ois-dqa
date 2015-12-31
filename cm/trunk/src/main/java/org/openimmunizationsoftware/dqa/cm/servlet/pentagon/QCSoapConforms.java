@@ -18,14 +18,12 @@ import org.openimmunizationsoftware.dqa.tr.model.TransportWsdlCdc;
 
 public class QCSoapConforms extends PentagonBox
 {
-  public QCSoapConforms()
-  {
+  public QCSoapConforms() {
     super(BOX_NAME_QC_SOAP_CONFORMS);
   }
 
-
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">In 2015, AIRA launched an Interoperability Testing Project to determine the level of alignment between "
         + "current Immunization Information Systems (IIS) and the community's interoperability standards. The testing process connects with "
@@ -36,12 +34,12 @@ public class QCSoapConforms extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     TransportWsdlCdc transportWsdlCdc = null;
     {
       Query query = dataSession.createQuery("from TransportWsdlCdc where transportAnalysis.connectionLabel = ?");
-      query.setParameter(0, testConducted.getConnectionLabel());
+      query.setParameter(0, pentagonReport.getTestConducted().getConnectionLabel());
       List<TransportWsdlCdc> transportWsdlCdcList = query.list();
       if (transportWsdlCdcList.size() > 0)
       {
@@ -51,7 +49,7 @@ public class QCSoapConforms extends PentagonBox
     TransportOther transportOther = null;
     {
       Query query = dataSession.createQuery("from TransportOther where transportAnalysis.connectionLabel = ?");
-      query.setParameter(0, testConducted.getConnectionLabel());
+      query.setParameter(0, pentagonReport.getTestConducted().getConnectionLabel());
       List<TransportOther> transportOtherList = query.list();
       if (transportOtherList.size() > 0)
       {
@@ -127,19 +125,19 @@ public class QCSoapConforms extends PentagonBox
     }
     // TODO Auto-generated method stub
   }
-  
+
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     // TODO Auto-generated method stub
-    
+
   }
 
-  
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    TestConducted testConducted = pentagonReport.getTestConducted();
     TransportWsdlCdc transportWsdlCdc = null;
     {
       Query query = dataSession.createQuery("from TransportWsdlCdc where transportAnalysis.connectionLabel = ?");
@@ -170,6 +168,6 @@ public class QCSoapConforms extends PentagonBox
         }
         pentagonReport.setScoreQCSoapConforms(score);
       }
-    }    
+    }
   }
 }

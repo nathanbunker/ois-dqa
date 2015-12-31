@@ -1,5 +1,7 @@
 package org.openimmunizationsoftware.dqa.tr.model;
 
+import java.util.Map;
+
 import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonBox;
 
 public class PentagonReport
@@ -35,6 +37,17 @@ public class PentagonReport
   private int scoreUCAcksConform = -1;
   private int scoreQCResponsesConform = -1;
   private int scoreQCSoapConforms = -1;
+  private transient Map<String, TestSection> testSectionMap = null;
+
+  public Map<String, TestSection> getTestSectionMap()
+  {
+    return testSectionMap;
+  }
+
+  public void setTestSectionMap(Map<String, TestSection> testSectionMap)
+  {
+    this.testSectionMap = testSectionMap;
+  }
 
   public int[] getScores()
   {

@@ -23,7 +23,7 @@ public class UFEhrExamples extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println(
         "<p class=\"pentagon\">Certified EHR systems are able to produce messages that meet NIST standards, but may contain minor variations "
@@ -35,7 +35,7 @@ public class UFEhrExamples extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score < 100)
     {
@@ -43,7 +43,7 @@ public class UFEhrExamples extends PentagonBox
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testCaseDescription like ? order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
@@ -54,7 +54,7 @@ public class UFEhrExamples extends PentagonBox
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testCaseDescription like ?  order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPass(out, testMessageList);
@@ -62,7 +62,7 @@ public class UFEhrExamples extends PentagonBox
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages that returned a postive response from the IIS. </p>");
@@ -74,8 +74,8 @@ public class UFEhrExamples extends PentagonBox
   
   
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    pentagonReport.setScoreUFEhrExamples(testConducted.getScoreEhr());
+    pentagonReport.setScoreUFEhrExamples(pentagonReport.getTestConducted().getScoreEhr());
   }
 }

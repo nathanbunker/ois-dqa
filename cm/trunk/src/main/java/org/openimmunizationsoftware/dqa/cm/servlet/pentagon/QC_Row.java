@@ -40,10 +40,10 @@ public class QC_Row extends PentagonRow
   public void calculateScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap)
   {
-    calculateBoxScores(testConducted, dataSession, pentagonReport, testSectionMap);
+    calculateBoxScores(testConducted, dataSession, pentagonReport);
     int scoreQC = 0;
-    scoreQC = addWeightToScore(scoreQC, 60, pentagonReport.getScoreQCResponsesConform());
-    scoreQC = addWeightToScore(scoreQC, 40, pentagonReport.getScoreQCSoapConforms());
+    scoreQC = addWeightToScore(scoreQC, this.get(0).getWeight(), pentagonReport.getScoreQCResponsesConform());
+    scoreQC = addWeightToScore(scoreQC, this.get(1).getWeight(), pentagonReport.getScoreQCSoapConforms());
     pentagonReport.setScoreQC(scoreQC / 100);
   }
   

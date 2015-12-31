@@ -20,7 +20,7 @@ public class UFPerformance extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession,PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println(
         "<p class=\"pentagon\">Ideally IIS should respond quickly to updates received. Rapid response reduces transmission times for large amounts"
@@ -31,21 +31,21 @@ public class UFPerformance extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    int average = (int) (((double) testConducted.getPerUpdateTotal()) / testConducted.getPerUpdateCount() + 0.5);
+    int average = (int) (((double) pentagonReport.getTestConducted().getPerUpdateTotal()) / pentagonReport.getTestConducted().getPerUpdateCount() + 0.5);
     out.println("<h3 class=\"pentagon\">Response Time</h3>");
     out.println("<ul class=\"pentagon\">");
     out.println("  <li class=\"pentagon\">Average: " + TestReportServlet.createTime(average) + "</li>");
-    out.println("  <li class=\"pentagon\">Minimum: " + TestReportServlet.createTime(testConducted.getPerUpdateMin()) + "</li>");
-    out.println("  <li class=\"pentagon\">Maximum: " + TestReportServlet.createTime(testConducted.getPerUpdateMax()) + "</li>");
-    out.println("  <li class=\"pentagon\">Std Dev: " + TestReportServlet.createTime(testConducted.getPerUpdateStd()) + "</li>");
+    out.println("  <li class=\"pentagon\">Minimum: " + TestReportServlet.createTime(pentagonReport.getTestConducted().getPerUpdateMin()) + "</li>");
+    out.println("  <li class=\"pentagon\">Maximum: " + TestReportServlet.createTime(pentagonReport.getTestConducted().getPerUpdateMax()) + "</li>");
+    out.println("  <li class=\"pentagon\">Std Dev: " + TestReportServlet.createTime(pentagonReport.getTestConducted().getPerUpdateStd()) + "</li>");
     out.println("</ul>");
   }
 
   
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<ul class=\"pentagon\">");
@@ -66,10 +66,10 @@ public class UFPerformance extends PentagonBox
 
   
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    int perUpdateCount = testConducted.getPerUpdateCount();
-    int perUpdateTotal = testConducted.getPerUpdateTotal();
+    int perUpdateCount = pentagonReport.getTestConducted().getPerUpdateCount();
+    int perUpdateTotal = pentagonReport.getTestConducted().getPerUpdateTotal();
     if (perUpdateTotal > 0)
     {
       int millisecondsPerUpdate = Math.round(((float) perUpdateTotal) / perUpdateCount);

@@ -33,7 +33,7 @@ public class UCConflicts extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">A conformant IIS interface must not conflict with the national guide. A conformance HL7 interface "
         + "may define certain constraints on the national guide, however it can not reverse or change R, RE or X requirements, it can either "
@@ -42,9 +42,9 @@ public class UCConflicts extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(testConducted, dataSession);
+    List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(pentagonReport.getTestConducted(), dataSession);
     CompatibilityConformanceCount cccConflict = null;
     CompatibilityConformanceCount cccMajorConflict = null;
     for (CompatibilityConformanceCount compatibilityConformanceCount : compatibilityConformanceCountList)
@@ -88,8 +88,8 @@ public class UCConflicts extends PentagonBox
         out.println("  </tr>");
       }
       out.println("</table>");
-      printCCCTable(out, dataSession, testConducted, cccMajorConflict, "Major Conflicts");
-      printCCCTable(out, dataSession, testConducted, cccConflict, "Conflicts");
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccMajorConflict, "Major Conflicts");
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConflict, "Conflicts");
     }
 
   }
@@ -155,7 +155,7 @@ public class UCConflicts extends PentagonBox
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is first set at 100% and then score is successively reduced by 20% for "
@@ -167,8 +167,10 @@ public class UCConflicts extends PentagonBox
   }
 
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
+    TestConducted testConducted = pentagonReport.getTestConducted();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING) != null)
     {
       List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(testConducted, dataSession);

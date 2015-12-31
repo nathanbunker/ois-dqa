@@ -38,11 +38,11 @@ public class C_Row extends PentagonRow
     pb[3].setWidth(20);
     pb[4].setWidth(20);
 
-    pb[0].setWeight(30);
+    pb[0].setWeight(20);
     pb[1].setWeight(20);
     pb[2].setWeight(20);
-    pb[3].setWeight(25);
-    pb[4].setWeight(5);
+    pb[3].setWeight(18);
+    pb[4].setWeight(12);
 
     pb[0].setScore(pentagonReport.getScoreCAckConform());
     pb[1].setScore(pentagonReport.getScoreCGoodMessages());
@@ -61,13 +61,13 @@ public class C_Row extends PentagonRow
   public void calculateScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap)
   {
-    calculateBoxScores(testConducted, dataSession, pentagonReport, testSectionMap);
+    calculateBoxScores(testConducted, dataSession, pentagonReport);
     int scoreC = 0;
-    scoreC = addWeightToScore(scoreC, 20, pentagonReport.getScoreCAckConform());
-    scoreC = addWeightToScore(scoreC, 20, pentagonReport.getScoreCGoodMessages());
-    scoreC = addWeightToScore(scoreC, 20, pentagonReport.getScoreCBadMessages());
-    scoreC = addWeightToScore(scoreC, 18, pentagonReport.getScoreCGoodData());
-    scoreC = addWeightToScore(scoreC, 12, pentagonReport.getScoreCBadData());
+    scoreC = addWeightToScore(scoreC, this.get(0).getWeight(), pentagonReport.getScoreCAckConform());
+    scoreC = addWeightToScore(scoreC, this.get(1).getWeight(), pentagonReport.getScoreCGoodMessages());
+    scoreC = addWeightToScore(scoreC, this.get(2).getWeight(), pentagonReport.getScoreCBadMessages());
+    scoreC = addWeightToScore(scoreC, this.get(3).getWeight(), pentagonReport.getScoreCGoodData());
+    scoreC = addWeightToScore(scoreC, this.get(4).getWeight(), pentagonReport.getScoreCBadData());
     pentagonReport.setScoreC(scoreC / 100);
   }
 

@@ -23,7 +23,7 @@ public class UFTolerant extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">HL7 requires that receiving systems, such as IIS, give a certain amount of tolerance to received message. "
         + "Ideally IIS would always receive perfect and consistent messages, but when it does not, it should still try its best to process"
@@ -34,7 +34,7 @@ public class UFTolerant extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score < 100)
     {
@@ -42,7 +42,7 @@ public class UFTolerant extends PentagonBox
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testCaseDescription like ? order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK + "%");
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
@@ -53,7 +53,7 @@ public class UFTolerant extends PentagonBox
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testCaseDescription like ?  order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK + "%");
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPass(out, testMessageList);
@@ -61,7 +61,7 @@ public class UFTolerant extends PentagonBox
   }
   
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages that returned a postive response from the IIS. </p>");
@@ -74,8 +74,8 @@ public class UFTolerant extends PentagonBox
 
   
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    pentagonReport.setScoreUFTolerant(testConducted.getScoreTolerance());
+    pentagonReport.setScoreUFTolerant(pentagonReport.getTestConducted().getScoreTolerance());
   }
 }

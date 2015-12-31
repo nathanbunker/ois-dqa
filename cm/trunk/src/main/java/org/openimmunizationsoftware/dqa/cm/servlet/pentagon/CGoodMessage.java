@@ -24,7 +24,7 @@ public class CGoodMessage extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score == 100)
     {
@@ -42,7 +42,7 @@ public class CGoodMessage extends PentagonBox
   }
   
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score < 100)
     {
@@ -50,7 +50,7 @@ public class CGoodMessage extends PentagonBox
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
     }
@@ -60,14 +60,14 @@ public class CGoodMessage extends PentagonBox
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPass(out, testMessageList);
     }
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is simple percentage of the number of NIST 2014 example messages accepted out of the "
@@ -84,8 +84,9 @@ public class CGoodMessage extends PentagonBox
 
   
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC) != null)
     {
       TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);

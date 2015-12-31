@@ -18,42 +18,42 @@ public class QF_Row extends PentagonRow
     pb[2] = new QFDeduplication();
     pb[3] = new QFForecaster();
     pb[4] = new QFPerformance();
-//    pb[5] = new QFMinimumQuery();
+    // pb[5] = new QFMinimumQuery();
 
     pb[0].setTitle("NIST 2015 QBP Supported");
     pb[1].setTitle("Data is Available");
     pb[2].setTitle("Deduplication Engaged");
     pb[3].setTitle("Forecaster Engaged");
     pb[4].setTitle("Performance");
-//    pb[5].setTitle("Query Check");
+    // pb[5].setTitle("Query Check");
 
     pb[0].setLabel("NIST 2015<br/>QBP Supported");
     pb[1].setLabel("Data is Available");
     pb[2].setLabel("Deduplication Engaged");
     pb[3].setLabel("Forecaster Engaged");
     pb[4].setLabel("Performance");
-//    pb[5].setLabel("Query Check");
+    // pb[5].setLabel("Query Check");
 
     pb[0].setWidth(20);
     pb[1].setWidth(20);
     pb[2].setWidth(20);
     pb[3].setWidth(20);
     pb[4].setWidth(20);
-//    pb[5].setWidth(15);
-    
-    pb[0].setWeight(30);
-    pb[1].setWeight(20);
-    pb[2].setWeight(20);
-    pb[3].setWeight(20);
+    // pb[5].setWidth(15);
+
+    pb[0].setWeight(35);
+    pb[1].setWeight(25);
+    pb[2].setWeight(15);
+    pb[3].setWeight(15);
     pb[4].setWeight(10);
-//    pb[5].setWeight(15);
-    
+    // pb[5].setWeight(15);
+
     pb[0].setScore(pentagonReport.getScoreQFQbp2015());
     pb[1].setScore(pentagonReport.getScoreQFDataAvailable());
     pb[2].setScore(pentagonReport.getScoreQFDeduplication());
     pb[3].setScore(pentagonReport.getScoreQFForecaster());
     pb[4].setScore(pentagonReport.getScoreQFPerformance());
-//    pb[5].setScore(pentagonReport.getScoreQFMinimumQuery());
+    // pb[5].setScore(pentagonReport.getScoreQFMinimumQuery());
     for (PentagonBox pentagonBox : pb)
     {
       this.add(pentagonBox);
@@ -64,14 +64,15 @@ public class QF_Row extends PentagonRow
   public void calculateScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap)
   {
-    calculateBoxScores(testConducted, dataSession, pentagonReport, testSectionMap);
+    calculateBoxScores(testConducted, dataSession, pentagonReport);
     int scoreQF = 0;
-    scoreQF = addWeightToScore(scoreQF, 30, pentagonReport.getScoreQFQbp2015());
-    scoreQF = addWeightToScore(scoreQF, 20, pentagonReport.getScoreQFDataAvailable());
-    scoreQF = addWeightToScore(scoreQF, 15, pentagonReport.getScoreQFDeduplication());
-    scoreQF = addWeightToScore(scoreQF, 15, pentagonReport.getScoreQFForecaster());
-    scoreQF = addWeightToScore(scoreQF, 10, pentagonReport.getScoreQFPerformance());
-    scoreQF = addWeightToScore(scoreQF, 10, pentagonReport.getScoreQFMinimumQuery());
+    scoreQF = addWeightToScore(scoreQF, this.get(0).getWeight(), pentagonReport.getScoreQFQbp2015());
+    scoreQF = addWeightToScore(scoreQF, this.get(1).getWeight(), pentagonReport.getScoreQFDataAvailable());
+    scoreQF = addWeightToScore(scoreQF, this.get(2).getWeight(), pentagonReport.getScoreQFDeduplication());
+    scoreQF = addWeightToScore(scoreQF, this.get(3).getWeight(), pentagonReport.getScoreQFForecaster());
+    scoreQF = addWeightToScore(scoreQF, this.get(4).getWeight(), pentagonReport.getScoreQFPerformance());
+    // scoreQF = addWeightToScore(scoreQF, this.get(5).getWeight(),
+    // pentagonReport.getScoreQFMinimumQuery());
     pentagonReport.setScoreQF(scoreQF / 100);
 
   }

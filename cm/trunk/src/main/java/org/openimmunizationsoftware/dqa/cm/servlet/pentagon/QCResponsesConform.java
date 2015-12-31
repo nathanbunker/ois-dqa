@@ -19,20 +19,20 @@ public class QCResponsesConform extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score >= 100)
     {
       out.println("<h3 class=\"pentagon\">All Acks Conform</h3>");
     } else
     {
-      UCAcksConform.printContentsConformanceProblems(out, dataSession, testConducted, "query");
+      UCAcksConform.printContentsConformanceProblems(out, dataSession, pentagonReport, "query");
     }
 
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The National Institute of Standards and Technology (NIST) has an Immunization Test Suite "
         + "for testing and verifying the format of HL7 messages used in immunization message. In cooperation with CDC and AIRA, "
@@ -41,15 +41,17 @@ public class QCResponsesConform extends PentagonBox
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
-    UCAcksConform.printScoreExplanation(out, dataSession, testConducted, "query");
+    UCAcksConform.printScoreExplanation(out, dataSession, pentagonReport, "query");
   }
 
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
+    TestConducted testConducted = pentagonReport.getTestConducted();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015) != null)
     {
       UCAcksConform.calculateScore(testConducted, dataSession, pentagonReport, "query");

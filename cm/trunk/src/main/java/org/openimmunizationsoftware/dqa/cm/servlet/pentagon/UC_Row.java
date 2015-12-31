@@ -33,10 +33,10 @@ public class UC_Row extends PentagonRow
     pb[2].setWidth(25);
     pb[3].setWidth(25);
 
-    pb[0].setWeight(20);
+    pb[0].setWeight(30);
     pb[1].setWeight(30);
     pb[2].setWeight(20);
-    pb[3].setWeight(30);
+    pb[3].setWeight(20);
 
     pb[0].setScore(pentagonReport.getScoreUCModifications());
     pb[1].setScore(pentagonReport.getScoreUCConflicts());
@@ -52,12 +52,12 @@ public class UC_Row extends PentagonRow
   public void calculateScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap)
   {
-    calculateBoxScores(testConducted, dataSession, pentagonReport, testSectionMap);
+    calculateBoxScores(testConducted, dataSession, pentagonReport);
     int scoreUC = 0;
-    scoreUC = addWeightToScore(scoreUC, 30, pentagonReport.getScoreUCModifications());
-    scoreUC = addWeightToScore(scoreUC, 30, pentagonReport.getScoreUCConflicts());
-    scoreUC = addWeightToScore(scoreUC, 20, pentagonReport.getScoreUCConstraints());
-    scoreUC = addWeightToScore(scoreUC, 20, pentagonReport.getScoreUCAcksConform());
+    scoreUC = addWeightToScore(scoreUC, this.get(0).getWeight(), pentagonReport.getScoreUCModifications());
+    scoreUC = addWeightToScore(scoreUC, this.get(1).getWeight(), pentagonReport.getScoreUCConflicts());
+    scoreUC = addWeightToScore(scoreUC, this.get(2).getWeight(), pentagonReport.getScoreUCConstraints());
+    scoreUC = addWeightToScore(scoreUC, this.get(3).getWeight(), pentagonReport.getScoreUCAcksConform());
     pentagonReport.setScoreUC(scoreUC / 100);    
   }
   

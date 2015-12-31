@@ -23,7 +23,7 @@ public class UFVxu2014 extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score == 0)
     {
@@ -47,7 +47,7 @@ public class UFVxu2014 extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score < 100)
     {
@@ -55,7 +55,7 @@ public class UFVxu2014 extends PentagonBox
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
     }
@@ -65,14 +65,14 @@ public class UFVxu2014 extends PentagonBox
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPass(out, testMessageList);
     }
   }
   
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of NIST 2014 VXU messages were accepted. </p>");
@@ -87,8 +87,9 @@ public class UFVxu2014 extends PentagonBox
 
   
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC) != null)
     {
       TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);

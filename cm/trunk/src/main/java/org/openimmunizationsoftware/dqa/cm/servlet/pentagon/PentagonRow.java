@@ -26,12 +26,11 @@ public abstract class PentagonRow extends ArrayList<PentagonBox>
     this.label = label;
   }
 
-  protected void calculateBoxScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
-      Map<String, TestSection> testSectionMap)
+  protected void calculateBoxScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport)
   {
     for (PentagonBox pentagonBox : this)
     {
-      pentagonBox.calculateScore(testConducted, dataSession, pentagonReport, testSectionMap);
+      pentagonBox.calculateScore(dataSession, pentagonReport);
     }
   }
 

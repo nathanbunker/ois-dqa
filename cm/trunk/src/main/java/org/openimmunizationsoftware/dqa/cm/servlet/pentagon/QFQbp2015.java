@@ -23,7 +23,7 @@ public class QFQbp2015 extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">NIST 2015 certified systems must be able to query IIS for an evaluation and forecast for a patient record.  "
         + "As part of the certification process NIST created test scenarios after carefully reading the requirements in the CDC Implementation Guide "
@@ -32,7 +32,7 @@ public class QFQbp2015 extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score < 100)
     {
@@ -41,7 +41,7 @@ public class QFQbp2015 extends PentagonBox
           .createQuery("from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' "
               + "and testType = 'query' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFailForQuery(out, testMessageList);
     }
@@ -52,14 +52,14 @@ public class QFQbp2015 extends PentagonBox
           .createQuery("from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' "
               + "and testType = 'query' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT);
-      query.setParameter(1, testConducted);
+      query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPassForQuery(out, testMessageList);
     }
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">This section tests to see if the IIS can respond with the required information for a given query "
@@ -78,8 +78,10 @@ public class QFQbp2015 extends PentagonBox
   }
 
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
+    TestConducted testConducted = pentagonReport.getTestConducted();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT) != null)
     {
       int countTotal = 0;
