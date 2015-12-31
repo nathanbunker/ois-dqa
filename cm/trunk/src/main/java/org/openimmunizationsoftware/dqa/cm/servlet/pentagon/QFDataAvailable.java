@@ -22,7 +22,7 @@ public class QFDataAvailable extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Submitting systems depend on the IIS to store all data submitted and return it when queried. "
         + "IIS that do not return data when queried will lose the confidence and support of submitters which will lead to further "
@@ -32,14 +32,14 @@ public class QFDataAvailable extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score < 100)
     {
       out.println("<h3 class=\"pentagon\">Fail - Data Not Returned</h3>");
       Query query = dataSession.createQuery("from TestMessage where testSection.testConducted = ? and testCaseAssertResult = 'MATCH' "
           + "and testType = 'query' and resultStoreStatus = 'a-nr' order by testCaseCategory");
-      query.setParameter(0, testConducted);
+      query.setParameter(0, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFailForQuery(out, testMessageList);
     }
@@ -52,7 +52,7 @@ public class QFDataAvailable extends PentagonBox
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">For every query submitted during testing where:</p>");
@@ -61,7 +61,7 @@ public class QFDataAvailable extends PentagonBox
     out.println("  <li class=\"pentagon\">The query test case expected to receive back an exact match, and </p>");
     out.println("  <li class=\"pentagon\">The IIS returned the essential patient and vaccination information submitted </p>");
     out.println("</ul>");
-    List<Object[]> objectsList = doCounts(testConducted, dataSession);
+    List<Object[]> objectsList = doCounts(pentagonReport.getTestConducted(), dataSession);
     if (objectsList.size() > 0)
     {
       out.println("<table class=\"pentagon\">");
@@ -89,8 +89,9 @@ public class QFDataAvailable extends PentagonBox
   }
 
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    TestConducted testConducted = pentagonReport.getTestConducted();
     List<Object[]> objectsList = doCounts(testConducted, dataSession);
     long countTotal = 0;
     long countMatch = 0;

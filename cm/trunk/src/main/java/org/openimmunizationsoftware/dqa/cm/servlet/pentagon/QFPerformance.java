@@ -19,7 +19,7 @@ public class QFPerformance extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Ideally IIS should respond quickly to queries received. External systems depend on "
         + "the IIS to return data to support clinical decisions. The longer that a clinician has to wait for this "
@@ -31,20 +31,20 @@ public class QFPerformance extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    int average = (int) (((double) testConducted.getPerQueryTotal()) / testConducted.getPerQueryCount() + 0.5);
+    int average = (int) (((double) pentagonReport.getTestConducted().getPerQueryTotal()) / pentagonReport.getTestConducted().getPerQueryCount() + 0.5);
     out.println("<h3 class=\"pentagon\">Response Time</h3>");
     out.println("<ul class=\"pentagon\">");
     out.println("  <li class=\"pentagon\">Average: " + TestReportServlet.createTime(average) + "</li>");
-    out.println("  <li class=\"pentagon\">Minimum: " + TestReportServlet.createTime(testConducted.getPerQueryMin()) + "</li>");
-    out.println("  <li class=\"pentagon\">Maximum: " + TestReportServlet.createTime(testConducted.getPerQueryMax()) + "</li>");
-    out.println("  <li class=\"pentagon\">Std Dev: " + TestReportServlet.createTime(testConducted.getPerQueryStd()) + "</li>");
+    out.println("  <li class=\"pentagon\">Minimum: " + TestReportServlet.createTime(pentagonReport.getTestConducted().getPerQueryMin()) + "</li>");
+    out.println("  <li class=\"pentagon\">Maximum: " + TestReportServlet.createTime(pentagonReport.getTestConducted().getPerQueryMax()) + "</li>");
+    out.println("  <li class=\"pentagon\">Std Dev: " + TestReportServlet.createTime(pentagonReport.getTestConducted().getPerQueryStd()) + "</li>");
     out.println("</ul>");
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<ul class=\"pentagon\">");
@@ -65,8 +65,9 @@ public class QFPerformance extends PentagonBox
   }
 
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    TestConducted testConducted = pentagonReport.getTestConducted();
     int perQueryCount = testConducted.getPerQueryCount();
     int perQueryTotal = testConducted.getPerQueryTotal();
     if (perQueryTotal > 0)

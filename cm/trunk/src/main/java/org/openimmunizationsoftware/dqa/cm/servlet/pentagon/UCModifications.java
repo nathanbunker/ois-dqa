@@ -17,13 +17,12 @@ import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
 public class UCModifications extends PentagonBox
 {
-  public UCModifications()
-  {
+  public UCModifications() {
     super(BOX_NAME_UC_MODIFICATIONS);
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Modifications are changes made to each test message to meet local IIS standards. Some of these"
         + "modifications are for fields that would be expected to be changed, such as identification parameters in the MSH segment. "
@@ -33,13 +32,13 @@ public class UCModifications extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     List<Transform> transformExpected = null;
     {
       Query query = dataSession
           .createQuery("from Transform where testConducted = ? and transformField.transformExpected = ? order by transformField.transformText");
-      query.setParameter(0, testConducted);
+      query.setParameter(0, pentagonReport.getTestConducted());
       query.setParameter(1, true);
       transformExpected = query.list();
     }
@@ -47,7 +46,7 @@ public class UCModifications extends PentagonBox
     {
       Query query = dataSession
           .createQuery("from Transform where testConducted = ? and transformField.transformExpected = ? order by transformField.transformText");
-      query.setParameter(0, testConducted);
+      query.setParameter(0, pentagonReport.getTestConducted());
       query.setParameter(1, false);
       transformCustom = query.list();
     }
@@ -81,49 +80,47 @@ public class UCModifications extends PentagonBox
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    TestConducted testConducted = pentagonReport.getTestConducted();
+    Query query = dataSession.createQuery("from Transform where testConducted = ?");
+    query.setParameter(0, testConducted);
+    List<Transform> transformList = query.list();
+    int countExpected = 0;
+    for (Transform transform : transformList)
     {
-      Query query = dataSession.createQuery("from Transform where testConducted = ?");
-      query.setParameter(0, testConducted);
-      List<Transform> transformList = query.list();
-      int countExpected = 0;
-      for (Transform transform : transformList)
+      if (transform.getTransformField().isTransformExpected())
       {
-        if (transform.getTransformField().isTransformExpected())
-        {
-          countExpected++;
-        }
+        countExpected++;
       }
-      int countUnexpected = transformList.size() - countExpected;
-      int totalScore = 0;
-      if (countUnexpected == 0)
-      {
-        totalScore += 70;
-      } else if (countUnexpected == 1)
-      {
-        totalScore += 50;
-      } else if (countUnexpected == 2)
-      {
-        totalScore += 30;
-      }
-      if (countExpected <= 5)
-      {
-        totalScore += 30;
-      } else if (countExpected <= 7)
-      {
-        totalScore += 15;
-      }
-      pentagonReport.setScoreUCModifications(totalScore);
-
     }
+    int countUnexpected = transformList.size() - countExpected;
+    int totalScore = 0;
+    if (countUnexpected == 0)
+    {
+      totalScore += 70;
+    } else if (countUnexpected == 1)
+    {
+      totalScore += 50;
+    } else if (countUnexpected == 2)
+    {
+      totalScore += 30;
+    }
+    if (countExpected <= 5)
+    {
+      totalScore += 30;
+    } else if (countExpected <= 7)
+    {
+      totalScore += 15;
+    }
+    pentagonReport.setScoreUCModifications(totalScore);
   }
 }

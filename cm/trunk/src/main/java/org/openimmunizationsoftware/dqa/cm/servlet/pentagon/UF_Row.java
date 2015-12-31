@@ -47,13 +47,13 @@ public class UF_Row extends PentagonRow
     pb[5].setWidth(14);
     pb[6].setWidth(14);
     
-    pb[0].setWeight(40);
-    pb[1].setWeight(30);
-    pb[2].setWeight(10);
-    pb[3].setWeight(4);
-    pb[4].setWeight(6);
-    pb[5].setWeight(4);
-    pb[6].setWeight(4);
+    pb[0].setWeight(35);
+    pb[1].setWeight(25);
+    pb[2].setWeight(12);
+    pb[3].setWeight(10);
+    pb[4].setWeight(8);
+    pb[5].setWeight(5);
+    pb[6].setWeight(5);
 
     pb[0].setScore(pentagonReport.getScoreUFVxu2014());
     pb[1].setScore(pentagonReport.getScoreUFVxu2015());
@@ -73,15 +73,15 @@ public class UF_Row extends PentagonRow
   public void calculateScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap)
   {
-    calculateBoxScores(testConducted, dataSession, pentagonReport, testSectionMap);
+    calculateBoxScores(testConducted, dataSession, pentagonReport);
     int scoreUF = 0;
-    scoreUF = addWeightToScore(scoreUF, 35, pentagonReport.getScoreUFVxu2014());
-    scoreUF = addWeightToScore(scoreUF, 25, pentagonReport.getScoreUFVxu2015());
-    scoreUF = addWeightToScore(scoreUF, 12, pentagonReport.getScoreUFSensitive());
-    scoreUF = addWeightToScore(scoreUF, 10, pentagonReport.getScoreUFCodedValues());
-    scoreUF = addWeightToScore(scoreUF, 8, pentagonReport.getScoreUFTolerant());
-    scoreUF = addWeightToScore(scoreUF, 5, pentagonReport.getScoreUFEhrExamples());
-    scoreUF = addWeightToScore(scoreUF, 5, pentagonReport.getScoreUFPerformance());
+    scoreUF = addWeightToScore(scoreUF, this.get(0).getWeight(), pentagonReport.getScoreUFVxu2014());
+    scoreUF = addWeightToScore(scoreUF, this.get(1).getWeight(), pentagonReport.getScoreUFVxu2015());
+    scoreUF = addWeightToScore(scoreUF, this.get(2).getWeight(), pentagonReport.getScoreUFSensitive());
+    scoreUF = addWeightToScore(scoreUF, this.get(3).getWeight(), pentagonReport.getScoreUFCodedValues());
+    scoreUF = addWeightToScore(scoreUF, this.get(4).getWeight(), pentagonReport.getScoreUFTolerant());
+    scoreUF = addWeightToScore(scoreUF, this.get(5).getWeight(), pentagonReport.getScoreUFEhrExamples());
+    scoreUF = addWeightToScore(scoreUF, this.get(6).getWeight(), pentagonReport.getScoreUFPerformance());
     pentagonReport.setScoreUF(scoreUF / 100);    
   }
   

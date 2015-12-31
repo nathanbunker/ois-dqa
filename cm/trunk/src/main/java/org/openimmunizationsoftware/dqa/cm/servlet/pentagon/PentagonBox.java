@@ -145,17 +145,16 @@ public abstract class PentagonBox
     this.label = label;
   }
 
-  public abstract void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public abstract void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession);
 
-  public abstract void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public abstract void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession);
 
-  public abstract void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public abstract void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession);
 
-  public abstract void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
-      Map<String, TestSection> testSectionMap);
+  public abstract void calculateScore(Session dataSession, PentagonReport pentagonReport);
 
   public void printTestMessageListFail(PrintWriter out, List<TestMessage> testMessageList)
   {

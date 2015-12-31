@@ -19,6 +19,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.cm.CentralControl;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.logic.PentagonReportLogic;
 import org.openimmunizationsoftware.dqa.tr.logic.ProfileUsageValueLogic;
 import org.openimmunizationsoftware.dqa.tr.model.Assertion;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
@@ -28,6 +29,7 @@ import org.openimmunizationsoftware.dqa.tr.model.Evaluation;
 import org.openimmunizationsoftware.dqa.tr.model.EvaluationField;
 import org.openimmunizationsoftware.dqa.tr.model.Forecast;
 import org.openimmunizationsoftware.dqa.tr.model.ForecastField;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileField;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsageValue;
@@ -125,7 +127,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
             dataSession.saveOrUpdate(testConducted);
             transaction.commit();
           }
-
+          
           {
             int i = 1;
             String transforms = readValue(req, PARAM_TC_TRANSFORMS + i);

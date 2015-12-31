@@ -15,6 +15,7 @@ import org.openimmunizationsoftware.dqa.tr.logic.AssertionFieldLogic;
 import org.openimmunizationsoftware.dqa.tr.logic.ConformanceCount;
 import org.openimmunizationsoftware.dqa.tr.logic.PentagonReportLogic;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
+import org.openimmunizationsoftware.dqa.tr.model.AssertionIdentified;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
@@ -27,7 +28,7 @@ public class UCAcksConform extends PentagonBox
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The National Institute of Standards and Technology (NIST) has an Immunization Test Suite "
         + "for testing and verifying the format of HL7 messages used in immunization message. In cooperation with CDC and AIRA, "
@@ -36,60 +37,54 @@ public class UCAcksConform extends PentagonBox
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (score >= 100)
     {
       out.println("<h3 class=\"pentagon\">All Acks Conform</h3>");
     } else
     {
-      printContentsConformanceProblems(out, dataSession, testConducted, "update");
+      printContentsConformanceProblems(out, dataSession, pentagonReport, "update");
     }
   }
 
-  protected static void printContentsConformanceProblems(PrintWriter out, Session dataSession, TestConducted testConducted, String testType)
+  protected static void printContentsConformanceProblems(PrintWriter out, Session dataSession, PentagonReport pentagonReport, String testType)
   {
     out.println("<h3 class=\"pentagon\">Conformance Problems Found</h3>");
-    List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted, testType);
-    Map<AssertionField, TestMessage> assertionFieldToTestMessageMap = AssertionFieldLogic.getAssertionFieldToTestMessageMap(dataSession,
-        testConducted, assertionFieldList);
+    List<AssertionIdentified> assertionIdentifiedList = AssertionFieldLogic.getAssertionIdentifiedListForErrors(dataSession, pentagonReport,
+        testType);
+
     out.println("<table class=\"pentagon\">");
     out.println("  <tr class=\"pentagon\">");
     out.println("    <th class=\"pentagon\">Count</th>");
     out.println("    <th class=\"pentagon\">Description</th>");
     out.println("  </tr>");
-    for (AssertionField assertionField : assertionFieldList)
+    for (AssertionIdentified assertionIdentified : assertionIdentifiedList)
     {
+      AssertionField assertionField = assertionIdentified.getAssertionField();
       out.println("  <tr class=\"pentagon\">");
-      out.println("    <td class=\"pentagon\">" + assertionField.getCount() + "</td>");
-      TestMessage testMessage = assertionFieldToTestMessageMap.get(assertionField);
-      if (testMessage == null)
-      {
-        out.println("    <td class=\"pentagon\">" + assertionField.getAssertionDescription() + "</td>");
-      } else
-      {
-        out.println("    <td class=\"pentagon\"><a class=\"pentagonTestMessageFail\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
-            + testMessage.getTestMessageId() + "');\">" + assertionField.getAssertionDescription() + "</a></td>");
-      }
+      out.println("    <td class=\"pentagon\">" + assertionIdentified.getAssertionCount() + "</td>");
+      out.println("    <td class=\"pentagon\"><a class=\"pentagonTestMessageFail\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
+          + assertionIdentified.getTestMessage().getTestMessageId() + "');\">" + assertionField.getAssertionDescription() + "</a></td>");
       out.println("  </tr>");
-
     }
     out.println("</table>");
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     String testType = "update";
-    printScoreExplanation(out, dataSession, testConducted, testType);
+    printScoreExplanation(out, dataSession, pentagonReport, testType);
   }
 
-  public static void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, String testType)
+  public static void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, String testType)
   {
+
     out.println("<p class=\"pentagon\">The score is determined by evaluation the number of errors identified by the NIST validator. </p>");
     out.println("<h4 class=\"pentagon\">Step 1: Set Maximum Score Possible</h4>");
-    ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(testConducted, dataSession, testType);
+    ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(pentagonReport, dataSession, testType);
     out.println("<p class=\"pentagon\"> Determine the percentage of tests where conformance was checked. </p>");
     out.println("<table class=\"pentagon\">");
     out.println("  <tr>");
@@ -152,19 +147,20 @@ public class UCAcksConform extends PentagonBox
     }
     NumberFormat formatter1 = new DecimalFormat("#0.0");
     NumberFormat formatter2 = new DecimalFormat("#0.000");
-    List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted, testType);
-    for (AssertionField assertionField : assertionFieldList)
+    List<AssertionIdentified> assertionIdentifiedList = AssertionFieldLogic.getAssertionIdentifiedListForErrors(dataSession, pentagonReport,
+        testType);
+    for (AssertionIdentified assertionIdentified : assertionIdentifiedList)
     {
       double percentage = 1.0;
-      if (assertionField.getCount() < conformanceCount.getCountTotal())
+      if (assertionIdentified.getAssertionCount() < conformanceCount.getCountTotal())
       {
-        percentage = assertionField.getCount() / (double) conformanceCount.getCountTotal();
+        percentage = assertionIdentified.getAssertionCount() / (double) conformanceCount.getCountTotal();
       }
       double deduction = percentage * 0.2 * scoreDouble;
       scoreDouble = scoreDouble - deduction;
       out.println("  <tr class=\"pentagon\">");
-      out.println("    <td class=\"pentagon\">" + assertionField.getCount() + "</td>");
-      out.println("    <td class=\"pentagon\">" + formatter1.format(percentage) + "%</td>");
+      out.println("    <td class=\"pentagon\">" + assertionIdentified.getAssertionCount() + "</td>");
+      out.println("    <td class=\"pentagon\">" + formatter1.format(percentage * 100) + "%</td>");
       out.println("    <td class=\"pentagon\">" + formatter2.format(deduction) + "%</td>");
       out.println("    <td class=\"pentagon\">" + formatter1.format(scoreDouble) + "%</td>");
       out.println("  </tr>");
@@ -179,8 +175,10 @@ public class UCAcksConform extends PentagonBox
   }
 
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    Map<String, TestSection> testSectionMap = pentagonReport.getTestSectionMap();
+    TestConducted testConducted = pentagonReport.getTestConducted();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015) != null)
     {
       String testType = "update";
@@ -190,7 +188,7 @@ public class UCAcksConform extends PentagonBox
 
   public static void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, String testType)
   {
-    ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(testConducted, dataSession, testType);
+    ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(pentagonReport, dataSession, testType);
     if (conformanceCount.getCountTotal() > 0)
     {
       double scoreDouble = 100.0;
@@ -199,18 +197,19 @@ public class UCAcksConform extends PentagonBox
         scoreDouble = scoreDouble
             * ((conformanceCount.getCountTotal() - conformanceCount.getCountNotRun()) / (double) conformanceCount.getCountTotal());
       }
-      List<AssertionField> assertionFieldList = AssertionFieldLogic.getAssertionFieldListForErrors(dataSession, testConducted, testType);
-      for (AssertionField assertionField : assertionFieldList)
+      List<AssertionIdentified> assertionIdentifiedList = AssertionFieldLogic.getAssertionIdentifiedListForErrors(dataSession, pentagonReport,
+          testType);
+      for (AssertionIdentified assertionIdentified : assertionIdentifiedList)
       {
         double percentage = 1.0;
-        if (assertionField.getCount() < conformanceCount.getCountTotal())
+        if (assertionIdentified.getAssertionCount() < conformanceCount.getCountTotal())
         {
-          percentage = assertionField.getCount() / (double) conformanceCount.getCountTotal();
+          percentage = assertionIdentified.getAssertionCount() / (double) conformanceCount.getCountTotal();
         }
         double deduction = percentage * 0.2 * scoreDouble;
         scoreDouble = scoreDouble - deduction;
       }
-      if (testType.equals("query"))
+      if (testType.equals("update"))
       {
         pentagonReport.setScoreUCAcksConform(((int) scoreDouble));
       } else

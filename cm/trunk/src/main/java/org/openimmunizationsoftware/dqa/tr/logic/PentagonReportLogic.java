@@ -19,43 +19,64 @@ public class PentagonReportLogic
 
   public static PentagonReport createOrReturnPentagonReport(TestConducted testConducted, Session dataSession)
   {
+    PentagonReport pentagonReport = null;
     {
       Query query = dataSession.createQuery("from PentagonReport where testConducted = ?");
       query.setParameter(0, testConducted);
       List<PentagonReport> pentagonReportList = query.list();
       if (pentagonReportList.size() > 0)
       {
-        return pentagonReportList.get(0);
+        pentagonReport = pentagonReportList.get(0);
+        loadTestSectionMap(dataSession, pentagonReport);
       }
     }
+    if (pentagonReport == null)
+    {
+      pentagonReport = new PentagonReport();
+      pentagonReport.setTestConducted(testConducted);
+      {
+        Transaction transaction = dataSession.beginTransaction();
+        dataSession.save(pentagonReport);
+        transaction.commit();
+      }
 
-    PentagonReport pentagonReport = new PentagonReport();
-    pentagonReport.setTestConducted(testConducted);
+      AssertionFieldLogic.createAssertionIdentifiedListForErrors(dataSession, testConducted, pentagonReport, "update");
+      AssertionFieldLogic.createAssertionIdentifiedListForErrors(dataSession, testConducted, pentagonReport, "query");
 
+      loadTestSectionMap(dataSession, pentagonReport);
+      Map<String, TestSection> testSectionMap = pentagonReport.getTestSectionMap();
+
+      ArrayList<PentagonRow> pentagonRowList = PentagonRow.createPentagonRowList(pentagonReport);
+      for (PentagonRow pentagonRow : pentagonRowList)
+      {
+        pentagonRow.calculateScores(testConducted, dataSession, pentagonReport, testSectionMap);
+      }
+
+      {
+        Transaction transaction = dataSession.beginTransaction();
+        dataSession.update(pentagonReport);
+        transaction.commit();
+      }
+    }
+    return pentagonReport;
+  }
+
+  public static void loadTestSectionMap(Session dataSession, PentagonReport pentagonReport)
+  {
     Map<String, TestSection> testSectionMap = new HashMap<String, TestSection>();
     {
       Query query = dataSession.createQuery("from TestSection where testConducted = ?");
-      query.setParameter(0, testConducted);
+      query.setParameter(0, pentagonReport.getTestConducted());
       List<TestSection> testSectionList = query.list();
       for (TestSection testSection : testSectionList)
       {
         testSectionMap.put(testSection.getTestSectionType(), testSection);
       }
     }
-
-    ArrayList<PentagonRow> pentagonRowList = PentagonRow.createPentagonRowList(pentagonReport);
-    for (PentagonRow pentagonRow : pentagonRowList)
-    {
-      pentagonRow.calculateScores(testConducted, dataSession, pentagonReport, testSectionMap);
-    }
-
-    Transaction transaction = dataSession.beginTransaction();
-    dataSession.save(pentagonReport);
-    transaction.commit();
-    return pentagonReport;
+    pentagonReport.setTestSectionMap(testSectionMap);
   }
 
-  public static ConformanceCount getConformanceCounts(TestConducted testConducted, Session dataSession, String testType)
+  public static ConformanceCount getConformanceCounts(PentagonReport pentagonReport, Session dataSession, String testType)
   {
     ConformanceCount conformanceCount = new ConformanceCount();
     {
@@ -65,7 +86,7 @@ public class PentagonReportLogic
       int countError = 0;
       Query query = dataSession.createQuery("select tm.resultAckConformance, count(tm.resultAckConformance) from TestMessage tm "
           + "where tm.testSection.testConducted = ? and tm.testType = ? group by tm.resultAckConformance");
-      query.setParameter(0, testConducted);
+      query.setParameter(0, pentagonReport.getTestConducted());
       query.setParameter(1, testType);
       List<Object[]> objectsList = query.list();
       for (Object[] object : objectsList)

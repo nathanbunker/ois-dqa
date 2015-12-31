@@ -22,7 +22,7 @@ public class UCConstraints extends UCConflicts
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println(
         "<p class=\"pentagon\">A conformant IIS may constrain or modify the national guide in certain ways in order to apply local requirements. "
@@ -33,9 +33,9 @@ public class UCConstraints extends UCConflicts
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
+  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(testConducted, dataSession);
+    List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(pentagonReport.getTestConducted(), dataSession);
     CompatibilityConformanceCount cccConstraint = null;
     CompatibilityConformanceCount cccMajorConstraint = null;
     for (CompatibilityConformanceCount compatibilityConformanceCount : compatibilityConformanceCountList)
@@ -80,14 +80,14 @@ public class UCConstraints extends UCConflicts
         out.println("  </tr>");
       }
       out.println("</table>");
-      printCCCTable(out, dataSession, testConducted, cccMajorConstraint, "Major Constraint");
-      printCCCTable(out, dataSession, testConducted, cccConstraint, "Constraint");
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccMajorConstraint, "Major Constraint");
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConstraint, "Constraint");
     }
 
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
+  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is first set at 100% and then score is successively reduced by 20% for "
@@ -100,8 +100,10 @@ public class UCConstraints extends UCConflicts
   }
 
   @Override
-  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, Map<String, TestSection> testSectionMap)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
+    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
+    TestConducted testConducted = pentagonReport.getTestConducted();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING) != null)
     {
       List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(testConducted, dataSession);
