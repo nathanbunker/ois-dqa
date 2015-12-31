@@ -28,7 +28,7 @@ public class QCSoapConforms extends PentagonBox
   public void printDescription(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">In 2015, AIRA launched an Interoperability Testing Project to determine the level of alignment between "
-        + "current Immunization Information Systems (IIS) and the community’s interoperability standards. The testing process connects with "
+        + "current Immunization Information Systems (IIS) and the community's interoperability standards. The testing process connects with "
         + "IIS directly and submits sample messages to IIS development platforms. When any two systems connect to exchange data, they must "
         + "use an agreed upon transport layer to connect. To this end, a CDC-led expert panel was tasked with selecting transport layer and "
         + "defining a technical specification. In 2011, the panel selected Soap  and defined a formal specification known as a \"CDC WSDL.\" </p>");

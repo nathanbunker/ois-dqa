@@ -38,6 +38,8 @@ public class PentagonServlet extends HomeServlet
 
   private static final String VIEW_CONFORMANCE1 = "c1";
 
+  protected static final String[] BOX_DETAILS_SECTIONS = { "Overview", "Importance", "Calculation", "History", "Comparison" };
+
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
@@ -184,7 +186,7 @@ public class PentagonServlet extends HomeServlet
     {
       int offsetY = 35;
       int offsetX = 35;
-      setupSmallPentagon(out, pentagonReport, offsetY, offsetX);
+      setupAndPrintSmallPentagon(out, pentagonReport, offsetY, offsetX);
     }
 
     out.println("  <rect fill=\"#83bbe5\" stroke=\"black\" stroke-width=\"2\" x=\"175\" y=\"138\" width=\"500\" height=\"27\"/>");
@@ -192,21 +194,6 @@ public class PentagonServlet extends HomeServlet
     out.println("  <rect fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" x=\"685\" y=\"150\" width=\"40\" height=\"500\"/>");
     out.println("  <rect fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" x=\"25\" y=\"660\" width=\"488\" height=\"27\"/>");
     out.println("  <rect fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" x=\"533\" y=\"660\" width=\"292\" height=\"27\"/>");
-    // out.println(
-    // " <circle fill=\"#83bbe5\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
-    // pointsBig[0][0] + "\" cy=\"" + pointsBig[0][1] + "\" r=\"40\"/>");
-    // out.println(
-    // " <circle fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
-    // pointsBig[1][0] + "\" cy=\"" + pointsBig[1][1] + "\" r=\"40\"/>");
-    // out.println(
-    // " <circle fill=\"#fcc438\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
-    // pointsBig[2][0] + "\" cy=\"" + pointsBig[2][1] + "\" r=\"40\"/>");
-    // out.println(
-    // " <circle fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
-    // pointsBig[3][0] + "\" cy=\"" + pointsBig[3][1] + "\" r=\"40\"/>");
-    // out.println(
-    // " <circle fill=\"#7ab648\" stroke=\"black\" stroke-width=\"2\" cx=\"" +
-    // pointsBig[4][0] + "\" cy=\"" + pointsBig[4][1] + "\" r=\"40\"/>");
 
     PentagonRow pentagonRowConfidence = PentagonRow.createConfidenceRow(pentagonReport);
     PentagonRow pentagonRowsUpdateFunctionality = PentagonRow.createUpdateFunctionalityRow(pentagonReport);
@@ -317,22 +304,45 @@ public class PentagonServlet extends HomeServlet
       out.println("  }");
     }
     {
-      out.println("  function loadBoxContents(boxName, selector) { ");
-      out.println("    var e = document.getElementById('boxContents');");
-      out.println(
-          "    e.innerHTML = '<p class=\"pentagon\">Loading...</p><p  class=\"pentagon\">(Please be patient, this may take a minute.)</p>'; ");
+      out.println("  function loadBoxContents(title, boxName, selector) { ");
+      out.println("    var e = document.getElementById('boxDetails');");
+      out.println("    var eTitle = document.getElementById('boxDetailsTitle');");
+      out.println("    var eContent = document.getElementById('boxDetailsContent');");
+      out.println("    eTitle.innerHTML = title; ");
+      out.println("    eContent.innerHTML = '<p class=\"pentagon\">Loading...</p>"
+          + "<p class=\"pentagon\">(Please be patient, this may take a minute.)</p>'; ");
       out.println("    e.style.display = 'block';");
       out.println("    var xhttp = new XMLHttpRequest(); ");
       out.println("    xhttp.onreadystatechange = function() { ");
       out.println("      if (xhttp.readyState == XMLHttpRequest.DONE) { ");
       out.println("        if (xhttp.status == 200) { ");
-      out.println("          e.innerHTML = xhttp.responseText; ");
+      out.println("          eContent.innerHTML = xhttp.responseText; ");
+      out.println("          showBoxSection(boxDetailsSelected);");
       out.println("        }");
       out.println("      }");
       out.println("    }");
-      String link = "'pentagonContent?" + PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId() + "&" + PARAM_BOX_NAME + "=' + boxName + '&" + PARAM_SELECTOR + "=' + selector";
+      String link = "'pentagonContent?" + PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId() + "&" + PARAM_BOX_NAME
+          + "=' + boxName + '&" + PARAM_SELECTOR + "=' + selector";
       out.println("    xhttp.open('GET', " + link + ", true); ");
       out.println("    xhttp.send(null);");
+      out.println("  }");
+    }
+    {
+      out.println("  var boxDetailsSelected = 'boxDetailsOverview'; ");
+      out.println("  function showBoxSection(id) { ");
+      for (String s : BOX_DETAILS_SECTIONS)
+      {
+        out.println("    if (id != 'boxDetails" + s + "') { ");
+        out.println("      hideReport('boxDetails" + s + "'); ");
+        out.println("      var mh = document.getElementById('boxDetails" + s + "TopMenu');");
+        out.println("      mh.style.border = '1px solid #eeeeee'; ");
+        out.println("      } ");
+      }
+      out.println("    boxDetailsSelected = id; ");
+      out.println("    var e = document.getElementById(id);");
+      out.println("    e.style.display = 'block'; ");
+      out.println("    var m = document.getElementById(id + 'TopMenu'); ");
+      out.println("    m.style.border = '1px solid #9b0d28'; ");
       out.println("  }");
     }
     out.println("  function flashOnGrey(id) { ");
@@ -385,7 +395,7 @@ public class PentagonServlet extends HomeServlet
       int posX = 0;
       int posY = 0;
       out.println("  <span style=\"position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
-          + "px; width: 850px; \"><h1 class=\"pentagon\">" + testConducted.getConnectionLabel() + "</h1></span>");
+          + "px; width: 850px; \"><h1 class=\"pentagon\" onClick=\"showReport('')\">" + testConducted.getConnectionLabel() + "</h1></span>");
     }
 
     {
@@ -395,18 +405,20 @@ public class PentagonServlet extends HomeServlet
       out.println("  <span id=\"box_reportSelect\" style=\"font-size: 20px; text-align: center; position: absolute; top: " + (posY + offsetY)
           + "px; left: " + (posX + offsetX) + "px; width: 130px; border-width: 0px; border-style: none; \" "
           + "onmouseout=\"flashOffGrey('box_reportSelect')\" onmouseover=\"flashOnGrey('box_reportSelect')\" onClick=\"loadBoxContents('"
-          + BOX_NAME_REPORT_SELECT + "', '')\">" + sdf.format(testConducted.getTestStartedTime()) + "</span>");
+          + "All Reports for " + testConducted.getConnectionLabel() + "', '" + BOX_NAME_REPORT_SELECT + "', '')\">"
+          + sdf.format(testConducted.getTestStartedTime()) + "</span>");
     }
 
     {
       NumberFormat nf = NumberFormat.getIntegerInstance();
       int posX = 690;
       int posY = 95;
-      String text = "<span style=\"color:#9b0d28; font-size: 10pt; \"><span style=\"font-weight: bold; \">" + nf.format(testConducted.getCountUpdate())
-          + "</span> Updates<br/><span style=\"font-weight: bold; \">" + nf.format(testConducted.getCountQuery()) + "</span> Queries</span>";
+      String text = "<span style=\"color:#9b0d28; font-size: 10pt; \"><span style=\"font-weight: bold; \">"
+          + nf.format(testConducted.getCountUpdate()) + "</span> Updates<br/><span style=\"font-weight: bold; \">"
+          + nf.format(testConducted.getCountQuery()) + "</span> Queries</span>";
       out.println("  <div id=\"box_testSections\" style=\"text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
           + (posX + offsetX) + "px; width: 130px; border-width: 0px; border-style: none; \" "
-          + "onmouseout=\"flashOffGrey('box_testSections')\" onmouseover=\"flashOnGrey('box_testSections')\" onClick=\"loadBoxContents('"
+          + "onmouseout=\"flashOffGrey('box_testSections')\" onmouseover=\"flashOnGrey('box_testSections')\" onClick=\"loadBoxContents('Test Run Details', '"
           + BOX_NAME_TEST_SECTIONS + "', '')\">" + text + "</div>");
     }
 
@@ -455,8 +467,8 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 100px;\" onmouseout=\"flashOffBlue('r_c" + i
-            + "')\" onmouseover=\"flashOnBlue('r_c" + i + "')\"  onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "', '')\">"
-            + pentagonBox.getLabel() + "</span>");
+            + "')\" onmouseover=\"flashOnBlue('r_c" + i + "')\"  onClick=\"loadBoxContents('" + "Confidence: " + pentagonBox.getTitle() + "', '"
+            + pentagonBox.getBoxName() + "', '')\">" + pentagonBox.getLabel() + "</span>");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -469,8 +481,8 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; height: " + pentagonBox.getSize() + "px; width: 100px; \" onmouseout=\"flashOffGreen('r_uf" + i
-            + "')\" onmouseover=\"flashOnGreen('r_uf" + i + "')\" onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "', '')\">"
-            + pentagonBox.getLabel() + "</span>");
+            + "')\" onmouseover=\"flashOnGreen('r_uf" + i + "')\" onClick=\"loadBoxContents('" + "Update Functionality: " + pentagonBox.getTitle() + "', '"
+            + pentagonBox.getBoxName() + "', '')\">" + pentagonBox.getLabel() + "</span>");
         posY += pentagonBox.getSize();
         i++;
       }
@@ -483,8 +495,8 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 70px;\" onmouseout=\"flashOffGreen('r_uc" + i
-            + "')\" onmouseover=\"flashOnGreen('r_uc" + i + "')\" onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "', '')\"><br/><br/>"
-            + pentagonBox.getLabel() + "</span>");
+            + "')\" onmouseover=\"flashOnGreen('r_uc" + i + "')\" onClick=\"loadBoxContents('" + "Update Conformance: " + pentagonBox.getTitle() + "', '"
+            + pentagonBox.getBoxName() + "', '')\"><br/><br/>" + pentagonBox.getLabel() + "</span>");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -497,8 +509,8 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; width: " + pentagonBox.getSize() + "px; height: 70px;\" onmouseout=\"flashOffOrange('r_qc" + i
-            + "')\" onmouseover=\"flashOnOrange('r_qc" + i + "')\" onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "', '')\"><br/><br/>"
-            + pentagonBox.getLabel() + "</span>");
+            + "')\" onmouseover=\"flashOnOrange('r_qc" + i + "')\" onClick=\"loadBoxContents('" + "Query Conformance: " + pentagonBox.getTitle() + "', '"
+            + pentagonBox.getBoxName() + "', '')\"><br/><br/>" + pentagonBox.getLabel() + "</span>");
         posX += pentagonBox.getSize();
         i++;
       }
@@ -511,8 +523,8 @@ public class PentagonServlet extends HomeServlet
       {
         out.println("  <span style=\"font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
             + (posX + offsetX) + "px; height: " + pentagonBox.getSize() + "px; width: 100px; \" onmouseout=\"flashOffOrange('r_qf" + i
-            + "')\" onmouseover=\"flashOnOrange('r_qf" + i + "')\" onClick=\"loadBoxContents('" + pentagonBox.getBoxName() + "', '')\">"
-            + pentagonBox.getLabel() + "</span>");
+            + "')\" onmouseover=\"flashOnOrange('r_qf" + i + "')\" onClick=\"loadBoxContents('" + "Query Functionality: " + pentagonBox.getTitle() + "', '"
+            + pentagonBox.getBoxName() + "', '')\">" + pentagonBox.getLabel() + "</span>");
         posY += pentagonBox.getSize();
         i++;
       }
@@ -521,8 +533,26 @@ public class PentagonServlet extends HomeServlet
     {
       int posX = 124;
       int posY = 135;
-      out.println("<div id=\"boxContents\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
-          + "px; height: 548px; width: 597px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; overflow: auto;\">");
+      out.println("<div id=\"boxDetails\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
+          + "px; width: 597px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28;\">");
+      out.println("<h2 class=\"pentagon\" id=\"boxDetailsTitle\" ></h2>");
+      out.println("<div style=\"text-align: center; margin-bottom: 10px; \">");
+      for (int i = 0; i < BOX_DETAILS_SECTIONS.length; i++)
+      {
+        String boxTopStyle;
+        if (i == 0)
+        {
+          boxTopStyle = "border-style: solid; border-color: #9b0d28; ";
+        } else
+        {
+          boxTopStyle = "";
+        }
+        String boxDetailsId = "boxDetails" + BOX_DETAILS_SECTIONS[i];
+        out.println("<a class=\"pentagonMenuLink\" id=\"" + boxDetailsId + "TopMenu\" style=\"" + boxTopStyle + "\" onClick=\"showBoxSection('" + boxDetailsId
+            + "')\" href=\"javascript: void; \">" + BOX_DETAILS_SECTIONS[i] + "</a>");
+      }
+      out.println("</div>");
+      out.println("<div id=\"boxDetailsContent\" style=\"height: 450px; overflow: auto; \"></div>");
       out.println("</div>");
     }
 
@@ -530,14 +560,14 @@ public class PentagonServlet extends HomeServlet
       int posX = 0;
       int posY = 50;
       out.println("<div id=\"details\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
-          + "px; height: 700px; width: 850px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; overflow: auto;\">");
-      out.println("</div>"); 
+          + "px; height: 700px; width: 850px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; overflow: auto;  \">");
+      out.println("</div>");
     }
 
     createFooter(webSession);
   }
 
-  public void setupSmallPentagon(PrintWriter out, PentagonReport pentagonReport, int offsetY, int offsetX)
+  public void setupAndPrintSmallPentagon(PrintWriter out, PentagonReport pentagonReport, int offsetY, int offsetX)
   {
     int[] centerPointSmall = { 50 + offsetX, 50 + offsetY };
     int[][] pointsSmall = new int[5][2];
@@ -699,12 +729,12 @@ public class PentagonServlet extends HomeServlet
     double total = 0;
     for (PentagonBox pentagonBox : pentagonRow)
     {
-      total += pentagonBox.getWeight();
+      total += pentagonBox.getWidth();
     }
 
     for (PentagonBox pentagonBox : pentagonRow)
     {
-      int size = (int) (totalSize * (pentagonBox.getWeight() / total) + 0.5);
+      int size = (int) (totalSize * (pentagonBox.getWidth() / total) + 0.5);
       if (size > amountLeft)
       {
         size = amountLeft;

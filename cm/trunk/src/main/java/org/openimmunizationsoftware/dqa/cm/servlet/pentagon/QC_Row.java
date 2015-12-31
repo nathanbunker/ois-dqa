@@ -10,6 +10,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 public class QC_Row extends PentagonRow
 {
   public QC_Row(PentagonReport pentagonReport) {
+    super("Query Conformance");
     PentagonBox[] pb = new PentagonBox[2];
 
     pb[0] = new QCResponsesConform();
@@ -21,8 +22,11 @@ public class QC_Row extends PentagonRow
     pb[0].setLabel("Responses<br/>Conform");
     pb[1].setLabel("CDC WSDL<br/>Conforms");
 
-    pb[0].setWeight(50);
-    pb[1].setWeight(50);
+    pb[0].setWidth(50);
+    pb[1].setWidth(50);
+
+    pb[0].setWeight(60);
+    pb[1].setWeight(40);
 
     pb[0].setScore(pentagonReport.getScoreQCResponsesConform());
     pb[1].setScore(pentagonReport.getScoreQCSoapConforms());

@@ -130,7 +130,7 @@ public class CAckConform extends PentagonBox
   public void printScoreExplanation(PrintWriter out, Session dataSession, TestConducted testConducted, HttpSession webSession,
       UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">Each acknowledgement message returned for Good and Bad messages is check for conformance "
+    out.println("<p class=\"pentagon\">Each acknowledgement message returned for Good and Bad messages is checked for conformance "
         + "against the National Institute of Standards and Technology (NIST) immunization validation service. "
         + "Each message that has has not error conformance identified are included in the passing list. "
         + "The score final score for this section is the percentage of passing divided by the total number of messages.  </p>");

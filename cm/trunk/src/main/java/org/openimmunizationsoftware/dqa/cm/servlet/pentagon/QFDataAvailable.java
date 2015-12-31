@@ -79,6 +79,7 @@ public class QFDataAvailable extends PentagonBox
       }
       out.println("</table>");
     }
+    printCalculatingEssentialDataReturnedExplanation(out);
     out.println("<p class=\"pentagon\">The following table shows the counts of the number of messages that returned data in comparison </p>");
     out.println("<p class=\"pentagon\">This test expects that the IIS is able to return essential information include basic patient information "
         + "and the basic information for every vaccination submitted. "

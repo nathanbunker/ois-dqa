@@ -10,7 +10,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 public class UC_Row extends PentagonRow
 {
   public UC_Row(PentagonReport pentagonReport) {
-
+    super("Update Conformance");
     PentagonBox[] pb = new PentagonBox[4];
 
     pb[0] = new UCModifications();
@@ -28,10 +28,15 @@ public class UC_Row extends PentagonRow
     pb[2].setLabel("No<br/>Constraints");
     pb[3].setLabel("Acks<br/>Conform");
 
+    pb[0].setWidth(25);
+    pb[1].setWidth(25);
+    pb[2].setWidth(25);
+    pb[3].setWidth(25);
+
     pb[0].setWeight(20);
-    pb[1].setWeight(20);
+    pb[1].setWeight(30);
     pb[2].setWeight(20);
-    pb[3].setWeight(20);
+    pb[3].setWeight(30);
 
     pb[0].setScore(pentagonReport.getScoreUCModifications());
     pb[1].setScore(pentagonReport.getScoreUCConflicts());
