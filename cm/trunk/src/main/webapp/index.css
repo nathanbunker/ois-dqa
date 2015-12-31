@@ -571,6 +571,11 @@ a:visited.pentagonMenuLink {text-decoration:none; color: #9b0d28; border-width: 
 a:hover.pentagonMenuLink {text-decoration:none; color: black; border-width: 1px; border-style: solid; border-color: #9b0d28; padding-left: 5px; padding-right: 5px; background-color: #FFE1AA;}
 a:active.pentagonMenuLink {text-decoration:none; color: #9b0d28;  border-width: 1px; border-style: solid; border-color: #eeeeee; padding-left: 5px; padding-right: 5px; }
 
+a:link.pentagonMenuLinkUnselected {text-decoration:none; color: #9b0d28; border-width: 1px; border-style: solid; border-color: #eeeeee; padding-left: 5px; padding-right: 5px;}
+a:visited.pentagonMenuLinkUnselected {text-decoration:none; color: #9b0d28; border-width: 1px; border-style: solid; border-color: #eeeeee; padding-left: 5px; padding-right: 5px;}
+a:hover.pentagonMenuLinkUnselected {text-decoration:none; color: black; border-width: 1px; border-style: solid; border-color: #9b0d28; padding-left: 5px; padding-right: 5px; background-color: #FFE1AA;}
+a:active.pentagonMenuLinkUnselected {text-decoration:none; color: #9b0d28;  border-width: 1px; border-style: solid; border-color: #eeeeee; padding-left: 5px; padding-right: 5px; }
+
 
 
 table.guideContents {  

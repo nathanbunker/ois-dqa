@@ -1,11 +1,6 @@
 package org.openimmunizationsoftware.dqa.tr.logic;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -15,7 +10,6 @@ import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionIdentified;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
-import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 
 public class AssertionFieldLogic
 {

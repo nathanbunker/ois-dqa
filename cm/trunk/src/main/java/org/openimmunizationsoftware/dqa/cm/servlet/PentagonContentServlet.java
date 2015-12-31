@@ -145,7 +145,6 @@ public class PentagonContentServlet extends PentagonServlet
         pentagonRowList.add(PentagonRow.createUpdateConformanceRow(pentagonReport));
         pentagonRowList.add(PentagonRow.createQueryFunctionalityRow(pentagonReport));
         pentagonRowList.add(PentagonRow.createQueryConformanceRow(pentagonReport));
-        
 
         PentagonRow pentagonRow = null;
         PentagonBox pentagonBox = null;
@@ -347,8 +346,6 @@ public class PentagonContentServlet extends PentagonServlet
       {
         testMessage = (TestMessage) dataSession.get(TestMessage.class, testMessageId);
       }
-      out.println(
-          "<a style=\"position: absolute; top: 5px; right: 5px; padding: 2px 5px; border-style: solid; border-width: 1px; \" onclick=\"hideReport('details')\" href=\"javascript: void(); \">Close</a>");
 
       printTestMessage(dataSession, out, profileUsage, testMessage);
     }
@@ -367,99 +364,214 @@ public class PentagonContentServlet extends PentagonServlet
 
     if (testMessage != null)
     {
+      printOverview(out, testMessage);
       if (testMessage.getTestType().equals("prep") || testMessage.getTestType().equals("update"))
+      {
+        printHL7ForUpdate(out, profileUsage, testMessage);
+      } else if (testMessage.getTestType().equals("query"))
+      {
+        printHl7ForQuery(out, profileUsage, testMessage);
+      }
+      printConformance(dataSession, out, testMessage);
+      printPreparationDetails(out, profileUsage, testMessage);
+
+      out.println("<div id=\"detailsData\">");
+      out.println("<p class=\"pentagon\">Here is where I'll put a view of the patient data that was sent or recieved back. </p>");
+      out.println("</div>");
+    }
+  }
+
+  public static void printHl7ForQuery(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage) throws IOException
+  {
+    out.println("<div id=\"detailsHL7\">");
+    if (!testMessage.getPrepMessageDerivedFrom().equals(""))
+    {
+      out.println("<h4 class=\"pentagon\">Update</h4>");
+      out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageDerivedFrom(), profileUsage) + "</pre>");
+      if (testMessage.getResultStoreStatus().equals("a-r") || testMessage.getResultStoreStatus().equals("a-nr"))
+      {
+        out.println("<h4 class=\"pentagon\">Accepted by IIS</h4>");
+      } else if (testMessage.getResultStoreStatus().equals("na-r") || testMessage.getResultStoreStatus().equals("na-nr"))
+      {
+        out.println("<h4 class=\"pentagon\">Rejected by IIS</h4>");
+      } else
+      {
+        out.println("<h4 class=\"pentagon\">Response from IIS</h4>");
+      }
+      out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageOriginalResponse(), profileUsage) + "</pre>");
+      out.println("<h4 class=\"pentagon\">Query</h4>");
+    }
+    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual(), profileUsage) + "</pre>");
+    out.println("<h4 class=\"pentagon\">" + testMessage.getResultQueryType() + " Returned</h4>");
+    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual(), profileUsage) + "</pre>");
+    out.println("</div>");
+
+  }
+
+  public static void printHL7ForUpdate(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage) throws IOException
+  {
+    out.println("<div id=\"detailsHL7\">");
+
+    out.println("<h4 class=\"pentagon\">Update Message Submitted</h4>");
+    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual(), profileUsage) + "</pre>");
+    if (testMessage.isResultAccepted())
+    {
+      out.println("<h4 class=\"pentagon\">Accepted by IIS</h4>");
+    } else
+    {
+      out.println("<h4 class=\"pentagon\">NOT Accepted by IIS</h4>");
+    }
+    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual(), profileUsage) + "</pre>");
+    out.println("</div>");
+  }
+
+  public static void printOverview(PrintWriter out, TestMessage testMessage)
+  {
+    out.println("<div id=\"detailsOverview\">");
+
+    if (testMessage.getTestType().equals("prep") || testMessage.getTestType().equals("update"))
+    {
+      if (testMessage.getTestType().equals("prep"))
+      {
+        out.println(
+            "<p class=\"pentagon\">This message is sent in before testing begins to ensure that a base message can be accepted. It is important that "
+                + "this message is accepted in order for the other tests to proceed, but the results of this particular test are not otherwise used. </p>");
+      } else
+      {
+        if (testMessage.getTestCaseAssertResult().startsWith("Accept"))
+        {
+          out.println(
+              "<p class=\"pentagon\">This update message includes patient information that is being sent to the IIS for inclusion in the registry. "
+                  + "The expectation is that this message will be accepted by the IIS.  </p>");
+        } else
+        {
+          out.println(
+              "<p class=\"pentagon\">This update message includes patient information that is being sent to the IIS for inclusion in the registry. "
+                  + "However the test case expects that the IIS will find a problem with this message and will not accept it. </p>");
+        }
+      }
+      out.println("<table class=\"pentagon\">");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Test Id</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseNumber() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Test Type</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestType() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Description</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseDescription() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Expected Response</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseAssertResult() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Actual Response</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getResultAckType() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Test Result Status</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getResultStatus() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Accepted</th>");
+      out.println("    <td class=\"pentagon\">" + (testMessage.isResultAccepted() ? "Yes" : "No") + "</td>");
+      out.println("  </tr>");
+      out.println("</table>");
+      if (testMessage.getResultStatus().equalsIgnoreCase("PASS"))
       {
         if (testMessage.getTestType().equals("prep"))
         {
-          out.println("<h2 class=\"pentagon\">Prep Message</h3>");
           out.println(
-              "<p class=\"pentagon\">This message is sent in before testing begins to ensure that a base message can be accepted. It is important that "
-                  + "this message is accepted in order for the other tests to proceed, but the results of this particular test are not otherwise used. </p>");
-        } else if (testMessage.getTestType().equals("update"))
-        {
-          out.println("<h2 class=\"pentagon\">Update Test</h3>");
-          out.println(
-              "<p class=\"pentagon\">This message is sent in before testing begins to ensure that a base message can be accepted. It is important that "
-                  + "this message is accepted in order for the other tests to proceed, but the results of this particular test are not otherwise used. </p>");
-          out.println("<table class=\"pentagon\">");
-          out.println("  <tr class=\"pentagon\">");
-          out.println("    <th class=\"pentagon\">Test Id</th>");
-          out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseNumber() + "</td>");
-          out.println("  </tr>");
-          out.println("  <tr class=\"pentagon\">");
-          out.println("    <th class=\"pentagon\">Description</th>");
-          out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseDescription() + "</td>");
-          out.println("  </tr>");
-          out.println("  <tr class=\"pentagon\">");
-          out.println("    <th class=\"pentagon\">Expected Response</th>");
-          out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseAssertResult() + "</td>");
-          out.println("  </tr>");
-          out.println("  <tr class=\"pentagon\">");
-          out.println("    <th class=\"pentagon\">Actual Response</th>");
-          out.println("    <td class=\"pentagon\">" + testMessage.getResultAckType() + "</td>");
-          out.println("  </tr>");
-          out.println("  <tr class=\"pentagon\">");
-          out.println("    <th class=\"pentagon\">Test Result Status</th>");
-          out.println("    <td class=\"pentagon\">" + testMessage.getResultStatus() + "</td>");
-          out.println("  </tr>");
-          out.println("</table>");
-        }
-        out.println("<h2 class=\"pentagon\">Update Message Submitted</h3>");
-        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual(), profileUsage) + "</pre>");
-        if (testMessage.isResultAccepted())
-        {
-          out.println("<h3 class=\"pentagon\">Accepted by IIS</h3>");
+              "<p class=\"pentagon\">This test case was accepted. This means testing could proceed normally. </p>");
         } else
         {
-          out.println("<h3 class=\"pentagon\">NOT Accepted by IIS</h3>");
-        }
-        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual(), profileUsage) + "</pre>");
-        printConformance(dataSession, out, testMessage);
-        printAdditionalInfo(out, profileUsage, testMessage);
-
-      } else if (testMessage.getTestType().equals("query"))
-      {
-        out.println("<h2 class=\"pentagon\">" + testMessage.getTestCaseDescription() + "</h3>");
-        if (!testMessage.getPrepMessageDerivedFrom().equals(""))
-        {
-          out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageDerivedFrom(), profileUsage) + "</pre>");
-          if (testMessage.getResultStoreStatus().equals("a-r") || testMessage.getResultStoreStatus().equals("a-nr"))
+          if (testMessage.getTestCaseAssertResult().startsWith("Accept"))
           {
-            out.println("<h3 class=\"pentagon\">Update Accepted</h3>");
-          } else if (testMessage.getResultStoreStatus().equals("na-r") || testMessage.getResultStoreStatus().equals("na-nr"))
-          {
-            out.println("<h3 class=\"pentagon\">Update Not Accepted</h3>");
+            out.println(
+                "<p class=\"pentagon\">The IIS appeared to accept this message, just as was expected.</p>");
           } else
           {
-            out.println("<h3 class=\"pentagon\">Update</h3>");
+            out.println("<p class=\"pentagon\">The IIS did not appear to accept this message, just as expected.. </p>");
           }
-          out.println(
-              "<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageOriginalResponse(), profileUsage) + "</pre>");
-          out.println("<h3 class=\"pentagon\">Query</h3>");
         }
-        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual(), profileUsage) + "</pre>");
-        out.println("<h3 class=\"pentagon\">" + testMessage.getResultQueryType() + " Returned</h3>");
-        out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual(), profileUsage) + "</pre>");
-        out.println("<table class=\"pentagon\">");
-        out.println("  <tr class=\"pentagon\">");
-        out.println("    <th class=\"pentagon\">Expected Response</th>");
-        out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseAssertResult() + "</td>");
-        out.println("  </tr>");
-        out.println("  <tr class=\"pentagon\">");
-        out.println("    <th class=\"pentagon\">Actual Response</th>");
-        out.println("    <td class=\"pentagon\">" + testMessage.getResultQueryType() + "</td>");
-        out.println("  </tr>");
-        out.println("  <tr class=\"pentagon\">");
-        out.println("    <th class=\"pentagon\">Store Status</th>");
-        out.println("    <td class=\"pentagon\">" + testMessage.getResultStoreStatusForDisplay() + "</td>");
-        out.println("  </tr>");
-        out.println("</table>");
-
-        printConformance(dataSession, out, testMessage);
-        printAdditionalInfo(out, profileUsage, testMessage);
-
       }
+      else
+      {
+        if (testMessage.getTestType().equals("prep"))
+        {
+          out.println(
+              "<p class=\"pentagon\">This test case was not accepted. This means that all or part of the test process could not proceed. </p>");
+        } else
+        {
+          if (testMessage.getTestCaseAssertResult().startsWith("Accept"))
+          {
+            out.println(
+                "<p class=\"pentagon\">The IIS appeared to accept this message. The test was expecting the IIS to find a problem and reject it. </p>");
+          } else
+          {
+            out.println("<p class=\"pentagon\">The IIS did not appear to accept this message. The test was expecting the IIS to accept it. </p>");
+          }
+        }
+      }
+        
+    } else if (testMessage.getTestType().equals("query"))
+    {
+      out.println("<table class=\"pentagon\">");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Test Id</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseNumber() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Test Type</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestType() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Description</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseDescription() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Expected Response</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseAssertResult() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Actual Response</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getResultAckType() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Query Type</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getResultQueryType() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Store Status</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getResultStoreStatus() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Forecast</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getResultForecastStatus() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Expected Response</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseAssertResult() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Actual Response</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getResultQueryType() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Store Status</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getResultStoreStatusForDisplay() + "</td>");
+      out.println("  </tr>");
+      out.println("</table>");
     }
+    if (!testMessage.getResultExceptionText().equals(""))
+    {
+      out.println("<h4 class=\"pentagon\">Exception Encountered</h4>");
+      out.println("<pre class=\"pentagon\">" + testMessage.getResultExceptionText() + "</pre>");
+    }
+    out.println("</div>");
   }
 
   public List<TestConducted> getTestConductedList(Session dataSession, TestConducted testConducted)
@@ -512,9 +624,13 @@ public class PentagonContentServlet extends PentagonServlet
     out.println("  </table>");
   }
 
-  public static void printAdditionalInfo(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage) throws IOException
+  public static void printPreparationDetails(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage) throws IOException
   {
-    out.println("<h3 class=\"pentagon\">How Test Message Was Prepared</h3>");
+    out.println("<div id=\"detailsPreparation\">");
+    out.println("<p class=\"pentagon\">Each test message is prepared dynamically through a process that creates consistently formatted "
+        + "HL7 messages with unique patient and vaccination information. This allows for each test run to contain new and unique patients "
+        + "that the IIS has not seen before. This page details the steps that are taken in order to arrive at the test message that "
+        + "was used for this test case. </p>");
     if (!testMessage.getPrepMessageOriginal().equals(""))
     {
       out.println("<h4 class=\"pentagon\">Starting Message</h4>");
@@ -578,32 +694,13 @@ public class PentagonContentServlet extends PentagonServlet
       out.println("<pre class=\"pentagon\">" + testMessage.getPrepMessageAcceptStatusDebug() + "</pre>");
     }
 
-    out.println("<h3 class=\"pentagon\">Results of Testing</h3>");
-
-    if (!testMessage.getResultExceptionText().equals(""))
-    {
-      out.println("<h4 class=\"pentagon\">Exception Encountered</h4>");
-      out.println("<pre class=\"pentagon\">" + testMessage.getResultExceptionText() + "</pre>");
-    }
-    out.println("<table class=\"pentagon\">");
-    out.println("  <tr class=\"pentagon\">");
-    out.println("    <th class=\"pentagon\">Query Type</th>");
-    out.println("    <td class=\"pentagon\">" + testMessage.getResultQueryType() + "</td>");
-    out.println("  </tr>");
-    out.println("  <tr class=\"pentagon\">");
-    out.println("    <th class=\"pentagon\">Store Status</th>");
-    out.println("    <td class=\"pentagon\">" + testMessage.getResultStoreStatus() + "</td>");
-    out.println("  </tr>");
-    out.println("  <tr class=\"pentagon\">");
-    out.println("    <th class=\"pentagon\">Forecast</th>");
-    out.println("    <td class=\"pentagon\">" + testMessage.getResultForecastStatus() + "</td>");
-    out.println("  </tr>");
-    out.println("</table>");
+    out.println("</div>");
 
   }
 
   public static void printConformance(Session dataSession, PrintWriter out, TestMessage testMessage)
   {
+    out.println("<div id=\"detailsConformance\">");
     if (testMessage.getResultAckConformance() != null)
     {
       if (testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_NOT_RUN))
@@ -614,14 +711,19 @@ public class PentagonContentServlet extends PentagonServlet
                 + "or because a technical issue prevented the test from connecting to NIST to obtain the validation results. </p>");
       } else
       {
+        out.println(
+            "<p class=\"pentagon\">The National Institute of Standards and Technology (NIST) provides a service for verifying the conformance "
+                + "of immunization messages to the HL7 and CDC standards. This section shows errors that were returned by NIST software. "
+                + "For a complete list of all errors, warnings, and assertions please use NIST's tool. For the sake of brevity this section only "
+                + "reports unique errors that were identified in the message. </p>");
         if (testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_OK))
         {
-          out.println("<h3 class=\"pentagon\">Response Meets NIST Standards</h3>");
+          out.println("<h4 class=\"pentagon\">Response Meets NIST Standards</h4>");
           out.println(
               "<p>The response was validated against the NIST validator for immunization messages and not error level issues were found. </p>");
         } else if (testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_ERROR))
         {
-          out.println("<h3 class=\"pentagon\">Response Does NOT Meet NIST Standards</h3>");
+          out.println("<h4 class=\"pentagon\">Response Does NOT Meet NIST Standards</h4>");
           out.println(
               "<p class=\"pentagon\">The response was validated against the NIST validator for immunization messages and problems were found. "
                   + "Please review carefully. Badly formatted acknowledgement messages can cause interoperability issues.  </p>");
@@ -654,6 +756,7 @@ public class PentagonContentServlet extends PentagonServlet
         out.println("</table>");
       }
     }
+    out.println("</div>");
   }
 
   private class PriorityWeight

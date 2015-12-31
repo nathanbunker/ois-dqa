@@ -172,7 +172,8 @@ public abstract class PentagonBox
         out.println("    <td class=\"pentagon\" style=\"text-align: center;\">Fail</td>");
         out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + (testMessage.isResultAccepted() ? "Yes" : "No") + "</td>");
         out.println("    <td class=\"pentagon\"><a class=\"pentagonTestMessageFail\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
-            + testMessage.getTestMessageId() + "');\">" + testMessage.getTestCaseDescription() + "</a></td>");
+            + testMessage.getTestMessageId() + "', '" + testMessage.getTestCaseDescription() + "');\">" + testMessage.getTestCaseDescription()
+            + "</a></td>");
         out.println("  </tr>");
       }
       out.println("</table>");
@@ -237,7 +238,7 @@ public abstract class PentagonBox
   public static String createLink(TestMessage testMessage, String label)
   {
     String testMessageLink = "<a class=\"pentagonTestMessagePass\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
-        + testMessage.getTestMessageId() + "');\">" + label + "</a>";
+        + testMessage.getTestMessageId() + "', '" + testMessage.getTestCaseDescription() + "');\">" + label + "</a>";
     return testMessageLink;
   }
 
@@ -265,7 +266,7 @@ public abstract class PentagonBox
         out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultQueryType() + "</td>");
         out.println("    <td class=\"pentagon\">" + testMessage.getResultStoreStatusForDisplay() + "</td>");
         out.println("    <td class=\"pentagon\"><a class=\"" + classString + "\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
-            + testMessage.getTestMessageId() + "');\">" + testMessage.getTestCaseDescription() + "</a></td>");
+            + testMessage.getTestMessageId() + "', '" + testMessage.getTestCaseDescription() + "');\">" + testMessage.getTestCaseDescription() + "</a></td>");
         out.println("  </tr>");
       }
       out.println("</table>");
