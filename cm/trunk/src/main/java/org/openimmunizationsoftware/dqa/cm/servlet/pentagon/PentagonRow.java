@@ -10,15 +10,31 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public abstract class PentagonRow extends ArrayList<PentagonBox>
 {
+  private String label = "";
+
+  public String getLabel()
+  {
+    return label;
+  }
+
+  public void setLabel(String label)
+  {
+    this.label = label;
+  }
+
+  protected PentagonRow(String label) {
+    this.label = label;
+  }
+
   protected void calculateBoxScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap)
   {
-    for (PentagonBox pentagonBox : this )
+    for (PentagonBox pentagonBox : this)
     {
       pentagonBox.calculateScore(testConducted, dataSession, pentagonReport, testSectionMap);
     }
   }
-  
+
   public abstract void calculateScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap);
 
@@ -67,7 +83,7 @@ public abstract class PentagonRow extends ArrayList<PentagonBox>
     return new UF_Row(pentagonReport);
   }
 
-  public PentagonBox getPentegonBox(String boxName)
+  public PentagonBox getPentagonBox(String boxName)
   {
     for (PentagonBox pentagonBox : this)
     {
@@ -78,6 +94,5 @@ public abstract class PentagonRow extends ArrayList<PentagonBox>
     }
     return null;
   }
-
 
 }

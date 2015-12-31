@@ -11,6 +11,7 @@ public class C_Row extends PentagonRow
 {
   public C_Row(PentagonReport pentagonReport) {
 
+    super("Confidence");
     PentagonBox[] pb = new PentagonBox[5];
 
     pb[0] = new CAckConform();
@@ -31,11 +32,17 @@ public class C_Row extends PentagonRow
     pb[3].setLabel("Good Data <br/>Stored");
     pb[4].setLabel("Bad Data <br/>Not Stored");
 
-    pb[0].setWeight(20);
+    pb[0].setWidth(20);
+    pb[1].setWidth(20);
+    pb[2].setWidth(20);
+    pb[3].setWidth(20);
+    pb[4].setWidth(20);
+
+    pb[0].setWeight(30);
     pb[1].setWeight(20);
     pb[2].setWeight(20);
-    pb[3].setWeight(20);
-    pb[4].setWeight(20);
+    pb[3].setWeight(25);
+    pb[4].setWeight(5);
 
     pb[0].setScore(pentagonReport.getScoreCAckConform());
     pb[1].setScore(pentagonReport.getScoreCGoodMessages());

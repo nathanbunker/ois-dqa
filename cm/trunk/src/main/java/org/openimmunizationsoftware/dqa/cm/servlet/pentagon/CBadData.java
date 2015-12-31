@@ -71,24 +71,8 @@ public class CBadData extends PentagonBox
         + "basic patient or vaccination information is not available to returned by query. This test helps to verify the impact and meaning "
         + "when an update is rejected. </p>");
     out.println("<p class=\"pentagon\">To verify this, the testing process compares the original update message with the query response and "
-        + "confirms that certain fields are returned. As IIS have varying standards and policies for what data is actually returned, this "
-        + "comparison is only done on a few core fields that would reasonably be expected to be returned. The following fields are " + "used: </p>");
-    out.println("<ul class=\"pentagon\">");
-    out.println("  <li class=\"pentagon\">Patient");
-    out.println("    <ul class=\"pentagon\">");
-    out.println("      <li class=\"pentagon\">Last Name</li>");
-    out.println("      <li class=\"pentagon\">First Name</li>");
-    out.println("      <li class=\"pentagon\">Middle Name (only if sent and also returned)</li>");
-    out.println("      <li class=\"pentagon\">Date of Birth</li>");
-    out.println("    </ul>");
-    out.println("  </li>");
-    out.println("  <li class=\"pentagon\">Vaccination (only fully administered, ignoring refusals and history-of-disease, etc.) ");
-    out.println("    <ul class=\"pentagon\">");
-    out.println("      <li class=\"pentagon\">Administration Date</li>");
-    out.println("      <li class=\"pentagon\">Vaccination Code (CVX or NDC)</li>");
-    out.println("    </ul>");
-    out.println("  </li>");
-    out.println("</ul>");
+        + "confirms that certain fields are returned.</p>");
+    printCalculatingEssentialDataReturnedExplanation(out);
     out.println("<p class=\"pentagon\">The score is the percentage of rejected messages (whether good or bad) "
         + "that could not be completely retrieved via a query.</p>");
     out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");

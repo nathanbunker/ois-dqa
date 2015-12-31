@@ -40,18 +40,28 @@ public abstract class PentagonBox
   public static final String BOX_NAME_UF_PERFORMANCE = "UFPerformance";
   public static final String BOX_NAME_UF_EHR_EXAMPLES = "UFEhrExamples";
   public static final String BOX_NAME_UF_CODED_VALUES = "UFCodedValues";
-  
+
   private String boxName = "";
   protected String label = "";
   protected String title = "";
   protected int weight = 0;
+  protected int width = 0;
   protected int posX = 0;
   protected int poxY = 0;
   protected int size = 0;
   protected int score = 0;
-  
-  public PentagonBox(String boxName)
+
+  public int getWidth()
   {
+    return width;
+  }
+
+  public void setWidth(int width)
+  {
+    this.width = width;
+  }
+
+  public PentagonBox(String boxName) {
     this.boxName = boxName;
   }
 
@@ -196,8 +206,7 @@ public abstract class PentagonBox
           out.println("  </tr>");
         }
         out.println("</table>");
-      }
-      else
+      } else
       {
         out.println("<table class=\"pentagon\">");
         out.println("  <tr class=\"pentagon\">");
@@ -232,7 +241,7 @@ public abstract class PentagonBox
         + testMessage.getTestMessageId() + "');\">" + label + "</a>";
     return testMessageLink;
   }
-  
+
   public void printTestMessageListFailForQuery(PrintWriter out, List<TestMessage> testMessageList)
   {
     String classString = "pentagonTestMessageFail";
@@ -268,6 +277,29 @@ public abstract class PentagonBox
   {
     String classString = "pentagonTestMessagePass";
     printTestMessageListFailForQuery(out, testMessageList, classString);
+  }
+
+  public void printCalculatingEssentialDataReturnedExplanation(PrintWriter out)
+  {
+    out.println("<h4 class=\"pentagon\">Calculating Essential Data Returned</h4>");
+    out.println("<p class=\"pentagon\">IIS have varying standards and policies for what data is actually returned when queried so this "
+        + "test is only done on a few core fields that would reasonably be expected to be returned. The following fields are compared: </p>");
+    out.println("<ul class=\"pentagon\">");
+    out.println("  <li class=\"pentagon\">Patient");
+    out.println("    <ul class=\"pentagon\">");
+    out.println("      <li class=\"pentagon\">Last Name</li>");
+    out.println("      <li class=\"pentagon\">First Name</li>");
+    out.println("      <li class=\"pentagon\">Middle Name (only if sent and also returned)</li>");
+    out.println("      <li class=\"pentagon\">Date of Birth</li>");
+    out.println("    </ul>");
+    out.println("  </li>");
+    out.println("  <li class=\"pentagon\">Vaccination (only fully administered or historical, ignoring refusals, history-of-disease, etc.) ");
+    out.println("    <ul class=\"pentagon\">");
+    out.println("      <li class=\"pentagon\">Administration Date</li>");
+    out.println("      <li class=\"pentagon\">Vaccination Code (CVX or NDC)</li>");
+    out.println("    </ul>");
+    out.println("  </li>");
+    out.println("</ul>");
   }
 
 }

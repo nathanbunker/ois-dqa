@@ -12,7 +12,7 @@ public class UF_Row extends PentagonRow
   
   public UF_Row(PentagonReport pentagonReport)
   {
-    
+    super("Update Functionality");
     PentagonBox[] pb = new PentagonBox[7];
 
     pb[0] = new UFVxu2014();
@@ -39,13 +39,21 @@ public class UF_Row extends PentagonRow
     pb[5].setLabel("EHR Examples");
     pb[6].setLabel("Performance");
 
-    pb[0].setWeight(15);
-    pb[1].setWeight(15);
-    pb[2].setWeight(14);
-    pb[3].setWeight(14);
-    pb[4].setWeight(14);
-    pb[5].setWeight(14);
-    pb[6].setWeight(14);
+    pb[0].setWidth(15);
+    pb[1].setWidth(15);
+    pb[2].setWidth(14);
+    pb[3].setWidth(14);
+    pb[4].setWidth(14);
+    pb[5].setWidth(14);
+    pb[6].setWidth(14);
+    
+    pb[0].setWeight(40);
+    pb[1].setWeight(30);
+    pb[2].setWeight(10);
+    pb[3].setWeight(4);
+    pb[4].setWeight(6);
+    pb[5].setWeight(4);
+    pb[6].setWeight(4);
 
     pb[0].setScore(pentagonReport.getScoreUFVxu2014());
     pb[1].setScore(pentagonReport.getScoreUFVxu2015());

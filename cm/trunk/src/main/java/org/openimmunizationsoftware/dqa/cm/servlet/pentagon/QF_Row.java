@@ -10,6 +10,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 public class QF_Row extends PentagonRow
 {
   public QF_Row(PentagonReport pentagonReport) {
+    super("Query Functionality");
     PentagonBox[] pb = new PentagonBox[5];
 
     pb[0] = new QFQbp2015();
@@ -33,13 +34,20 @@ public class QF_Row extends PentagonRow
     pb[4].setLabel("Performance");
 //    pb[5].setLabel("Query Check");
 
-    pb[0].setWeight(20);
+    pb[0].setWidth(20);
+    pb[1].setWidth(20);
+    pb[2].setWidth(20);
+    pb[3].setWidth(20);
+    pb[4].setWidth(20);
+//    pb[5].setWidth(15);
+    
+    pb[0].setWeight(30);
     pb[1].setWeight(20);
     pb[2].setWeight(20);
     pb[3].setWeight(20);
-    pb[4].setWeight(20);
+    pb[4].setWeight(10);
 //    pb[5].setWeight(15);
-
+    
     pb[0].setScore(pentagonReport.getScoreQFQbp2015());
     pb[1].setScore(pentagonReport.getScoreQFDataAvailable());
     pb[2].setScore(pentagonReport.getScoreQFDeduplication());
