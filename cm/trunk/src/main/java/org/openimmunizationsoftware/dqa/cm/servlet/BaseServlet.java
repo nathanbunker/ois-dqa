@@ -139,6 +139,7 @@ public abstract class BaseServlet extends HttpServlet
     out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">");
     out.println("<html>");
     out.println("  <head>");
+    out.println("    <meta charset=\"UTF-8\">");
     Application application = (Application) dataSession.get(Application.class, 1);
     if (userSession.getUser() != null && userSession.getUser().getApplicationUser() != null)
     {

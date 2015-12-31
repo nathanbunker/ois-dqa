@@ -65,7 +65,8 @@ public class UCAcksConform extends PentagonBox
       out.println("  <tr class=\"pentagon\">");
       out.println("    <td class=\"pentagon\">" + assertionIdentified.getAssertionCount() + "</td>");
       out.println("    <td class=\"pentagon\"><a class=\"pentagonTestMessageFail\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
-          + assertionIdentified.getTestMessage().getTestMessageId() + "');\">" + assertionField.getAssertionDescription() + "</a></td>");
+          + assertionIdentified.getTestMessage().getTestMessageId() + "', '" + assertionIdentified.getTestMessage().getTestCaseDescription()
+          + "');\">" + assertionField.getAssertionDescription() + "</a></td>");
       out.println("  </tr>");
     }
     out.println("</table>");
