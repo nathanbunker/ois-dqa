@@ -178,35 +178,6 @@ public class PentagonContentServlet extends PentagonServlet
             }
             {
               out.println("<div id=\"boxDetailsImportance\" style=\"display:none; \">");
-              out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
-              printScoreChart(out, pentagonBox.getWeight());
-              out.println("</span>");
-              if (pentagonBox.getWeight() <= 5)
-              {
-                out.println("<p class=\"pentagon\">The " + pentagonBox.getTitle() + " Score has very little impact on the " + pentagonRow.getLabel()
-                    + " Score. This suggests that improvement in this area should take lowest priority. </p>");
-              } else if (pentagonBox.getWeight() <= 10)
-              {
-                out.println("<p class=\"pentagon\">The " + pentagonBox.getTitle() + " Score has some impact on the " + pentagonRow.getLabel()
-                    + " Score. This suggests that improvement in this area should take low priority. </p>");
-              } else if (pentagonBox.getWeight() <= 20)
-              {
-                out.println(
-                    "<p class=\"pentagon\">The " + pentagonBox.getTitle() + " Score does impact the " + pentagonRow.getLabel() + " Score. </p>");
-              } else if (pentagonBox.getWeight() <= 50)
-              {
-                out.println("<p class=\"pentagon\">The " + pentagonBox.getTitle() + " Score greatly impacts the " + pentagonRow.getLabel()
-                    + " Score. Improvement in this area should be given a high priority. </p>");
-              } else
-              {
-                out.println("<p class=\"pentagon\">The " + pentagonBox.getTitle() + " Score is the largest factor in the " + pentagonRow.getLabel()
-                    + " Score. Improvement in this area should be given the highest priority. </p>");
-              }
-              out.println("<p class=\"pentagon\">The following lists shows the improvement potential, or score gap, for each section. "
-                  + "This lists suggests a starting point for priorities. Items with the highest improvement potential should "
-                  + "generally be given more attention and concern over areas with the lowest improvement potential. </p>");
-              out.println("<p class=\"pentagon\"><b>Score Gap</b>: The percentage point improvement possible for the score if "
-                  + "the section were improved to a score of 100%. </p>");
 
               List<PriorityWeight> priorityWeightList = new ArrayList();
               for (PentagonBox pb : pentagonRow)
@@ -230,8 +201,63 @@ public class PentagonContentServlet extends PentagonServlet
                   return 0;
                 }
               });
-              ;
-              out.println("<p class=\"pentagon\"></p>");
+              int position = 0;
+              int scoreGap = 0;
+              for (PriorityWeight pw : priorityWeightList)
+              {
+                position++;
+                if (pw.pentagonBox.getBoxName().equals(pentagonBox.getBoxName()))
+                {
+                  scoreGap = (int) Math.round(pw.importance);
+                  break;
+                }
+              }
+              out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
+              printScoreChart(out, scoreGap);
+              out.println("</span>");
+              String improvementLevel = "<b>No improvement possible:</b> ";
+              if (scoreGap >= 10)
+              {
+                improvementLevel = "<b>Major improvement possible:</b> ";
+              }
+              else if (scoreGap >= 5)
+              {
+                improvementLevel = "<b>Improvement possible:</b> ";
+              }
+              else if (scoreGap > 0)
+              {
+                improvementLevel = "<b>Some improvement possible:</b> ";
+              }
+              if (scoreGap == 0)
+              {
+                out.println("<p class=\"pentagon\">" + improvementLevel +  "No further improvement is possible in this section. </p>");
+              } else if (position == 1)
+              {
+                out.println("<p class=\"pentagon\">" + improvementLevel +  "This section has the biggest potential for a improving the " + pentagonRow.getLabel()
+                    + " Score. If this section were improved to 100% it would raise the entire row score by " + scoreGap + " percentage points.</p>");
+              } else if (position == 2)
+              {
+                out.println("<p class=\"pentagon\">" + improvementLevel +  "This section has the second biggest potential for a improving the " + pentagonRow.getLabel()
+                    + " Score. If this section were improved to 100% it would raise the entire row score by " + scoreGap + " percentage points.</p>");
+              } else if (position == pentagonRow.size())
+              {
+                out.println("<p class=\"pentagon\">" + improvementLevel +  "This section has the lowest potential for a improving the " + pentagonRow.getLabel()
+                    + " Score. If this section were improved to 100% it would only raise the entire row score by " + scoreGap + " percentage points. "
+                    + "It would be best to focus on other areas first. </p>");
+              } else
+              {
+                out.println("<p class=\"pentagon\">" + improvementLevel +  "This section has some potential for a improving the " + pentagonRow.getLabel()
+                    + " Score. If this section were improved to 100% it would raise the entire row score by " + scoreGap
+                    + " percentage points. </p>");
+              }
+              out.println("<p class=\"pentagon\">The following lists shows the improvement potential, or score gap, for each section. "
+                  + "This lists suggests a starting point for priorities. Items with the highest improvement potential should "
+                  + "generally be given more attention and concern over areas with the lowest improvement potential. </p>");
+              out.println("<p class=\"pentagon\"><b>Score Gap</b>: The percentage point improvement possible for the score if "
+                  + "the section were improved to a score of 100%. </p>");
+              out.println("<p class=\"pentagon\"><b>Weight</b>: The total weight this sections score counts towards the final row score. "
+                  + "This value is fixed by the test. </p>");
+
               out.println("<table class=\"pentagon\">");
               out.println("  <tr class=\"pentagon\">");
               out.println("    <th class=\"pentagon\">Score Gap</th>");
@@ -254,6 +280,7 @@ public class PentagonContentServlet extends PentagonServlet
                 out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pw.pentagonBox.getWeight() + "%</td>");
                 out.println("  </tr>");
               }
+
               out.println("</table>");
               out.println("</div>");
             }
@@ -484,21 +511,18 @@ public class PentagonContentServlet extends PentagonServlet
       {
         if (testMessage.getTestType().equals("prep"))
         {
-          out.println(
-              "<p class=\"pentagon\">This test case was accepted. This means testing could proceed normally. </p>");
+          out.println("<p class=\"pentagon\">This test case was accepted. This means testing could proceed normally. </p>");
         } else
         {
           if (testMessage.getTestCaseAssertResult().startsWith("Accept"))
           {
-            out.println(
-                "<p class=\"pentagon\">The IIS appeared to accept this message, just as was expected.</p>");
+            out.println("<p class=\"pentagon\">The IIS appeared to accept this message, just as was expected.</p>");
           } else
           {
             out.println("<p class=\"pentagon\">The IIS did not appear to accept this message, just as expected.. </p>");
           }
         }
-      }
-      else
+      } else
       {
         if (testMessage.getTestType().equals("prep"))
         {
@@ -516,7 +540,7 @@ public class PentagonContentServlet extends PentagonServlet
           }
         }
       }
-        
+
     } else if (testMessage.getTestType().equals("query"))
     {
       out.println("<table class=\"pentagon\">");
