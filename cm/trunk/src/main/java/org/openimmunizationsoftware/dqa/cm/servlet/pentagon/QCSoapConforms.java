@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
@@ -16,10 +17,10 @@ import org.openimmunizationsoftware.dqa.tr.model.TransportAnalysis;
 import org.openimmunizationsoftware.dqa.tr.model.TransportOther;
 import org.openimmunizationsoftware.dqa.tr.model.TransportWsdlCdc;
 
-public class QCSoapConforms extends PentagonBox
+public class QCSoapConforms extends PentagonBoxHelper
 {
-  public QCSoapConforms() {
-    super(BOX_NAME_QC_SOAP_CONFORMS);
+  public QCSoapConforms(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -166,8 +167,14 @@ public class QCSoapConforms extends PentagonBox
         {
           score += 10;
         }
-        pentagonReport.setScoreQCSoapConforms(score);
+        pentagonBox.setReportScore(score);
       }
     }
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    // TODO Auto-generated method stub
+    
   }
 }

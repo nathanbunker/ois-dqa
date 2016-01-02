@@ -3,20 +3,21 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 import java.util.Map;
 
 import org.hibernate.Session;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class UC_Row extends PentagonRow
+public class UC_Row extends PentagonRowHelper
 {
   public UC_Row(PentagonReport pentagonReport) {
-    super("Update Conformance");
-    PentagonBox[] pb = new PentagonBox[4];
+    super(pentagonReport, "Update Conformance", PentagonBox.ROW_NAME_UC);
+    PentagonBoxHelper[] pb = new PentagonBoxHelper[4];
 
-    pb[0] = new UCModifications();
-    pb[1] = new UCConflicts();
-    pb[2] = new UCConstraints();
-    pb[3] = new UCAcksConform();
+    pb[0] = new UCModifications(getOrCreatePentagonBox(30, PentagonBox.BOX_NAME_UC_MODIFICATIONS), this);
+    pb[1] = new UCConflicts(getOrCreatePentagonBox(30, PentagonBox.BOX_NAME_UC_CONFLICTS), this);
+    pb[2] = new UCConstraints(getOrCreatePentagonBox(20, PentagonBox.BOX_NAME_UC_CONSTRAINTS), this);
+    pb[3] = new UCAcksConform(getOrCreatePentagonBox(20, PentagonBox.BOX_NAME_UC_ACKS_CONFORM), this);
 
     pb[0].setTitle("No Modifications");
     pb[1].setTitle("No Conflicts");
@@ -33,16 +34,7 @@ public class UC_Row extends PentagonRow
     pb[2].setWidth(25);
     pb[3].setWidth(25);
 
-    pb[0].setWeight(30);
-    pb[1].setWeight(30);
-    pb[2].setWeight(20);
-    pb[3].setWeight(20);
-
-    pb[0].setScore(pentagonReport.getScoreUCModifications());
-    pb[1].setScore(pentagonReport.getScoreUCConflicts());
-    pb[2].setScore(pentagonReport.getScoreUCConstraints());
-    pb[3].setScore(pentagonReport.getScoreUCAcksConform());
-    for (PentagonBox pentagonBox : pb)
+    for (PentagonBoxHelper pentagonBox : pb)
     {
       this.add(pentagonBox);
     }
@@ -53,12 +45,6 @@ public class UC_Row extends PentagonRow
       Map<String, TestSection> testSectionMap)
   {
     calculateBoxScores(testConducted, dataSession, pentagonReport);
-    int scoreUC = 0;
-    scoreUC = addWeightToScore(scoreUC, this.get(0).getWeight(), pentagonReport.getScoreUCModifications());
-    scoreUC = addWeightToScore(scoreUC, this.get(1).getWeight(), pentagonReport.getScoreUCConflicts());
-    scoreUC = addWeightToScore(scoreUC, this.get(2).getWeight(), pentagonReport.getScoreUCConstraints());
-    scoreUC = addWeightToScore(scoreUC, this.get(3).getWeight(), pentagonReport.getScoreUCAcksConform());
-    pentagonReport.setScoreUC(scoreUC / 100);    
   }
   
 

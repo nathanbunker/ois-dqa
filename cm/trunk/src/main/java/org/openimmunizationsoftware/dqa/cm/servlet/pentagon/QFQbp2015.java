@@ -10,16 +10,17 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class QFQbp2015 extends PentagonBox
+public class QFQbp2015 extends PentagonBoxHelper
 {
 
-  public QFQbp2015() {
-    super(BOX_NAME_QF_QBP2015);
+  public QFQbp2015(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -34,7 +35,7 @@ public class QFQbp2015 extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score < 100)
+    if (pentagonBox.getReportScore() < 100)
     {
       out.println("<h3 class=\"pentagon\">Fail - Match Not Found</h3>");
       Query query = dataSession
@@ -45,7 +46,7 @@ public class QFQbp2015 extends PentagonBox
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFailForQuery(out, testMessageList);
     }
-    if (score > 0)
+    if (pentagonBox.getReportScore() > 0)
     {
       out.println("<h3 class=\"pentagon\">Pass - Match Found</h3>");
       Query query = dataSession
@@ -66,9 +67,6 @@ public class QFQbp2015 extends PentagonBox
         + "based on what data was submitted in the update step. In order to receive a positive score the IIS must both pass the test "
         + "expectation</p>");
     out.println("<p class=\"pentagon\">The score is the percentage of messages that meets this criteria.  </p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">Provide full support for both Z34 and Z44 queries. Ensure that deduplication process is configured to "
-        + "match patients within 15 minutes of being submitted to the IIS. </p>");
     out.println("<p class=\"pentagon\">Note: Some IIS can not return a list of possible matches due to policy reasons. This test set "
         + "does include a scenario where the IIS is expected to return a list of possible matches. IIS who operate under this "
         + "policy restriction will not be able to pass this test. While there are good reasons for an IIS to have such a policy it "
@@ -102,8 +100,14 @@ public class QFQbp2015 extends PentagonBox
 
       if (countTotal > 0)
       {
-        pentagonReport.setScoreQFQbp2015(((int) 100.0 * countPass / countTotal));
+        pentagonBox.setReportScore(((int) 100.0 * countPass / countTotal));
       }
     }
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Provide full support for both Z34 and Z44 queries. Ensure that deduplication process is configured to "
+        + "match patients within 15 minutes of being submitted to the IIS. </p>");
   }
 }

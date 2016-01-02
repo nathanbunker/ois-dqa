@@ -10,15 +10,15 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
-import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class CAckConform extends PentagonBox
+public class CAckConform extends PentagonBoxHelper
 {
-  public CAckConform() {
-    super(BOX_NAME_C_ACK_CONFORM);
+  public CAckConform(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -35,7 +35,7 @@ public class CAckConform extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score >= 100)
+    if (pentagonBox.getReportScore() >= 100)
     {
       out.println("<h3 class=\"pentagon\">Acks Conform</h3>");
     } else
@@ -134,9 +134,6 @@ public class CAckConform extends PentagonBox
         + "against the National Institute of Standards and Technology (NIST) immunization validation service. "
         + "Each message that has has not error conformance identified are included in the passing list. "
         + "The score final score for this section is the percentage of passing divided by the total number of messages.  </p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">Update the IIS ACK message so that it conforms to the CDC Guide. "
-        + "Focus on the errors that appear the most often. Be sure to verify the response messages using the " + "NIST test site. </p>");
   }
 
   @Override
@@ -168,9 +165,16 @@ public class CAckConform extends PentagonBox
       }
       if (countTotal != 0)
       {
-        pentagonReport.setScoreCAckConform(((int) 100.0 * countOk / countTotal));
+        pentagonBox.setReportScore(((int) 100.0 * countOk / countTotal));
       }
     }
 
+  }
+  
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Update the IIS ACK message so that it conforms to the CDC Guide. "
+        + "Focus on the errors that appear the most often. Be sure to verify the response messages using the " + "NIST test site. </p>");
   }
 }

@@ -53,6 +53,7 @@
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/EvaluationField.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Forecast.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ForecastField.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/PentagonBox.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/PentagonReport.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ProfileUsage.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ProfileUsageValue.hbm.xml"/>

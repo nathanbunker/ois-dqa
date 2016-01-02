@@ -26,6 +26,17 @@ public class ProfileUsageValue
   private String linkDetail = "";
   private String linkClarification = "";
   private String linkSupplement = "";
+  private String linkTable = "";
+
+  public String getLinkTable()
+  {
+    return linkTable;
+  }
+
+  public void setLinkTable(String linkTable)
+  {
+    this.linkTable = linkTable;
+  }
 
   public String getLinkDefinition()
   {

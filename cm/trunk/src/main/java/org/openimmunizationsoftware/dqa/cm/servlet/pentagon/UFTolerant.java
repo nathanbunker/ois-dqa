@@ -2,7 +2,6 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -10,16 +9,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
-import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
-import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class UFTolerant extends PentagonBox
+public class UFTolerant extends PentagonBoxHelper
 {
-  public UFTolerant()
-  {
-    super(BOX_NAME_UF_TOLERANT);
+  public UFTolerant(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -36,7 +33,7 @@ public class UFTolerant extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score < 100)
+    if (pentagonBox.getReportScore() < 100)
     {
       out.println("<h3 class=\"pentagon\">Fail - Message Was Not Accepted</h3>");
       Query query = dataSession.createQuery(
@@ -47,7 +44,7 @@ public class UFTolerant extends PentagonBox
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
     }
-    if (score > 0)
+    if (pentagonBox.getReportScore() > 0)
     {
       out.println("<h3 class=\"pentagon\">Pass - Message Was Accepted</h3>");
       Query query = dataSession.createQuery(
@@ -65,17 +62,20 @@ public class UFTolerant extends PentagonBox
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages that returned a postive response from the IIS. </p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">An IIS's primary goal should be to improve the quality of data being submitted. Many of the issues in these test "
-        + "messages are not related to data quality and most IIS should be able to still process them. However, this list is not definitive and there is not "
-        + "agreement with which issues the IIS should be tolerant. For this reason it is expected that IIS will be tolerant to most if not all issues "
-        + "listed here. </p>");
   }
 
   
   @Override
   public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    pentagonReport.setScoreUFTolerant(pentagonReport.getTestConducted().getScoreTolerance());
+    pentagonBox.setReportScore(pentagonReport.getTestConducted().getScoreTolerance());
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">An IIS's primary goal should be to improve the quality of data being submitted. Many of the issues in these test "
+        + "messages are not related to data quality and most IIS should be able to still process them. However, this list is not definitive and there is not "
+        + "agreement with which issues the IIS should be tolerant. For this reason it is expected that IIS will be tolerant to most if not all issues "
+        + "listed here. </p>");
   }
 }

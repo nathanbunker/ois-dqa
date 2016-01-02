@@ -2,54 +2,36 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
-import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
-import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public abstract class PentagonBox
+public abstract class PentagonBoxHelper
 {
-  public static final String BOX_NAME_C_GOOD_MESSAGE = "CGoodMessage";
-  public static final String BOX_NAME_C_GOOD_DATA = "CGoodData";
-  public static final String BOX_NAME_C_BAD_MESSAGE = "CBadMessage";
-  public static final String BOX_NAME_C_BAD_DATA = "CBadData";
-  public static final String BOX_NAME_C_ACK_CONFORM = "CAckConform";
-  public static final String BOX_NAME_QC_SOAP_CONFORMS = "QCSoapConforms";
-  public static final String BOX_NAME_QC_RESPONSES_CONFORM = "QCResponsesConform";
-  public static final String BOX_NAME_QF_QBP2015 = "QFQbp2015";
-  public static final String BOX_NAME_QF_PERFORMANCE = "QFPerformance";
-  public static final String BOX_NAME_QF_MINIMUM_QUERY = "QFMinimumQuery";
-  public static final String BOX_NAME_QF_FORECASTER = "QFForecaster";
-  public static final String BOX_NAME_QF_DEDUPLICATION = "QFDeduplication";
-  public static final String BOX_NAME_QF_DATA_AVAILABLE = "QFDataAvailable";
-  public static final String BOX_NAME_UC_MODIFICATIONS = "UCModifications";
-  public static final String BOX_NAME_UC_CONFLICTS = "UCConflicts";
-  public static final String BOX_NAME_UC_CONSTRAINTS = "UCConstraints";
-  public static final String BOX_NAME_UC_ACKS_CONFORM = "UCAcksConform";
-  public static final String BOX_NAME_UF_VXU2015 = "UFVxu2015";
-  public static final String BOX_NAME_UF_VXU2014 = "UFVxu2014";
-  public static final String BOX_NAME_UF_TOLERANT = "UFTolerant";
-  public static final String BOX_NAME_UF_SENSITIVE = "UFSensitive";
-  public static final String BOX_NAME_UF_PERFORMANCE = "UFPerformance";
-  public static final String BOX_NAME_UF_EHR_EXAMPLES = "UFEhrExamples";
-  public static final String BOX_NAME_UF_CODED_VALUES = "UFCodedValues";
-
-  private String boxName = "";
+  protected PentagonRowHelper pentagonRowHelper = null;
+  protected PentagonBox pentagonBox = null;
   protected String label = "";
   protected String title = "";
-  protected int weight = 0;
   protected int width = 0;
   protected int posX = 0;
   protected int poxY = 0;
   protected int size = 0;
-  protected int score = 0;
+
+  public PentagonRowHelper getPentagonRowHelper()
+  {
+    return pentagonRowHelper;
+  }
+  
+  public PentagonBox getPentagonBox()
+  {
+    return pentagonBox;
+  }
 
   public int getWidth()
   {
@@ -61,28 +43,19 @@ public abstract class PentagonBox
     this.width = width;
   }
 
-  public PentagonBox(String boxName) {
-    this.boxName = boxName;
+  public PentagonBoxHelper(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    this.pentagonBox = pentagonBox;
+    this.pentagonRowHelper = pentagonRowHelper;
   }
 
   public String getBoxName()
   {
-    return boxName;
-  }
-
-  public void setBoxName(String boxName)
-  {
-    this.boxName = boxName;
+    return pentagonBox.getBoxName();
   }
 
   public int getScore()
   {
-    return score;
-  }
-
-  public void setScore(int score)
-  {
-    this.score = score;
+    return pentagonBox.getReportScore();
   }
 
   public String getTitle()
@@ -127,12 +100,7 @@ public abstract class PentagonBox
 
   public int getWeight()
   {
-    return weight;
-  }
-
-  public void setWeight(int weight)
-  {
-    this.weight = weight;
+    return pentagonBox.getReportWeight();
   }
 
   public String getLabel()
@@ -154,6 +122,10 @@ public abstract class PentagonBox
   public abstract void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession);
 
+  public abstract void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+      UserSession userSession);
+
+  
   public abstract void calculateScore(Session dataSession, PentagonReport pentagonReport);
 
   public void printTestMessageListFail(PrintWriter out, List<TestMessage> testMessageList)

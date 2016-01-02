@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="PentagonBox" table="pentagon_box">
+    <id name="pentgonBoxId" column="pentagon_box_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="pentagonReport" column="pentagon_report_id" class="PentagonReport"/>
+    <property name="boxRow" column="box_row" type="string"/>
+    <property name="boxName" column="box_name" type="string"/>
+    <property name="reportWeight" column="report_weight" type="int"/>
+    <property name="reportScore" column="report_score" type="int"/>
+    <property name="reportScoreGap" column="report_score_gap" type="int"/>
+    <property name="priorityRow" column="priority_row" type="int"/>
+    <property name="priorityOverall" column="priority_overall" type="int"/>
+  </class>
+</hibernate-mapping>

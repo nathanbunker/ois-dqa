@@ -16,15 +16,16 @@ import org.openimmunizationsoftware.dqa.tr.logic.ConformanceCount;
 import org.openimmunizationsoftware.dqa.tr.logic.PentagonReportLogic;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionIdentified;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class UCAcksConform extends PentagonBox
+public class UCAcksConform extends PentagonBoxHelper
 {
-  public UCAcksConform() {
-    super(BOX_NAME_UC_ACKS_CONFORM);
+  public UCAcksConform(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -39,7 +40,7 @@ public class UCAcksConform extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score >= 100)
+    if (pentagonBox.getReportScore() >= 100)
     {
       out.println("<h3 class=\"pentagon\">All Acks Conform</h3>");
     } else
@@ -170,9 +171,6 @@ public class UCAcksConform extends PentagonBox
     out.println("<h4 class=\"pentagon\">Step 3: Final Score</h4>");
     out.println("<p class=\"pentagon\">This process yields a score of " + formatter1.format(scoreDouble)
         + "% which is rounded down to the nearest whole number for a final score of " + ((int) scoreDouble) + "%.</p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">Update the IIS ACK message so that it conforms to the CDC Guide. "
-        + "Focus on the errors that appear the most often. Be sure to verify the response messages using the " + "NIST test site. </p>");
   }
 
   @Override
@@ -187,7 +185,7 @@ public class UCAcksConform extends PentagonBox
     }
   }
 
-  public static void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, String testType)
+  public void calculateScore(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport, String testType)
   {
     ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(pentagonReport, dataSession, testType);
     if (conformanceCount.getCountTotal() > 0)
@@ -210,13 +208,14 @@ public class UCAcksConform extends PentagonBox
         double deduction = percentage * 0.2 * scoreDouble;
         scoreDouble = scoreDouble - deduction;
       }
-      if (testType.equals("update"))
-      {
-        pentagonReport.setScoreUCAcksConform(((int) scoreDouble));
-      } else
-      {
-        pentagonReport.setScoreQCResponsesConform(((int) scoreDouble));
-      }
+      pentagonBox.setReportScore(((int) scoreDouble));
     }
+  }
+
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Update the IIS ACK message so that it conforms to the CDC Guide. "
+        + "Focus on the errors that appear the most often. Be sure to verify the response messages using the NIST test site. </p>");
   }
 }

@@ -3,18 +3,19 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 import java.util.Map;
 
 import org.hibernate.Session;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class QC_Row extends PentagonRow
+public class QC_Row extends PentagonRowHelper
 {
   public QC_Row(PentagonReport pentagonReport) {
-    super("Query Conformance");
-    PentagonBox[] pb = new PentagonBox[2];
+    super(pentagonReport, "Query Conformance", PentagonBox.ROW_NAME_QC);
+    PentagonBoxHelper[] pb = new PentagonBoxHelper[2];
 
-    pb[0] = new QCResponsesConform();
-    pb[1] = new QCSoapConforms();
+    pb[0] = new QCResponsesConform(getOrCreatePentagonBox(60, PentagonBox.BOX_NAME_QC_RESPONSES_CONFORM), this);
+    pb[1] = new QCSoapConforms(getOrCreatePentagonBox(40, PentagonBox.BOX_NAME_QC_SOAP_CONFORMS), this);
 
     pb[0].setTitle("Responses Conform");
     pb[1].setTitle("CDC WSDL Conforms");
@@ -25,12 +26,7 @@ public class QC_Row extends PentagonRow
     pb[0].setWidth(50);
     pb[1].setWidth(50);
 
-    pb[0].setWeight(60);
-    pb[1].setWeight(40);
-
-    pb[0].setScore(pentagonReport.getScoreQCResponsesConform());
-    pb[1].setScore(pentagonReport.getScoreQCSoapConforms());
-    for (PentagonBox pentagonBox : pb)
+    for (PentagonBoxHelper pentagonBox : pb)
     {
       this.add(pentagonBox);
     }
@@ -41,10 +37,6 @@ public class QC_Row extends PentagonRow
       Map<String, TestSection> testSectionMap)
   {
     calculateBoxScores(testConducted, dataSession, pentagonReport);
-    int scoreQC = 0;
-    scoreQC = addWeightToScore(scoreQC, this.get(0).getWeight(), pentagonReport.getScoreQCResponsesConform());
-    scoreQC = addWeightToScore(scoreQC, this.get(1).getWeight(), pentagonReport.getScoreQCSoapConforms());
-    pentagonReport.setScoreQC(scoreQC / 100);
   }
   
 

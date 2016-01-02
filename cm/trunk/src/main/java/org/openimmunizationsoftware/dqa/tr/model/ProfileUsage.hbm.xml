@@ -8,5 +8,6 @@
     <property name="categoryString" column="category" type="string"/>
     <property name="label" column="label" type="string"/>
     <property name="version" column="version" type="string"/>
+    <property name="linkGuide" column="link_guide" type="string"/>
   </class>
 </hibernate-mapping>

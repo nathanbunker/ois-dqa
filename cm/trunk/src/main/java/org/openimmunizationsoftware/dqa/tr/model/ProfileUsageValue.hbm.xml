@@ -22,5 +22,6 @@
     <property name="linkDetail" column="link_detail" type="string"/>
     <property name="linkClarification" column="link_clarification" type="string"/>
     <property name="linkSupplement" column="link_supplement" type="string"/>
+    <property name="linkTable" column="link_table" type="string"/>
   </class>
 </hibernate-mapping>

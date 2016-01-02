@@ -17,18 +17,17 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonBox;
-import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonRow;
+import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonBoxHelper;
+import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonRowHelper;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.logic.PentagonReportLogic;
 import org.openimmunizationsoftware.dqa.tr.model.Assertion;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
-
-import com.mchange.v1.util.ArrayUtils;
 
 public class PentagonContentServlet extends PentagonServlet
 {
@@ -62,19 +61,35 @@ public class PentagonContentServlet extends PentagonServlet
     String boxName = req.getParameter(PARAM_BOX_NAME);
     if (boxName != null)
     {
-      if (boxName.equals(BOX_NAME_REPORT_SELECT))
+      if (boxName.equals(BOX_NAME_HOW_TO_READ))
       {
+        out.println("<p class=\"pentagon\">Need to explain the following concepts here:</p>");
+        out.println("<ul class=\"pentagon\">");
+        out.println("  <li class=\"pentagon\">Test Message</li>");
+        out.println("  <li class=\"pentagon\">Report Box/Section</li>");
+        out.println("  <li class=\"pentagon\">Report Row/Area</li>");
+        out.println("</ul>");
+      }
+      else if (boxName.equals(BOX_NAME_REPORT_SELECT))
+      {
+        out.println("<div id=\"boxDetailsCalculation\">");
+        out.println("<p class=\"pentagon\">Todo</p>");
+        out.println("</div>");
         {
+          out.println("<div id=\"boxDetailsHistory\">");
           List<TestConducted> testConductedList = getTestConductedList(dataSession, testConducted);
           printReportsRun(dataSession, out, testConductedList);
+          out.println("</div>");
         }
-        out.println("<h3 class=\"pentagon\">Other IIS Reports</h3>");
         {
+          out.println("<div id=\"boxDetailsComparison\">");
           List<TestConducted> testConductedList = getOtherIISTestReports(dataSession);
           printReportsRun(dataSession, out, testConductedList);
+          out.println("</div>");
         }
-      } else if (boxName.equals(BOX_NAME_TEST_SECTIONS))
-      {
+
+        out.println("<div id=\"boxDetailsOverview\">");
+
         String selector = req.getParameter(PARAM_SELECTOR);
         if (selector == null || selector.equals(""))
         {
@@ -109,7 +124,7 @@ public class PentagonContentServlet extends PentagonServlet
               continue;
             }
             out.println("  <tr class=\"pentagon\">");
-            out.println("    <td class=\"pentagon\"><a href=\"javascript: void;\"  onClick=\"loadBoxContents('" + BOX_NAME_TEST_SECTIONS + "', '"
+            out.println("    <td class=\"pentagon\"><a href=\"javascript: void;\" onClick=\"loadBoxContents('" + BOX_NAME_REPORT_SELECT + "', '"
                 + testSection.getTestSectionId() + "')\">" + testSection.getTestSectionType() + "</a></td>");
             out.println("    <td class=\"pentagon\">" + testSection.getCountLevel1() + "</td>");
             out.println("    <td class=\"pentagon\">" + testSection.getCountLevel2() + "</td>");
@@ -126,38 +141,112 @@ public class PentagonContentServlet extends PentagonServlet
             Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'update' order by testCaseCategory");
             query.setParameter(0, testSection);
             List<TestMessage> testMessageList = query.list();
-            PentagonBox.printTestMessageListPass(out, testMessageList);
+            PentagonBoxHelper.printTestMessageListPass(out, testMessageList);
           }
           {
             out.println("<h3 class=\"pentagon\">Queries</h2>");
             Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'query' order by testCaseCategory");
             query.setParameter(0, testSection);
             List<TestMessage> testMessageList = query.list();
-            PentagonBox.printTestMessageListPass(out, testMessageList);
+            PentagonBoxHelper.printTestMessageListPass(out, testMessageList);
           }
         }
+        out.println("</div>");
+
+        {
+          out.println("<div id=\"boxDetailsImprove\">");
+          PentagonReport pentagonReport = PentagonReportLogic.createOrReturnPentagonReport(testConducted, dataSession);
+          List<PentagonRowHelper> pentagonRowList = new ArrayList<PentagonRowHelper>();
+          pentagonRowList.add(PentagonRowHelper.createConfidenceRow(pentagonReport));
+          pentagonRowList.add(PentagonRowHelper.createUpdateFunctionalityRow(pentagonReport));
+          pentagonRowList.add(PentagonRowHelper.createUpdateConformanceRow(pentagonReport));
+          pentagonRowList.add(PentagonRowHelper.createQueryFunctionalityRow(pentagonReport));
+          pentagonRowList.add(PentagonRowHelper.createQueryConformanceRow(pentagonReport));
+
+          List<PentagonBoxHelper> pbSorted = new ArrayList<PentagonBoxHelper>();
+          for (PentagonRowHelper pentagonRowHelper : pentagonRowList)
+          {
+            for (PentagonBoxHelper pentagonBoxHelper : pentagonRowHelper)
+            {
+              if (pentagonBoxHelper.getPentagonBox().getPriorityOverall() > 0)
+              {
+                pbSorted.add(pentagonBoxHelper);
+              }
+            }
+          }
+          Collections.sort(pbSorted, new OverallComparator());
+          out.println("<p class=\"pentagon\">This report has been designed for analysis purposes, but can be used to "
+              + "help understand improvemments that could be made to impove both the IIS interface. "
+              + "In this way this report can be used now to drive improvements in the IIS. "
+              + "Below is a prioritization of issues based on the weight of each measurement in the report. "
+              + "This prioritization is given as only a suggestion and a starting point for improving the IIS HL7 interface. </p>");
+
+          for (PentagonBoxHelper pb : pbSorted)
+          {
+            if (pb.getPentagonBox().getPriorityRow() == 1)
+            {
+              out.println("<h3 class=\"pentagon\">#" + pb.getPentagonBox().getPriorityOverall() + " " + pb.getPentagonRowHelper().getLabel() + ": "
+                  + pb.getTitle() + "</h3>");
+              out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
+              printScoreChart(out, pb.getScore());
+              out.println("</span>");
+              out.println("<p class=\"pentagon\"><b>Section Score:</b> " + pb.getScore() + "%</p>");
+              pb.printImprove(out, dataSession, pentagonReport, webSession, userSession);
+              String improvementLevel = getImprovementLevelText(pb.getPentagonBox().getReportScoreGap());
+              out.println("<p class=\"pentagon\"><b>Score Gap:</b> " + +pb.getPentagonBox().getReportScoreGap() + "%</p>");
+              out.println("<p class=\"pentagon\">" + improvementLevel + " The score gap indicates how much improvement could be made to "
+                  + "the row score if the Section Score were improved to 100%. </p>");
+              out.println("<p class=\"pentagon\"><a class=\"pentagonMenuLink\" href=\"javascript: void(0);\" onClick=\"loadBoxContents('"
+                  + pb.getPentagonRowHelper().getLabel() + ": " + pb.getTitle() + "', '" + pb.getBoxName()
+                  + "', '', true)\">See Section Details</a></p>");
+            }
+          }
+
+          out.println("<h3 class=\"pentagon\">Complete Priority Listing</h3>");
+          out.println("<table class=\"pentagon\">");
+          out.println("  <tr class=\"pentagon\">");
+          out.println("    <th class=\"pentagon\">Priority</th>");
+          out.println("    <th class=\"pentagon\">Score Gap</th>");
+          out.println("    <th class=\"pentagon\">Section</th>");
+          out.println("    <th class=\"pentagon\">Weight</th>");
+          out.println("  </tr>");
+          for (PentagonBoxHelper pb : pbSorted)
+          {
+            String styleClass = "pentagon";
+            out.println("  <tr class=\"pentagon\">");
+            out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pb.getPentagonBox().getPriorityOverall() + "</td>");
+            out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pb.getPentagonBox().getReportScoreGap() + "%</td>");
+            out.println("    <td class=\"" + styleClass + "\"><a class=\"pentagonMenuLink\" href=\"javascript: void(0);\" onClick=\"loadBoxContents('"
+                + pb.getPentagonRowHelper().getLabel() + ": " + pb.getTitle() + "', '" + pb.getBoxName() + "', '', true)\">"
+                + pb.getPentagonRowHelper().getLabel() + ": " + pb.getTitle() + "</a></td>");
+            out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pb.getPentagonBox().getReportWeight() + "%</td>");
+            out.println("  </tr>");
+          }
+          out.println("</div>");
+        }
+
       } else
       {
         PentagonReport pentagonReport = PentagonReportLogic.createOrReturnPentagonReport(testConducted, dataSession);
-        List<PentagonRow> pentagonRowList = new ArrayList<PentagonRow>();
-        pentagonRowList.add(PentagonRow.createConfidenceRow(pentagonReport));
-        pentagonRowList.add(PentagonRow.createUpdateFunctionalityRow(pentagonReport));
-        pentagonRowList.add(PentagonRow.createUpdateConformanceRow(pentagonReport));
-        pentagonRowList.add(PentagonRow.createQueryFunctionalityRow(pentagonReport));
-        pentagonRowList.add(PentagonRow.createQueryConformanceRow(pentagonReport));
+        List<PentagonRowHelper> pentagonRowList = new ArrayList<PentagonRowHelper>();
+        pentagonRowList.add(PentagonRowHelper.createConfidenceRow(pentagonReport));
+        pentagonRowList.add(PentagonRowHelper.createUpdateFunctionalityRow(pentagonReport));
+        pentagonRowList.add(PentagonRowHelper.createUpdateConformanceRow(pentagonReport));
+        pentagonRowList.add(PentagonRowHelper.createQueryFunctionalityRow(pentagonReport));
+        pentagonRowList.add(PentagonRowHelper.createQueryConformanceRow(pentagonReport));
 
-        PentagonRow pentagonRow = null;
-        PentagonBox pentagonBox = null;
-        for (PentagonRow pr : pentagonRowList)
+        PentagonRowHelper pentagonRowHelper = null;
+        PentagonBoxHelper pentagonBoxHelper = null;
+        for (PentagonRowHelper pr : pentagonRowList)
         {
-          pentagonBox = pr.getPentagonBox(boxName);
-          if (pentagonBox != null)
+          pentagonBoxHelper = pr.getPentagonBox(boxName);
+          if (pentagonBoxHelper != null)
           {
-            pentagonRow = pr;
+            pentagonRowHelper = pr;
             break;
           }
         }
-        if (pentagonBox != null)
+        if (pentagonBoxHelper != null)
         {
           try
           {
@@ -165,90 +254,53 @@ public class PentagonContentServlet extends PentagonServlet
             {
               out.println("<div id=\"boxDetailsOverview\">");
               out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
-              printScoreChart(out, pentagonBox.getScore());
+              printScoreChart(out, pentagonBoxHelper.getScore());
               out.println("</span>");
-              pentagonBox.printDescription(out, dataSession, pentagonReport, webSession, userSession);
-              pentagonBox.printContents(out, dataSession, pentagonReport, webSession, userSession);
+              pentagonBoxHelper.printDescription(out, dataSession, pentagonReport, webSession, userSession);
+              pentagonBoxHelper.printContents(out, dataSession, pentagonReport, webSession, userSession);
               out.println("</div>");
             }
             {
               out.println("<div id=\"boxDetailsCalculation\" style=\"display:none; \">");
-              pentagonBox.printScoreExplanation(out, dataSession, pentagonReport, webSession, userSession);
+              pentagonBoxHelper.printScoreExplanation(out, dataSession, pentagonReport, webSession, userSession);
               out.println("</div>");
             }
             {
-              out.println("<div id=\"boxDetailsImportance\" style=\"display:none; \">");
+              out.println("<div id=\"boxDetailsImprove\" style=\"display:none; \">");
 
-              List<PriorityWeight> priorityWeightList = new ArrayList();
-              for (PentagonBox pb : pentagonRow)
-              {
-                PriorityWeight priorityWeight = new PriorityWeight();
-                priorityWeight.importance = (pb.getWeight() / 100.0) * (100.0 - pb.getScore());
-                priorityWeight.pentagonBox = pb;
-                priorityWeightList.add(priorityWeight);
-              }
-              Collections.sort(priorityWeightList, new Comparator<PriorityWeight>() {
-                @Override
-                public int compare(PriorityWeight o1, PriorityWeight o2)
-                {
-                  if (o1.importance > o2.importance)
-                  {
-                    return -1;
-                  } else if (o1.importance < o2.importance)
-                  {
-                    return 1;
-                  }
-                  return 0;
-                }
-              });
-              int position = 0;
-              int scoreGap = 0;
-              for (PriorityWeight pw : priorityWeightList)
-              {
-                position++;
-                if (pw.pentagonBox.getBoxName().equals(pentagonBox.getBoxName()))
-                {
-                  scoreGap = (int) Math.round(pw.importance);
-                  break;
-                }
-              }
+              int scoreGap = pentagonBoxHelper.getPentagonBox().getReportScoreGap();
+              int position = pentagonBoxHelper.getPentagonBox().getPriorityRow();
               out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
               printScoreChart(out, scoreGap);
               out.println("</span>");
-              String improvementLevel = "<b>No improvement possible:</b> ";
-              if (scoreGap >= 10)
-              {
-                improvementLevel = "<b>Major improvement possible:</b> ";
-              }
-              else if (scoreGap >= 5)
-              {
-                improvementLevel = "<b>Improvement possible:</b> ";
-              }
-              else if (scoreGap > 0)
-              {
-                improvementLevel = "<b>Some improvement possible:</b> ";
-              }
+              String improvementLevel = getImprovementLevelText(scoreGap);
               if (scoreGap == 0)
               {
-                out.println("<p class=\"pentagon\">" + improvementLevel +  "No further improvement is possible in this section. </p>");
-              } else if (position == 1)
-              {
-                out.println("<p class=\"pentagon\">" + improvementLevel +  "This section has the biggest potential for a improving the " + pentagonRow.getLabel()
-                    + " Score. If this section were improved to 100% it would raise the entire row score by " + scoreGap + " percentage points.</p>");
-              } else if (position == 2)
-              {
-                out.println("<p class=\"pentagon\">" + improvementLevel +  "This section has the second biggest potential for a improving the " + pentagonRow.getLabel()
-                    + " Score. If this section were improved to 100% it would raise the entire row score by " + scoreGap + " percentage points.</p>");
-              } else if (position == pentagonRow.size())
-              {
-                out.println("<p class=\"pentagon\">" + improvementLevel +  "This section has the lowest potential for a improving the " + pentagonRow.getLabel()
-                    + " Score. If this section were improved to 100% it would only raise the entire row score by " + scoreGap + " percentage points. "
-                    + "It would be best to focus on other areas first. </p>");
+                out.println("<p class=\"pentagon\">" + improvementLevel + "No further improvement is possible in this section. </p>");
               } else
               {
-                out.println("<p class=\"pentagon\">" + improvementLevel +  "This section has some potential for a improving the " + pentagonRow.getLabel()
-                    + " Score. If this section were improved to 100% it would raise the entire row score by " + scoreGap
-                    + " percentage points. </p>");
+                if (position == 1)
+                {
+                  out.println("<p class=\"pentagon\">" + improvementLevel + "This section has the biggest potential for a improving the "
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to 100% it would raise the entire row score by "
+                      + scoreGap + " percentage points.</p>");
+                } else if (position == 2)
+                {
+                  out.println("<p class=\"pentagon\">" + improvementLevel + "This section has the second biggest potential for a improving the "
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to 100% it would raise the entire row score by "
+                      + scoreGap + " percentage points.</p>");
+                } else if (position == pentagonRowHelper.size())
+                {
+                  out.println("<p class=\"pentagon\">" + improvementLevel + "This section has the lowest potential for a improving the "
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to 100% it would only raise the entire row score by "
+                      + scoreGap + " percentage points. " + "It would be best to focus on other areas first. </p>");
+                } else
+                {
+                  out.println("<p class=\"pentagon\">" + improvementLevel + "This section has some potential for a improving the "
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to 100% it would raise the entire row score by "
+                      + scoreGap + " percentage points. </p>");
+                }
+                pentagonBoxHelper.printImprove(out, dataSession, pentagonReport, webSession, userSession);
               }
               out.println("<p class=\"pentagon\">The following lists shows the improvement potential, or score gap, for each section. "
                   + "This lists suggests a starting point for priorities. Items with the highest improvement potential should "
@@ -260,14 +312,17 @@ public class PentagonContentServlet extends PentagonServlet
 
               out.println("<table class=\"pentagon\">");
               out.println("  <tr class=\"pentagon\">");
+              out.println("    <th class=\"pentagon\">Priority</th>");
               out.println("    <th class=\"pentagon\">Score Gap</th>");
               out.println("    <th class=\"pentagon\">Section</th>");
               out.println("    <th class=\"pentagon\">Weight</th>");
               out.println("  </tr>");
-              for (PriorityWeight pw : priorityWeightList)
+              List<PentagonBoxHelper> pbSorted = new ArrayList<PentagonBoxHelper>(pentagonRowHelper);
+              Collections.sort(pbSorted, new WeightComparator());
+              for (PentagonBoxHelper pb : pbSorted)
               {
                 String styleClass = "pentagonSelected";
-                if (pw.pentagonBox.getBoxName().equals(pentagonBox.getBoxName()))
+                if (pb.getPentagonBox().getBoxName().equals(pentagonBoxHelper.getBoxName()))
                 {
                   styleClass = "pentagonSelected";
                 } else
@@ -275,9 +330,12 @@ public class PentagonContentServlet extends PentagonServlet
                   styleClass = "pentagon";
                 }
                 out.println("  <tr class=\"pentagon\">");
-                out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + Math.round(pw.importance) + "%</td>");
-                out.println("    <td class=\"" + styleClass + "\">" + pw.pentagonBox.getTitle() + "</td>");
-                out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pw.pentagonBox.getWeight() + "%</td>");
+                out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pb.getPentagonBox().getPriorityRow() + "</td>");
+                out.println(
+                    "    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pb.getPentagonBox().getReportScoreGap() + "%</td>");
+                out.println("    <td class=\"" + styleClass + "\"><a class=\"pentagonMenuLink\" href=\"javascript: void(0);\" onClick=\"loadBoxContents('"
+                + pb.getPentagonRowHelper().getLabel() + ": " + pb.getTitle() + "', '" + pb.getBoxName() + "', '', true)\">" + pb.getTitle() + "</a></td>");
+                out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pb.getPentagonBox().getReportWeight() + "%</td>");
                 out.println("  </tr>");
               }
 
@@ -301,7 +359,7 @@ public class PentagonContentServlet extends PentagonServlet
                   PentagonReport pentagonReportDisplay = PentagonReportLogic.createOrReturnPentagonReport(testConductedDisplay, dataSession);
                   String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId();
                   out.println("  <tr class=\"pentagon\">");
-                  out.println("    <td class=\"pentagon\">" + pentagonReportDisplay.getScore(pentagonBox.getBoxName()) + "</td>");
+                  out.println("    <td class=\"pentagon\">" + pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) + "</td>");
                   out.println(
                       "    <td class=\"pentagon\"><a href=\"" + link + "\">" + sdf.format(testConductedDisplay.getTestStartedTime()) + "</a></td>");
                   out.println("  </tr>");
@@ -324,7 +382,7 @@ public class PentagonContentServlet extends PentagonServlet
               {
                 out.println("  <tr class=\"pentagon\">");
                 PentagonReport pentagonReportDisplay = PentagonReportLogic.createOrReturnPentagonReport(testConductedDisplay, dataSession);
-                out.println("    <td class=\"pentagon\">" + pentagonReportDisplay.getScore(pentagonBox.getBoxName()) + "%</td>");
+                out.println("    <td class=\"pentagon\">" + pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) + "%</td>");
                 {
                   String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId() + "&" + PARAM_CONNECTION_LABEL
                       + "=" + URLEncoder.encode(testConductedDisplay.getConnectionLabel(), "UTF-8");
@@ -377,6 +435,22 @@ public class PentagonContentServlet extends PentagonServlet
       printTestMessage(dataSession, out, profileUsage, testMessage);
     }
     out.close();
+  }
+
+  public String getImprovementLevelText(int scoreGap)
+  {
+    String improvementLevel = "<b>No improvement possible:</b> ";
+    if (scoreGap >= 10)
+    {
+      improvementLevel = "<b>Major improvement possible:</b> ";
+    } else if (scoreGap >= 5)
+    {
+      improvementLevel = "<b>Improvement possible:</b> ";
+    } else if (scoreGap > 0)
+    {
+      improvementLevel = "<b>Some improvement possible:</b> ";
+    }
+    return improvementLevel;
   }
 
   public List<TestConducted> getOtherIISTestReports(Session dataSession)
@@ -783,10 +857,36 @@ public class PentagonContentServlet extends PentagonServlet
     out.println("</div>");
   }
 
-  private class PriorityWeight
+  private static final class WeightComparator implements Comparator<PentagonBoxHelper>
   {
-    double importance = 0;
-    PentagonBox pentagonBox = null;
+    @Override
+    public int compare(PentagonBoxHelper pbh1, PentagonBoxHelper pbh2)
+    {
+      if (pbh1.getPentagonBox().getPriorityRow() > pbh2.getPentagonBox().getPriorityRow())
+      {
+        return 1;
+      } else if (pbh1.getPentagonBox().getPriorityRow() < pbh2.getPentagonBox().getPriorityRow())
+      {
+        return -11;
+      }
+      return 0;
+    }
+  }
+
+  private static final class OverallComparator implements Comparator<PentagonBoxHelper>
+  {
+    @Override
+    public int compare(PentagonBoxHelper pbh1, PentagonBoxHelper pbh2)
+    {
+      if (pbh1.getPentagonBox().getPriorityOverall() > pbh2.getPentagonBox().getPriorityOverall())
+      {
+        return 1;
+      } else if (pbh1.getPentagonBox().getPriorityOverall() < pbh2.getPentagonBox().getPriorityOverall())
+      {
+        return -11;
+      }
+      return 0;
+    }
   }
 
 }

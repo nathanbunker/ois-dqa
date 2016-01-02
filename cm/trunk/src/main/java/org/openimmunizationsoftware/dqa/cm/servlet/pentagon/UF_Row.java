@@ -3,25 +3,26 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 import java.util.Map;
 
 import org.hibernate.Session;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class UF_Row extends PentagonRow
+public class UF_Row extends PentagonRowHelper
 {
   
   public UF_Row(PentagonReport pentagonReport)
   {
-    super("Update Functionality");
-    PentagonBox[] pb = new PentagonBox[7];
+    super(pentagonReport, "Update Functionality", PentagonBox.ROW_NAME_UF);
+    PentagonBoxHelper[] pb = new PentagonBoxHelper[7];
 
-    pb[0] = new UFVxu2014();
-    pb[1] = new UFVxu2015();
-    pb[2] = new UFSensitive();
-    pb[3] = new UFCodedValues();
-    pb[4] = new UFTolerant();
-    pb[5] = new UFEhrExamples();
-    pb[6] = new UFPerformance();
+    pb[0] = new UFVxu2014(getOrCreatePentagonBox(35, PentagonBox.BOX_NAME_UF_VXU2014), this);
+    pb[1] = new UFVxu2015(getOrCreatePentagonBox(25, PentagonBox.BOX_NAME_UF_VXU2015), this);
+    pb[2] = new UFSensitive(getOrCreatePentagonBox(12, PentagonBox.BOX_NAME_UF_SENSITIVE), this);
+    pb[3] = new UFCodedValues(getOrCreatePentagonBox(10, PentagonBox.BOX_NAME_UF_CODED_VALUES), this);
+    pb[4] = new UFTolerant(getOrCreatePentagonBox(8, PentagonBox.BOX_NAME_UF_TOLERANT), this);
+    pb[5] = new UFEhrExamples(getOrCreatePentagonBox(5, PentagonBox.BOX_NAME_UF_EHR_EXAMPLES), this);
+    pb[6] = new UFPerformance(getOrCreatePentagonBox(5, PentagonBox.BOX_NAME_UF_PERFORMANCE), this);
 
     pb[0].setTitle("NIST 2014 VXU Accepted");
     pb[1].setTitle("NIST 2015 VXU Accepted");
@@ -47,23 +48,7 @@ public class UF_Row extends PentagonRow
     pb[5].setWidth(14);
     pb[6].setWidth(14);
     
-    pb[0].setWeight(35);
-    pb[1].setWeight(25);
-    pb[2].setWeight(12);
-    pb[3].setWeight(10);
-    pb[4].setWeight(8);
-    pb[5].setWeight(5);
-    pb[6].setWeight(5);
-
-    pb[0].setScore(pentagonReport.getScoreUFVxu2014());
-    pb[1].setScore(pentagonReport.getScoreUFVxu2015());
-    pb[2].setScore(pentagonReport.getScoreUFSensitive());
-    pb[3].setScore(pentagonReport.getScoreUFCodedValues());
-    pb[4].setScore(pentagonReport.getScoreUFTolerant());
-    pb[5].setScore(pentagonReport.getScoreUFEhrExamples());
-    pb[6].setScore(pentagonReport.getScoreUFPerformance());
-    
-    for (PentagonBox pentagonBox : pb)
+    for (PentagonBoxHelper pentagonBox : pb)
     {
       this.add(pentagonBox);
     }
@@ -73,16 +58,7 @@ public class UF_Row extends PentagonRow
   public void calculateScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap)
   {
-    calculateBoxScores(testConducted, dataSession, pentagonReport);
-    int scoreUF = 0;
-    scoreUF = addWeightToScore(scoreUF, this.get(0).getWeight(), pentagonReport.getScoreUFVxu2014());
-    scoreUF = addWeightToScore(scoreUF, this.get(1).getWeight(), pentagonReport.getScoreUFVxu2015());
-    scoreUF = addWeightToScore(scoreUF, this.get(2).getWeight(), pentagonReport.getScoreUFSensitive());
-    scoreUF = addWeightToScore(scoreUF, this.get(3).getWeight(), pentagonReport.getScoreUFCodedValues());
-    scoreUF = addWeightToScore(scoreUF, this.get(4).getWeight(), pentagonReport.getScoreUFTolerant());
-    scoreUF = addWeightToScore(scoreUF, this.get(5).getWeight(), pentagonReport.getScoreUFEhrExamples());
-    scoreUF = addWeightToScore(scoreUF, this.get(6).getWeight(), pentagonReport.getScoreUFPerformance());
-    pentagonReport.setScoreUF(scoreUF / 100);    
+    calculateBoxScores(testConducted, dataSession, pentagonReport);   
   }
   
 

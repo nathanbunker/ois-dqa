@@ -12,7 +12,18 @@ public class ProfileUsage
   private ProfileCategory category = null;
   private String label = "";
   private String version = "";
+  private String linkGuide = "";
   
+  public String getLinkGuide()
+  {
+    return linkGuide;
+  }
+
+  public void setLinkGuide(String linkGuide)
+  {
+    this.linkGuide = linkGuide;
+  }
+
   public static ProfileUsage getBaseProfileUsage(Session dataSession)
   {
     ProfileUsage baseProfileUsage = null;

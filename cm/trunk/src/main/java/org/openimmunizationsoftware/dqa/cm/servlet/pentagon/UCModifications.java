@@ -10,15 +10,16 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.TestReportServlet;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
-public class UCModifications extends PentagonBox
+public class UCModifications extends PentagonBoxHelper
 {
-  public UCModifications() {
-    super(BOX_NAME_UC_MODIFICATIONS);
+  public UCModifications(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -121,6 +122,12 @@ public class UCModifications extends PentagonBox
     {
       totalScore += 15;
     }
-    pentagonReport.setScoreUCModifications(totalScore);
+    pentagonBox.setReportScore(totalScore);
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    // TODO Auto-generated method stub
+    
   }
 }

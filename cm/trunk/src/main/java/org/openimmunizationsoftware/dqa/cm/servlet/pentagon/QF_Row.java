@@ -3,21 +3,22 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 import java.util.Map;
 
 import org.hibernate.Session;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class QF_Row extends PentagonRow
+public class QF_Row extends PentagonRowHelper
 {
   public QF_Row(PentagonReport pentagonReport) {
-    super("Query Functionality");
-    PentagonBox[] pb = new PentagonBox[5];
+    super(pentagonReport, "Query Functionality", PentagonBox.ROW_NAME_QF);
+    PentagonBoxHelper[] pb = new PentagonBoxHelper[5];
 
-    pb[0] = new QFQbp2015();
-    pb[1] = new QFDataAvailable();
-    pb[2] = new QFDeduplication();
-    pb[3] = new QFForecaster();
-    pb[4] = new QFPerformance();
+    pb[0] = new QFQbp2015(getOrCreatePentagonBox(35, PentagonBox.BOX_NAME_QF_QBP2015), this);
+    pb[1] = new QFDataAvailable(getOrCreatePentagonBox(25, PentagonBox.BOX_NAME_QF_DATA_AVAILABLE), this);
+    pb[2] = new QFDeduplication(getOrCreatePentagonBox(15, PentagonBox.BOX_NAME_QF_DEDUPLICATION), this);
+    pb[3] = new QFForecaster(getOrCreatePentagonBox(15, PentagonBox.BOX_NAME_QF_FORECASTER), this);
+    pb[4] = new QFPerformance(getOrCreatePentagonBox(10, PentagonBox.BOX_NAME_QF_PERFORMANCE), this);
     // pb[5] = new QFMinimumQuery();
 
     pb[0].setTitle("NIST 2015 QBP Supported");
@@ -41,20 +42,7 @@ public class QF_Row extends PentagonRow
     pb[4].setWidth(20);
     // pb[5].setWidth(15);
 
-    pb[0].setWeight(35);
-    pb[1].setWeight(25);
-    pb[2].setWeight(15);
-    pb[3].setWeight(15);
-    pb[4].setWeight(10);
-    // pb[5].setWeight(15);
-
-    pb[0].setScore(pentagonReport.getScoreQFQbp2015());
-    pb[1].setScore(pentagonReport.getScoreQFDataAvailable());
-    pb[2].setScore(pentagonReport.getScoreQFDeduplication());
-    pb[3].setScore(pentagonReport.getScoreQFForecaster());
-    pb[4].setScore(pentagonReport.getScoreQFPerformance());
-    // pb[5].setScore(pentagonReport.getScoreQFMinimumQuery());
-    for (PentagonBox pentagonBox : pb)
+    for (PentagonBoxHelper pentagonBox : pb)
     {
       this.add(pentagonBox);
     }
@@ -65,16 +53,6 @@ public class QF_Row extends PentagonRow
       Map<String, TestSection> testSectionMap)
   {
     calculateBoxScores(testConducted, dataSession, pentagonReport);
-    int scoreQF = 0;
-    scoreQF = addWeightToScore(scoreQF, this.get(0).getWeight(), pentagonReport.getScoreQFQbp2015());
-    scoreQF = addWeightToScore(scoreQF, this.get(1).getWeight(), pentagonReport.getScoreQFDataAvailable());
-    scoreQF = addWeightToScore(scoreQF, this.get(2).getWeight(), pentagonReport.getScoreQFDeduplication());
-    scoreQF = addWeightToScore(scoreQF, this.get(3).getWeight(), pentagonReport.getScoreQFForecaster());
-    scoreQF = addWeightToScore(scoreQF, this.get(4).getWeight(), pentagonReport.getScoreQFPerformance());
-    // scoreQF = addWeightToScore(scoreQF, this.get(5).getWeight(),
-    // pentagonReport.getScoreQFMinimumQuery());
-    pentagonReport.setScoreQF(scoreQF / 100);
-
   }
 
 }

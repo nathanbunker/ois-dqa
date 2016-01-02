@@ -10,22 +10,22 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class CBadMessage extends PentagonBox
+public class CBadMessage extends PentagonBoxHelper
 {
-  public CBadMessage()
-  {
-    super(BOX_NAME_C_BAD_MESSAGE);
+  public CBadMessage(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
   public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score == 100)
+    if (pentagonBox.getReportScore() == 100)
     {
       out.println(
           "<p class=\"pentagon\">All clearly bad messages were not accepted by the IIS. This means that the IIS identified the issue, messaged it back "
@@ -44,7 +44,7 @@ public class CBadMessage extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score < 100)
+    if (pentagonBox.getReportScore() < 100)
     {
       out.println("<h3 class=\"pentagon\">Fail - Bad Message Was Accepted</h3>");
       Query query = dataSession.createQuery(
@@ -54,7 +54,7 @@ public class CBadMessage extends PentagonBox
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
     }
-    if (score > 0)
+    if (pentagonBox.getReportScore() > 0)
     {
       out.println("<h3 class=\"pentagon\">Pass - Bad Message Was Rejected</h3>");
       Query query = dataSession.createQuery(
@@ -85,21 +85,25 @@ public class CBadMessage extends PentagonBox
     out.println("</ul>");
     out.println("<p class=\"pentagon\">The examples shown above are reasonable expectations for situations when most IIS would be expected to "
         + "not accept part or all of the data in a message.</p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">Ensure that major issues, such as critical data missing, are noted in the acknowledgment response. "
-        + "IIS should return an error to the submitter when missing data prevents the acceptance of critical patient or vaccination information. </p>");
 
   }
 
   @Override
-  public void calculateScore( Session dataSession, PentagonReport pentagonReport)
+  public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
+    Map<String, TestSection> testSectionMap = pentagonReport.getTestSectionMap();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED) != null)
     {
       TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
-      pentagonReport.setScoreCBadMessages(testSection.getScoreLevel1());
+      pentagonBox.setReportScore(testSection.getScoreLevel1());
     }
 
+  }
+
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Ensure that major issues, such as critical data missing, are noted in the acknowledgment response. "
+        + "IIS should return an error to the submitter when missing data prevents the acceptance of critical patient or vaccination information. </p>");
   }
 }
