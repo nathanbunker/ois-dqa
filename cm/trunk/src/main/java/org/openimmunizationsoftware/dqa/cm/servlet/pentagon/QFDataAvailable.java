@@ -2,23 +2,21 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
-import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
-import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class QFDataAvailable extends PentagonBox
+public class QFDataAvailable extends PentagonBoxHelper
 {
-  public QFDataAvailable() {
-    super(BOX_NAME_QF_DATA_AVAILABLE);
+  public QFDataAvailable(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -34,7 +32,7 @@ public class QFDataAvailable extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score < 100)
+    if (pentagonBox.getReportScore() < 100)
     {
       out.println("<h3 class=\"pentagon\">Fail - Data Not Returned</h3>");
       Query query = dataSession.createQuery("from TestMessage where testSection.testConducted = ? and testCaseAssertResult = 'MATCH' "
@@ -43,7 +41,7 @@ public class QFDataAvailable extends PentagonBox
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFailForQuery(out, testMessageList);
     }
-    if (score > 0)
+    if (pentagonBox.getReportScore() > 0)
     {
       out.println("<h3 class=\"pentagon\">Pass - Data Returned</h3>");
       out.println("<p class=\"pentagon\">Test cases where data was returned are not shown. </p>");
@@ -105,7 +103,7 @@ public class QFDataAvailable extends PentagonBox
     }
     if (countTotal > 0)
     {
-      pentagonReport.setScoreQFDataAvailable((int)( 100.0 * countMatch / countTotal));
+      pentagonBox.setReportScore((int)( 100.0 * countMatch / countTotal));
     }
 
   }
@@ -118,5 +116,11 @@ public class QFDataAvailable extends PentagonBox
     query.setParameter(0, testConducted);
     List<Object[]> objectsList = query.list();
     return objectsList;
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    // TODO Auto-generated method stub
+    
   }
 }

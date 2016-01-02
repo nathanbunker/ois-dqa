@@ -10,15 +10,16 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class UFCodedValues extends PentagonBox
+public class UFCodedValues extends PentagonBoxHelper
 {
-  public UFCodedValues() {
-    super(BOX_NAME_UF_CODED_VALUES);
+  public UFCodedValues(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -33,7 +34,7 @@ public class UFCodedValues extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score < 100)
+    if (pentagonBox.getReportScore() < 100)
     {
       out.println("<h3 class=\"pentagon\">Fail - Message Was Not Accepted</h3>");
       Query query = dataSession.createQuery(
@@ -43,7 +44,7 @@ public class UFCodedValues extends PentagonBox
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFailCodes(out, testMessageList);
     }
-    if (score > 0)
+    if (pentagonBox.getReportScore() > 0)
     {
       out.println("<h3 class=\"pentagon\">Pass - Coded Value Accepted</h3>");
       Query query = dataSession.createQuery(
@@ -152,17 +153,20 @@ public class UFCodedValues extends PentagonBox
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages that returned a postive response from the IIS. </p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">Ensure that coded values defined in the national guide are recognized and properly handled by the IIS. "
-        + "In general an IIS should not reject a message when a valid code is sent, even if the IIS is not prepared to save the data. "
-        + "In most cases the IIS can accept the other data and return a positive acknowledgement, with minor issues listed with a Warning or "
-        + "Informational error.   </p>");
   }
 
   @Override
   public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
     TestConducted testConducted = pentagonReport.getTestConducted();
-    pentagonReport.setScoreUFCodedValues(testConducted.getScoreCoded());
+    pentagonBox.setReportScore(testConducted.getScoreCoded());
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Ensure that coded values defined in the national guide are recognized and properly handled by the IIS. "
+        + "In general an IIS should not reject a message when a valid code is sent, even if the IIS is not prepared to save the data. "
+        + "In most cases the IIS can accept the other data and return a positive acknowledgement, with minor issues listed with a Warning or "
+        + "Informational error.   </p>");
   }
 }

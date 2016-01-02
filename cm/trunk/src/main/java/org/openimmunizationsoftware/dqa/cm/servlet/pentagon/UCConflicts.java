@@ -11,6 +11,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsageValue;
@@ -22,14 +23,10 @@ import org.openimmunizationsoftware.dqa.tr.profile.CompatibilityConformance;
 import org.openimmunizationsoftware.dqa.tr.profile.CompatibilityConformanceCount;
 import org.openimmunizationsoftware.dqa.tr.profile.ProfileManager;
 
-public class UCConflicts extends PentagonBox
+public class UCConflicts extends PentagonBoxHelper
 {
-  public UCConflicts() {
-    super(BOX_NAME_UC_CONFLICTS);
-  }
-
-  public UCConflicts(String boxName) {
-    super(boxName);
+  public UCConflicts(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -137,19 +134,19 @@ public class UCConflicts extends PentagonBox
     {
       if (testMessage.isResultAccepted())
       {
-        return PentagonBox.createLink(testMessage, "Accepted");
+        return PentagonBoxHelper.createLink(testMessage, "Accepted");
       } else
       {
-        return PentagonBox.createLink(testMessage, "Rejected as Expected");
+        return PentagonBoxHelper.createLink(testMessage, "Rejected as Expected");
       }
     } else
     {
       if (testMessage.isResultAccepted())
       {
-        return PentagonBox.createLink(testMessage, "Accepted, Not Expected");
+        return PentagonBoxHelper.createLink(testMessage, "Accepted, Not Expected");
       } else
       {
-        return PentagonBox.createLink(testMessage, "Rejected, Not Expected");
+        return PentagonBoxHelper.createLink(testMessage, "Rejected, Not Expected");
       }
     }
   }
@@ -162,8 +159,6 @@ public class UCConflicts extends PentagonBox
         + "each Major Conflict and then by 5% for each Conflict. As the score diminishes the absolute size of each reduction "
         + "is likewise reduced, the first Major Conflict then has the largest negative impact on the score, with each "
         + "additional conflict reducing the score by less. </p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\"></p>");
   }
 
   @Override
@@ -201,7 +196,7 @@ public class UCConflicts extends PentagonBox
           scoreDouble = scoreDouble * 0.95;
         }
       }
-      pentagonReport.setScoreUCConflicts(((int) scoreDouble));
+      pentagonBox.setReportScore(((int) scoreDouble));
     }
   }
 
@@ -225,4 +220,10 @@ public class UCConflicts extends PentagonBox
     return compatibilityConformanceCountList;
   }
 
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    // TODO Auto-generated method stub
+    
+  }
 }

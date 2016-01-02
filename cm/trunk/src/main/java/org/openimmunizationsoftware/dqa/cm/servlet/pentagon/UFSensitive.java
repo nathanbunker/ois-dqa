@@ -10,15 +10,15 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
-import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class UFSensitive extends PentagonBox
+public class UFSensitive extends PentagonBoxHelper
 {
-  public UFSensitive() {
-    super(BOX_NAME_UF_SENSITIVE);
+  public UFSensitive(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -35,7 +35,7 @@ public class UFSensitive extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score < 100)
+    if (pentagonBox.getReportScore() < 100)
     {
       out.println("<h3 class=\"pentagon\">Fail - IIS Does Not Recognize Issue</h3>");
       Query query = dataSession.createQuery(
@@ -45,7 +45,7 @@ public class UFSensitive extends PentagonBox
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
     }
-    if (score > 0)
+    if (pentagonBox.getReportScore() > 0)
     {
       out.println("<h3 class=\"pentagon\">Pass - IIS Seems to Recognize Issue</h3>");
       Query query = dataSession.createQuery(
@@ -63,10 +63,6 @@ public class UFSensitive extends PentagonBox
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages with issues that returned a different "
         + "response from the IIS. </p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">Ensure that critical issues are recognized in update messages and reported in the acknowledgement message. "
-        + "Ideally the submitter should be told about all issues that are identified in the update message so that corrective action can be taken."
-        + "The examples in this section can be used as a starting point to look at issues an IIS will likely want to be senstive to.  </p>");
   }
 
   @Override
@@ -76,8 +72,15 @@ public class UFSensitive extends PentagonBox
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED) != null)
     {
       TestSection testSection = testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED);
-      pentagonReport.setScoreUFSensitive(testSection.getScoreLevel1());
+      pentagonBox.setReportScore(testSection.getScoreLevel1());
     }
 
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Ensure that critical issues are recognized in update messages and reported in the acknowledgement message. "
+        + "Ideally the submitter should be told about all issues that are identified in the update message so that corrective action can be taken."
+        + "The examples in this section can be used as a starting point to look at issues an IIS will likely want to be senstive to.  </p>");
   }
 }

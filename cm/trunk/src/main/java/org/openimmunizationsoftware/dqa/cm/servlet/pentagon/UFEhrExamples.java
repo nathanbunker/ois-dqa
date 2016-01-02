@@ -10,16 +10,16 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class UFEhrExamples extends PentagonBox
+public class UFEhrExamples extends PentagonBoxHelper
 {
-  public UFEhrExamples()
-  {
-    super(BOX_NAME_UF_EHR_EXAMPLES);
+  public UFEhrExamples(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -37,7 +37,7 @@ public class UFEhrExamples extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score < 100)
+    if (pentagonBox.getReportScore() < 100)
     {
       out.println("<h3 class=\"pentagon\">Fail - EHR Example Was Not Accepted</h3>");
       Query query = dataSession.createQuery(
@@ -48,7 +48,7 @@ public class UFEhrExamples extends PentagonBox
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
     }
-    if (score > 0)
+    if (pentagonBox.getReportScore() > 0)
     {
       out.println("<h3 class=\"pentagon\">Pass - EHR Example Was Accepted</h3>");
       Query query = dataSession.createQuery(
@@ -66,9 +66,6 @@ public class UFEhrExamples extends PentagonBox
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages that returned a postive response from the IIS. </p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">Review the messages and determine if there are any changes needed to how the IIS processes these messages. "
-        + "These messages were collected from certified EHR systems. </p>");
   }
 
   
@@ -76,6 +73,12 @@ public class UFEhrExamples extends PentagonBox
   @Override
   public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    pentagonReport.setScoreUFEhrExamples(pentagonReport.getTestConducted().getScoreEhr());
+    pentagonBox.setReportScore(pentagonReport.getTestConducted().getScoreEhr());
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Review the messages and determine if there are any changes needed to how the IIS processes these messages. "
+        + "These messages were collected from certified EHR systems. </p>");
   }
 }

@@ -133,14 +133,21 @@ public class GuideServlet extends HomeServlet
 
       if (location == null)
       {
-        location = profileUsageValue.getLinkDefinition();
+        if (profileUsageValue != null && profileUsageValue.getLinkDefinition() != null && !profileUsageValue.getLinkDefinition().equals(""))
+        {
+          location = profileUsageValue.getLinkDefinition();
+        } else if (profileUsage != null && profileUsage.getLinkGuide() != null && !profileUsage.getLinkGuide().equals(""))
+        {
+          location = profileUsage.getLinkGuide();
+        }
       }
 
+      int width = 850;
+      int height = 850;
+      File file = null;
       if (location != null)
       {
-        int width = 850;
-        int height = 850;
-        File file = GuideImageServlet.getImageFile(location, profileUsage);
+        file = GuideImageServlet.getImageFile(location, profileUsage);
         if (file != null && file.exists())
         {
           BufferedImage bimg = ImageIO.read(file);
@@ -155,171 +162,213 @@ public class GuideServlet extends HomeServlet
             width = (int) (((double) width / height) * 850);
             height = 850;
           }
-
-          out.println("<div style=\"position: fixed; left: 325px; width: " + (width + 2)
-              + "px; border-style: solid; border-width: 1px; background-color: #FFFFFF;\">");
+        }
+      }
+      out.println("<div style=\"float: left; width: 325px; margin-right: 10px; \">");
+      printInformationPanel(out, location, profileUsage, profileUsageBase, profileField, profileUsageValue);
+      out.println("</div>");
+      out.println(
+          "<div style=\"display: inline-block; width: " + (width + 2) + "px; border-style: solid; border-width: 2px; background-color: #ffffff;\">");
+      if (location == null)
+      {
+        out.println("<h2 style=\"text-align: center; position: fixed;  top: 15px; left: " + ((width - 300) / 2 + 325) + "px; width: 300px;\">"
+            + profileUsage + "</h2>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<h2 style=\"text-align: center; color: red; \">Guide Not Available</h2>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+        out.println("<p>&nbsp;</p>");
+      } else
+      {
+        if (file != null && file.exists())
+        {
           int page = GuideImageServlet.getPage(location);
+          String link = "guide?" + GuideServlet.PARAM_PROFILE_USAGE_ID + "=" + profileUsage.getProfileUsageId();
+          String base = GuideImageServlet.getBase(location);
+          if (profileUsageValue != null)
+          {
+            link += "&" + GuideServlet.PARAM_PROFILE_USAGE_VALUE_ID + "=" + profileUsageValue.getProfileUsageValueId();
+          }
+          link += "&" + GuideServlet.PARAM_LOCATION + "=" + base + "/";
+          if (page > 0)
+          {
+            out.println(
+                "<a style=\"float: left; width: 75px; border-style: solid; border-width: 1px; text-align: center; margin: 3px; padding: 3px;\" href=\""
+                    + link + (page - 1) + "\">Previous</a>");
+          }
           if (page != -1)
           {
-            out.println("<p>");
-            String base = GuideImageServlet.getBase(location);
-            String link = "guide?" + GuideServlet.PARAM_PROFILE_USAGE_ID + "=" + profileUsage.getProfileUsageId() + "&"
-                + GuideServlet.PARAM_PROFILE_USAGE_VALUE_ID + "=" + profileUsageValue.getProfileUsageValueId() + "&" + GuideServlet.PARAM_LOCATION
-                + "=" + base + "/";
-            if (page > 0)
-            {
-              out.println(
-                  "<a style=\"text-align: center; position: fixed; top: 15px; left: 330px; width: 75px; border-style: solid; border-width: 1px\" href=\""
-                      + link + (page - 1) + "\">Previous</a>");
-            }
-            out.println("<a style=\"text-align: center; position: fixed;  top: 15px; left: " + (width - 75 + 325 - 5)
-                + "px; width: 75px; border-style: solid; border-width: 1px;\" href=\"" + link + (page + 1) + "\">Next</a>");
+            out.println(
+                "<a style=\"float:right; width: 75px; border-style: solid; border-width: 1px; text-align: center; margin: 3px; padding: 3px;\" href=\""
+                    + link + (page + 1) + "\">Next</a>");
           }
-          out.println("<h2 style=\"text-align: center; position: fixed;  top: 15px; left: " + ((width - 300) / 2 + 325) + "px; width: 300px;\">"
-              + profileUsage + "</h2>");
+          out.println("<h2 style=\"text-align: center; \">" + profileUsage + "</h2>");
           String imageLink = "guideImage?" + GuideImageServlet.PARAM_PROFILE_USAGE_ID + "=" + profileUsage.getProfileUsageId() + "&"
               + GuideImageServlet.PARAM_LOCATION + "=" + URLEncoder.encode(location, "UTF-8");
           out.println("<img src=\"" + imageLink + "\" height=\"" + height + " width=\"" + width + "\"/>");
           out.println("<br/><p style=\"text-align: center;\">" + location + "</p>");
-          out.println("</div>");
-        }
-        out.println("<div style=\"width: 300px; padding-left: 5px; \">");
-        if (profileField != null)
+        } else
         {
-          out.println("<h3>" + profileField.getFieldName() + " " + profileField.getDescription() + "</h3>");
-          if (profileUsageValue != null)
-          {
-            out.println("<table class=\"guide\" width=\"100%\">");
-            out.println("  <caption class=\"guide\">Testing " + profileUsage + "</caption>");
-            if (profileUsageValue.getProfileUsage().getCategory() != ProfileCategory.US)
-            {
-              out.println("  <tr class=\"guide\">");
-              out.println("    <th class=\"guide\">Test Usage</th>");
-              out.println("    <td class=\"guide\">" + profileUsageValue.getUsageString() + "</td>");
-              out.println("  </tr>");
-              if (profileUsageValue.getUsageDetected() != null && profileUsageValue.getUsageDetected() != Usage.NOT_DEFINED)
-              {
-                out.println("  <tr class=\"guide\">");
-                out.println("    <th class=\"guide\">Detected Usage</th>");
-                out.println("    <td class=\"guide\">" + profileUsageValue.getUsageDetected() + "</td>");
-                out.println("  </tr>");
-              }
-              if (profileUsageValue.getEnforcement() != null && profileUsageValue.getEnforcement() != Enforcement.NOT_DEFINED)
-              {
-                out.println("  <tr class=\"guide\">");
-                out.println("    <th class=\"guide\">Enforcement</th>");
-                out.println("    <td class=\"guide\">" + profileUsageValue.getEnforcement().getDescription() + "</td>");
-                out.println("  </tr>");
-              }
-              if (profileUsageValue.getImplementation() != null && profileUsageValue.getImplementation() != Implementation.NOT_DEFINED)
-              {
-                out.println("  <tr class=\"guide\">");
-                out.println("    <th class=\"guide\">Implementation</th>");
-                out.println("    <td class=\"guide\">" + profileUsageValue.getImplementation().getDescription() + "</td>");
-                out.println("  </tr>");
-              }
-            }
-            if (profileUsageValue.getLinkDefinition() != null && !profileUsageValue.getLinkDefinition().equals(""))
-            {
-              String link = createLink(profileUsage, profileField, profileUsageValue, profileUsageValue.getLinkDefinition());
-              out.println("  <tr class=\"guide\">");
-              out.println("    <th class=\"guide\">Definition</th>");
-              out.println("    <td class=\"guide\"><a href=\"" + link + "\">" + profileUsageValue.getLinkDefinition() + "</a></td>");
-              out.println("  </tr>");
-            }
-            if (profileUsageValue.getLinkDetail() != null && !profileUsageValue.getLinkDetail().equals(""))
-            {
-              String link = createLink(profileUsage, profileField, profileUsageValue, profileUsageValue.getLinkDetail());
-              out.println("  <tr class=\"guide\">");
-              out.println("    <th class=\"guide\">Detail</th>");
-              out.println("    <td class=\"guide\"><a href=\"" + link + "\">" + profileUsageValue.getLinkDetail() + "</a></td>");
-              out.println("  </tr>");
-            }
-            if (profileUsageValue.getLinkClarification() != null && !profileUsageValue.getLinkClarification().equals(""))
-            {
-              String link = createLink(profileUsage, profileField, profileUsageValue, profileUsageValue.getLinkClarification());
-              out.println("  <tr class=\"guide\">");
-              out.println("    <th class=\"guide\">Clarification</th>");
-              out.println("    <td class=\"guide\"><a href=\"" + link + "\">" + profileUsageValue.getLinkClarification() + "</a></td>");
-              out.println("  </tr>");
-            }
-            if (profileUsageValue.getLinkSupplement() != null && !profileUsageValue.getLinkSupplement().equals(""))
-            {
-              String link = createLink(profileUsage, profileField, profileUsageValue, profileUsageValue.getLinkSupplement());
-              out.println("  <tr class=\"guide\">");
-              out.println("    <th class=\"guide\">Supplement</th>");
-              out.println("    <td class=\"guide\"><a href=\"" + link + "\">" + profileUsageValue.getLinkSupplement() + "</a></td>");
-              out.println("  </tr>");
-            }
-          }
-          out.println("</table>");
-
-          out.println("<h3>");
-          printGuideLink(out, profileField, profileUsageBase);
-          out.println("</h3>");
-          out.println("<table class=\"guide\" width=\"100%\">");
-          out.println("  <caption class=\"guide\">From CDC Guide</caption>");
-          out.println("  <tr class=\"guide\">");
-          out.println("    <th class=\"guide\">Data Type</th>");
-          out.println("    <td class=\"guide\">" + profileField.getDataType() + "</td>");
-          out.println("  </tr>");
-          out.println("  <tr class=\"guide\">");
-          out.println("    <th class=\"guide\">Usage</th>");
-          out.println("    <td class=\"guide\">" + profileField.getBaseUsage() + "</td>");
-          out.println("  </tr>");
-          if (profileField.getLength() != null && !profileField.getLength().equals(""))
-          {
-            out.println("  <tr class=\"guide\">");
-            out.println("    <th class=\"guide\">Length</th>");
-            out.println("    <td class=\"guide\">" + profileField.getLength() + "</td>");
-            out.println("  </tr>");
-          }
-          if (profileField.getConditionalPredicate() != null && !profileField.getConditionalPredicate().equals(""))
-          {
-            out.println("  <tr class=\"guide\">");
-            out.println("    <th class=\"guide\">Cond Pred</th>");
-            out.println("    <td class=\"guide\">" + profileField.getConditionalPredicate() + "</td>");
-            out.println("  </tr>");
-          }
-          if (profileField.getTableName() != null && !profileField.getTableName().equals(""))
-          {
-            out.println("  <tr class=\"guide\">");
-            out.println("    <th class=\"guide\">Value Set</th>");
-            out.println("    <td class=\"guide\">" + profileField.getTableName() + "</td>");
-            out.println("  </tr>");
-          }
-          if (profileField.getComments() != null && !profileField.getComments().equals(""))
-          {
-            out.println("  <tr class=\"guide\">");
-            out.println("    <th class=\"guide\">Comments</th>");
-            out.println("    <td class=\"guide\">" + profileField.getComments() + "</td>");
-            out.println("  </tr>");
-          }
-          out.println("</table>");
+          out.println("<p class=\"guide\">Unable to find location " + location + "</p>");
         }
-        out.println("</div>");
-        out.println("<div  style=\"position: fixed; top: 0px; left: " + (325 + width + 20) + "px; \">");
-        out.println("<h4>All IIS Guides</h4>");
-        out.println("<ul style=\"font-size: 0.9em; \">");
-        Query query = dataSession.createQuery("from ProfileUsage where category = 'IIS' order by label, version");
-        List<ProfileUsage> profileUsageList = query.list();
-        for (ProfileUsage pu : profileUsageList)
-        {
-          out.println("<li>");
-          printGuideLink(out, profileField, pu);
-          out.println("</li>");
-        }
-        out.println("</ul>");
-
-        out.println("</div>");
-
       }
+
+      out.println("</div>");
+      out.println("<div style=\"float: right; width: 250px;\">");
+      out.println("<h4>All IIS Guides</h4>");
+      out.println("<ul style=\"font-size: 0.9em; \">");
+      Query query = dataSession.createQuery("from ProfileUsage where category = 'IIS' order by label, version");
+      List<ProfileUsage> profileUsageList = query.list();
+      for (ProfileUsage pu : profileUsageList)
+      {
+        out.println("<li>");
+        printGuideLink(out, profileField, pu);
+        out.println("</li>");
+      }
+      out.println("</ul>");
+      out.println("</div>");
+
       createFooter(webSession);
     } finally
     {
       out.close();
     }
 
+  }
+
+  public void printInformationPanel(PrintWriter out, String location, ProfileUsage profileUsage, ProfileUsage profileUsageBase,
+      ProfileField profileField, ProfileUsageValue profileUsageValue) throws UnsupportedEncodingException
+  {
+
+    if (profileField != null)
+    {
+      out.println("<h3>" + profileField.getFieldName() + " " + profileField.getDescription() + "</h3>");
+      if (profileUsageValue != null)
+      {
+        out.println("<table class=\"guide\" width=\"100%\">");
+        out.println("  <caption class=\"guide\">Testing " + profileUsage + "</caption>");
+        if (profileUsageValue.getProfileUsage().getCategory() != ProfileCategory.US)
+        {
+          out.println("  <tr class=\"guide\">");
+          out.println("    <th class=\"guide\">Test Usage</th>");
+          out.println("    <td class=\"guide\">" + profileUsageValue.getUsageString() + "</td>");
+          out.println("  </tr>");
+          if (profileUsageValue.getUsageDetected() != null && profileUsageValue.getUsageDetected() != Usage.NOT_DEFINED)
+          {
+            out.println("  <tr class=\"guide\">");
+            out.println("    <th class=\"guide\">Detected Usage</th>");
+            out.println("    <td class=\"guide\">" + profileUsageValue.getUsageDetected() + "</td>");
+            out.println("  </tr>");
+          }
+          if (profileUsageValue.getEnforcement() != null && profileUsageValue.getEnforcement() != Enforcement.NOT_DEFINED)
+          {
+            out.println("  <tr class=\"guide\">");
+            out.println("    <th class=\"guide\">Enforcement</th>");
+            out.println("    <td class=\"guide\">" + profileUsageValue.getEnforcement().getDescription() + "</td>");
+            out.println("  </tr>");
+          }
+          if (profileUsageValue.getImplementation() != null && profileUsageValue.getImplementation() != Implementation.NOT_DEFINED)
+          {
+            out.println("  <tr class=\"guide\">");
+            out.println("    <th class=\"guide\">Implementation</th>");
+            out.println("    <td class=\"guide\">" + profileUsageValue.getImplementation().getDescription() + "</td>");
+            out.println("  </tr>");
+          }
+        }
+        if (profileUsageValue.getLinkDefinition() != null && !profileUsageValue.getLinkDefinition().equals(""))
+        {
+          String link = createLink(profileUsage, profileField, profileUsageValue, profileUsageValue.getLinkDefinition());
+          out.println("  <tr class=\"guide\">");
+          out.println("    <th class=\"guide\">Definition</th>");
+          out.println("    <td class=\"guide\"><a href=\"" + link + "\">" + profileUsageValue.getLinkDefinition() + "</a></td>");
+          out.println("  </tr>");
+        }
+        if (profileUsageValue.getLinkDetail() != null && !profileUsageValue.getLinkDetail().equals(""))
+        {
+          String link = createLink(profileUsage, profileField, profileUsageValue, profileUsageValue.getLinkDetail());
+          out.println("  <tr class=\"guide\">");
+          out.println("    <th class=\"guide\">Detail</th>");
+          out.println("    <td class=\"guide\"><a href=\"" + link + "\">" + profileUsageValue.getLinkDetail() + "</a></td>");
+          out.println("  </tr>");
+        }
+        if (profileUsageValue.getLinkClarification() != null && !profileUsageValue.getLinkClarification().equals(""))
+        {
+          String link = createLink(profileUsage, profileField, profileUsageValue, profileUsageValue.getLinkClarification());
+          out.println("  <tr class=\"guide\">");
+          out.println("    <th class=\"guide\">Clarification</th>");
+          out.println("    <td class=\"guide\"><a href=\"" + link + "\">" + profileUsageValue.getLinkClarification() + "</a></td>");
+          out.println("  </tr>");
+        }
+        if (profileUsageValue.getLinkSupplement() != null && !profileUsageValue.getLinkSupplement().equals(""))
+        {
+          String link = createLink(profileUsage, profileField, profileUsageValue, profileUsageValue.getLinkSupplement());
+          out.println("  <tr class=\"guide\">");
+          out.println("    <th class=\"guide\">Supplement</th>");
+          out.println("    <td class=\"guide\"><a href=\"" + link + "\">" + profileUsageValue.getLinkSupplement() + "</a></td>");
+          out.println("  </tr>");
+        }
+      }
+      out.println("</table>");
+    }
+    out.println("<h3>");
+    printGuideLink(out, profileField, profileUsageBase);
+    out.println("</h3>");
+    if (profileField != null)
+    {
+      out.println("<table class=\"guide\" width=\"100%\">");
+      out.println("  <caption class=\"guide\">From CDC Guide</caption>");
+      out.println("  <tr class=\"guide\">");
+      out.println("    <th class=\"guide\">Data Type</th>");
+      out.println("    <td class=\"guide\">" + profileField.getDataType() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"guide\">");
+      out.println("    <th class=\"guide\">Usage</th>");
+      out.println("    <td class=\"guide\">" + profileField.getBaseUsage() + "</td>");
+      out.println("  </tr>");
+      if (profileField.getLength() != null && !profileField.getLength().equals(""))
+      {
+        out.println("  <tr class=\"guide\">");
+        out.println("    <th class=\"guide\">Length</th>");
+        out.println("    <td class=\"guide\">" + profileField.getLength() + "</td>");
+        out.println("  </tr>");
+      }
+      if (profileField.getConditionalPredicate() != null && !profileField.getConditionalPredicate().equals(""))
+      {
+        out.println("  <tr class=\"guide\">");
+        out.println("    <th class=\"guide\">Cond Pred</th>");
+        out.println("    <td class=\"guide\">" + profileField.getConditionalPredicate() + "</td>");
+        out.println("  </tr>");
+      }
+      if (profileField.getTableName() != null && !profileField.getTableName().equals(""))
+      {
+        out.println("  <tr class=\"guide\">");
+        out.println("    <th class=\"guide\">Value Set</th>");
+        out.println("    <td class=\"guide\">" + profileField.getTableName() + "</td>");
+        out.println("  </tr>");
+      }
+      if (profileField.getComments() != null && !profileField.getComments().equals(""))
+      {
+        out.println("  <tr class=\"guide\">");
+        out.println("    <th class=\"guide\">Comments</th>");
+        out.println("    <td class=\"guide\">" + profileField.getComments() + "</td>");
+        out.println("  </tr>");
+      }
+      out.println("</table>");
+    }
   }
 
   public String createLink(ProfileUsage profileUsage, ProfileField profileField, ProfileUsageValue profileUsageValue, String loc)
@@ -333,8 +382,11 @@ public class GuideServlet extends HomeServlet
 
   public void printGuideLink(PrintWriter out, ProfileField profileField, ProfileUsage pu)
   {
-    String link = "guide?" + PARAM_PROFILE_USAGE_ID + "=" + pu.getProfileUsageId() + "&" + PARAM_PROFILE_FIELD_ID + "="
-        + profileField.getProfileFieldId();
+    String link = "guide?" + PARAM_PROFILE_USAGE_ID + "=" + pu.getProfileUsageId();
+    if (profileField != null)
+    {
+      link += "&" + PARAM_PROFILE_FIELD_ID + "=" + profileField.getProfileFieldId();
+    }
     if (pu.getCategory() == ProfileCategory.IIS)
     {
       if (pu.getVersion() == null || pu.getVersion().equals(""))

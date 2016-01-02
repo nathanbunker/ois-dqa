@@ -3,22 +3,23 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 import java.util.Map;
 
 import org.hibernate.Session;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class C_Row extends PentagonRow
+public class C_Row extends PentagonRowHelper
 {
   public C_Row(PentagonReport pentagonReport) {
 
-    super("Confidence");
-    PentagonBox[] pb = new PentagonBox[5];
+    super(pentagonReport, "Confidence", PentagonBox.ROW_NAME_C);
+    PentagonBoxHelper[] pb = new PentagonBoxHelper[5];
 
-    pb[0] = new CAckConform();
-    pb[1] = new CGoodMessage();
-    pb[2] = new CBadMessage();
-    pb[3] = new CGoodData();
-    pb[4] = new CBadData();
+    pb[0] = new CAckConform(getOrCreatePentagonBox(20, PentagonBox.BOX_NAME_C_ACK_CONFORM), this);
+    pb[1] = new CGoodMessage(getOrCreatePentagonBox(20, PentagonBox.BOX_NAME_C_GOOD_MESSAGE), this);
+    pb[2] = new CBadMessage(getOrCreatePentagonBox(20, PentagonBox.BOX_NAME_C_BAD_MESSAGE), this);
+    pb[3] = new CGoodData(getOrCreatePentagonBox(18, PentagonBox.BOX_NAME_C_GOOD_DATA), this);
+    pb[4] = new CBadData(getOrCreatePentagonBox(12, PentagonBox.BOX_NAME_C_BAD_DATA), this);
 
     pb[0].setTitle("ACKs Conform to NIST 2015");
     pb[1].setTitle("Good Messages Accepted");
@@ -38,37 +39,20 @@ public class C_Row extends PentagonRow
     pb[3].setWidth(20);
     pb[4].setWidth(20);
 
-    pb[0].setWeight(20);
-    pb[1].setWeight(20);
-    pb[2].setWeight(20);
-    pb[3].setWeight(18);
-    pb[4].setWeight(12);
-
-    pb[0].setScore(pentagonReport.getScoreCAckConform());
-    pb[1].setScore(pentagonReport.getScoreCGoodMessages());
-    pb[2].setScore(pentagonReport.getScoreCBadMessages());
-    pb[3].setScore(pentagonReport.getScoreCGoodData());
-    pb[4].setScore(pentagonReport.getScoreCBadData());
-
-    for (PentagonBox pentagonBox : pb)
+    for (PentagonBoxHelper pentagonBoxHelper : pb)
     {
-      this.add(pentagonBox);
+      this.add(pentagonBoxHelper);
     }
 
   }
+  
+  
 
   @Override
   public void calculateScores(TestConducted testConducted, Session dataSession, PentagonReport pentagonReport,
       Map<String, TestSection> testSectionMap)
   {
     calculateBoxScores(testConducted, dataSession, pentagonReport);
-    int scoreC = 0;
-    scoreC = addWeightToScore(scoreC, this.get(0).getWeight(), pentagonReport.getScoreCAckConform());
-    scoreC = addWeightToScore(scoreC, this.get(1).getWeight(), pentagonReport.getScoreCGoodMessages());
-    scoreC = addWeightToScore(scoreC, this.get(2).getWeight(), pentagonReport.getScoreCBadMessages());
-    scoreC = addWeightToScore(scoreC, this.get(3).getWeight(), pentagonReport.getScoreCGoodData());
-    scoreC = addWeightToScore(scoreC, this.get(4).getWeight(), pentagonReport.getScoreCBadData());
-    pentagonReport.setScoreC(scoreC / 100);
   }
 
 }

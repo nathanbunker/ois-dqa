@@ -8,15 +8,15 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.TestReportServlet;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class UFPerformance extends PentagonBox
+public class UFPerformance extends PentagonBoxHelper
 {
-  public UFPerformance()
-  {
-    super(BOX_NAME_UF_PERFORMANCE);
+  public UFPerformance(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -56,12 +56,6 @@ public class UFPerformance extends PentagonBox
     out.println("</ul>");
     out.println("<p class=\"pentagon\">For example, if the average response time is 1.25 seconds the score is calculated as follows: "
         + "-((1.25 - 2.00) / 1.00) = 0.75 = 75%</p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">Performance is a relatively insignificant part of the final score for this "
-        + "section. Faster response times are helpful but not critical for update functionality. Improvement in performance requires "
-        + "a thorough review of current processing procedure to determine what is happening to delay the processing of this message. In "
-        + "some cases the delays may be architectural and can not be avoided, in others they may be due to how the test system is "
-        + "configured. The meaning and importance of this section is thus left to the IIS to determine. </p>");
   }
 
   
@@ -75,14 +69,23 @@ public class UFPerformance extends PentagonBox
       int millisecondsPerUpdate = Math.round(((float) perUpdateTotal) / perUpdateCount);
       if (millisecondsPerUpdate < 1050)
       {
-        pentagonReport.setScoreUFPerformance(100);
+        pentagonBox.setReportScore(100);
       } else if (millisecondsPerUpdate > 2000)
       {
-        pentagonReport.setScoreUFPerformance(0);
+        pentagonBox.setReportScore(0);
       } else
       {
-        pentagonReport.setScoreUFPerformance((int) Math.round(-100 * ((millisecondsPerUpdate - 2000.0) / 1000)));
+        pentagonBox.setReportScore((int) Math.round(-100 * ((millisecondsPerUpdate - 2000.0) / 1000)));
       }
     }    
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Performance is a relatively insignificant part of the final score for this "
+        + "section. Faster response times are helpful but not critical for update functionality. Improvement in performance requires "
+        + "a thorough review of current processing procedure to determine what is happening to delay the processing of this message. In "
+        + "some cases the delays may be architectural and can not be avoided, in others they may be due to how the test system is "
+        + "configured. The meaning and importance of this section is thus left to the IIS to determine. </p>");
   }
 }

@@ -8,20 +8,21 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class QCResponsesConform extends PentagonBox
+public class QCResponsesConform extends UCAcksConform
 {
-  public QCResponsesConform() {
-    super(BOX_NAME_QC_RESPONSES_CONFORM);
+  public QCResponsesConform(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score >= 100)
+    if (pentagonBox.getReportScore() >= 100)
     {
       out.println("<h3 class=\"pentagon\">All Acks Conform</h3>");
     } else
@@ -50,11 +51,19 @@ public class QCResponsesConform extends PentagonBox
   @Override
   public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
+    Map<String, TestSection> testSectionMap = pentagonReport.getTestSectionMap();
     TestConducted testConducted = pentagonReport.getTestConducted();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015) != null)
     {
-      UCAcksConform.calculateScore(testConducted, dataSession, pentagonReport, "query");
+      calculateScore(testConducted, dataSession, pentagonReport, "query");
     }
   }
+
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Update the IIS query response message so that it conforms to the CDC Guide. "
+        + "Focus on the errors that appear the most often. Be sure to verify the response messages using the NIST test site. </p>");
+  }
+
 }

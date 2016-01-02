@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
@@ -17,8 +18,8 @@ import org.openimmunizationsoftware.dqa.tr.profile.CompatibilityConformanceCount
 
 public class UCConstraints extends UCConflicts
 {
-  public UCConstraints() {
-    super(BOX_NAME_UC_CONSTRAINTS);
+  public UCConstraints(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -94,9 +95,6 @@ public class UCConstraints extends UCConflicts
         + "each Major Constraint and then by 5% for each Constraint. As the score diminishes the absolute size of each reduction "
         + "is likewise reduced, the first Major Constraint then has the largest negative impact on the score, with each "
         + "additional constraints reducing the score by less. </p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\"></p>");
-
   }
 
   @Override
@@ -134,7 +132,7 @@ public class UCConstraints extends UCConflicts
           scoreDouble = scoreDouble * 0.95;
         }
       }
-      pentagonReport.setScoreUCConstraints(((int) scoreDouble));
+      pentagonBox.setReportScore(((int) scoreDouble));
     }
 
   }

@@ -10,16 +10,17 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class CBadData extends PentagonBox
+public class CBadData extends PentagonBoxHelper
 {
 
-  public CBadData() {
-    super(BOX_NAME_C_BAD_DATA);
+  public CBadData(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -35,7 +36,7 @@ public class CBadData extends PentagonBox
   @Override
   public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (score < 100)
+    if (pentagonBox.getReportScore() < 100)
     {
       out.println("<h3 class=\"pentagon\">Fail - Data Returned for NOT Accepted Message</h3>");
       Query query = dataSession.createQuery(
@@ -47,7 +48,7 @@ public class CBadData extends PentagonBox
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
     }
-    if (score > 0)
+    if (pentagonBox.getReportScore() > 0)
     {
       out.println("<h3 class=\"pentagon\">Pass - Data NOT Returned for NOT Accepted Message</h3>");
       Query query = dataSession.createQuery(
@@ -75,18 +76,12 @@ public class CBadData extends PentagonBox
     printCalculatingEssentialDataReturnedExplanation(out);
     out.println("<p class=\"pentagon\">The score is the percentage of rejected messages (whether good or bad) "
         + "that could not be completely retrieved via a query.</p>");
-    out.println("<h4 class=\"pentagon\">How To Improve Score</h4>");
-    out.println("<p class=\"pentagon\">Review process for acknowledging messages to ensure that if important vaccination or patient information is "
-        + "not accepted by the IIS that this is reflected in the acknowledgement message when possible. The test cases selected for this section "
-        + "were especially chosen as ones that either ought to be accepted or had such problems that it is reasonable to assume that an IIS should "
-        + "identify these upon receipt and return an acknowledgment indicating the message that the submitter should correct and resend. </p>");
-
   }
 
   @Override
   public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
+    Map<String, TestSection> testSectionMap = pentagonReport.getTestSectionMap();
     TestConducted testConducted = pentagonReport.getTestConducted();
     int count = 0;
     int countPass = 0;
@@ -114,8 +109,17 @@ public class CBadData extends PentagonBox
     }
     if (count > 0)
     {
-      pentagonReport.setScoreCBadData((int) (100.0 * countPass / count));
+      pentagonBox.setReportScore((int) (100.0 * countPass / count));
     }
 
+  }
+
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">Review process for acknowledging messages to ensure that if important vaccination or patient information is "
+        + "not accepted by the IIS that this is reflected in the acknowledgement message when possible. The test cases selected for this section "
+        + "were especially chosen as ones that either ought to be accepted or had such problems that it is reasonable to assume that an IIS should "
+        + "identify these upon receipt and return an acknowledgment indicating the message that the submitter should correct and resend. </p>");
   }
 }

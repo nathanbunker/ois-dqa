@@ -10,15 +10,16 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
+import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
-public class QFDeduplication extends PentagonBox
+public class QFDeduplication extends PentagonBoxHelper
 {
-  public QFDeduplication() {
-    super(BOX_NAME_QF_DEDUPLICATION);
+  public QFDeduplication(PentagonBox pentagonBox, PentagonRowHelper pentagonRowHelper) {
+    super(pentagonBox, pentagonRowHelper);
   }
 
   @Override
@@ -73,8 +74,14 @@ public class QFDeduplication extends PentagonBox
     }
     if (count > 0)
     {
-      pentagonReport.setScoreQFDeduplication((int) (100.0 * countPass / count));
+      pentagonBox.setReportScore((int) (100.0 * countPass / count));
     }
 
+  }
+  @Override
+  public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  {
+    // TODO Auto-generated method stub
+    
   }
 }
