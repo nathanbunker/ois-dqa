@@ -523,7 +523,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
             String profileFieldName = readValue(req, PARAM_TP_PROFILE_FIELD_NAME, 250);
             if (!profileFieldName.equals("") && !organizationName.equals(""))
             {
-              TestParticipant testParticipant = getTestParticipant(dataSession, organizationName);
+              TestParticipant testParticipant = getTestParticipantByOrganizationName(dataSession, organizationName);
               if (testParticipant != null && testParticipant.getProfileUsage() != null)
               {
                 ProfileField profileField = null;
@@ -679,7 +679,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
       } else if (!organizationName.equals(""))
       {
 
-        TestParticipant testParticipant = getTestParticipant(dataSession, organizationName);
+        TestParticipant testParticipant = getTestParticipantByOrganizationName(dataSession, organizationName);
         if (testParticipant == null)
         {
           testParticipant = new TestParticipant();
@@ -736,12 +736,27 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     out.close();
   }
 
-  public static TestParticipant getTestParticipant(Session dataSession, String organizationName)
+  public static TestParticipant getTestParticipantByOrganizationName(Session dataSession, String organizationName)
   {
     TestParticipant testParticipant = null;
     {
       Query query = dataSession.createQuery("from TestParticipant where organizationName = ?");
       query.setParameter(0, organizationName);
+      List<TestParticipant> testParticipantList = query.list();
+      if (testParticipantList.size() > 0)
+      {
+        testParticipant = testParticipantList.get(0);
+      }
+    }
+    return testParticipant;
+  }
+
+  public static TestParticipant getTestParticipantByConnectionLabel(Session dataSession, String connectionLabel)
+  {
+    TestParticipant testParticipant = null;
+    {
+      Query query = dataSession.createQuery("from TestParticipant where connectionLabel = ?");
+      query.setParameter(0, connectionLabel);
       List<TestParticipant> testParticipantList = query.list();
       if (testParticipantList.size() > 0)
       {

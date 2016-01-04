@@ -57,6 +57,11 @@ public class TestReportServlet extends HomeServlet
   public static final String VIEW_CONFORMANCE_2015 = RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015;
   public static final String VIEW_ONC_2015 = RecordServletInterface.VALUE_TEST_SECTION_TYPE_ONC_2015;
   public static final String VIEW_NOT_ACCEPTED = RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED;
+  public static final String VIEW_EXTRA = RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXTRA;
+  public static final String VIEW_DEDUPLICATION_ENGAGED = RecordServletInterface.VALUE_TEST_SECTION_TYPE_DEDUPLICATION_ENGAGED;
+  public static final String VIEW_FORECASTER_ENGAGED = RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECASTER_ENGAGED;
+  public static final String VIEW_QBP_SUPPORT = RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT;
+  public static final String VIEW_TRANSFORM = RecordServletInterface.VALUE_TEST_SECTION_TYPE_TRANSFORM;
 
   public static final String VIEW_HOME = "home";
   public static final String VIEW_REPORTS = "reports";
@@ -1281,7 +1286,8 @@ public class TestReportServlet extends HomeServlet
         out.println("</div>");
       } else if (view.equals(VIEW_BASIC) || view.equals(VIEW_INTERMEDIATE) || view.equals(VIEW_ADVANCED) || view.equals(VIEW_PROFILING)
           || view.equals(VIEW_EXCEPTIONAL) || view.equals(VIEW_FORECAST_PREP) || view.equals(VIEW_FORECAST) || view.equals(VIEW_ONC_2015)
-          || view.equals(VIEW_NOT_ACCEPTED))
+          || view.equals(VIEW_NOT_ACCEPTED) || view.equals(VIEW_EXTRA) || view.equals(VIEW_DEDUPLICATION_ENGAGED)
+          || view.equals(VIEW_FORECASTER_ENGAGED) || view.equals(VIEW_QBP_SUPPORT) || view.equals(VIEW_TRANSFORM))
       {
         out.println("<div class=\"leftColumn\">");
         printTestConductedNavigationBox(testConducted, userSession);
