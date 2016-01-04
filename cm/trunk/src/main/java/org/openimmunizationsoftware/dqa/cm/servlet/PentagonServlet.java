@@ -19,14 +19,12 @@ import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
-import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
 public class PentagonServlet extends HomeServlet
 {
 
   public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
-  public static final String PARAM_CONNECTION_LABEL = "connectionLabel";
   public static final String PARAM_TEST_MESSAGE_ID = "testMessageId";
   public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
   public static final String PARAM_COMPARISON_FIELD_ID = "comparisonFieldId";
@@ -67,101 +65,16 @@ public class PentagonServlet extends HomeServlet
     {
       view = "";
     }
-    String connectionLabel = req.getParameter(PARAM_CONNECTION_LABEL);
-    if (connectionLabel == null)
-    {
-      connectionLabel = "";
-    }
-    TestConducted testConducted = (TestConducted) webSession.getAttribute(ATTRIBUTE_TEST_CONDUCTED);
-
-    int testConductedId = 0;
+    TestConducted testConducted;
     {
       String testConnectedIdString = req.getParameter(PARAM_TEST_CONDUCTED_ID);
-      if (testConnectedIdString != null)
-      {
-        testConductedId = Integer.parseInt(testConnectedIdString);
-      }
-      if (testConductedId != 0)
-      {
-        testConducted = (TestConducted) dataSession.get(TestConducted.class, testConductedId);
-      }
-      if (testConducted != null)
-      {
-        if (connectionLabel.equals(""))
-        {
-          connectionLabel = testConducted.getConnectionLabel();
-        } else
-        {
-          if (!testConducted.getConnectionLabel().equals(connectionLabel))
-          {
-            webSession.removeAttribute(ATTRIBUTE_TEST_CONDUCTED);
-            testConducted = null;
-          }
-        }
-      }
+      int testConductedId = Integer.parseInt(testConnectedIdString);
+      testConducted = (TestConducted) dataSession.get(TestConducted.class, testConductedId);
     }
-
-    TestParticipant testParticipantSelected = (TestParticipant) webSession.getAttribute(ATTRIBUTE_TEST_PARTICIPANT);
-    if (req.getParameter(PARAM_TEST_PARTICIPANT_ID) != null)
+    TestParticipant testParticipantSelected = RecordServlet.getTestParticipantByConnectionLabel(dataSession, testConducted.getConnectionLabel());
+    if (testParticipantSelected == null)
     {
-      int testParticipantId = Integer.parseInt(req.getParameter(PARAM_TEST_PARTICIPANT_ID));
-      testParticipantSelected = (TestParticipant) dataSession.get(TestParticipant.class, testParticipantId);
-      connectionLabel = testParticipantSelected.getConnectionLabel();
-    }
-    if (testParticipantSelected != null)
-    {
-      webSession.setAttribute(ATTRIBUTE_TEST_PARTICIPANT, testParticipantSelected);
-    } else
-    {
-      webSession.removeAttribute(ATTRIBUTE_TEST_PARTICIPANT);
-    }
-
-    if (testConducted != null && testParticipantSelected != null)
-    {
-      if (!testConducted.getConnectionLabel().equals(testParticipantSelected.getConnectionLabel()))
-      {
-        testParticipantSelected = RecordServlet.getTestParticipant(dataSession, testConducted.getConnectionLabel());
-      }
-    }
-
-    if (testConducted != null)
-    {
-      webSession.setAttribute(ATTRIBUTE_TEST_CONDUCTED, testConducted);
-    } else
-    {
-      webSession.removeAttribute(ATTRIBUTE_TEST_CONDUCTED);
-    }
-
-    TestMessage testMessage = null;
-    {
-      String testMessageIdString = req.getParameter(PARAM_TEST_MESSAGE_ID);
-      if (testMessageIdString != null)
-      {
-        if (!testMessageIdString.equals(""))
-        {
-          testMessage = (TestMessage) dataSession.get(TestMessage.class, Integer.parseInt(testMessageIdString));
-        }
-        if (testMessage != null)
-        {
-          webSession.setAttribute(ATTRIBUTE_TEST_MESSAGE, testMessage);
-        } else
-        {
-          webSession.removeAttribute(ATTRIBUTE_TEST_MESSAGE);
-        }
-      } else
-      {
-        testMessage = (TestMessage) webSession.getAttribute(ATTRIBUTE_TEST_MESSAGE);
-        if (testMessage != null && testConducted != null && !testMessage.getTestSection().getTestConducted().equals(testConducted))
-        {
-          webSession.removeAttribute(ATTRIBUTE_TEST_MESSAGE);
-          testMessage = null;
-        }
-      }
-    }
-
-    if (testConducted != null && connectionLabel.equals(""))
-    {
-      connectionLabel = testConducted.getConnectionLabel();
+      throw new NullPointerException("Test Conducted did not have Test Participant '" + testConducted.getConnectionLabel() + "'");
     }
 
     PentagonReport pentagonReport = PentagonReportLogic.createOrReturnPentagonReport(testConducted, dataSession);
@@ -171,7 +84,7 @@ public class PentagonServlet extends HomeServlet
     int[] centerPointBig = { 425, 438 };
     int[][] pointsBig = new int[5][2];
     setupPointsBig(pointsBig);
-    printPentagon(out, pointsBig, "#cccccc", "2");
+    printPentagon(out, pointsBig, "#cccccc", "2", null);
 
     {
       int[][] scorePoints = new int[5][2];
@@ -182,7 +95,7 @@ public class PentagonServlet extends HomeServlet
           scorePoints[i][0] = pointsBig[i][0] - ((int) ((pointsBig[i][0] - centerPointBig[0]) * ((100 - scores[i]) / 100.0)));
           scorePoints[i][1] = pointsBig[i][1] - ((int) ((pointsBig[i][1] - centerPointBig[1]) * ((100 - scores[i]) / 100.0)));
         }
-        printPentagon(out, scorePoints, "#9b0d28", "2");
+        printPentagon(out, scorePoints, "#9b0d28", "2", null);
       }
     }
 
@@ -318,7 +231,7 @@ public class PentagonServlet extends HomeServlet
       out.println("      }");
       out.println("    }");
       String link;
-      if (testParticipantSelected == null || testParticipantSelected.getProfileUsage() == null)
+      if (testParticipantSelected.getProfileUsage() == null)
       {
         link = "'pentagonContent?" + PARAM_TEST_MESSAGE_ID + "=' + testMessageId";
       } else
@@ -501,11 +414,22 @@ public class PentagonServlet extends HomeServlet
           + "px; width: 44px; height: 55px; cursor: pointer; cursor: hand; \" onmouseout=\"flashOnGrey('box_nist')\" onmouseover=\"flashOnLinkYellow('box_nist')\"  "
           + "onClick=\"window.open('http://hl7v2-iz-r1.5-testing.nist.gov/iztool/#/cf', '_blank')\"><span style=\"font-size: 10pt; font-weight: bold;\">NIST Test Suite</span></span>");
       posX += 44;
-      out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-          + (posX + offsetX)
-          + "px; width: 43px; height: 55px; cursor: pointer; cursor: hand; \" onmouseout=\"flashOnGrey('box_local')\" onmouseover=\"flashOnLinkYellow('box_local')\"  "
-          + "onClick=\"window.open('guide?profileUsageId=" + testParticipantSelected.getProfileUsage().getProfileUsageId()
-          + "', '_blank')\"><span style=\"font-size: 10pt; font-weight: bold;\">IIS Guide</span></span>");
+      if (testParticipantSelected.getProfileUsage() == null || testParticipantSelected.getProfileUsage().getLinkGuide() == null
+          || testParticipantSelected.getProfileUsage().getLinkGuide().equals(""))
+      {
+        out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
+            + (posX + offsetX)
+            + "px; width: 43px; height: 55px; cursor: pointer; cursor: hand; \" onmouseout=\"flashOnGrey('box_local')\" onmouseover=\"flashOnLinkYellow('box_local')\"  "
+            + "onClick=\"window.open('guide?profileUsageId=" + testParticipantSelected.getProfileUsage().getProfileUsageId() + "', '_blank')\">"
+            + "<span style=\"font-size: 10pt; font-weight: bold; color: #AAAAAA; \">IIS Guide</span></span>");
+      } else
+      {
+        out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
+            + (posX + offsetX)
+            + "px; width: 43px; height: 55px; cursor: pointer; cursor: hand; \" onmouseout=\"flashOnGrey('box_local')\" onmouseover=\"flashOnLinkYellow('box_local')\"  "
+            + "onClick=\"window.open('guide?profileUsageId=" + testParticipantSelected.getProfileUsage().getProfileUsageId()
+            + "', '_blank')\"><span style=\"font-size: 10pt; font-weight: bold;\">IIS Guide</span></span>");
+      }
     }
 
     {
@@ -703,7 +627,7 @@ public class PentagonServlet extends HomeServlet
     int[] centerPointSmall = { 50 + offsetX, 50 + offsetY };
     int[][] pointsSmall = new int[5][2];
     setupPointsSmall(pointsSmall, offsetX, offsetY);
-    printPentagon(out, pointsSmall, "#eeeeee", "0.5");
+    printPentagon(out, pointsSmall, "#eeeeee", "0.5", pentagonReport);
 
     {
       int[][] scorePoints = new int[5][2];
@@ -714,7 +638,7 @@ public class PentagonServlet extends HomeServlet
           scorePoints[i][0] = pointsSmall[i][0] - ((int) ((pointsSmall[i][0] - centerPointSmall[0]) * ((100 - scores[i]) / 100.0)));
           scorePoints[i][1] = pointsSmall[i][1] - ((int) ((pointsSmall[i][1] - centerPointSmall[1]) * ((100 - scores[i]) / 100.0)));
         }
-        printPentagon(out, scorePoints, "#cccccc", "0.5");
+        printPentagon(out, scorePoints, "#cccccc", "0.5", pentagonReport);
       }
     }
   }
@@ -843,15 +767,23 @@ public class PentagonServlet extends HomeServlet
     points[4][1] = 36 + offsetY;
   }
 
-  public void printPentagon(PrintWriter out, int[][] points, String color, String strokeWidth)
+  public void printPentagon(PrintWriter out, int[][] points, String color, String strokeWidth, PentagonReport pentagonReport)
   {
     String makePoints = "";
     for (int i = 0; i < points.length; i++)
     {
       makePoints += points[i][0] + "," + points[i][1] + " ";
     }
-    out.println("  <polygon fill=\"" + color + "\" stroke=\"black\" stroke-width=\"" + strokeWidth + "\" points=\"" + makePoints
-        + "\" onClick=\"showReport('')\"/>");
+    if (pentagonReport != null)
+    {
+      TestConducted testConductedDisplay = pentagonReport.getTestConducted();
+      String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId();
+      out.println("  <polygon fill=\"" + color + "\" stroke=\"black\" stroke-width=\"" + strokeWidth + "\" points=\"" + makePoints
+          + "\" onClick=\"window.open('" + link + "', '_self')\"/>");
+    } else
+    {
+      out.println("  <polygon fill=\"" + color + "\" stroke=\"black\" stroke-width=\"" + strokeWidth + "\" points=\"" + makePoints + "\"\"/>");
+    }
   }
 
   private void prepare(PentagonRowHelper pentagonRow, int totalSize)

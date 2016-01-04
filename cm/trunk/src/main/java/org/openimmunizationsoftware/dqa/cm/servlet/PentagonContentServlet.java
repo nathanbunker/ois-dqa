@@ -69,8 +69,7 @@ public class PentagonContentServlet extends PentagonServlet
         out.println("  <li class=\"pentagon\">Report Box/Section</li>");
         out.println("  <li class=\"pentagon\">Report Row/Area</li>");
         out.println("</ul>");
-      }
-      else if (boxName.equals(BOX_NAME_REPORT_SELECT))
+      } else if (boxName.equals(BOX_NAME_REPORT_SELECT))
       {
         out.println("<div id=\"boxDetailsCalculation\">");
         out.println("<p class=\"pentagon\">Todo</p>");
@@ -333,8 +332,10 @@ public class PentagonContentServlet extends PentagonServlet
                 out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pb.getPentagonBox().getPriorityRow() + "</td>");
                 out.println(
                     "    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pb.getPentagonBox().getReportScoreGap() + "%</td>");
-                out.println("    <td class=\"" + styleClass + "\"><a class=\"pentagonMenuLink\" href=\"javascript: void(0);\" onClick=\"loadBoxContents('"
-                + pb.getPentagonRowHelper().getLabel() + ": " + pb.getTitle() + "', '" + pb.getBoxName() + "', '', true)\">" + pb.getTitle() + "</a></td>");
+                out.println(
+                    "    <td class=\"" + styleClass + "\"><a class=\"pentagonMenuLink\" href=\"javascript: void(0);\" onClick=\"loadBoxContents('"
+                        + pb.getPentagonRowHelper().getLabel() + ": " + pb.getTitle() + "', '" + pb.getBoxName() + "', '', true)\">" + pb.getTitle()
+                        + "</a></td>");
                 out.println("    <td class=\"" + styleClass + "\" style=\"text-align: center;\">" + pb.getPentagonBox().getReportWeight() + "%</td>");
                 out.println("  </tr>");
               }
@@ -384,8 +385,7 @@ public class PentagonContentServlet extends PentagonServlet
                 PentagonReport pentagonReportDisplay = PentagonReportLogic.createOrReturnPentagonReport(testConductedDisplay, dataSession);
                 out.println("    <td class=\"pentagon\">" + pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) + "%</td>");
                 {
-                  String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId() + "&" + PARAM_CONNECTION_LABEL
-                      + "=" + URLEncoder.encode(testConductedDisplay.getConnectionLabel(), "UTF-8");
+                  String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId();
                   out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + "\">" + testConductedDisplay.getConnectionLabel()
                       + "</a></td>");
                 }
@@ -706,15 +706,8 @@ public class PentagonContentServlet extends PentagonServlet
       out.println("    <td class=\"pentagon\">");
       out.println("     <h4 class=\"pentagon\">" + testConductedDisplay.getConnectionLabel() + "</h4>");
       out.println("     <p class=\"pentagon\">" + sdf.format(testConductedDisplay.getTestStartedTime()));
-      try
-      {
-        String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId() + "&" + PARAM_CONNECTION_LABEL + "="
-            + URLEncoder.encode(testConductedDisplay.getConnectionLabel(), "UTF-8");
-        out.println("     <br/><a class=\"pentagon\" href=\"" + link + "\">Select</a>");
-      } catch (UnsupportedEncodingException uie)
-      {
-        out.println("     <br/>Problem! " + uie.getMessage() + "</p>");
-      }
+      String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId();
+      out.println("     <br/><a class=\"pentagon\" href=\"" + link + "\">Select</a>");
       out.println("      </p>");
       out.println("    </td>");
       out.println("  </tr>");
