@@ -20,7 +20,7 @@ public class QFDataAvailable extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Submitting systems depend on the IIS to store all data submitted and return it when queried. "
         + "IIS that do not return data when queried will lose the confidence and support of submitters which will lead to further "
@@ -30,11 +30,11 @@ public class QFDataAvailable extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() < 100)
     {
-      out.println("<h3 class=\"pentagon\">Fail - Data Not Returned</h3>");
+      out.println("<h4 class=\"pentagon\">Fail - Data Not Returned</h4>");
       Query query = dataSession.createQuery("from TestMessage where testSection.testConducted = ? and testCaseAssertResult = 'MATCH' "
           + "and testType = 'query' and resultStoreStatus = 'a-nr' order by testCaseCategory");
       query.setParameter(0, pentagonReport.getTestConducted());
@@ -50,7 +50,7 @@ public class QFDataAvailable extends PentagonBoxHelper
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">For every query submitted during testing where:</p>");

@@ -24,7 +24,7 @@ public class QFQbp2015 extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">NIST 2015 certified systems must be able to query IIS for an evaluation and forecast for a patient record.  "
         + "As part of the certification process NIST created test scenarios after carefully reading the requirements in the CDC Implementation Guide "
@@ -33,11 +33,11 @@ public class QFQbp2015 extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() < 100)
     {
-      out.println("<h3 class=\"pentagon\">Fail - Match Not Found</h3>");
+      out.println("<h4 class=\"pentagon\">Fail - Match Not Found</h4>");
       Query query = dataSession
           .createQuery("from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' "
               + "and testType = 'query' order by testCaseCategory");
@@ -48,7 +48,7 @@ public class QFQbp2015 extends PentagonBoxHelper
     }
     if (pentagonBox.getReportScore() > 0)
     {
-      out.println("<h3 class=\"pentagon\">Pass - Match Found</h3>");
+      out.println("<h4 class=\"pentagon\">Pass - Match Found</h4>");
       Query query = dataSession
           .createQuery("from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' "
               + "and testType = 'query' order by testCaseCategory");
@@ -60,7 +60,7 @@ public class QFQbp2015 extends PentagonBoxHelper
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">This section tests to see if the IIS can respond with the required information for a given query "

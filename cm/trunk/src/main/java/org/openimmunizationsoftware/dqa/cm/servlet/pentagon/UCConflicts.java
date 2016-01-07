@@ -30,7 +30,7 @@ public class UCConflicts extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">A conformant IIS interface must not conflict with the national guide. A conformance HL7 interface "
         + "may define certain constraints on the national guide, however it can not reverse or change R, RE or X requirements, it can either "
@@ -39,7 +39,7 @@ public class UCConflicts extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(pentagonReport.getTestConducted(), dataSession);
     CompatibilityConformanceCount cccConflict = null;
@@ -56,17 +56,17 @@ public class UCConflicts extends PentagonBoxHelper
     }
     if (cccConflict == null && cccMajorConflict == null)
     {
-      out.println("<h3 class=\"pentagon\">No Conflicts Found</h3>");
+      out.println("<h4 class=\"pentagon\">No Conflicts Found</h4>");
       out.println("<p class=\"pentagon\">IIS interface does not appear to be in conflict with national standards. </p>");
     } else
     {
       if (cccMajorConflict != null)
       {
-        out.println("<h3 class=\"pentagon\">Major Conflicts Found</h3>");
+        out.println("<h4 class=\"pentagon\">Major Conflicts Found</h4>");
         out.println("<p class=\"pentagon\">A critical review needs to be conducted to see if this IIS conforms to the national specification. </p>");
       } else
       {
-        out.println("<h3 class=\"pentagon\">Conflicts Found</h3>");
+        out.println("<h4 class=\"pentagon\">Conflicts Found</h4>");
         out.println("<p class=\"pentagon\">A review needs to be conducted to verify that IIS conforms to the national specification. </p>");
       }
       out.println("<table class=\"pentagon\">");
@@ -152,7 +152,7 @@ public class UCConflicts extends PentagonBoxHelper
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is first set at 100% and then score is successively reduced by 20% for "

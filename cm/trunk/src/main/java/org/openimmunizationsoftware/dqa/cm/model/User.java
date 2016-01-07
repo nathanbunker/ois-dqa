@@ -2,7 +2,11 @@ package org.openimmunizationsoftware.dqa.cm.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
 public class User implements Serializable {
   private int userId = 0;
@@ -11,7 +15,19 @@ public class User implements Serializable {
   private String emailAddress = "";
   private ApplicationUser applicationUser = null;
   private List<ApplicationUser> applicationUserList = null;
+  private Map<String, UserSetting> userSettingMap = new HashMap<String, UserSetting>();
+  private Map<TestParticipant, ReportUser> reportUserMap = new HashMap<TestParticipant, ReportUser>();
   
+  public Map<TestParticipant, ReportUser> getReportUserMap()
+  {
+    return reportUserMap;
+  }
+
+  public Map<String, UserSetting> getUserSettingMap()
+  {
+    return userSettingMap;
+  }
+
   public boolean isSystemUser()
   {
     return userId == 2 || userId == 3 || userId == 4;

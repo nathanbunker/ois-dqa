@@ -22,7 +22,7 @@ public class UFVxu2014 extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() == 0)
     {
@@ -46,11 +46,11 @@ public class UFVxu2014 extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() < 100)
     {
-      out.println("<h3 class=\"pentagon\">Fail - NIST 2014 Example Was Not Accepted</h3>");
+      out.println("<h4 class=\"pentagon\">Fail - NIST 2014 Example Was Not Accepted</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
@@ -60,7 +60,7 @@ public class UFVxu2014 extends PentagonBoxHelper
     }
     if (pentagonBox.getReportScore() > 0)
     {
-      out.println("<h3 class=\"pentagon\">Pass - NIST 2014 Example Was Accepted</h3>");
+      out.println("<h4 class=\"pentagon\">Pass - NIST 2014 Example Was Accepted</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
@@ -71,7 +71,7 @@ public class UFVxu2014 extends PentagonBoxHelper
   }
   
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of NIST 2014 VXU messages were accepted. </p>");

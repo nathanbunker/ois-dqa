@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TesterCommand" table="tester_command">
+    <id name="testerCommandId" column="tester_command_id">
+      <generator class="native"/>
+    </id>
+    <property name="testerName" column="tester_name" type="string"/>
+    <many-to-one name="testParticipant" column="test_participant_id" class="TestParticipant"/>
+    <property name="commandText" column="command_text" type="string"/>
+    <property name="commandOptions" column="command_options" type="string"/>
+    <property name="runDate" column="run_date" type="timestamp"/>
+  </class>
+</hibernate-mapping>

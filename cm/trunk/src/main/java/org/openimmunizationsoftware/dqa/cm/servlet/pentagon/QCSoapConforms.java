@@ -24,7 +24,7 @@ public class QCSoapConforms extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">In 2015, AIRA launched an Interoperability Testing Project to determine the level of alignment between "
         + "current Immunization Information Systems (IIS) and the community's interoperability standards. The testing process connects with "
@@ -35,12 +35,12 @@ public class QCSoapConforms extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     TransportWsdlCdc transportWsdlCdc = null;
     {
       Query query = dataSession.createQuery("from TransportWsdlCdc where transportAnalysis.connectionLabel = ?");
-      query.setParameter(0, pentagonReport.getTestConducted().getConnectionLabel());
+      query.setParameter(0, pentagonReport.getTestConducted().getTestParticipant().getConnectionLabel());
       List<TransportWsdlCdc> transportWsdlCdcList = query.list();
       if (transportWsdlCdcList.size() > 0)
       {
@@ -50,7 +50,7 @@ public class QCSoapConforms extends PentagonBoxHelper
     TransportOther transportOther = null;
     {
       Query query = dataSession.createQuery("from TransportOther where transportAnalysis.connectionLabel = ?");
-      query.setParameter(0, pentagonReport.getTestConducted().getConnectionLabel());
+      query.setParameter(0, pentagonReport.getTestConducted().getTestParticipant().getConnectionLabel());
       List<TransportOther> transportOtherList = query.list();
       if (transportOtherList.size() > 0)
       {
@@ -67,11 +67,11 @@ public class QCSoapConforms extends PentagonBoxHelper
     }
     if (transportAnalysis == null)
     {
-      out.println("<h3 class=\"pentagon\">Transport Analysis</h3>");
+      out.println("<h4 class=\"pentagon\">Transport Analysis</h4>");
       out.println("<p class=\"pentagon\">Not completed</p>");
     } else if (transportWsdlCdc != null)
     {
-      out.println("<h3 class=\"pentagon\">CDC WSDL Analysis</h3>");
+      out.println("<h4 class=\"pentagon\">CDC WSDL Analysis</h4>");
       if (!transportAnalysis.getReportComplete().equalsIgnoreCase("Yes"))
       {
         out.println("<p class=\"pentagon\">Report is not complete yet. </p>");
@@ -122,13 +122,13 @@ public class QCSoapConforms extends PentagonBoxHelper
       }
     } else if (transportOther != null)
     {
-      out.println("<h3 class=\"pentagon\">Other Transport Analysis</h3>");
+      out.println("<h4 class=\"pentagon\">Other Transport Analysis</h4>");
     }
     // TODO Auto-generated method stub
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     // TODO Auto-generated method stub
@@ -142,7 +142,7 @@ public class QCSoapConforms extends PentagonBoxHelper
     TransportWsdlCdc transportWsdlCdc = null;
     {
       Query query = dataSession.createQuery("from TransportWsdlCdc where transportAnalysis.connectionLabel = ?");
-      query.setParameter(0, testConducted.getConnectionLabel());
+      query.setParameter(0, testConducted.getTestParticipant().getConnectionLabel());
       List<TransportWsdlCdc> transportWsdlCdcList = query.list();
       if (transportWsdlCdcList.size() > 0)
       {

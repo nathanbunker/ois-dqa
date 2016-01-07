@@ -70,7 +70,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
       {
         TestConducted testConducted = null;
         {
-          Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and testStartedTime = ?");
+          Query query = dataSession.createQuery("from TestConducted where testParticipant.connectionLabel = ? and testStartedTime = ?");
           query.setParameter(0, connectionLabel);
           query.setParameter(1, testStartedTime);
           List<TestConducted> testConductedList = query.list();
@@ -84,7 +84,12 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           if (testConducted == null)
           {
             testConducted = new TestConducted();
-            testConducted.setConnectionLabel(connectionLabel);
+            TestParticipant testParticipant = getTestParticipantByConnectionLabel(dataSession, connectionLabel);
+            if (testParticipant == null)
+            {
+              throw new IllegalArgumentException("Unrecognized connection " + connectionLabel);
+            }
+            testConducted.setTestParticipant(testParticipant);
             testConducted.setTestStartedTime(testStartedTime);
           }
           testConducted.setConnectionType(readValue(req, PARAM_TC_CONNECTION_TYPE, 250));
@@ -95,6 +100,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           testConducted.setQueryEnabled(readValue(req, PARAM_TC_QUERY_ENABLED, 1));
           testConducted.setQueryEnabled(readValue(req, PARAM_TC_QUERY_PAUSE, 1));
           testConducted.setCompleteTest(readValueBoolean(req, PARAM_TC_COMPLETE_TEST));
+          testConducted.setManualTest(readValueBoolean(req, PARAM_TC_MANUAL_TEST));
           testConducted.setTestLog(readValue(req, PARAM_TC_TEST_LOG));
           testConducted.setTestStatus(readValue(req, PARAM_TC_TEST_STATUS, 250));
           testConducted.setTestFinishedTime(readValueDate(req, PARAM_TC_TEST_FINISHED_TIME));
@@ -121,13 +127,13 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           testConducted.setPerUpdateMin(readValueInt(req, PARAM_TC_PER_UPDATE_MIN));
           testConducted.setPerUpdateMax(readValueInt(req, PARAM_TC_PER_UPDATE_MAX));
           testConducted.setPerUpdateStd(readValueFloat(req, PARAM_TC_PER_UPDATE_STD));
-          testConducted.setLatestTest(testConducted.isCompleteTest());
+          testConducted.setLatestTest(testConducted.isCompleteTest() && !testConducted.isManualTest());
           {
             Transaction transaction = dataSession.beginTransaction();
             dataSession.saveOrUpdate(testConducted);
             transaction.commit();
           }
-          
+
           {
             int i = 1;
             String transforms = readValue(req, PARAM_TC_TRANSFORMS + i);
@@ -195,8 +201,8 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
 
           if (testConducted.isCompleteTest())
           {
-            Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and latestTest = ?");
-            query.setParameter(0, testConducted.getConnectionLabel());
+            Query query = dataSession.createQuery("from TestConducted where testParticipant.connectionLabel = ? and latestTest = ?");
+            query.setParameter(0, testConducted.getTestParticipant().getConnectionLabel());
             query.setParameter(1, true);
             List<TestConducted> latestList = query.list();
             for (TestConducted latest : latestList)
@@ -656,13 +662,14 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                       testProfile.setUsageDetected(usageDetected);
                       testProfile.setAcceptExpected(masExpected.toString());
                       testProfile.setAcceptDetected(masDetected.toString());
-                      
+
                       ProfileUsage profileUsageBase = ProfileUsage.getBaseProfileUsage(dataSession);
                       ProfileUsageValue profileUsageValueBase = ProfileManager.getProfileUsageValue(dataSession, profileUsageBase, profileField);
                       if (profileUsageValueBase != null)
                       {
-                        Usage usageCompare =  ProfileUsageValueLogic.rectifyUsageForDetection(profileUsageValueBase);
-                        CompatibilityConformance compatibilityConformance = ProfileUsageValueLogic.getCompatibilityConformance(usageDetected, usageCompare);
+                        Usage usageCompare = ProfileUsageValueLogic.rectifyUsageForDetection(profileUsageValueBase);
+                        CompatibilityConformance compatibilityConformance = ProfileUsageValueLogic.getCompatibilityConformance(usageDetected,
+                            usageCompare);
                         testProfile.setCompatibilityConformance(compatibilityConformance);
                       }
                     }

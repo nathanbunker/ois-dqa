@@ -23,7 +23,7 @@ public class UFCodedValues extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The CDC Implementation Guide defines coded values that must be supported by conformant systems. "
         + "This section tests whether these coded values can be placed in messages without causing messages to NOT be accepted. "
@@ -32,11 +32,11 @@ public class UFCodedValues extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() < 100)
     {
-      out.println("<h3 class=\"pentagon\">Fail - Message Was Not Accepted</h3>");
+      out.println("<h4 class=\"pentagon\">Fail - Message Was Not Accepted</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE);
@@ -46,7 +46,7 @@ public class UFCodedValues extends PentagonBoxHelper
     }
     if (pentagonBox.getReportScore() > 0)
     {
-      out.println("<h3 class=\"pentagon\">Pass - Coded Value Accepted</h3>");
+      out.println("<h4 class=\"pentagon\">Pass - Coded Value Accepted</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE);
@@ -149,7 +149,7 @@ public class UFCodedValues extends PentagonBoxHelper
     }
   }
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages that returned a postive response from the IIS. </p>");

@@ -23,6 +23,7 @@ import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
+import org.openimmunizationsoftware.dqa.cm.model.UserType;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 
@@ -50,7 +51,8 @@ public abstract class BaseServlet extends HttpServlet
   {
     if (application.isApplicationAart())
     {
-      RequestDispatcher dispatcher = req.getRequestDispatcher("testReport?" + TestReportServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP);
+
+      RequestDispatcher dispatcher = req.getRequestDispatcher("testReport?" + TestReportServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_PENTAGON_REPORTS);
       dispatcher.forward(req, resp);
     } else
     {
@@ -76,7 +78,7 @@ public abstract class BaseServlet extends HttpServlet
     resp.setContentType("text/html");
     return webSession;
   }
-  
+
   protected HttpSession setupSkinny(HttpServletRequest req, HttpServletResponse resp) throws IOException
   {
     HttpSession webSession = req.getSession(true);
@@ -167,26 +169,19 @@ public abstract class BaseServlet extends HttpServlet
     } else if (application.isApplicationAart())
     {
       out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_HOME + "\" class=\"menuLink\">home</a>");
-      TestConducted testConducted = (TestConducted) webSession.getAttribute(ATTRIBUTE_TEST_CONDUCTED);
       out.println("     |");
-      out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP + "\" class=\"menuLink\">dashboard</a>");
-      out.println("     |");
-      out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_REPORTS + "\" class=\"menuLink\">reports</a>");
-      if (testConducted != null)
+      out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_PENTAGON_REPORTS + "\" class=\"menuLink\">report</a>");
+      if (userSession.getUser().getApplicationUser().getUserType() == UserType.ADMIN)
       {
         out.println("     |");
-        out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_TEST_MESSAGES
-            + "\" class=\"menuLink\">tests</a>");
-        TestMessage testMessage = (TestMessage) webSession.getAttribute(ATTRIBUTE_TEST_MESSAGE);
-        if (testMessage != null)
-        {
-          out.println("     |");
-          out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_FIELD_COMPARISON
-              + "\" class=\"menuLink\">fields</a>");
-        }
+        out.println("     <a href=\"manualManage?" + HomeServlet.PARAM_VIEW + "=" + ManualManageServlet.VIEW_HL7_DOWNLOAD + "\" class=\"menuLink\">messages</a>"); 
+        out.println("     |");
+        out.println("     <a href=\"manualManage?" + HomeServlet.PARAM_VIEW + "=" + ManualManageServlet.VIEW_HL7_TESTERS + "\" class=\"menuLink\">testers</a>"); 
+        out.println("     |");
+        out.println("     <a href=\"profile\" class=\"menuLink\">profile</a>");
+        out.println("     |");
+        out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP + "\" class=\"menuLink\">old dashboard</a>");
       }
-      out.println("     |");
-      out.println("     <a href=\"profile\" class=\"menuLink\">profile</a>");
     } else
     {
       out.println("     <a href=\"home\" class=\"menuLink\">home</a>");
@@ -210,7 +205,7 @@ public abstract class BaseServlet extends HttpServlet
     out.println("    <div class=\"contents\">");
 
   }
-  
+
   protected void createHeaderForGuide(HttpSession webSession)
   {
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);

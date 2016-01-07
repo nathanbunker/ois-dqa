@@ -39,6 +39,7 @@
     <property name="resultQueryType" column="result_query_type" type="string"/>
     <property name="resultStoreStatus" column="result_store_status" type="string"/>
     <property name="resultForecastStatus" column="result_forecast_status" type="string"/>
+    <property name="resultManualTest" column="result_manual_test" type="yes_no"/>
     <property name="forecastTestPanelCaseId" column="forecast_test_panel_case_id" type="integer"/>
     <property name="forecastTestPanelId" column="forecast_test_panel_id" type="integer"/>
   </class>

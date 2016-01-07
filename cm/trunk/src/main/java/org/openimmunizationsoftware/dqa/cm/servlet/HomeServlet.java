@@ -94,6 +94,11 @@ public class HomeServlet extends BaseServlet
   protected static final String VIEW_SEARCH = "search";
   protected static final String VIEW_TABLE = "table";
   protected static final String VIEW_CODE = "code";
+  
+  
+  public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
+  public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
+
 
   private String paramCodeValue = null;
   private String paramCodeLabel = null;
@@ -148,6 +153,8 @@ public class HomeServlet extends BaseServlet
         } else if (action.equals(ACTION_LOGOUT))
         {
           logout(webSession);
+          webSession = req.getSession(true);
+          userSession = null;
         } else if (action.equals(ACTION_SELECT_APPLICATION))
         {
           if (userSession.getUser() != null)
@@ -236,8 +243,9 @@ public class HomeServlet extends BaseServlet
               addAttributeComment("" + contextCodeMaster.getCodeId(), AttributeTypeLogic.AT_CONTEXT_CODE, "", codeMaster, userSession);
             }
             addAttributeComment(paramCodeLabel, AttributeTypeLogic.AT_CODE_LABEL, paramCommentText, codeMaster, userSession);
-            addAttributeComment(paramUseValue, AttributeTypeLogic.AT_USE_VALUE, paramUseValue.equals(paramCodeValue) ? "Same as code value"
-                : "Different than code value, value is being mapped", codeMaster, userSession);
+            addAttributeComment(paramUseValue, AttributeTypeLogic.AT_USE_VALUE,
+                paramUseValue.equals(paramCodeValue) ? "Same as code value" : "Different than code value, value is being mapped", codeMaster,
+                userSession);
             addAttributeComment(paramCodeStatus, AttributeTypeLogic.AT_CODE_STATUS, "Initially defined value", codeMaster, userSession);
             if (!paramHl7CodeTable.equals(""))
             {
@@ -888,8 +896,8 @@ public class HomeServlet extends BaseServlet
             AllowedValue allowedValue = AllowedValueLogic.getAllowedValue(at, getValueLabel(ai, userSession), dataSession);
             if (allowedValue != null)
             {
-              out.println("    <td class=\"" + classString + "\"><a href=\"" + link + "\">" + allowedValue.getDisplayText() + "</a>"
-                  + issueCountLabel + "</td>");
+              out.println("    <td class=\"" + classString + "\"><a href=\"" + link + "\">" + allowedValue.getDisplayText() + "</a>" + issueCountLabel
+                  + "</td>");
             } else
             {
               out.println("    <td class=\"" + classString + "\"><a href=\"" + link + "\">" + getValueLabel(ai, userSession) + "</a>"
@@ -941,12 +949,13 @@ public class HomeServlet extends BaseServlet
       if (userSession.canEdit())
       {
         out.println("<form action=\"home\" method=\"POST\">");
-        out.println("<input type=\"hidden\" name=\"" + PARAM_CODE_TABLE_INSTANCE_ID + "\" value=\"" + codeTableInstance.getTableInstanceId() + "\"/>");
+        out.println(
+            "<input type=\"hidden\" name=\"" + PARAM_CODE_TABLE_INSTANCE_ID + "\" value=\"" + codeTableInstance.getTableInstanceId() + "\"/>");
         out.println("<input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"" + view + "\"/>");
         if (contextCodeInstance != null)
         {
-          out.println("<input type=\"hidden\" name=\"" + PARAM_CONTEXT_CODE_INSTANCE_ID + "\" value=\"" + contextCodeInstance.getCodeInstanceId()
-              + "\"/>");
+          out.println(
+              "<input type=\"hidden\" name=\"" + PARAM_CONTEXT_CODE_INSTANCE_ID + "\" value=\"" + contextCodeInstance.getCodeInstanceId() + "\"/>");
         }
         out.println("<input type=\"hidden\" name=\"" + PARAM_CODE_INSTANCE_ID + "\" value=\"" + codeInstance.getCodeInstanceId() + "\"/>");
       }
@@ -979,8 +988,8 @@ public class HomeServlet extends BaseServlet
         }
         out.println("    </td>");
         out.println("    <td>");
-        out.println("      <a href=\"" + supportingInfo.getResource().getUrl() + "\">" + supportingInfo.getResource().getDisplayLabel()
-            + "</a>><br/>");
+        out.println(
+            "      <a href=\"" + supportingInfo.getResource().getUrl() + "\">" + supportingInfo.getResource().getDisplayLabel() + "</a>><br/>");
         if (supportingInfo.getAbstractText() != null && supportingInfo.getAbstractText().length() > 0)
         {
           out.println("      Abstract:</br>");
@@ -1355,8 +1364,8 @@ public class HomeServlet extends BaseServlet
     out.println("<input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"" + view + "\"/>");
     if (contextCodeInstance != null)
     {
-      out.println("<input type=\"hidden\" name=\"" + PARAM_CONTEXT_CODE_INSTANCE_ID + "\" value=\"" + contextCodeInstance.getCodeInstanceId()
-          + "\"/>");
+      out.println(
+          "<input type=\"hidden\" name=\"" + PARAM_CONTEXT_CODE_INSTANCE_ID + "\" value=\"" + contextCodeInstance.getCodeInstanceId() + "\"/>");
     }
     if (userSession.canEdit())
     {
@@ -1365,8 +1374,8 @@ public class HomeServlet extends BaseServlet
       out.println("<input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"" + view + "\"/>");
       if (contextCodeInstance != null)
       {
-        out.println("<input type=\"hidden\" name=\"" + PARAM_CONTEXT_CODE_INSTANCE_ID + "\" value=\"" + contextCodeInstance.getCodeInstanceId()
-            + "\"/>");
+        out.println(
+            "<input type=\"hidden\" name=\"" + PARAM_CONTEXT_CODE_INSTANCE_ID + "\" value=\"" + contextCodeInstance.getCodeInstanceId() + "\"/>");
       }
       out.println("  <table width=\"100%\">");
       out.println("    <caption>Add New Code Value</caption>");

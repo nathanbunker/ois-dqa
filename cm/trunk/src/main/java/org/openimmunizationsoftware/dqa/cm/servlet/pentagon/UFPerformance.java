@@ -20,7 +20,7 @@ public class UFPerformance extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession,PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession,PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println(
         "<p class=\"pentagon\">Ideally IIS should respond quickly to updates received. Rapid response reduces transmission times for large amounts"
@@ -31,10 +31,10 @@ public class UFPerformance extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     int average = (int) (((double) pentagonReport.getTestConducted().getPerUpdateTotal()) / pentagonReport.getTestConducted().getPerUpdateCount() + 0.5);
-    out.println("<h3 class=\"pentagon\">Response Time</h3>");
+    out.println("<h4 class=\"pentagon\">Response Time</h4>");
     out.println("<ul class=\"pentagon\">");
     out.println("  <li class=\"pentagon\">Average: " + TestReportServlet.createTime(average) + "</li>");
     out.println("  <li class=\"pentagon\">Minimum: " + TestReportServlet.createTime(pentagonReport.getTestConducted().getPerUpdateMin()) + "</li>");
@@ -45,7 +45,7 @@ public class UFPerformance extends PentagonBoxHelper
 
   
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<ul class=\"pentagon\">");

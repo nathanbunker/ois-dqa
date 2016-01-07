@@ -2,6 +2,11 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -9,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.cm.logic.ApplicationLogic;
@@ -20,8 +26,10 @@ import org.openimmunizationsoftware.dqa.cm.logic.thread.UpdateIssueCountThread;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
 import org.openimmunizationsoftware.dqa.cm.model.ApplicationUser;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
+import org.openimmunizationsoftware.dqa.cm.model.ReportUser;
 import org.openimmunizationsoftware.dqa.cm.model.User;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
+import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
 public class AdminUserServlet extends BaseServlet
 {
@@ -45,11 +53,14 @@ public class AdminUserServlet extends BaseServlet
   public static final String ACTION_ADD_USER = "Add User";
   public static final String PARAM_USER_ID = "userId";
   public static final String ACTION_UPDATE_USER = "Update User";
+  public static final String ACTION_UPDATE_REPORT_USER = "Update Report Access";
   public static final String ACTION_RESET_PASSWORD = "Reset Password";
   public static final String PARAM_USER_NAME = "userName";
   public static final String PARAM_EMAIL_ADDRESS = "emailAddress";
   public static final String PARAM_USER_TYPE = "userType";
   public static final String PARAM_APPLICATION_ID = "applicationId";
+  public static final String PARAM_REPORT_ROLE = "reportRole";
+  public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
 
   private static ReleaseNewVersionThread releaseNewVersionThread = null;
   private static DeleteProposedVersionThread deleteProposedVersionThread = null;
@@ -160,6 +171,29 @@ public class AdminUserServlet extends BaseServlet
       {
         UserLogic.resetPassword(userBeingEdited, dataSession);
         userSession.setMessageConfirmation("Password is now " + userBeingEdited.getPassword());
+      } else if (action.equals(ACTION_UPDATE_REPORT_USER))
+      {
+        List<TestParticipant> testParticipantListSelected = new ArrayList<TestParticipant>(userBeingEdited.getReportUserMap().keySet());
+        for (TestParticipant testParticipant : testParticipantListSelected)
+        {
+          ReportUser reportUser = userBeingEdited.getReportUserMap().get(testParticipant);
+          String reportRoleString = req.getParameter(PARAM_REPORT_ROLE + "." + reportUser.getReportUserId());
+          reportUser.setReportRoleString(reportRoleString);
+        }
+        String testParticipantIdString = req.getParameter(PARAM_TEST_PARTICIPANT_ID);
+        String reportRoleString = req.getParameter(PARAM_REPORT_ROLE);
+        if (!testParticipantIdString.equals("") && !reportRoleString.equals(""))
+        {
+          TestParticipant testParticipant = (TestParticipant) dataSession.get(TestParticipant.class, Integer.parseInt(testParticipantIdString));
+          ReportUser reportUser = new ReportUser();
+          reportUser.setUser(userBeingEdited);
+          reportUser.setTestParticipant(testParticipant);
+          reportUser.setAuthorizedByUser(userSession.getUser());
+          reportUser.setAuthorizedDate(new Date());
+          reportUser.setReportRoleString(reportRoleString);
+          userBeingEdited.getReportUserMap().put(testParticipant, reportUser);
+        }
+        UserLogic.updateUser(userBeingEdited, dataSession);
       }
     }
 
@@ -233,7 +267,7 @@ public class AdminUserServlet extends BaseServlet
     out.println("    <caption>Users</caption>");
     out.println("    <tr>");
     out.println("      <th>User Name</th>");
-    // out.println("      <th>User Type</th>");
+    // out.println(" <th>User Type</th>");
     out.println("    <tr>");
     List<User> userList = UserLogic.getUserList(userSession.getDataSession());
     for (User u : userList)
@@ -246,7 +280,7 @@ public class AdminUserServlet extends BaseServlet
       }
       out.println("    <tr>");
       out.println("      <td class=\"" + classString + "\"><a href=\"" + link + "\">" + u.getUserName() + "</a></td>");
-      // out.println("      <td class=\"" + classString + "\"><a href=\""
+      // out.println(" <td class=\"" + classString + "\"><a href=\""
       // + link + "\">" + u.getUserType() + "</a></td>");
       out.println("    <tr>");
     }
@@ -268,14 +302,15 @@ public class AdminUserServlet extends BaseServlet
       out.println("    <tr>");
       out.println("    <tr>");
       out.println("      <th>User Name</th>");
-      out.println("      <td><input type=\"text\" name=\"" + PARAM_USER_NAME + "\" value=\"" + userBeingEdited.getUserName()
-          + "\" size=\"30\"/></td>");
+      out.println(
+          "      <td><input type=\"text\" name=\"" + PARAM_USER_NAME + "\" value=\"" + userBeingEdited.getUserName() + "\" size=\"30\"/></td>");
       out.println("    <tr>");
       out.println("    <tr>");
       out.println("      <th>Email</th>");
       out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" value=\"" + userBeingEdited.getEmailAddress()
           + "\" size=\"30\"/></td>");
       out.println("    <tr>");
+      boolean isAartUser = false;
       for (Application application : ApplicationLogic.getApplications(userSession.getDataSession()))
       {
         out.println("    <tr>");
@@ -299,6 +334,10 @@ public class AdminUserServlet extends BaseServlet
         }
         out.println("         </select>");
         out.println("      </td>");
+        if (application.isApplicationAart() && userTypeSelected != null)
+        {
+          isAartUser = userTypeSelected == UserType.ADMIN || userTypeSelected == UserType.EXPERT;
+        }
       }
       out.println("    <tr>");
       out.println("    <tr>");
@@ -310,6 +349,86 @@ public class AdminUserServlet extends BaseServlet
       out.println("  </table>");
       out.println("  <br/>");
       out.println("  </form>");
+
+      if (isAartUser)
+      {
+        out.println("  <form action=\"adminUser\" method=\"POST\">");
+        out.println("  <input type=\"hidden\" name=\"" + PARAM_USER_ID + "\" value=\"" + userBeingEdited.getUserId() + "\"/>");
+        out.println("  <table width=\"100%\">");
+        out.println("    <caption>AART Report Access</caption>");
+        out.println("    <tr>");
+        out.println("      <th>Connection Label</th>");
+        out.println("      <th>Report Role</th>");
+        out.println("      <th>Granted By</th>");
+        out.println("      <th>Date</th>");
+        out.println("    </tr>");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        List<TestParticipant> testParticipantListSelected = new ArrayList<TestParticipant>(userBeingEdited.getReportUserMap().keySet());
+        Collections.sort(testParticipantListSelected, new Comparator<TestParticipant>() {
+          @Override
+          public int compare(TestParticipant tp1, TestParticipant tp2)
+          {
+            return tp1.getConnectionLabel().compareTo(tp2.getConnectionLabel());
+          }
+        });
+        for (TestParticipant testParticipant : testParticipantListSelected)
+        {
+          ReportUser reportUser = userBeingEdited.getReportUserMap().get(testParticipant);
+          out.println("    <tr>");
+          out.println("      <td>" + testParticipant.getConnectionLabel() + "</td>");
+          out.println("      <td>");
+          out.println("         <select name=\"" + PARAM_REPORT_ROLE + "." + reportUser.getReportUserId() + "\">");
+          UserType reportRoleSelected = reportUser.getReportRole();
+          for (UserType userType : UserType.values())
+          {
+            out.println("           <option value=\"" + userType.getId() + "\"" + (userType == reportRoleSelected ? " selected=\"true\"" : "") + ">"
+                + userType.getLabel() + "</option>");
+          }
+          out.println("         </select>");
+          out.println("      </td>");
+          out.println("      <td>" + reportUser.getAuthorizedByUser().getUserName() + "</td>");
+          out.println("      <td>" + sdf.format(reportUser.getAuthorizedDate()) + "</td>");
+          out.println("    </tr>");
+        }
+        out.println("    <tr>");
+        out.println("      <td>");
+        List<TestParticipant> testParticipantList = null;
+        {
+          Query query = userSession.getDataSession().createQuery("from TestParticipant order by connectionLabel");
+          testParticipantList = query.list();
+        }
+
+        out.println("         <select name=\"" + PARAM_TEST_PARTICIPANT_ID + "\">");
+        out.println("           <option value=\"\">--select--</option>");
+        for (TestParticipant tp : testParticipantList)
+        {
+          if (!testParticipantListSelected.contains(tp))
+          {
+            out.println("           <option value=\"" + tp.getTestParticipantId() + "\">" + tp.getConnectionLabel() + "</option>");
+          }
+        }
+        out.println("      </td>");
+        out.println("      <td>");
+        out.println("         <select name=\"" + PARAM_REPORT_ROLE + "\">");
+        out.println("           <option value=\"\">--select--</option>");
+        for (UserType userType : UserType.values())
+        {
+          out.println("           <option value=\"" + userType.getId() + "\">" + userType.getLabel() + "</option>");
+        }
+        out.println("         </select>");
+        out.println("      </td>");
+        out.println("      <td colspan=\"2\"></td>");
+        out.println("    </tr>");
+        out.println("    <tr>");
+        out.println("      <td colspan=\"4\" align=\"right\">");
+        out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_UPDATE_REPORT_USER + "\"/>");
+        out.println("      </td>");
+        out.println("    <tr>");
+        out.println("  </table>");
+        out.println("  <br/>");
+        out.println("  </form>");
+
+      }
     }
   }
 
