@@ -22,7 +22,7 @@ public class CAckConform extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Acknowledgment messages returned should conform to the CDC Implementation Guide and HL7 requirements. "
         + "Non-conformant messages may be incorrectly read by the testing system. "
@@ -33,14 +33,14 @@ public class CAckConform extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() >= 100)
     {
-      out.println("<h3 class=\"pentagon\">Acks Conform</h3>");
+      out.println("<h4 class=\"pentagon\">Acks Conform</h4>");
     } else
     {
-      out.println("<h3 class=\"pentagon\">Conformance Problems Found</h3>");
+      out.println("<h4 class=\"pentagon\">Conformance Problems Found</h4>");
       out.println("<table class=\"pentagon\">");
       out.println("  <tr class=\"pentagon\">");
       out.println("    <th class=\"pentagon\">Accepted</th>");
@@ -79,7 +79,7 @@ public class CAckConform extends PentagonBoxHelper
         }
       }
       out.println("</table>");
-      out.println("<h3 class=\"pentagon\">Acks Conform</h3>");
+      out.println("<h4 class=\"pentagon\">Acks Conform</h4>");
       if (countOk == 0)
       {
         out.println("<p class=\"pentagon\">None of the acknowledgement messages conform. </p>");
@@ -114,11 +114,11 @@ public class CAckConform extends PentagonBoxHelper
       }
       if (countTotal == 0)
       {
-        out.println("<h3 class=\"pentagon\">Problem Validating for Conformance</h3>");
+        out.println("<h4 class=\"pentagon\">Problem Validating for Conformance</h4>");
         out.println("<p class=\"pentagon\">Score can not be calculated because tests were not validated for conformance. </p>");
       } else if (countTotal < testMessageList.size())
       {
-        out.println("<h3 class=\"pentagon\">Problem Validating for Conformance</h3>");
+        out.println("<h4 class=\"pentagon\">Problem Validating for Conformance</h4>");
         out.println("<p class=\"pentagon\">" + (testMessageList.size() - countTotal) + "/" + testMessageList.size()
             + " were not validated for conformance.</p>");
       }
@@ -127,7 +127,7 @@ public class CAckConform extends PentagonBoxHelper
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Each acknowledgement message returned for Good and Bad messages is checked for conformance "

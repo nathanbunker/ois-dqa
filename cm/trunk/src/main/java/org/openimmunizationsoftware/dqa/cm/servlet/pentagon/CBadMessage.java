@@ -23,7 +23,7 @@ public class CBadMessage extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() == 100)
     {
@@ -37,16 +37,16 @@ public class CBadMessage extends PentagonBoxHelper
           "<p class=\"pentagon\">Messages that have severe data quality or format issues that should prevent them from being read and properly saved by most IIS "
               + "are considered to be bad messages. While there may be some exceptions in certain cases most IIS should be identifying and "
               + "acknowledging the problems in these messages when replying. This score reflects the ability of the IIS to identify and communicate "
-              + "issues that are present in bad messages or the ability of this report to understanda the not accept message from the IIS.</p> ");
+              + "issues that are present in bad messages or the ability of this report to understand the not accept message from the IIS.</p> ");
     }
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() < 100)
     {
-      out.println("<h3 class=\"pentagon\">Fail - Bad Message Was Accepted</h3>");
+      out.println("<h4 class=\"pentagon\">Fail - Bad Message Was Accepted</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
@@ -56,7 +56,7 @@ public class CBadMessage extends PentagonBoxHelper
     }
     if (pentagonBox.getReportScore() > 0)
     {
-      out.println("<h3 class=\"pentagon\">Pass - Bad Message Was Rejected</h3>");
+      out.println("<h4 class=\"pentagon\">Pass - Bad Message Was Rejected</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
@@ -67,7 +67,7 @@ public class CBadMessage extends PentagonBoxHelper
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println(

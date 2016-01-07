@@ -4,17 +4,17 @@
   <session-factory>
     <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
 
+<!--
     <property name="hibernate.connection.url">jdbc:mysql://localhost/oisptorg_cm</property>
     <property name="hibernate.connection.username">oisptorg_cm_web</property>
     <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
     <property name="connection.password">SavvyTrainPendedMucked81</property>
+ -->
 
-<!--
     <property name="hibernate.connection.url">jdbc:mysql://localhost/dqacm</property>
     <property name="hibernate.connection.username">dqacm_web</property>
     <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
     <property name="connection.password">SharkBaitHooHaHa</property>
- -->
  
     <property name="show_sql">false</property>
     <property name="hibernate.c3p0.acquire_increment">1</property>
@@ -37,8 +37,10 @@
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/CodeTableInstance.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/ReleaseVersion.hbm.xml"/> 
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/Resource.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/ReportUser.hbm.xml"/> 
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/SupportingInfo.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/User.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/UserSetting.hbm.xml"/> 
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestConducted.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestMessage.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestParticipant.hbm.xml"/>
@@ -58,6 +60,8 @@
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ProfileUsage.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ProfileUsageValue.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ProfileField.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TesterStatus.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TesterCommand.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Transform.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TransformField.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TransportAnalysis.hbm.xml"/>

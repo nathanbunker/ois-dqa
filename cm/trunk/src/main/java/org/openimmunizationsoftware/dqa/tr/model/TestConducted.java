@@ -3,16 +3,22 @@ package org.openimmunizationsoftware.dqa.tr.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.openimmunizationsoftware.dqa.cm.model.ReportUser;
+import org.openimmunizationsoftware.dqa.cm.model.UserType;
+import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
+
 public class TestConducted implements Serializable {
 
   private int testConductedId = 0;
-  private String connectionLabel = "";
   private String connectionType = "";
   private String connectionUrl = "";
   private String connectionAckType = "";
   private String connectionConfig = "";
   private boolean latestTest = false;
   private boolean completeTest = false;
+  private boolean manualTest = false;
   private String queryType = "";
   private String queryEnabled = "";
   private String queryPause = "";
@@ -43,6 +49,27 @@ public class TestConducted implements Serializable {
   private int perUpdateMin = 0;
   private int perUpdateMax = 0;
   private float perUpdateStd = 0.0f;
+  private TestParticipant testParticipant = null; 
+
+  public boolean isManualTest()
+  {
+    return manualTest;
+  }
+
+  public void setManualTest(boolean manualTest)
+  {
+    this.manualTest = manualTest;
+  }
+
+  public void setTestParticipant(TestParticipant testParticipant)
+  {
+    this.testParticipant = testParticipant;
+  }
+
+  public TestParticipant getTestParticipant()
+  {
+    return testParticipant;
+  }
 
   public boolean isCompleteTest() {
     return completeTest;
@@ -226,14 +253,6 @@ public class TestConducted implements Serializable {
 
   public void setTestConductedId(int testConductedId) {
     this.testConductedId = testConductedId;
-  }
-
-  public String getConnectionLabel() {
-    return connectionLabel;
-  }
-
-  public void setConnectionLabel(String connectionLabel) {
-    this.connectionLabel = connectionLabel;
   }
 
   public String getConnectionType() {

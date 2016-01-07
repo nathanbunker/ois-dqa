@@ -23,7 +23,7 @@ public class UCConstraints extends UCConflicts
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println(
         "<p class=\"pentagon\">A conformant IIS may constrain or modify the national guide in certain ways in order to apply local requirements. "
@@ -34,7 +34,7 @@ public class UCConstraints extends UCConflicts
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(pentagonReport.getTestConducted(), dataSession);
     CompatibilityConformanceCount cccConstraint = null;
@@ -51,18 +51,18 @@ public class UCConstraints extends UCConflicts
     }
     if (cccConstraint == null && cccMajorConstraint == null)
     {
-      out.println("<h3 class=\"pentagon\">No Constraints Found</h3>");
+      out.println("<h4 class=\"pentagon\">No Constraints Found</h4>");
       out.println("<p class=\"pentagon\">IIS interface does not appear to constrain the national standard. </p>");
     } else
     {
       if (cccMajorConstraint != null)
       {
-        out.println("<h3 class=\"pentagon\">Major Constraints Found</h3>");
+        out.println("<h4 class=\"pentagon\">Major Constraints Found</h4>");
         out.println(
             "<p class=\"pentagon\">A review needs to be conducted of constraints to verify business need in balance with interoperability need. </p>");
       } else
       {
-        out.println("<h3 class=\"pentagon\">Constraints Found</h3>");
+        out.println("<h4 class=\"pentagon\">Constraints Found</h4>");
         out.println("<p class=\"pentagon\">A review may be conducted to verify business need in balance with interoperability need. </p>");
       }
       out.println("<table class=\"pentagon\">");
@@ -88,7 +88,7 @@ public class UCConstraints extends UCConflicts
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is first set at 100% and then score is successively reduced by 20% for "

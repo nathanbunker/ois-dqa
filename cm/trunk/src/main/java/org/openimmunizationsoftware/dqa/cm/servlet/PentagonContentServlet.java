@@ -2,8 +2,6 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,12 +15,13 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.immunizationsoftware.dqa.transform.TestCaseMessage;
+import org.immunizationsoftware.dqa.transform.Transformer;
 import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonBoxHelper;
 import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonRowHelper;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.logic.PentagonReportLogic;
 import org.openimmunizationsoftware.dqa.tr.model.Assertion;
-import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
@@ -77,18 +76,20 @@ public class PentagonContentServlet extends PentagonServlet
         {
           out.println("<div id=\"boxDetailsHistory\">");
           List<TestConducted> testConductedList = getTestConductedList(dataSession, testConducted);
-          printReportsRun(dataSession, out, testConductedList);
+          printReportTable(dataSession, out, testConductedList, userSession);
           out.println("</div>");
         }
         {
           out.println("<div id=\"boxDetailsComparison\">");
           List<TestConducted> testConductedList = getOtherIISTestReports(dataSession);
-          printReportsRun(dataSession, out, testConductedList);
+          printReportsRun(dataSession, out, testConductedList, userSession);
           out.println("</div>");
         }
 
         out.println("<div id=\"boxDetailsOverview\">");
+        out.println("</div>");
 
+        out.println("<div id=\"boxDetailsDetails\">");
         String selector = req.getParameter(PARAM_SELECTOR);
         if (selector == null || selector.equals(""))
         {
@@ -125,11 +126,28 @@ public class PentagonContentServlet extends PentagonServlet
             out.println("  <tr class=\"pentagon\">");
             out.println("    <td class=\"pentagon\"><a href=\"javascript: void;\" onClick=\"loadBoxContents('" + BOX_NAME_REPORT_SELECT + "', '"
                 + testSection.getTestSectionId() + "')\">" + testSection.getTestSectionType() + "</a></td>");
-            out.println("    <td class=\"pentagon\">" + testSection.getCountLevel1() + "</td>");
-            out.println("    <td class=\"pentagon\">" + testSection.getCountLevel2() + "</td>");
+            if (testSection.getCountLevel1() < 0)
+            {
+              out.println("    <td class=\"pentagon\">Not Run</td>");
+            } else
+            {
+              out.println("    <td class=\"pentagon\">" + testSection.getCountLevel1() + "</td>");
+            }
+            if (testSection.getCountLevel2() < 0)
+            {
+              out.println("    <td class=\"pentagon\">Not Run</td>");
+            } else
+            {
+              out.println("    <td class=\"pentagon\">" + testSection.getCountLevel2() + "</td>");
+            }
             out.println("  </tr>");
           }
           out.println("</table>");
+          out.println("<br/>");
+          out.println("<h4 class=\"pentagon\">Download HL7</h4>");
+          out.println("<p class=\"pentagon\">The HL7 messages sent and received can be downloaded and used for other testing purposes. </p>");
+          showDownloads(out, testConducted, testSectionList);
+
         } else
         {
           int testSectionId = Integer.parseInt(selector);
@@ -255,13 +273,17 @@ public class PentagonContentServlet extends PentagonServlet
               out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
               printScoreChart(out, pentagonBoxHelper.getScore());
               out.println("</span>");
-              pentagonBoxHelper.printDescription(out, dataSession, pentagonReport, webSession, userSession);
-              pentagonBoxHelper.printContents(out, dataSession, pentagonReport, webSession, userSession);
+              pentagonBoxHelper.printOverview(out, dataSession, pentagonReport, webSession, userSession);
+              out.println("</div>");
+            }
+            {
+              out.println("<div id=\"boxDetailsDetails\">");
+              pentagonBoxHelper.printDetails(out, dataSession, pentagonReport, webSession, userSession);
               out.println("</div>");
             }
             {
               out.println("<div id=\"boxDetailsCalculation\" style=\"display:none; \">");
-              pentagonBoxHelper.printScoreExplanation(out, dataSession, pentagonReport, webSession, userSession);
+              pentagonBoxHelper.printCalculation(out, dataSession, pentagonReport, webSession, userSession);
               out.println("</div>");
             }
             {
@@ -360,7 +382,13 @@ public class PentagonContentServlet extends PentagonServlet
                   PentagonReport pentagonReportDisplay = PentagonReportLogic.createOrReturnPentagonReport(testConductedDisplay, dataSession);
                   String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId();
                   out.println("  <tr class=\"pentagon\">");
-                  out.println("    <td class=\"pentagon\">" + pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) + "</td>");
+                  if (pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) < 0)
+                  {
+                    out.println("    <td class=\"pentagon\">Not Run</td>");
+                  } else
+                  {
+                    out.println("    <td class=\"pentagon\">" + pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) + "</td>");
+                  }
                   out.println(
                       "    <td class=\"pentagon\"><a href=\"" + link + "\">" + sdf.format(testConductedDisplay.getTestStartedTime()) + "</a></td>");
                   out.println("  </tr>");
@@ -372,26 +400,7 @@ public class PentagonContentServlet extends PentagonServlet
             {
               out.println("<div id=\"boxDetailsComparison\" style=\"display:none; \">");
               out.println("<p class=\"pentagon\">How does this score compare with the scores from other IIS? </p>");
-              List<TestConducted> testConductedList = getOtherIISTestReports(dataSession);
-              out.println("<table class=\"pentagon\">");
-              out.println("  <tr class=\"pentagon\">");
-              out.println("    <th class=\"pentagon\">Score</th>");
-              out.println("    <th class=\"pentagon\">IIS</th>");
-              out.println("  </tr>");
-
-              for (TestConducted testConductedDisplay : testConductedList)
-              {
-                out.println("  <tr class=\"pentagon\">");
-                PentagonReport pentagonReportDisplay = PentagonReportLogic.createOrReturnPentagonReport(testConductedDisplay, dataSession);
-                out.println("    <td class=\"pentagon\">" + pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) + "%</td>");
-                {
-                  String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId();
-                  out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + "\">" + testConductedDisplay.getConnectionLabel()
-                      + "</a></td>");
-                }
-                out.println("  </tr>");
-              }
-              out.println("  </table>");
+              printIISSelectionList(dataSession, out, pentagonBoxHelper, userSession);
               out.println("</div>");
             }
 
@@ -431,10 +440,121 @@ public class PentagonContentServlet extends PentagonServlet
       {
         testMessage = (TestMessage) dataSession.get(TestMessage.class, testMessageId);
       }
+      boolean anonymize = !testMessage.getTestSection().getTestConducted().getTestParticipant().canViewConnectionLabel(userSession);
 
-      printTestMessage(dataSession, out, profileUsage, testMessage);
+      printTestMessage(dataSession, out, profileUsage, testMessage, anonymize);
     }
     out.close();
+  }
+
+  public static void showDownloads(PrintWriter out, TestConducted testConducted, List<TestSection> testSectionList)
+  {
+    out.println("<table class=\"pentagon\">");
+    out.println("  <tr class=\"pentagon\">");
+    out.println("    <th class=\"pentagon\">Test Areas</th>");
+    out.println("    <th class=\"pentagon\">Updates</th>");
+    out.println("    <th class=\"pentagon\">Acks</th>");
+    out.println("    <th class=\"pentagon\">Queries</th>");
+    out.println("    <th class=\"pentagon\">Responses</th>");
+    out.println("  </tr>");
+    boolean queriesWereRun = false;
+    for (TestSection testSection : testSectionList)
+    {
+      String link = "hl7Download?" + HL7DownloadServlet.PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId() + "&"
+          + HL7DownloadServlet.PARAM_TEST_SECTION_ID + "=" + testSection.getTestSectionId() + "&" + HL7DownloadServlet.PARAM_TYPE + "=";
+      if (testSection.getTestSectionType().equals(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE))
+      {
+        continue;
+      }
+      if (testSection.getTestSectionType().equals(RecordServletInterface.VALUE_TEST_SECTION_TYPE_CONFORMANCE_2015))
+      {
+        continue;
+      }
+      if (testSection.getTestSectionType().equals(RecordServletInterface.VALUE_TEST_SECTION_TYPE_PERFORMANCE))
+      {
+        continue;
+      }
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <td class=\"pentagon\">" + testSection.getTestSectionType() + "</td>");
+      if (testSection.getCountLevel1() < 0)
+      {
+        out.println("    <td class=\"pentagon\">-</td>");
+        out.println("    <td class=\"pentagon\">-</td>");
+      } else
+      {
+        out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + HL7DownloadServlet.TYPE_UPDATES + "\">Download "
+            + testSection.getCountLevel1() + "</a></td>");
+        out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + HL7DownloadServlet.TYPE_ACKS + "\">Download "
+            + testSection.getCountLevel1() + "</a></td>");
+      }
+      if (testSection.getCountLevel2() < 0)
+      {
+        out.println("    <td class=\"pentagon\">-</td>");
+        out.println("    <td class=\"pentagon\">-</td>");
+      } else
+      {
+        queriesWereRun = true;
+        out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + HL7DownloadServlet.TYPE_QUERIES + "\">Download "
+            + testSection.getCountLevel2() + "</a></td>");
+        out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + HL7DownloadServlet.TYPE_RESPONSES + "\">Download "
+            + testSection.getCountLevel2() + "</a></td>");
+      }
+      out.println("  </tr>");
+    }
+    {
+      String link = "hl7Download?" + HL7DownloadServlet.PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId() + "&"
+          + HL7DownloadServlet.PARAM_TYPE + "=";
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <td class=\"pentagon\">All Messages</td>");
+      out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + HL7DownloadServlet.TYPE_UPDATES + "\">Download "
+          + testConducted.getCountUpdate() + "</a></td>");
+      out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + HL7DownloadServlet.TYPE_ACKS + "\">Download "
+          + testConducted.getCountUpdate() + "</a></td>");
+      if (!queriesWereRun)
+      {
+        out.println("    <td class=\"pentagon\">-</td>");
+        out.println("    <td class=\"pentagon\">-</td>");
+      } else
+      {
+        out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + HL7DownloadServlet.TYPE_QUERIES + "\">Download "
+            + testConducted.getCountQuery() + "</a></td>");
+        out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + HL7DownloadServlet.TYPE_RESPONSES + "\">Download "
+            + testConducted.getCountQuery() + "</a></td>");
+      }
+      out.println("  </tr>");
+
+    }
+    out.println("</table>");
+  }
+
+  public void printIISSelectionList(Session dataSession, PrintWriter out, PentagonBoxHelper pentagonBoxHelper, UserSession userSession)
+  {
+    List<TestConducted> testConductedList = getOtherIISTestReports(dataSession);
+    out.println("<table class=\"pentagon\">");
+    out.println("  <tr class=\"pentagon\">");
+    out.println("    <th class=\"pentagon\">Score</th>");
+    out.println("    <th class=\"pentagon\">IIS</th>");
+    out.println("  </tr>");
+
+    for (TestConducted testConductedDisplay : testConductedList)
+    {
+      out.println("  <tr class=\"pentagon\">");
+      PentagonReport pentagonReportDisplay = PentagonReportLogic.createOrReturnPentagonReport(testConductedDisplay, dataSession);
+      if (pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) < 0)
+      {
+        out.println("    <td class=\"pentagon\">Not Run</td>");
+      } else
+      {
+        out.println("    <td class=\"pentagon\">" + pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) + "%</td>");
+      }
+      {
+        String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId();
+        out.println("    <td class=\"pentagon\"><a class=\"pentagon\" href=\"" + link + "\">"
+            + testConductedDisplay.getTestParticipant().getConnectionLabel(userSession) + "</a></td>");
+      }
+      out.println("  </tr>");
+    }
+    out.println("  </table>");
   }
 
   public String getImprovementLevelText(int scoreGap)
@@ -453,14 +573,15 @@ public class PentagonContentServlet extends PentagonServlet
     return improvementLevel;
   }
 
-  public List<TestConducted> getOtherIISTestReports(Session dataSession)
+  public static List<TestConducted> getOtherIISTestReports(Session dataSession)
   {
-    Query query = dataSession.createQuery("from TestConducted where latestTest = 'Y' order by connectionLabel");
+    Query query = dataSession.createQuery("from TestConducted where latestTest = 'Y' order by testParticipant.connectionLabel");
     List<TestConducted> testConductedList = query.list();
     return testConductedList;
   }
 
-  public static void printTestMessage(Session dataSession, PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage) throws IOException
+  public static void printTestMessage(Session dataSession, PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize)
+      throws IOException
   {
 
     if (testMessage != null)
@@ -468,10 +589,10 @@ public class PentagonContentServlet extends PentagonServlet
       printOverview(out, testMessage);
       if (testMessage.getTestType().equals("prep") || testMessage.getTestType().equals("update"))
       {
-        printHL7ForUpdate(out, profileUsage, testMessage);
+        printHL7ForUpdate(out, profileUsage, testMessage, anonymize);
       } else if (testMessage.getTestType().equals("query"))
       {
-        printHl7ForQuery(out, profileUsage, testMessage);
+        printHl7ForQuery(out, profileUsage, testMessage, anonymize);
       }
       printConformance(dataSession, out, testMessage);
       printPreparationDetails(out, profileUsage, testMessage);
@@ -482,47 +603,89 @@ public class PentagonContentServlet extends PentagonServlet
     }
   }
 
-  public static void printHl7ForQuery(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage) throws IOException
+  public static void printHl7ForQuery(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize) throws IOException
   {
+    String prepMessageDerivedFrom = testMessage.getPrepMessageDerivedFrom();
+    String prepMessageOriginalResponse = testMessage.getPrepMessageOriginalResponse();
+    String prepMessageActual = testMessage.getPrepMessageActual();
+    String resultMessageActual = testMessage.getResultMessageActual();
+    if (anonymize)
+    {
+      prepMessageDerivedFrom = anonymizeHL7(prepMessageDerivedFrom);
+      prepMessageOriginalResponse = anonymizeHL7(prepMessageOriginalResponse);
+      prepMessageActual = anonymizeHL7(prepMessageActual);
+      resultMessageActual = anonymizeHL7(resultMessageActual);
+    }
+
     out.println("<div id=\"detailsHL7\">");
     if (!testMessage.getPrepMessageDerivedFrom().equals(""))
     {
-      out.println("<h4 class=\"pentagon\">Update</h4>");
-      out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageDerivedFrom(), profileUsage) + "</pre>");
+      out.println("<h4 class=\"pentagon\">Update" + (anonymize ? " *" : "") + "</h4>");
+      out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(prepMessageDerivedFrom, profileUsage) + "</pre>");
       if (testMessage.getResultStoreStatus().equals("a-r") || testMessage.getResultStoreStatus().equals("a-nr"))
       {
-        out.println("<h4 class=\"pentagon\">Accepted by IIS</h4>");
+        out.println("<h4 class=\"pentagon\">Accepted by IIS" + (anonymize ? " *" : "") + "</h4>");
       } else if (testMessage.getResultStoreStatus().equals("na-r") || testMessage.getResultStoreStatus().equals("na-nr"))
       {
-        out.println("<h4 class=\"pentagon\">Rejected by IIS</h4>");
+        out.println("<h4 class=\"pentagon\">Rejected by IIS" + (anonymize ? " *" : "") + "</h4>");
       } else
       {
-        out.println("<h4 class=\"pentagon\">Response from IIS</h4>");
+        out.println("<h4 class=\"pentagon\">Response from IIS" + (anonymize ? " *" : "") + "</h4>");
       }
-      out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageOriginalResponse(), profileUsage) + "</pre>");
-      out.println("<h4 class=\"pentagon\">Query</h4>");
+      out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(prepMessageOriginalResponse, profileUsage) + "</pre>");
+      out.println("<h4 class=\"pentagon\">Query" + (anonymize ? " *" : "") + "</h4>");
     }
-    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual(), profileUsage) + "</pre>");
-    out.println("<h4 class=\"pentagon\">" + testMessage.getResultQueryType() + " Returned</h4>");
-    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual(), profileUsage) + "</pre>");
+    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(prepMessageActual, profileUsage) + "</pre>");
+    out.println("<h4 class=\"pentagon\">" + testMessage.getResultQueryType() + " Returned" + (anonymize ? " *" : "") + "</h4>");
+    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(resultMessageActual, profileUsage) + "</pre>");
+    printAnonymizedStatement(out, anonymize);
     out.println("</div>");
 
   }
 
-  public static void printHL7ForUpdate(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage) throws IOException
+  public static void printAnonymizedStatement(PrintWriter out, boolean anonymize)
   {
-    out.println("<div id=\"detailsHL7\">");
+    if (anonymize)
+    {
+      out.println("<p class=\"pentagon\">* Message has been modified to remove sensitive MSH fields: "
+          + "MSH-3, MSH-4, MSH-5, MSH-6, MSH-8, MSH-22, and MSH-23. </p>");
+    }
+  }
 
-    out.println("<h4 class=\"pentagon\">Update Message Submitted</h4>");
-    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getPrepMessageActual(), profileUsage) + "</pre>");
+  private static final String ANONYMIZE_TRANSFORMS = "clear MSH-3 \nclear MSH-4 \nclear MSH-5 \nclear MSH-6 \nclear MSH-7 \nclear MSH-22 \nclear MSH-23\n";
+
+  public static final String anonymizeHL7(String hl7)
+  {
+    Transformer transformer = new Transformer();
+    TestCaseMessage tcm = new TestCaseMessage();
+    tcm.setOriginalMessage(hl7);
+    tcm.setCustomTransformations(ANONYMIZE_TRANSFORMS);
+    transformer.transform(tcm);
+    return tcm.getMessageText();
+  }
+
+  public static void printHL7ForUpdate(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize) throws IOException
+  {
+    String prepMessageActual = testMessage.getPrepMessageActual();
+    String reaultMessageActual = testMessage.getResultMessageActual();
+    if (anonymize)
+    {
+      prepMessageActual = anonymizeHL7(prepMessageActual);
+      reaultMessageActual = anonymizeHL7(reaultMessageActual);
+    }
+
+    out.println("<div id=\"detailsHL7\">");
+    out.println("<h4 class=\"pentagon\">Update Message Submitted" + (anonymize ? " *" : "") + "</h4>");
+    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(prepMessageActual, profileUsage) + "</pre>");
     if (testMessage.isResultAccepted())
     {
-      out.println("<h4 class=\"pentagon\">Accepted by IIS</h4>");
+      out.println("<h4 class=\"pentagon\">Accepted by IIS" + (anonymize ? " *" : "") + "</h4>");
     } else
     {
-      out.println("<h4 class=\"pentagon\">NOT Accepted by IIS</h4>");
+      out.println("<h4 class=\"pentagon\">NOT Accepted by IIS" + (anonymize ? " *" : "") + "</h4>");
     }
-    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(testMessage.getResultMessageActual(), profileUsage) + "</pre>");
+    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(reaultMessageActual, profileUsage) + "</pre>");
+    printAnonymizedStatement(out, anonymize);
     out.println("</div>");
   }
 
@@ -672,15 +835,63 @@ public class PentagonContentServlet extends PentagonServlet
     out.println("</div>");
   }
 
-  public List<TestConducted> getTestConductedList(Session dataSession, TestConducted testConducted)
+  public static List<TestConducted> getTestConductedList(Session dataSession, TestConducted testConducted)
   {
-    Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and completeTest = 'Y' order by testStartedTime Desc");
-    query.setParameter(0, testConducted.getConnectionLabel());
+    Query query = dataSession
+        .createQuery("from TestConducted where testParticipant.connectionLabel = ? and completeTest = 'Y' order by testStartedTime Desc");
+    query.setParameter(0, testConducted.getTestParticipant().getConnectionLabel());
     List<TestConducted> testConductedList = query.list();
     return testConductedList;
   }
 
-  public void printReportsRun(Session dataSession, PrintWriter out, List<TestConducted> testConductedList)
+  public static void printReportsRun(Session dataSession, PrintWriter out, List<TestConducted> testConductedList, UserSession userSession)
+  {
+    List<TestConducted> testConductedListCanView = new ArrayList<TestConducted>();
+    List<TestConducted> testConductedListAnonymous = new ArrayList<TestConducted>();
+    for (TestConducted testConductedDisplay : testConductedList)
+    {
+      if (testConductedDisplay.getTestParticipant().canViewConnectionLabel(userSession))
+      {
+        testConductedListCanView.add(testConductedDisplay);
+      } else
+      {
+        testConductedListAnonymous.add(testConductedDisplay);
+      }
+    }
+
+    Collections.sort(testConductedListCanView, new Comparator<TestConducted>() {
+      @Override
+      public int compare(TestConducted tc1, TestConducted tc2)
+      {
+        return tc1.getTestParticipant().getConnectionLabel().compareTo(tc2.getTestParticipant().getConnectionLabel());
+      }
+    });
+
+    if (testConductedListCanView.size() > 0)
+    {
+      if (testConductedListCanView.size() == 1)
+      {
+        out.println("<h4 class=\"pentagon\">Your IIS Report</h4>");
+      } else
+      {
+        out.println("<h4 class=\"pentagon\">Your IIS Reports</h4>");
+      }
+      printReportTable(dataSession, out, testConductedListCanView, userSession);
+    }
+    if (testConductedListAnonymous.size() > 0)
+    {
+      if (testConductedListAnonymous.size() == 1)
+      {
+        out.println("<h4 class=\"pentagon\">Other IIS Report</h4>");
+      } else
+      {
+        out.println("<h4 class=\"pentagon\">Other IIS Reports</h4>");
+      }
+      printReportTable(dataSession, out, testConductedListAnonymous, userSession);
+    }
+  }
+
+  public static void printReportTable(Session dataSession, PrintWriter out, List<TestConducted> testConductedList, UserSession userSession)
   {
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm aa zz");
     out.println("<table class=\"pentagon\">");
@@ -702,17 +913,18 @@ public class PentagonContentServlet extends PentagonServlet
       }
       out.println("</svg>");
       out.println("    </td>");
-
-      out.println("    <td class=\"pentagon\">");
-      out.println("     <h4 class=\"pentagon\">" + testConductedDisplay.getConnectionLabel() + "</h4>");
-      out.println("     <p class=\"pentagon\">" + sdf.format(testConductedDisplay.getTestStartedTime()));
       String link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConductedDisplay.getTestConductedId();
-      out.println("     <br/><a class=\"pentagon\" href=\"" + link + "\">Select</a>");
+      out.println("    <td class=\"pentagon\">");
+      out.println("     <h4 class=\"pentagon\"><a class=\"pentagonMenuLink\" href=\"" + link + "\">"
+          + testConductedDisplay.getTestParticipant().getConnectionLabel(userSession) + "</a></h4>");
+      out.println("     <p class=\"pentagon\">Last Run: " + sdf.format(testConductedDisplay.getTestStartedTime()));
       out.println("      </p>");
+      out.println("     <p><a class=\"pentagonMenuLink\" href=\"" + link + "\">View Report</a></p>");
       out.println("    </td>");
       out.println("  </tr>");
     }
     out.println("  </table>");
+    out.println("  <br/>");
   }
 
   public static void printPreparationDetails(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage) throws IOException

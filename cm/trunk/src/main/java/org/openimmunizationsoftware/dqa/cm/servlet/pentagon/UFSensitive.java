@@ -22,7 +22,7 @@ public class UFSensitive extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">IIS must be ensuring that received messages meet basic standards by performing basic checks before "
         + "accepting incoming data. Problems that are found should be messaged back to the sender in the acknowledgement message. "
@@ -33,11 +33,11 @@ public class UFSensitive extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() < 100)
     {
-      out.println("<h3 class=\"pentagon\">Fail - IIS Does Not Recognize Issue</h3>");
+      out.println("<h4 class=\"pentagon\">Fail - IIS Does Not Recognize Issue</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED);
@@ -47,7 +47,7 @@ public class UFSensitive extends PentagonBoxHelper
     }
     if (pentagonBox.getReportScore() > 0)
     {
-      out.println("<h3 class=\"pentagon\">Pass - IIS Seems to Recognize Issue</h3>");
+      out.println("<h4 class=\"pentagon\">Pass - IIS Seems to Recognize Issue</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED);
@@ -58,7 +58,7 @@ public class UFSensitive extends PentagonBoxHelper
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages with issues that returned a different "

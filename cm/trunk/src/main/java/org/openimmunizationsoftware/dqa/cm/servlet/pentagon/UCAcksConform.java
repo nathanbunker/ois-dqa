@@ -29,7 +29,7 @@ public class UCAcksConform extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The National Institute of Standards and Technology (NIST) has an Immunization Test Suite "
         + "for testing and verifying the format of HL7 messages used in immunization message. In cooperation with CDC and AIRA, "
@@ -38,7 +38,7 @@ public class UCAcksConform extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() >= 100)
     {
@@ -51,7 +51,7 @@ public class UCAcksConform extends PentagonBoxHelper
 
   protected static void printContentsConformanceProblems(PrintWriter out, Session dataSession, PentagonReport pentagonReport, String testType)
   {
-    out.println("<h3 class=\"pentagon\">Conformance Problems Found</h3>");
+    out.println("<h4 class=\"pentagon\">Conformance Problems Found</h4>");
     List<AssertionIdentified> assertionIdentifiedList = AssertionFieldLogic.getAssertionIdentifiedListForErrors(dataSession, pentagonReport,
         testType);
 
@@ -74,7 +74,7 @@ public class UCAcksConform extends PentagonBoxHelper
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     String testType = "update";
@@ -84,7 +84,7 @@ public class UCAcksConform extends PentagonBoxHelper
   public static void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, String testType)
   {
 
-    out.println("<p class=\"pentagon\">The score is determined by evaluation the number of errors identified by the NIST validator. </p>");
+    out.println("<p class=\"pentagon\">The score is determined by evaluating the number of errors identified by the NIST validator. </p>");
     out.println("<h4 class=\"pentagon\">Step 1: Set Maximum Score Possible</h4>");
     ConformanceCount conformanceCount = PentagonReportLogic.getConformanceCounts(pentagonReport, dataSession, testType);
     out.println("<p class=\"pentagon\"> Determine the percentage of tests where conformance was checked. </p>");

@@ -41,8 +41,19 @@ public class TestMessage implements Serializable
   private String resultQueryType = "";
   private String resultStoreStatus = "";
   private String resultForecastStatus = "";
+  private boolean resultManualTest = false;
   private int forecastTestPanelId = 0;
   private int forecastTestPanelCaseId = 0;
+
+  public boolean isResultManualTest()
+  {
+    return resultManualTest;
+  }
+
+  public void setResultManualTest(boolean resultManualTest)
+  {
+    this.resultManualTest = resultManualTest;
+  }
 
   public String getResultForecastStatus()
   {
@@ -53,7 +64,6 @@ public class TestMessage implements Serializable
   {
     this.resultForecastStatus = resultForecastStatus;
   }
-
 
   public String getResultQueryType()
   {
@@ -80,12 +90,11 @@ public class TestMessage implements Serializable
     return resultStoreStatus;
   }
 
-  
   public String getResultStoreStatusForDisplay()
   {
     return getResultStoreStatusForDisplay(resultStoreStatus);
   }
-  
+
   public static String getResultStoreStatusForDisplay(String resultStoreStatus)
   {
     if (resultStoreStatus.equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_ACCEPTED_NOT_RETURNED))
@@ -106,8 +115,6 @@ public class TestMessage implements Serializable
     }
     return resultStoreStatus;
   }
-  
-  
 
   public void setResultStoreStatus(String resultStoreStatus)
   {

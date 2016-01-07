@@ -3,7 +3,12 @@ package org.openimmunizationsoftware.dqa.tr.model;
 import java.io.Serializable;
 import java.util.Map;
 
-public class TestParticipant implements Serializable {
+import org.openimmunizationsoftware.dqa.cm.model.ReportUser;
+import org.openimmunizationsoftware.dqa.cm.model.UserType;
+import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
+
+public class TestParticipant implements Serializable
+{
 
   private int testParticipantId = 0;
   private String organizationName = "";
@@ -30,7 +35,6 @@ public class TestParticipant implements Serializable {
   private String accessPasscode = "";
   private Map<String, String> filterValueMap = null;
   private String reportRunStatus = "";
-  private TestParticipant testParticipant = null;
   private ProfileUsage profileUsage = null;
 
   public ProfileUsage getProfileUsage()
@@ -43,214 +47,295 @@ public class TestParticipant implements Serializable {
     this.profileUsage = profileUsage;
   }
 
-  public TestParticipant getTestParticipant()
+  public String getReportRunStatus()
   {
-    return testParticipant;
-  }
-
-  public void setTestParticipant(TestParticipant testParticipant)
-  {
-    this.testParticipant = testParticipant;
-  }
-
-  public String getReportRunStatus() {
     return reportRunStatus;
   }
 
-  public void setReportRunStatus(String reportRunStatus) {
+  public void setReportRunStatus(String reportRunStatus)
+  {
     this.reportRunStatus = reportRunStatus;
   }
 
-  public Map<String, String> getFilterValueMap() {
+  public Map<String, String> getFilterValueMap()
+  {
     return filterValueMap;
   }
 
-  public void setFilterValueMap(Map<String, String> filterValueMap) {
+  public void setFilterValueMap(Map<String, String> filterValueMap)
+  {
     this.filterValueMap = filterValueMap;
   }
 
-  public int getTestParticipantId() {
+  public int getTestParticipantId()
+  {
     return testParticipantId;
   }
 
-  public void setTestParticipantId(int testParticipantId) {
+  public void setTestParticipantId(int testParticipantId)
+  {
     this.testParticipantId = testParticipantId;
   }
 
-  public String getOrganizationName() {
+  public String getOrganizationName()
+  {
     return organizationName;
   }
 
-  public void setOrganizationName(String organizationName) {
+  public void setOrganizationName(String organizationName)
+  {
     this.organizationName = organizationName;
   }
 
-  public String getConnectionLabel() {
+  public String getConnectionLabel()
+  {
     return connectionLabel;
   }
 
-  public void setConnectionLabel(String connectionLabel) {
+  public void setConnectionLabel(String connectionLabel)
+  {
     this.connectionLabel = connectionLabel;
   }
 
-  public int getMapRow() {
+  public int getMapRow()
+  {
     return mapRow;
   }
 
-  public void setMapRow(int mapRow) {
+  public void setMapRow(int mapRow)
+  {
     this.mapRow = mapRow;
   }
 
-  public int getMapCol() {
+  public int getMapCol()
+  {
     return mapCol;
   }
 
-  public void setMapCol(int mapCol) {
+  public void setMapCol(int mapCol)
+  {
     this.mapCol = mapCol;
   }
 
-  public String getPlatformLabel() {
+  public String getPlatformLabel()
+  {
     return platformLabel;
   }
 
-  public void setPlatformLabel(String platformLabel) {
+  public void setPlatformLabel(String platformLabel)
+  {
     this.platformLabel = platformLabel;
   }
 
-  public String getVendorLabel() {
+  public String getVendorLabel()
+  {
     return vendorLabel;
   }
 
-  public void setVendorLabel(String vendorLabel) {
+  public void setVendorLabel(String vendorLabel)
+  {
     this.vendorLabel = vendorLabel;
   }
 
-  public String getInternalComments() {
+  public String getInternalComments()
+  {
     return internalComments;
   }
 
-  public void setInternalComments(String internalComments) {
+  public void setInternalComments(String internalComments)
+  {
     this.internalComments = internalComments;
   }
 
-  public String getPhase1Participation() {
+  public String getPhase1Participation()
+  {
     return phase1Participation;
   }
 
-  public void setPhase1Participation(String phase1Participation) {
+  public void setPhase1Participation(String phase1Participation)
+  {
     this.phase1Participation = phase1Participation;
   }
 
-  public String getPhase1Status() {
+  public String getPhase1Status()
+  {
     return phase1Status;
   }
 
-  public void setPhase1Status(String phase1Status) {
+  public void setPhase1Status(String phase1Status)
+  {
     this.phase1Status = phase1Status;
   }
 
-  public String getPhase1Comments() {
+  public String getPhase1Comments()
+  {
     return phase1Comments;
   }
 
-  public void setPhase1Comments(String phase1Comments) {
+  public void setPhase1Comments(String phase1Comments)
+  {
     this.phase1Comments = phase1Comments;
   }
 
-  public String getPhase2Participation() {
+  public String getPhase2Participation()
+  {
     return phase2Participation;
   }
 
-  public void setPhase2Participation(String phase2Participation) {
+  public void setPhase2Participation(String phase2Participation)
+  {
     this.phase2Participation = phase2Participation;
   }
 
-  public String getPhase2Status() {
+  public String getPhase2Status()
+  {
     return phase2Status;
   }
 
-  public void setPhase2Status(String phase2Status) {
+  public void setPhase2Status(String phase2Status)
+  {
     this.phase2Status = phase2Status;
   }
 
-  public String getPhase2Comments() {
+  public String getPhase2Comments()
+  {
     return phase2Comments;
   }
 
-  public void setPhase2Comments(String phase2Comments) {
+  public void setPhase2Comments(String phase2Comments)
+  {
     this.phase2Comments = phase2Comments;
   }
 
-  public String getIhsStatus() {
+  public String getIhsStatus()
+  {
     return ihsStatus;
   }
 
-  public void setIhsStatus(String ihsStatus) {
+  public void setIhsStatus(String ihsStatus)
+  {
     this.ihsStatus = ihsStatus;
   }
 
-  public String getGuideStatus() {
+  public String getGuideStatus()
+  {
     return guideStatus;
   }
 
-  public void setGuideStatus(String guideStatus) {
+  public void setGuideStatus(String guideStatus)
+  {
     this.guideStatus = guideStatus;
   }
 
-  public String getGuideName() {
+  public String getGuideName()
+  {
     return guideName;
   }
 
-  public void setGuideName(String guideName) {
+  public void setGuideName(String guideName)
+  {
     this.guideName = guideName;
   }
 
-  public String getConnectStatus() {
+  public String getConnectStatus()
+  {
     return connectStatus;
   }
 
-  public void setConnectStatus(String connectStatus) {
+  public void setConnectStatus(String connectStatus)
+  {
     this.connectStatus = connectStatus;
   }
 
-  public String getGeneralComments() {
+  public String getGeneralComments()
+  {
     return generalComments;
   }
 
-  public void setGeneralComments(String generalComments) {
+  public void setGeneralComments(String generalComments)
+  {
     this.generalComments = generalComments;
   }
 
-  public String getTransportType() {
+  public String getTransportType()
+  {
     return transportType;
   }
 
-  public void setTransportType(String transportType) {
+  public void setTransportType(String transportType)
+  {
     this.transportType = transportType;
   }
 
-  public String getQuerySupport() {
+  public String getQuerySupport()
+  {
     return querySupport;
   }
 
-  public void setQuerySupport(String querySupport) {
+  public void setQuerySupport(String querySupport)
+  {
     this.querySupport = querySupport;
   }
 
-  public String getNistStatus() {
+  public String getNistStatus()
+  {
     return nistStatus;
   }
 
-  public void setNistStatus(String nistStatus) {
+  public void setNistStatus(String nistStatus)
+  {
     this.nistStatus = nistStatus;
   }
 
-  public String getAccessPasscode() {
+  public String getAccessPasscode()
+  {
     return accessPasscode;
   }
 
-  public void setAccessPasscode(String accessPasscode) {
+  public void setAccessPasscode(String accessPasscode)
+  {
     this.accessPasscode = accessPasscode;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return getTestParticipantId();
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj instanceof TestParticipant)
+    {
+      TestParticipant otherTp = (TestParticipant) obj;
+      return otherTp.getTestParticipantId() == this.getTestParticipantId();
+    }
+    return super.equals(obj);
+  }
+
+  public String getConnectionLabel(UserSession userSession)
+  {
+    boolean canViewConnectionLabel = canViewConnectionLabel(userSession);
+    if (canViewConnectionLabel)
+    {
+      return getConnectionLabel();
+    }
+    return "Immunization Information System";
+  }
+
+  public boolean canViewConnectionLabel(UserSession userSession)
+  {
+    if (userSession == null || userSession.getUser() == null || userSession.getUser().getApplicationUser().getUserType() == UserType.ADMIN)
+    {
+      return true;
+    }
+    ReportUser reportUser = userSession.getUser().getReportUserMap().get(this);
+    if (reportUser != null && (reportUser.getReportRole() == UserType.ADMIN || reportUser.getReportRole() == UserType.EXPERT))
+    {
+      return true;
+    }
+    return false;
   }
 
 }

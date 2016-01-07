@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.cm.model">
+  <class name="ReportUser" table="report_user">
+    <id name="reportUserId" column="report_user_id">
+      <generator class="native"/>
+      <!--  native or assigned -->
+    </id>
+    <many-to-one name="user" column="user_id" class="User"/> 
+    <many-to-one name="testParticipant" column="test_participant_id" class="org.openimmunizationsoftware.dqa.tr.model.TestParticipant"/> 
+    <many-to-one name="authorizedByUser" column="authorized_by_user_id" class="User"/> 
+    <property name="authorizedDate" column="authorized_date" type="date"/>
+    <property name="reportRoleString" column="report_role" type="string"/>
+  </class>
+</hibernate-mapping>

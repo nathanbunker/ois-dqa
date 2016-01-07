@@ -113,13 +113,13 @@ public abstract class PentagonBoxHelper
     this.label = label;
   }
 
-  public abstract void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public abstract void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession);
 
-  public abstract void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public abstract void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession);
 
-  public abstract void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public abstract void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession);
 
   public abstract void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,

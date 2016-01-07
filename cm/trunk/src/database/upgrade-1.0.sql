@@ -157,8 +157,47 @@ update profile_usage set version = 'v1.1' where profile_usage_id = 34;
 update profile_usage set label = 'TN TIR', version = 'v1.5' where profile_usage_id = 40;
 update profile_usage set version = 'v1.4' where profile_usage_id = 45;
 
+
 delete from pentagon_box;
 delete from assertion_identified;
 delete from pentagon_report;
 
  
+create table report_user (
+    report_user_id          INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id                 INTEGER NOT NULL,
+    test_participant_id     INTEGER NOT NULL,
+    authorized_by_user_id   INTEGER NOT NULL,
+    authorized_date         DATE NOT NULL,
+    report_role             VARCHAR(120) NOT NULL
+);
+
+create table user_setting (
+    user_setting_id         INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id                 INTEGER NOT NULL,
+    setting_key             VARCHAR(250) NOT NULL,
+    setting_value           VARCHAR(1200) NOT NULL
+);
+
+ALTER TABLE test_conducted ADD COLUMN manual_test VARCHAR(1) NOT NULL DEFAULT 'N';
+
+create table tester_status (
+    tester_status_id        INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    tester_name             VARCHAR(250) NOT NULL,
+    ready_status            VARCHAR(250) NOT NULL,
+    status_date             DATETIME NOT NULL,
+    test_conducted_id       INTEGER,
+    etc_query_date          DATETIME,
+    etc_update_date         DATETIME
+);
+
+create table tester_command (
+    tester_command_id       INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    tester_name             VARCHAR(250) NOT NULL,
+    test_participant_id     INTEGER,
+    command_text            VARCHAR(250) NOT NULL,
+    command_options         VARCHAR(1200),
+    run_date                DATETIME NOT NULL
+);
+
+ALTER TABLE test_message ADD COLUMN result_manual_test VARCHAR(1) NOT NULL DEFAULT 'N';

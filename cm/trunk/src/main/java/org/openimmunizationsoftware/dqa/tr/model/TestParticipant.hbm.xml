@@ -5,6 +5,11 @@
     <id name="testParticipantId" column="test_participant_id">
       <generator class="native"/>
     </id>
+    <!-- 
+    <set name="testConducteds" inverse="true" lazy="true" table="test_conducted" fetch="select">
+       <key column="connection_label" property-ref="connectionLabel"/>
+       <one-to-many class="TestConducted"/>
+    </set> -->
     <property name="organizationName" column="organization_name" type="string"/>
     <property name="connectionLabel" column="connection_label" type="string"/>
     <property name="mapRow" column="map_row" type="integer"/>

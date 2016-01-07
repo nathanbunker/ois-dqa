@@ -33,6 +33,14 @@
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.RecordServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>ManualServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.ManualServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ManualManageServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.ManualManageServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>TestReportServlet</servlet-name>
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.TestReportServlet</servlet-class>
   </servlet>
@@ -55,6 +63,10 @@
   <servlet>
     <servlet-name>PentagonContentServlet</servlet-name>
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.PentagonContentServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>HL7DownloadServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.HL7DownloadServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
@@ -86,6 +98,14 @@
     <url-pattern>/record</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>ManualServlet</servlet-name>
+    <url-pattern>/manual</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ManualManageServlet</servlet-name>
+    <url-pattern>/manualManage</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>TestReportServlet</servlet-name>
     <url-pattern>/testReport</url-pattern>
   </servlet-mapping>
@@ -109,7 +129,10 @@
     <servlet-name>PentagonContentServlet</servlet-name>
     <url-pattern>/pentagonContent</url-pattern>
   </servlet-mapping>
-
+  <servlet-mapping>
+    <servlet-name>HL7DownloadServlet</servlet-name>
+    <url-pattern>/hl7Download</url-pattern>
+  </servlet-mapping>
 
 
 </web-app>

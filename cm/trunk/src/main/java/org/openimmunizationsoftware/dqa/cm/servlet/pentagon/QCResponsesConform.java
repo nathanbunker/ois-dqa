@@ -20,11 +20,11 @@ public class QCResponsesConform extends UCAcksConform
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() >= 100)
     {
-      out.println("<h3 class=\"pentagon\">All Acks Conform</h3>");
+      out.println("<h4 class=\"pentagon\">All Acks Conform</h4>");
     } else
     {
       UCAcksConform.printContentsConformanceProblems(out, dataSession, pentagonReport, "query");
@@ -33,7 +33,7 @@ public class QCResponsesConform extends UCAcksConform
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The National Institute of Standards and Technology (NIST) has an Immunization Test Suite "
         + "for testing and verifying the format of HL7 messages used in immunization message. In cooperation with CDC and AIRA, "
@@ -42,7 +42,7 @@ public class QCResponsesConform extends UCAcksConform
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     UCAcksConform.printScoreExplanation(out, dataSession, pentagonReport, "query");

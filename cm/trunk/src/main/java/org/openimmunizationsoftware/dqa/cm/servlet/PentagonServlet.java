@@ -24,9 +24,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 public class PentagonServlet extends HomeServlet
 {
 
-  public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
   public static final String PARAM_TEST_MESSAGE_ID = "testMessageId";
-  public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
   public static final String PARAM_COMPARISON_FIELD_ID = "comparisonFieldId";
   public static final String PARAM_PROFILE_USAGE_ID = "profileUsageId";
   public static final String PARAM_BOX_NAME = "boxName";
@@ -39,7 +37,7 @@ public class PentagonServlet extends HomeServlet
   private static final String VIEW_CONFORMANCE1 = "c1";
 
   protected static final String[] DETAILS_SECTIONS = { "Overview", "Data", "HL7", "Conformance", "Preparation" };
-  protected static final String[] BOX_DETAILS_SECTIONS = { "Overview", "Improve", "Calculation", "History", "Comparison" };
+  protected static final String[] BOX_DETAILS_SECTIONS = { "Overview", "Details", "Improve", "Calculation", "History", "Comparison" };
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -71,10 +69,10 @@ public class PentagonServlet extends HomeServlet
       int testConductedId = Integer.parseInt(testConnectedIdString);
       testConducted = (TestConducted) dataSession.get(TestConducted.class, testConductedId);
     }
-    TestParticipant testParticipantSelected = RecordServlet.getTestParticipantByConnectionLabel(dataSession, testConducted.getConnectionLabel());
+    TestParticipant testParticipantSelected = testConducted.getTestParticipant();
     if (testParticipantSelected == null)
     {
-      throw new NullPointerException("Test Conducted did not have Test Participant '" + testConducted.getConnectionLabel() + "'");
+      throw new NullPointerException("Test Conducted did not have Test Participant ");
     }
 
     PentagonReport pentagonReport = PentagonReportLogic.createOrReturnPentagonReport(testConducted, dataSession);
@@ -378,7 +376,7 @@ public class PentagonServlet extends HomeServlet
       int posY = 0;
       out.println("  <span style=\"position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
           + "px; width: 850px; cursor: pointer; cursor: hand; \"><h1 class=\"pentagon\" onClick=\"loadBoxContents('"
-          + "AIRA Interoperability Testing Report', '" + BOX_NAME_REPORT_SELECT + "', '', true)\">" + testConducted.getConnectionLabel()
+          + "AIRA Interoperability Testing Report', '" + BOX_NAME_REPORT_SELECT + "', '', true)\">" + testConducted.getTestParticipant().getConnectionLabel(userSession)
           + "</h1></span>");
     }
 
@@ -401,7 +399,7 @@ public class PentagonServlet extends HomeServlet
           + (posX + offsetX)
           + "px; width: 130px; height: 25px; cursor: pointer; cursor: hand; \" onmouseout=\"flashOnGrey('box_help')\" onmouseover=\"flashOnLinkYellow('box_help')\"  "
           + "onClick=\"loadBoxContents('How To Read This Report', '" + BOX_NAME_HOW_TO_READ
-          + "', '', false)\"><span style=\"font-size: 11pt; font-weight: bold;\">How To Read</span></span>");
+          + "', '', true)\"><span style=\"font-size: 11pt; font-weight: bold;\">How To Read</span></span>");
       posY += 25;
       out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
           + (posX + offsetX)
@@ -569,6 +567,7 @@ public class PentagonServlet extends HomeServlet
       int posY = 135;
       out.println("<div id=\"boxDetails\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
           + "px; width: 597px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28;\">");
+      out.println("<a class=\"pentagonMenuLink\" onclick=\"hideReport('boxDetails')\" style=\"float: right;\" href=\"javascript: void(0); \">Close</a>");
       out.println("<h2 class=\"pentagon\" id=\"boxDetailsTitle\" ></h2>");
       out.println("<div id=\"boxDetailsMenu\" style=\"text-align: center; margin-bottom: 10px; \">");
       for (int i = 0; i < BOX_DETAILS_SECTIONS.length; i++)
@@ -585,7 +584,6 @@ public class PentagonServlet extends HomeServlet
         out.println("<a class=\"pentagonMenuLink\" id=\"" + boxDetailsId + "TopMenu\"" + boxTopStyle + " onClick=\"showBoxDetailsSection('"
             + boxDetailsId + "')\" href=\"javascript: void(0); \">" + BOX_DETAILS_SECTIONS[i] + "</a>");
       }
-      out.println("<a class=\"pentagonMenuLink\" onclick=\"hideReport('boxDetails')\" href=\"javascript: void(0); \">Close</a>");
       out.println("</div>");
       out.println("<div id=\"boxDetailsContent\" style=\"height: 450px; overflow: auto; \"></div>");
       out.println("</div>");
@@ -593,12 +591,13 @@ public class PentagonServlet extends HomeServlet
 
     {
       int posX = 0;
-      int posY = 50;
+      int posY = 48;
       out.println("<div id=\"details\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
           + "px; width: 850px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; overflow: auto;  \">");
+      out.println("<a class=\"pentagonMenuLink\" onclick=\"hideReport('details')\" style=\"float: right;\" href=\"javascript: void(0); \">Close</a>");
       out.println("<h2 class=\"pentagon\" id=\"detailsTitle\" ></h2>");
       out.println("<div id=\"detailsMenu\" style=\"text-align: center; margin-bottom: 10px; \">");
-      for (int i = 0; i < BOX_DETAILS_SECTIONS.length; i++)
+      for (int i = 0; i < DETAILS_SECTIONS.length; i++)
       {
         String boxTopStyle;
         if (i == 0)
@@ -612,7 +611,6 @@ public class PentagonServlet extends HomeServlet
         out.println("<a class=\"pentagonMenuLink\" id=\"" + detailsId + "TopMenu\" style=\"" + boxTopStyle + "\" onClick=\"showDetailsSection('"
             + detailsId + "')\" href=\"javascript: void(0); \">" + DETAILS_SECTIONS[i] + "</a>");
       }
-      out.println("<a class=\"pentagonMenuLink\" onclick=\"hideReport('details')\" href=\"javascript: void(0); \">Close</a>");
       out.println("</div>");
       out.println("<div id=\"detailsContent\" style=\"height: 700px; overflow: auto; \"></div>");
       out.println("</div>");
@@ -622,7 +620,7 @@ public class PentagonServlet extends HomeServlet
     createFooter(webSession);
   }
 
-  public void setupAndPrintSmallPentagon(PrintWriter out, PentagonReport pentagonReport, int offsetY, int offsetX)
+  public static void setupAndPrintSmallPentagon(PrintWriter out, PentagonReport pentagonReport, int offsetY, int offsetX)
   {
     int[] centerPointSmall = { 50 + offsetX, 50 + offsetY };
     int[][] pointsSmall = new int[5][2];
@@ -749,7 +747,7 @@ public class PentagonServlet extends HomeServlet
     points[4][1] = 357;
   }
 
-  public void setupPointsSmall(int[][] points, int offsetX, int offsetY)
+  public static void setupPointsSmall(int[][] points, int offsetX, int offsetY)
   {
     points[0][0] = 50 + offsetX;
     points[0][1] = 0 + offsetY;
@@ -767,7 +765,7 @@ public class PentagonServlet extends HomeServlet
     points[4][1] = 36 + offsetY;
   }
 
-  public void printPentagon(PrintWriter out, int[][] points, String color, String strokeWidth, PentagonReport pentagonReport)
+  public static void printPentagon(PrintWriter out, int[][] points, String color, String strokeWidth, PentagonReport pentagonReport)
   {
     String makePoints = "";
     for (int i = 0; i < points.length; i++)

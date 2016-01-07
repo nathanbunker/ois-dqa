@@ -23,7 +23,7 @@ public class CGoodData extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Messages that were accepted by the IIS should return that data when queried. This test verifies that patient "
         + "was accepted and that all the vaccinations submitted are returned. It does not check every field submitted, rather "
@@ -32,11 +32,11 @@ public class CGoodData extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     if (pentagonBox.getReportScore() < 100)
     {
-      out.println("<h3 class=\"pentagon\">Fail - Data NOT Returned for Accepted Message</h3>");
+      out.println("<h4 class=\"pentagon\">Fail - Data NOT Returned for Accepted Message</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where (testSection.testSectionType = ? or testSection.testSectionType = ?) and testSection.testConducted = ? "
               + "and resultStoreStatus = 'a-nr' and testType = 'query' order by testCaseCategory");
@@ -48,7 +48,7 @@ public class CGoodData extends PentagonBoxHelper
     }
     if (pentagonBox.getReportScore() > 0)
     {
-      out.println("<h3 class=\"pentagon\">Pass - Data Returned for Accepted Message</h3>");
+      out.println("<h4 class=\"pentagon\">Pass - Data Returned for Accepted Message</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where (testSection.testSectionType = ? or testSection.testSectionType = ?) and testSection.testConducted = ? "
               + "and resultStoreStatus = 'a-r' and testType = 'query' order by testCaseCategory");
@@ -61,7 +61,7 @@ public class CGoodData extends PentagonBoxHelper
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">This test is based on the premise that the primary responsibility of an IIS is to store "

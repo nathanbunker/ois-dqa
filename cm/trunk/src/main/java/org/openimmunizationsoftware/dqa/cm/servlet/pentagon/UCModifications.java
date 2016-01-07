@@ -23,7 +23,7 @@ public class UCModifications extends PentagonBoxHelper
   }
 
   @Override
-  public void printDescription(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Modifications are changes made to each test message to meet local IIS standards. Some of these"
         + "modifications are for fields that would be expected to be changed, such as identification parameters in the MSH segment. "
@@ -33,7 +33,7 @@ public class UCModifications extends PentagonBoxHelper
   }
 
   @Override
-  public void printContents(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
+  public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     List<Transform> transformExpected = null;
     {
@@ -53,11 +53,11 @@ public class UCModifications extends PentagonBoxHelper
     }
     if (transformExpected.size() == 0 && transformCustom.size() == 0)
     {
-      out.println("<h3 class=\"pentagon\">Custom Modifications</h3>");
+      out.println("<h4 class=\"pentagon\">No Custom Modifications Needed</h4>");
       out.println("<p class=\"pentagon\">This interface did not require any modifications to the message in order for it to be accepted. </p>");
     } else
     {
-      out.println("<h3 class=\"pentagon\">Custom Modifications</h3>");
+      out.println("<h4 class=\"pentagon\">Custom Modifications Needed</h4>");
       out.println("<p class=\"pentagon\">This interface requires customized Transformations to modify each message "
           + "before transmitting them to the IIS. These transformations can range from setting "
           + "the correct submitter facility in the message header to modifying the structure of "
@@ -81,7 +81,7 @@ public class UCModifications extends PentagonBoxHelper
   }
 
   @Override
-  public void printScoreExplanation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
     // TODO Auto-generated method stub

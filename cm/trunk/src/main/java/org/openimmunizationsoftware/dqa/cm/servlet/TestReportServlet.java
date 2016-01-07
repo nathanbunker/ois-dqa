@@ -40,7 +40,6 @@ public class TestReportServlet extends HomeServlet
   private static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
   private static final String PARAM_CONNECTION_LABEL = "connectionLabel";
   private static final String PARAM_TEST_MESSAGE_ID = "testMessageId";
-  private static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
   private static final String PARAM_COMPARISON_FIELD_ID = "comparisonFieldId";
 
   private static final String ACTION_VIEW_DETAIL = "View Detail";
@@ -82,6 +81,7 @@ public class TestReportServlet extends HomeServlet
   public static final String VIEW_TEST_MESSAGES = "testMessages";
   public static final String VIEW_FIELD_COMPARISON = "fieldComparison";
   public static final String VIEW_MAP = "map";
+  public static final String VIEW_PENTAGON_REPORTS = "pentagonReports";
 
   public static final String PARAM_MAP_STATUS = "mapStatus";
   public static final String PARAM_MAP_FILTER = "mapFilter";
@@ -170,10 +170,10 @@ public class TestReportServlet extends HomeServlet
       {
         if (connectionLabel.equals(""))
         {
-          connectionLabel = testConducted.getConnectionLabel();
+          connectionLabel = testConducted.getTestParticipant().getConnectionLabel();
         } else
         {
-          if (!testConducted.getConnectionLabel().equals(connectionLabel))
+          if (!testConducted.getTestParticipant().getConnectionLabel().equals(connectionLabel))
           {
             webSession.removeAttribute(ATTRIBUTE_TEST_CONDUCTED);
             testConducted = null;
@@ -213,7 +213,7 @@ public class TestReportServlet extends HomeServlet
 
     if (testConducted != null && testParticipantSelected != null)
     {
-      if (!testConducted.getConnectionLabel().equals(testParticipantSelected.getConnectionLabel()))
+      if (!testConducted.getTestParticipant().getConnectionLabel().equals(testParticipantSelected.getConnectionLabel()))
       {
         testConducted = null;
       }
@@ -256,7 +256,7 @@ public class TestReportServlet extends HomeServlet
 
     if (testConducted != null && connectionLabel.equals(""))
     {
-      connectionLabel = testConducted.getConnectionLabel();
+      connectionLabel = testConducted.getTestParticipant().getConnectionLabel();
     }
 
     ComparisonField comparisonField = null;
@@ -430,10 +430,10 @@ public class TestReportServlet extends HomeServlet
             for (TestMessage exampleTm : exampleTestMessageList)
             {
               String link = "testReport?" + PARAM_VIEW + "=" + VIEW_BASIC + "&" + PARAM_CONNECTION_LABEL + "="
-                  + URLEncoder.encode(exampleTm.getTestSection().getTestConducted().getConnectionLabel(), "UTF-8") + "&" + PARAM_TEST_MESSAGE_ID + "="
+                  + URLEncoder.encode(exampleTm.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel(), "UTF-8") + "&" + PARAM_TEST_MESSAGE_ID + "="
                   + exampleTm.getTestMessageId();
               out.println("  <tr>");
-              String label = exampleTm.getTestSection().getTestConducted().getConnectionLabel();
+              String label = exampleTm.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel();
               out.println("    <td><a href=\"" + link + "\">" + label + "</a></td>");
               out.println("    <td>" + sdf.format(exampleTm.getTestSection().getTestConducted().getTestStartedTime()) + "</td>");
               if (exampleTm.isResultAccepted())
@@ -451,7 +451,7 @@ public class TestReportServlet extends HomeServlet
 
           for (TestMessage exampleTm : exampleTestMessageList)
           {
-            String label = exampleTm.getTestSection().getTestConducted().getConnectionLabel();
+            String label = exampleTm.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel();
             if (exampleTm.isResultAccepted())
             {
               label += " <span class=\"pass\">Accepted</span>";
@@ -602,7 +602,7 @@ public class TestReportServlet extends HomeServlet
         out.println("  </tr>");
         out.println("  <tr>");
         out.println("    <th>Connection</th>");
-        out.println("    <td>" + testConducted.getConnectionLabel() + "</td>");
+        out.println("    <td>" + testConducted.getTestParticipant().getConnectionLabel() + "</td>");
         out.println("  </tr>");
         out.println("  <tr>");
         out.println("    <th>Type</th>");
@@ -883,6 +883,10 @@ public class TestReportServlet extends HomeServlet
         }
         out.println("</div>");
 
+      } else if (view.equals(VIEW_PENTAGON_REPORTS))
+      {
+        List<TestConducted> testConductedList = PentagonContentServlet.getOtherIISTestReports(dataSession);
+        PentagonContentServlet.printReportsRun(dataSession, out, testConductedList, userSession);
       } else if (view.equals(VIEW_CONNECTION))
       {
         out.println("<div class=\"leftColumn\">");
@@ -892,7 +896,7 @@ public class TestReportServlet extends HomeServlet
         out.println("<div class=\"rightFullColumn\">");
         {
           out.println("<table>");
-          out.println("  <caption>" + testConducted.getConnectionLabel() + "</caption>");
+          out.println("  <caption>" + testConducted.getTestParticipant().getConnectionLabel() + "</caption>");
           out.println("  <tr>");
           out.println("    <th>Connection Type</th>");
           out.println("    <td>" + testConducted.getConnectionType() + "</td>");
@@ -1371,7 +1375,7 @@ public class TestReportServlet extends HomeServlet
     {
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm aa zz");
       List<TestConducted> testConductedList = null;
-      Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and completeTest = ? order by testStartedTime desc");
+      Query query = dataSession.createQuery("from TestConducted where testParticipant.connectionLabel = ? and completeTest = ? order by testStartedTime desc");
       query.setParameter(0, connectionLabel);
       query.setParameter(1, true);
       testConductedList = query.list();
@@ -1540,10 +1544,10 @@ public class TestReportServlet extends HomeServlet
       {
         TestMessage exampleTm = comparison.getTestMessage();
         String link = "testReport?" + PARAM_VIEW + "=" + VIEW_BASIC + "&" + PARAM_CONNECTION_LABEL + "="
-            + URLEncoder.encode(exampleTm.getTestSection().getTestConducted().getConnectionLabel(), "UTF-8") + "&" + PARAM_TEST_MESSAGE_ID + "="
+            + URLEncoder.encode(exampleTm.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel(), "UTF-8") + "&" + PARAM_TEST_MESSAGE_ID + "="
             + exampleTm.getTestMessageId();
         out.println("  <tr>");
-        String label = exampleTm.getTestSection().getTestConducted().getConnectionLabel();
+        String label = exampleTm.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel();
         out.println("    <td><a href=\"" + link + "\">" + label + "</a></td>");
         out.println("    <td>" + sdf.format(exampleTm.getTestSection().getTestConducted().getTestStartedTime()) + "</td>");
         out.println("    <td>" + comparison.getValueOriginal() + "</td>");
@@ -1572,7 +1576,7 @@ public class TestReportServlet extends HomeServlet
   {
     TestConducted testConducted = null;
     List<TestConducted> testConductedList = null;
-    Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? and latestTest = ? order by testStartedTime desc");
+    Query query = dataSession.createQuery("from TestConducted where testParticipant.connectionLabel = ? and latestTest = ? order by testStartedTime desc");
     query.setParameter(0, connectionLabel);
     query.setParameter(1, true);
     testConductedList = query.list();
@@ -1595,7 +1599,7 @@ public class TestReportServlet extends HomeServlet
       {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm aa zz");
         List<TestConducted> testConductedList = null;
-        Query query = dataSession.createQuery("from TestConducted where connectionLabel = ? order by testStartedTime desc");
+        Query query = dataSession.createQuery("from TestConducted where testParticipant.connectionLabel = ? order by testStartedTime desc");
         query.setParameter(0, connectionLabel);
         testConductedList = query.list();
         if (testConductedList.size() > 0)
@@ -1616,7 +1620,7 @@ public class TestReportServlet extends HomeServlet
               selected = " class=\"selected\"";
             }
             String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_CONNECTION_LABEL + "="
-                + URLEncoder.encode(tc.getConnectionLabel(), "UTF-8") + "&" + PARAM_TEST_CONDUCTED_ID + "=" + tc.getTestConductedId();
+                + URLEncoder.encode(tc.getTestParticipant().getConnectionLabel(), "UTF-8") + "&" + PARAM_TEST_CONDUCTED_ID + "=" + tc.getTestConductedId();
             out.println("  <tr>");
             out.println("    <td" + selected + "><a href=\"" + link + "\">" + sdf.format(tc.getTestStartedTime()) + "</a></td>");
             out.println("    <td" + selected + "><a href=\"" + link + "\">" + tc.getTestStatus() + "</a></td>");
@@ -1707,7 +1711,7 @@ public class TestReportServlet extends HomeServlet
     Session dataSession = userSession.getDataSession();
 
     out.println("<div style=\"background-color: #eeeeee; border-size: 2px; border-style: solid; \">");
-    PentagonContentServlet.printTestMessage(dataSession, out, profileUsage, testMessage);
+    PentagonContentServlet.printTestMessage(dataSession, out, profileUsage, testMessage, false);
     out.println("</div>");
 
     if (testMessage != null)
@@ -1879,7 +1883,7 @@ public class TestReportServlet extends HomeServlet
     {
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm aa zz");
       out.println("<table width=\"100%\">");
-      out.println("  <caption>" + testConducted.getConnectionLabel() + "</caption>");
+      out.println("  <caption>" + testConducted.getTestParticipant().getConnectionLabel() + "</caption>");
       {
         String link = "testReport?" + PARAM_VIEW + "=" + VIEW_DEFAULT;
         out.println("  <tr>");
@@ -2135,7 +2139,7 @@ public class TestReportServlet extends HomeServlet
   {
     return addHovers(message, null);
   }
-
+  
   public static String addHovers(String message, ProfileUsage profileUsage) throws IOException
   {
     StringBuilder sb = new StringBuilder();

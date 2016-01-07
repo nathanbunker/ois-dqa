@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TesterStatus" table="tester_status">
+    <id name="testerStatusId" column="tester_status_id">
+      <generator class="native"/>
+    </id>
+    <property name="testerName" column="tester_name" type="string"/>
+    <property name="readyStatus" column="ready_status" type="string"/>
+    <property name="statusDate" column="status_date" type="timestamp"/>
+    <many-to-one name="testConducted" column="test_conducted_id" class="TestConducted"/>
+    <property name="etcQueryDate" column="etc_query_date" type="timestamp"/>
+    <property name="etcUpdateDate" column="etc_update_date" type="timestamp"/>
+  </class>
+</hibernate-mapping>
