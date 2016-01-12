@@ -178,6 +178,8 @@ public abstract class BaseServlet extends HttpServlet
         out.println("     |");
         out.println("     <a href=\"manualManage?" + HomeServlet.PARAM_VIEW + "=" + ManualManageServlet.VIEW_HL7_TESTERS + "\" class=\"menuLink\">testers</a>"); 
         out.println("     |");
+        out.println("     <a href=\"manualManage?" + HomeServlet.PARAM_VIEW + "=" + ManualManageServlet.VIEW_HL7_REPORTS + "\" class=\"menuLink\">schedule</a>"); 
+        out.println("     |");
         out.println("     <a href=\"profile\" class=\"menuLink\">profile</a>");
         out.println("     |");
         out.println("     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP + "\" class=\"menuLink\">old dashboard</a>");
