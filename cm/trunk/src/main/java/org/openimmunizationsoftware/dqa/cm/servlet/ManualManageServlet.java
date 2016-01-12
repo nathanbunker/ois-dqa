@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class ManualManageServlet extends HomeServlet
 
   public static final String VIEW_HL7_DOWNLOAD = "hl7Download";
   public static final String VIEW_HL7_TESTERS = "hl7Testers";
+  public static final String VIEW_HL7_REPORTS = "hl7Reports";
   public static final String PARAM_TESTER_NAME = "testerName";
   public static final String PARAM_RUN_DATE = "runDate";
   public static final String PARAM_TESTER_COMMAND_ID = "testerCommandId";
@@ -63,7 +65,7 @@ public class ManualManageServlet extends HomeServlet
     {
       if (action != null)
       {
-        if (view.equals(VIEW_HL7_TESTERS))
+        if (view.equals(VIEW_HL7_TESTERS) || view.equals(VIEW_HL7_REPORTS))
         {
           if (action.equals(ACTION_START) || action.equals(ACTION_STOP))
           {
@@ -83,7 +85,13 @@ public class ManualManageServlet extends HomeServlet
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
             try
             {
-              testerCommand.setRunDate(sdf.parse(req.getParameter(PARAM_RUN_DATE)));
+              if (req.getParameter(PARAM_RUN_DATE) != null && !req.getParameter(PARAM_RUN_DATE).equals(""))
+              {
+                testerCommand.setRunDate(sdf.parse(req.getParameter(PARAM_RUN_DATE)));
+              } else
+              {
+                testerCommand.setRunDate(new Date());
+              }
               Transaction transaction = dataSession.beginTransaction();
               dataSession.save(testerCommand);
               transaction.commit();
@@ -135,7 +143,7 @@ public class ManualManageServlet extends HomeServlet
           query.setParameter(1, UserType.ADMIN.getId());
           query.setParameter(2, UserType.EXPERT.getId());
           List<ReportUser> reportUserList = query.list();
-          testParticipantList = new ArrayList<>();
+          testParticipantList = new ArrayList<TestParticipant>();
           for (ReportUser reportUser : reportUserList)
           {
             testParticipantList.add(reportUser.getTestParticipant());
@@ -223,25 +231,28 @@ public class ManualManageServlet extends HomeServlet
           PentagonContentServlet.showDownloads(out, testConducted, testSectionList);
           out.println("</div>");
         }
+      } else if (view.equals(VIEW_HL7_REPORTS))
+      {
+        List<TestParticipant> testParticipantList;
+        {
+          Query query = dataSession.createQuery("from TestParticipant order by connectionLabel");
+          testParticipantList = query.list();
+        }
+
+        {
+          String connected = "Connected";
+          String manual = "Manual Reporter";
+          List<TesterStatus> testerStatusList = getTesterStatusList(dataSession);
+          printStatusTable(dataSession, out, testParticipantList, connected, manual, connected, testerStatusList);
+          printStatusTable(dataSession, out, testParticipantList, connected, manual, manual, testerStatusList);
+          printStatusTable(dataSession, out, testParticipantList, connected, manual, null, testerStatusList);
+        }
+        printRefreshScript(out, 300);
       } else if (view.equals(VIEW_HL7_TESTERS))
       {
         String testerNameSelected = req.getParameter(PARAM_TESTER_NAME);
         TesterStatus testerStatusSelected = null;
-        List<TesterStatus> testerStatusList = new ArrayList<TesterStatus>();
-        {
-          Query query = dataSession.createQuery("select testerName from TesterStatus group by testerName order by testerName ");
-          List<Object> testerNameList = query.list();
-          for (Object testerName : testerNameList)
-          {
-            query = dataSession.createQuery("from TesterStatus where testerName = ? order by statusDate desc");
-            query.setParameter(0, (String) testerName);
-            List<TesterStatus> testerStatusItemList = query.list();
-            if (testerStatusItemList.size() > 0)
-            {
-              testerStatusList.add(testerStatusItemList.get(0));
-            }
-          }
-        }
+        List<TesterStatus> testerStatusList = getTesterStatusList(dataSession);
         {
           out.println("<div class=\"leftColumn\">");
           out.println("<table class=\"pentagon\">");
@@ -265,8 +276,7 @@ public class ManualManageServlet extends HomeServlet
             if (age < 1000 * 60)
             {
               out.println("    <td class=\"pentagonPass\">" + testerStatus.getReadyStatus() + "</td>");
-            }
-            else
+            } else
             {
               out.println("    <td class=\"pentagon\">Offline</td>");
             }
@@ -446,6 +456,7 @@ public class ManualManageServlet extends HomeServlet
           }
           out.println("</table>");
           out.println("</div>");
+          printRefreshScript(out, 30);
         }
       }
       createFooter(webSession);
@@ -454,5 +465,196 @@ public class ManualManageServlet extends HomeServlet
       out.close();
     }
 
+  }
+
+  public void printStatusTable(Session dataSession, PrintWriter out, List<TestParticipant> testParticipantList, String connectStatusConnected,
+      String connectStatusManualReporter, String connectShow, List<TesterStatus> testerStatusList)
+  {
+    if (connectShow == null)
+    {
+      out.println("<h4 class=\"pentagon\">All Other</h4>");
+    } else
+    {
+      out.println("<h4 class=\"pentagon\">" + connectShow + "</h4>");
+    }
+    out.println("<table class=\"pentagon\">");
+    out.println("  <tr class=\"pentagon\">");
+    out.println("    <th class=\"pentagon\" rowSpan=\"2\">Connection</th>");
+    out.println("    <th class=\"pentagon\" rowSpan=\"2\">Connect Status</th>");
+    out.println("    <th class=\"pentagon\" rowSpan=\"2\">Latest Test</th>");
+    out.println("    <th class=\"pentagon\" colspan=\"5\">Last Test Run</th>");
+    out.println("    <th class=\"pentagon\" rowSpan=\"2\">Start</th>");
+    out.println("  </tr>");
+    out.println("  <tr class=\"pentagon\">");
+    out.println("    <th class=\"pentagon\" colspan=\"\">Date</th>");
+    out.println("    <th class=\"pentagon\" colspan=\"\">Status</th>");
+    out.println("    <th class=\"pentagon\" colspan=\"\">Updates</th>");
+    out.println("    <th class=\"pentagon\" colspan=\"\">Queries</th>");
+    out.println("    <th class=\"pentagon\" colspan=\"\">Time</th>");
+    out.println("  </tr>");
+    for (TestParticipant testParticipant : testParticipantList)
+    {
+      String connectStatus = testParticipant.getConnectStatus();
+      if (connectShow == null)
+      {
+        if (connectStatus != null)
+        {
+          if (connectStatus.equalsIgnoreCase(connectStatusConnected) || connectStatus.equalsIgnoreCase(connectStatusManualReporter))
+          {
+            continue;
+          }
+        }
+      } else
+      {
+        if (connectStatus == null || !connectStatus.equalsIgnoreCase(connectShow))
+        {
+          continue;
+        }
+      }
+      List<TestConducted> testConductedList;
+      TestConducted latestTest = null;
+      {
+        Query query = dataSession.createQuery("from TestConducted where testParticipant = ? order by testStartedTime desc");
+        query.setParameter(0, testParticipant);
+        testConductedList = query.list();
+        for (TestConducted testConducted : testConductedList)
+        {
+          if (testConducted.isLatestTest())
+          {
+            latestTest = testConducted;
+          }
+        }
+      }
+      SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <td class=\"pentagon\">" + testParticipant.getConnectionLabel() + "</td>");
+      out.println("    <td class=\"pentagon\">" + connectStatus + "</td>");
+      if (latestTest == null)
+      {
+        out.println("    <td class=\"fail\">-</td>");
+      } else
+      {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.MONTH, -1);
+        if (c.getTime().before(latestTest.getTestStartedTime()))
+        {
+          out.println("    <td class=\"pass\">" + sdf.format(latestTest.getTestStartedTime()) + "</td>");
+        } else
+        {
+          out.println("    <td class=\"fail\">" + sdf.format(latestTest.getTestStartedTime()) + "</td>");
+        }
+      }
+      if (testConductedList.size() == 0)
+      {
+        out.println("    <td class=\"pentagon\">-</td>");
+        out.println("    <td class=\"pentagon\">-</td>");
+        out.println("    <td class=\"pentagon\">-</td>");
+        out.println("    <td class=\"pentagon\">-</td>");
+        out.println("    <td class=\"pentagon\">-</td>");
+      } else
+      {
+        TestConducted testConducted = testConductedList.get(0);
+        out.println("    <td class=\"pentagon\">" + sdf.format(testConducted.getTestStartedTime()) + "</td>");
+        out.println("    <td class=\"pentagon\">" + testConducted.getTestStatus() + "</td>");
+        out.println("    <td class=\"pentagon\">" + testConducted.getCountUpdate() + "</td>");
+        out.println("    <td class=\"pentagon\">" + testConducted.getCountQuery() + "</td>");
+        if (testConducted.getTestFinishedTime() != null)
+        {
+          long timeElapsed = testConducted.getTestFinishedTime().getTime() - testConducted.getTestStartedTime().getTime();
+          int minutes = (int) (0.5 + timeElapsed / 1000.0 / 60.0);
+          int hours = minutes / 60;
+          minutes = minutes % 60;
+          out.println("    <td class=\"pentagon\">" + hours + ":" + (minutes < 10 ? "0" + minutes : "" + minutes) + "</td>");
+        } else
+        {
+          out.println("    <td class=\"pentagon\">-</td>");
+        }
+        out.println("    <td class=\"pentagon\">");
+        TesterCommand testerCommand = null;
+        {
+          Query query = dataSession.createQuery("from TesterCommand where testParticipant = ? and commandText = ?");
+          query.setParameter(0, testParticipant);
+          query.setParameter(1, ACTION_START);
+          List<TesterCommand> testerCommandList = query.list();
+          if (testerCommandList.size() > 0)
+          {
+            testerCommand = testerCommandList.get(0);
+          }
+        }
+
+        if (testerCommand == null)
+        {
+          boolean canSchedule = true;
+          for (TesterStatus testerStatus : testerStatusList)
+          {
+            if (testerStatus.getTestConducted() != null && testerStatus.getTestConducted().getTestParticipant() == testParticipant)
+            {
+              out.println(testerStatus.getTesterName() + " running now");
+              canSchedule = false;
+            }
+          }
+          if (canSchedule)
+          {
+            out.println("<form method=\"GET\" action=\"manualManage\">");
+            out.println(
+                "      <input type=\"hidden\" name=\"" + PARAM_TEST_PARTICIPANT_ID + "\" value=\"" + testParticipant.getTestParticipantId() + "\">");
+            out.println("      <input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_HL7_REPORTS + "\">");
+            for (TesterStatus testerStatus : testerStatusList)
+            {
+              out.println("      <input type=\"submit\" name=\"" + PARAM_TESTER_NAME + "\" value=\"" + testerStatus.getTesterName() + "\">");
+            }
+            out.println("      <input type=\"hidden\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_START + "\">");
+            out.println("</form>");
+          }
+        } else
+        {
+          out.println(testerCommand.getTesterName());
+        }
+        out.println("    </td>");
+      }
+      out.println("  </tr>");
+    }
+    out.println("</table>");
+    out.println("<br/>");
+  }
+
+  public List<TesterStatus> getTesterStatusList(Session dataSession)
+  {
+    List<TesterStatus> testerStatusList = new ArrayList<TesterStatus>();
+    {
+      Query query = dataSession.createQuery("select testerName from TesterStatus group by testerName order by testerName ");
+      List<Object> testerNameList = query.list();
+      for (Object testerName : testerNameList)
+      {
+        query = dataSession.createQuery("from TesterStatus where testerName = ? order by statusDate desc");
+        query.setParameter(0, (String) testerName);
+        List<TesterStatus> testerStatusItemList = query.list();
+        if (testerStatusItemList.size() > 0)
+        {
+          testerStatusList.add(testerStatusItemList.get(0));
+        }
+      }
+    }
+    return testerStatusList;
+  }
+
+  public void printRefreshScript(PrintWriter out, int refreshCount)
+  {
+    out.println("<script>");
+    out.println("  var refreshCount = 0;");
+    out.println("  function checkRefresh()");
+    out.println("  {");
+    out.println("    refreshCount++;");
+    out.println("    if (refreshCount > " + refreshCount + ")");
+    out.println("    {");
+    out.println("      window.location.href=\"manualManage?" + PARAM_VIEW + "=" + VIEW_HL7_TESTERS + "\"");
+    out.println("    }");
+    out.println("    else");
+    out.println("    {");
+    out.println("      setTimeout('checkRefresh()', 1000);");
+    out.println("    }");
+    out.println("  }");
+    out.println("  checkRefresh(); ");
+    out.println("</script>");
   }
 }
