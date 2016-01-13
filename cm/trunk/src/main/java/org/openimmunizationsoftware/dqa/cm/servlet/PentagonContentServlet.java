@@ -2,6 +2,7 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import org.hibernate.Session;
 import org.immunizationsoftware.dqa.transform.TestCaseMessage;
 import org.immunizationsoftware.dqa.transform.Transformer;
 import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonBoxHelper;
+import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonBoxHelper.Show;
 import org.openimmunizationsoftware.dqa.cm.servlet.pentagon.PentagonRowHelper;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.logic.PentagonReportLogic;
@@ -124,8 +126,9 @@ public class PentagonContentServlet extends PentagonServlet
               continue;
             }
             out.println("  <tr class=\"pentagon\">");
-            out.println("    <td class=\"pentagon\"><a href=\"javascript: void;\" onClick=\"loadBoxContents('" + BOX_NAME_REPORT_SELECT + "', '"
-                + testSection.getTestSectionId() + "')\">" + testSection.getTestSectionType() + "</a></td>");
+            out.println("    <td class=\"pentagon\"><a href=\"javascript: void;\" onClick=\"loadBoxContents('" + testSection.getTestSectionType()
+                + "', '" + BOX_NAME_REPORT_SELECT + "', '" + testSection.getTestSectionId() + "', true)\">" + testSection.getTestSectionType()
+                + "</a></td>");
             if (testSection.getCountLevel1() < 0)
             {
               out.println("    <td class=\"pentagon\">Not Run</td>");
@@ -147,25 +150,23 @@ public class PentagonContentServlet extends PentagonServlet
           out.println("<h4 class=\"pentagon\">Download HL7</h4>");
           out.println("<p class=\"pentagon\">The HL7 messages sent and received can be downloaded and used for other testing purposes. </p>");
           showDownloads(out, testConducted, testSectionList);
-
         } else
         {
           int testSectionId = Integer.parseInt(selector);
           TestSection testSection = (TestSection) dataSession.get(TestSection.class, testSectionId);
-          out.println("<h2 class=\"pentagon\">" + testSection.getTestSectionType() + " Test Cases</h2>");
           {
             out.println("<h3 class=\"pentagon\">Updates</h2>");
             Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'update' order by testCaseCategory");
             query.setParameter(0, testSection);
             List<TestMessage> testMessageList = query.list();
-            PentagonBoxHelper.printTestMessageListPass(out, testMessageList);
+            PentagonBoxHelper.printTestMessageListPass(out, testMessageList, Show.DESCRIPTION, false);
           }
           {
             out.println("<h3 class=\"pentagon\">Queries</h2>");
             Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'query' order by testCaseCategory");
             query.setParameter(0, testSection);
             List<TestMessage> testMessageList = query.list();
-            PentagonBoxHelper.printTestMessageListPass(out, testMessageList);
+            PentagonBoxHelper.printTestMessageListPass(out, testMessageList, Show.DESCRIPTION, false);
           }
         }
         out.println("</div>");
@@ -267,7 +268,6 @@ public class PentagonContentServlet extends PentagonServlet
         {
           try
           {
-
             {
               out.println("<div id=\"boxDetailsOverview\">");
               out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
@@ -442,7 +442,7 @@ public class PentagonContentServlet extends PentagonServlet
       }
       boolean anonymize = !testMessage.getTestSection().getTestConducted().getTestParticipant().canViewConnectionLabel(userSession);
 
-      printTestMessage(dataSession, out, profileUsage, testMessage, anonymize);
+      printTestMessage(dataSession, out, profileUsage, testMessage, anonymize, userSession);
     }
     out.close();
   }
@@ -580,8 +580,8 @@ public class PentagonContentServlet extends PentagonServlet
     return testConductedList;
   }
 
-  public static void printTestMessage(Session dataSession, PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize)
-      throws IOException
+  public static void printTestMessage(Session dataSession, PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize,
+      UserSession userSession) throws IOException
   {
 
     if (testMessage != null)
@@ -596,6 +596,8 @@ public class PentagonContentServlet extends PentagonServlet
       }
       printConformance(dataSession, out, testMessage);
       printPreparationDetails(out, profileUsage, testMessage);
+      printCompareDetails(out, testMessage, userSession, dataSession);
+      printHistoryDetails(out, testMessage, userSession, dataSession);
 
       out.println("<div id=\"detailsData\">");
       out.println("<p class=\"pentagon\">Here is where I'll put a view of the patient data that was sent or recieved back. </p>");
@@ -927,6 +929,32 @@ public class PentagonContentServlet extends PentagonServlet
     out.println("  <br/>");
   }
 
+  public static void printCompareDetails(PrintWriter out, TestMessage testMessage, UserSession userSession, Session dataSession) throws IOException
+  {
+    out.println("<div id=\"detailsComparison\">");
+    Query query = dataSession.createQuery(
+        "from TestMessage where testSection.testConducted.latestTest = ? and testCaseCategory = ? order by testSection.testConducted.testParticipant.connectionLabel");
+    query.setParameter(0, true);
+    query.setParameter(1, testMessage.getTestCaseCategory());
+    List<TestMessage> exampleTestMessageList = query.list();
+    PentagonBoxHelper.printTestMessageListPass(out, exampleTestMessageList, Show.CONNECTION_LABEL, true);
+    out.println("</div>");
+  }
+
+  public static void printHistoryDetails(PrintWriter out, TestMessage testMessage, UserSession userSession, Session dataSession) throws IOException
+  {
+    out.println("<div id=\"detailsHistory\">");
+    Query query = dataSession
+        .createQuery("from TestMessage where testSection.testConducted.completeTest = ? and testSection.testConducted.testParticipant = ? "
+            + "and testCaseCategory = ? order by testSection.testConducted.testParticipant.connectionLabel");
+    query.setParameter(0, true);
+    query.setParameter(1, testMessage.getTestSection().getTestConducted().getTestParticipant());
+    query.setParameter(2, testMessage.getTestCaseCategory());
+    List<TestMessage> exampleTestMessageList = query.list();
+    PentagonBoxHelper.printTestMessageListPass(out, exampleTestMessageList, Show.TEST_DATE, true);
+    out.println("</div>");
+  }
+
   public static void printPreparationDetails(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage) throws IOException
   {
     out.println("<div id=\"detailsPreparation\">");
@@ -996,9 +1024,7 @@ public class PentagonContentServlet extends PentagonServlet
       out.println("<h4 class=\"pentagon\">Message Accept Debug</h4>");
       out.println("<pre class=\"pentagon\">" + testMessage.getPrepMessageAcceptStatusDebug() + "</pre>");
     }
-
     out.println("</div>");
-
   }
 
   public static void printConformance(Session dataSession, PrintWriter out, TestMessage testMessage)

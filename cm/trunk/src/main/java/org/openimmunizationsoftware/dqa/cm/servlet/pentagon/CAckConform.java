@@ -46,20 +46,21 @@ public class CAckConform extends PentagonBoxHelper
     query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
     query.setParameter(2, pentagonReport.getTestConducted());
     testMessageList = query.list();
-    
+
     // Determine what level of validation was done
-    for(TestMessage testMessage : testMessageList) {
+    for (TestMessage testMessage : testMessageList)
+    {
       if (testMessage.getResultAckConformance() != null
           && !testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_NOT_RUN))
+      {
+        countTotal++;
+        if (testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_OK))
         {
-          countTotal++;
-          if (testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_OK))
-          {
-            countOk++;
-          }
+          countOk++;
         }
-     }
-    
+      }
+    }
+
     if (countTotal == 0)
     {
       out.println("<h4 class=\"pentagon\">Problem Validating for Conformance</h4>");
@@ -71,13 +72,13 @@ public class CAckConform extends PentagonBoxHelper
       out.println("<p class=\"pentagon\">" + (testMessageList.size() - countTotal) + "/" + testMessageList.size()
           + " were not validated for conformance.</p>");
       return;
-    } 
-    
+    }
+
     if (pentagonBox.getReportScore() < 100)
     {
       out.println("<h4 class=\"pentagon\">Fail - ACK Message Conformance Problems</h4>");
       out.println("<p class=\"pentagon\">The following test cases had ACK messages which failed NIST 2015 Conformance."
-                  + "<br>Click on each test case for further details.</p>");
+          + "<br>Click on each test case for further details.</p>");
       out.println("<table class=\"pentagon\">");
       out.println("  <tr class=\"pentagon\">");
       out.println("    <th class=\"pentagon\">Test Case</th>");
@@ -90,18 +91,18 @@ public class CAckConform extends PentagonBoxHelper
           if (!testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_OK))
           {
             out.println("  <tr class=\"pentagon\">");
-            out.println("    <td class=\"pentagon\">" + createLink(testMessage) + "</td>");
+            out.println("    <td class=\"pentagon\">" + createAjaxLink(testMessage) + "</td>");
             out.println("  </tr>");
           }
         }
       }
       out.println("</table><br><br>");
     }
-    if(countOk > 0)
+    if (countOk > 0)
     {
       out.println("<h4 class=\"pentagon\">Pass - Conformant ACK Messages</h4>");
       out.println("<p class=\"pentagon\">The following test cases had ACK messages which passed NIST 2015 conformance. "
-                  + "<br>Click on each test case for further details.</p>");
+          + "<br>Click on each test case for further details.</p>");
       out.println("<table class=\"pentagon\">");
       out.println("  <tr class=\"pentagon\">");
       out.println("    <th class=\"pentagon\">Test Case</th>");
@@ -114,7 +115,7 @@ public class CAckConform extends PentagonBoxHelper
           if (testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_OK))
           {
             out.println("  <tr class=\"pentagon\">");
-            out.println("    <td class=\"pentagon\">" + createLink(testMessage) + "</td>");
+            out.println("    <td class=\"pentagon\">" + createAjaxLink(testMessage) + "</td>");
             out.println("  </tr>");
           }
         }
@@ -124,8 +125,7 @@ public class CAckConform extends PentagonBoxHelper
   }
 
   @Override
-  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
-      UserSession userSession)
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Each acknowledgement message returned for Good and Bad messages is checked for conformance "
         + "against the National Institute of Standards and Technology (NIST) immunization validation service. "
@@ -136,7 +136,7 @@ public class CAckConform extends PentagonBoxHelper
   @Override
   public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
+    Map<String, TestSection> testSectionMap = pentagonReport.getTestSectionMap();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC) != null
         && testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED) != null)
     {
@@ -167,7 +167,7 @@ public class CAckConform extends PentagonBoxHelper
     }
 
   }
-  
+
   @Override
   public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {

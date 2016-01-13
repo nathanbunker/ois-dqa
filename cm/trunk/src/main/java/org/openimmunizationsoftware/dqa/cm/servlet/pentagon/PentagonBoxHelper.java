@@ -1,11 +1,13 @@
 package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
+import org.openimmunizationsoftware.dqa.cm.servlet.PentagonServlet;
 import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
@@ -27,7 +29,7 @@ public abstract class PentagonBoxHelper
   {
     return pentagonRowHelper;
   }
-  
+
   public PentagonBox getPentagonBox()
   {
     return pentagonBox;
@@ -125,7 +127,6 @@ public abstract class PentagonBoxHelper
   public abstract void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession);
 
-  
   public abstract void calculateScore(Session dataSession, PentagonReport pentagonReport);
 
   public void printTestMessageListFail(PrintWriter out, List<TestMessage> testMessageList)
@@ -152,7 +153,16 @@ public abstract class PentagonBoxHelper
     }
   }
 
+  public static enum Show {
+    DESCRIPTION, CONNECTION_LABEL, TEST_DATE
+  }
+
   public static void printTestMessageListPass(PrintWriter out, List<TestMessage> testMessageList)
+  {
+    printTestMessageListPass(out, testMessageList, Show.DESCRIPTION, false);
+  }
+
+  public static void printTestMessageListPass(PrintWriter out, List<TestMessage> testMessageList, Show show, boolean hardLink)
   {
     if (testMessageList.size() > 0)
     {
@@ -164,7 +174,17 @@ public abstract class PentagonBoxHelper
         out.println("    <th class=\"pentagon\">Result</th>");
         out.println("    <th class=\"pentagon\">Store Status</th>");
         out.println("    <th class=\"pentagon\">Forecast Status</th>");
-        out.println("    <th class=\"pentagon\">Description</th>");
+        if (show == Show.DESCRIPTION)
+        {
+          out.println("    <th class=\"pentagon\">Description</th>");
+        } else if (show == Show.CONNECTION_LABEL)
+        {
+          out.println("    <th class=\"pentagon\">System</th>");
+        } else if (show == Show.TEST_DATE)
+        {
+          out.println("    <th class=\"pentagon\">Run Date</th>");
+        }
+
         out.println("  </tr>");
         for (TestMessage testMessage : testMessageList)
         {
@@ -173,7 +193,14 @@ public abstract class PentagonBoxHelper
           out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultQueryType() + "</td>");
           out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultStoreStatusForDisplay() + "</td>");
           out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultForecastStatus() + "</td>");
-          String testMessageLink = createLink(testMessage);
+          String testMessageLink;
+          if (hardLink)
+          {
+            testMessageLink = createHardLink(testMessage, show);
+          } else
+          {
+            testMessageLink = createAjaxLink(testMessage, show);
+          }
           out.println("    <td class=\"pentagon\">" + testMessageLink + "</td>");
           out.println("  </tr>");
         }
@@ -191,7 +218,14 @@ public abstract class PentagonBoxHelper
           out.println("  <tr class=\"pentagon\">");
           out.println("    <td class=\"pentagon\" style=\"text-align: center;\">Pass</td>");
           out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + (testMessage.isResultAccepted() ? "Yes" : "No") + "</td>");
-          String testMessageLink = createLink(testMessage);
+          String testMessageLink;
+          if (hardLink)
+          {
+            testMessageLink = createHardLink(testMessage, show);
+          } else
+          {
+            testMessageLink = createAjaxLink(testMessage, show);
+          }
           out.println("    <td class=\"pentagon\">" + testMessageLink + "</td>");
           out.println("  </tr>");
         }
@@ -201,17 +235,66 @@ public abstract class PentagonBoxHelper
     }
   }
 
-  public static String createLink(TestMessage testMessage)
+  public static String createAjaxLink(TestMessage testMessage)
   {
-    String testMessageLink = createLink(testMessage, testMessage.getTestCaseDescription());
+    return createAjaxLink(testMessage, Show.DESCRIPTION);
+  }
+
+  public static String createAjaxLink(TestMessage testMessage, Show show)
+  {
+    String testMessageLink = createAjaxLink(testMessage, testMessage.getTestCaseDescription(), show);
     return testMessageLink;
   }
 
-  public static String createLink(TestMessage testMessage, String label)
+  public static String createAjaxLink(TestMessage testMessage, String label)
   {
-    String testMessageLink = "<a class=\"pentagonTestMessagePass\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
-        + testMessage.getTestMessageId() + "', '" + testMessage.getTestCaseDescription() + "');\">" + label + "</a>";
-    return testMessageLink;
+    return createAjaxLink(testMessage, label, Show.DESCRIPTION);
+  }
+
+  public static String createAjaxLink(TestMessage testMessage, String label, Show show)
+  {
+    if (show != null)
+    {
+      if (show == Show.CONNECTION_LABEL)
+      {
+        return "<a class=\"pentagonTestMessagePass\" href=\"javascript: void(0);\" onclick=\"loadDetails('" + testMessage.getTestMessageId() + "', '"
+            + testMessage.getTestCaseDescription() + "');\">"
+            + testMessage.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel() + "</a>";
+      }
+      if (show == Show.TEST_DATE)
+      {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm a z");
+        return "<a class=\"pentagonTestMessagePass\" href=\"javascript: void(0);\" onclick=\"loadDetails('" + testMessage.getTestMessageId() + "', '"
+            + testMessage.getTestCaseDescription() + "');\">" + sdf.format(testMessage.getTestSection().getTestConducted().getTestStartedTime())
+            + "</a>";
+      }
+    }
+    return "<a class=\"pentagonTestMessagePass\" href=\"javascript: void(0);\" onclick=\"loadDetails('" + testMessage.getTestMessageId() + "', '"
+        + testMessage.getTestCaseDescription() + "');\">" + label + "</a>";
+  }
+
+  public static String createHardLink(TestMessage testMessage, Show show)
+  {
+    if (show != null)
+    {
+      if (show == Show.CONNECTION_LABEL)
+      {
+        return "<a class=\"pentagonTestMessagePass\" href=\"pentagon?" + PentagonServlet.PARAM_TEST_CONDUCTED_ID + "="
+            + testMessage.getTestSection().getTestConducted().getTestConductedId() + "&" + PentagonServlet.PARAM_TEST_MESSAGE_ID + "="
+            + testMessage.getTestMessageId() + "\">" + testMessage.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel()
+            + "</a>";
+      }
+      if (show == Show.TEST_DATE)
+      {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm a z");
+        return "<a class=\"pentagonTestMessagePass\" href=\"pentagon?" + PentagonServlet.PARAM_TEST_CONDUCTED_ID + "="
+            + testMessage.getTestSection().getTestConducted().getTestConductedId() + "&" + PentagonServlet.PARAM_TEST_MESSAGE_ID + "="
+            + testMessage.getTestMessageId() + "\">" + sdf.format(testMessage.getTestSection().getTestConducted().getTestStartedTime()) + "</a>";
+      }
+    }
+    return "<a class=\"pentagonTestMessagePass\" href=\"pentagon?" + PentagonServlet.PARAM_TEST_CONDUCTED_ID + "="
+        + testMessage.getTestSection().getTestConducted().getTestConductedId() + "&" + PentagonServlet.PARAM_TEST_MESSAGE_ID + "="
+        + testMessage.getTestMessageId() + "\">" + testMessage.getTestCaseDescription() + "</a>";
   }
 
   public void printTestMessageListFailForQuery(PrintWriter out, List<TestMessage> testMessageList)
@@ -238,7 +321,8 @@ public abstract class PentagonBoxHelper
         out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultQueryType() + "</td>");
         out.println("    <td class=\"pentagon\">" + testMessage.getResultStoreStatusForDisplay() + "</td>");
         out.println("    <td class=\"pentagon\"><a class=\"" + classString + "\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
-            + testMessage.getTestMessageId() + "', '" + testMessage.getTestCaseDescription() + "');\">" + testMessage.getTestCaseDescription() + "</a></td>");
+            + testMessage.getTestMessageId() + "', '" + testMessage.getTestCaseDescription() + "');\">" + testMessage.getTestCaseDescription()
+            + "</a></td>");
         out.println("  </tr>");
       }
       out.println("</table>");

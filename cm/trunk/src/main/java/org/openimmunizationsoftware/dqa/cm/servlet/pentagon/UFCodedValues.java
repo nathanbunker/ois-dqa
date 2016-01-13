@@ -79,7 +79,7 @@ public class UFCodedValues extends PentagonBoxHelper
             tableValue = tableValue.substring(pos + 4);
           }
         }
-        String testMessageLink = createLink(testMessage, tableValue.trim());
+        String testMessageLink = createAjaxLink(testMessage, tableValue.trim());
         if (!tableName.equals(tableNamePrevious))
         {
           if (!tableNamePrevious.equals(""))
@@ -126,7 +126,7 @@ public class UFCodedValues extends PentagonBoxHelper
             tableValue = tableValue.substring(pos + 4);
           }
         }
-        String testMessageLink = createLink(testMessage, tableValue.trim());
+        String testMessageLink = createAjaxLink(testMessage, tableValue.trim());
         if (!tableName.equals(tableNamePrevious))
         {
           if (!tableNamePrevious.equals(""))
