@@ -303,38 +303,38 @@ public class PentagonContentServlet extends PentagonServlet
                 if (position == 1)
                 {
                   out.println("<p class=\"pentagon\">" + improvementLevel + "This section has the biggest potential for a improving the "
-                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to 100% it would raise the entire row score by "
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire " + pentagonRowHelper.getLabel() + " Score by "
                       + scoreGap + " percentage points.</p>");
                 } else if (position == 2)
                 {
                   out.println("<p class=\"pentagon\">" + improvementLevel + "This section has the second biggest potential for a improving the "
-                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to 100% it would raise the entire row score by "
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire " + pentagonRowHelper.getLabel() + " Score by "
                       + scoreGap + " percentage points.</p>");
                 } else if (position == pentagonRowHelper.size())
                 {
                   out.println("<p class=\"pentagon\">" + improvementLevel + "This section has the lowest potential for a improving the "
-                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to 100% it would only raise the entire row score by "
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire " + pentagonRowHelper.getLabel() + " Score by "
                       + scoreGap + " percentage points. " + "It would be best to focus on other areas first. </p>");
                 } else
                 {
                   out.println("<p class=\"pentagon\">" + improvementLevel + "This section has some potential for a improving the "
-                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to 100% it would raise the entire row score by "
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire " + pentagonRowHelper.getLabel() + " Score by "
                       + scoreGap + " percentage points. </p>");
                 }
                 pentagonBoxHelper.printImprove(out, dataSession, pentagonReport, webSession, userSession);
               }
-              out.println("<p class=\"pentagon\">The following lists shows the improvement potential, or score gap, for each section. "
+              out.println("<p class=\"pentagon\">The following list shows the improvement potential for each section. "
                   + "This lists suggests a starting point for priorities. Items with the highest improvement potential should "
                   + "generally be given more attention and concern over areas with the lowest improvement potential. </p>");
-              out.println("<p class=\"pentagon\"><b>Score Gap</b>: The percentage point improvement possible for the score if "
-                  + "the section were improved to a score of 100%. </p>");
-              out.println("<p class=\"pentagon\"><b>Weight</b>: The total weight this sections score counts towards the final row score. "
-                  + "This value is fixed by the test. </p>");
+              out.println("<p class=\"pentagon\"><b>Improvement Potential</b>: The percentage point improvement possible for the " + pentagonRowHelper.getLabel().toLowerCase() + " score if "
+                  + "this section were improved to pass all tests. </p>");
+              out.println("<p class=\"pentagon\"><b>Weight</b>: The total weight this section's score counts towards the overall " + pentagonRowHelper.getLabel().toLowerCase() + " score. "
+                  + "This value is fixed by the Interoperability Testing Project. </p>");
 
               out.println("<table class=\"pentagon\">");
               out.println("  <tr class=\"pentagon\">");
               out.println("    <th class=\"pentagon\">Priority</th>");
-              out.println("    <th class=\"pentagon\">Score Gap</th>");
+              out.println("    <th class=\"pentagon\">Improvement Potential</th>");
               out.println("    <th class=\"pentagon\">Section</th>");
               out.println("    <th class=\"pentagon\">Weight</th>");
               out.println("  </tr>");
