@@ -41,7 +41,8 @@ public class UCConflicts extends PentagonBoxHelper
   @Override
   public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(pentagonReport.getTestConducted(), dataSession);
+    List<CompatibilityConformanceCount> compatibilityConformanceCountList = getCompatibilityConformanceCountList(pentagonReport.getTestConducted(),
+        dataSession);
     CompatibilityConformanceCount cccConflict = null;
     CompatibilityConformanceCount cccMajorConflict = null;
     for (CompatibilityConformanceCount compatibilityConformanceCount : compatibilityConformanceCountList)
@@ -97,8 +98,8 @@ public class UCConflicts extends PentagonBoxHelper
     {
       ProfileUsage profileUsageBase = ProfileUsage.getBaseProfileUsage(dataSession);
       out.println("<h3 class=\"pentagon\">" + label + "</h3>");
-      Query query = dataSession
-          .createQuery("from TestProfile where testSection.testConducted = ? and testSection.testSectionType = ? and compatibilityConformanceString = ?");
+      Query query = dataSession.createQuery(
+          "from TestProfile where testSection.testConducted = ? and testSection.testSectionType = ? and compatibilityConformanceString = ?");
       query.setParameter(0, testConducted);
       query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING);
       query.setParameter(2, ccc.getCompatibilityConformance().toString());
@@ -134,26 +135,25 @@ public class UCConflicts extends PentagonBoxHelper
     {
       if (testMessage.isResultAccepted())
       {
-        return PentagonBoxHelper.createLink(testMessage, "Accepted");
+        return PentagonBoxHelper.createAjaxLink(testMessage, "Accepted");
       } else
       {
-        return PentagonBoxHelper.createLink(testMessage, "Rejected as Expected");
+        return PentagonBoxHelper.createAjaxLink(testMessage, "Rejected as Expected");
       }
     } else
     {
       if (testMessage.isResultAccepted())
       {
-        return PentagonBoxHelper.createLink(testMessage, "Accepted, Not Expected");
+        return PentagonBoxHelper.createAjaxLink(testMessage, "Accepted, Not Expected");
       } else
       {
-        return PentagonBoxHelper.createLink(testMessage, "Rejected, Not Expected");
+        return PentagonBoxHelper.createAjaxLink(testMessage, "Rejected, Not Expected");
       }
     }
   }
 
   @Override
-  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
-      UserSession userSession)
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is first set at 100% and then score is successively reduced by 20% for "
         + "each Major Conflict and then by 5% for each Conflict. As the score diminishes the absolute size of each reduction "
@@ -164,7 +164,7 @@ public class UCConflicts extends PentagonBoxHelper
   @Override
   public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
-    Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();
+    Map<String, TestSection> testSectionMap = pentagonReport.getTestSectionMap();
     TestConducted testConducted = pentagonReport.getTestConducted();
     if (testSectionMap.get(RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING) != null)
     {
@@ -224,6 +224,6 @@ public class UCConflicts extends PentagonBoxHelper
   public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     // TODO Auto-generated method stub
-    
+
   }
 }

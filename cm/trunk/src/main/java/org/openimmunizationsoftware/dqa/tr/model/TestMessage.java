@@ -97,6 +97,10 @@ public class TestMessage implements Serializable
 
   public static String getResultStoreStatusForDisplay(String resultStoreStatus)
   {
+    if (resultStoreStatus == null)
+    {
+      return "";
+    }
     if (resultStoreStatus.equals(RecordServletInterface.VALUE_RESULT_ACK_STORE_STATUS_ACCEPTED_NOT_RETURNED))
     {
       return "Accepted but Not Returned";

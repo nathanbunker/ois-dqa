@@ -19,6 +19,7 @@ import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
+import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
 public class PentagonServlet extends HomeServlet
@@ -36,7 +37,7 @@ public class PentagonServlet extends HomeServlet
 
   private static final String VIEW_CONFORMANCE1 = "c1";
 
-  protected static final String[] DETAILS_SECTIONS = { "Overview", "Data", "HL7", "Conformance", "Preparation" };
+  protected static final String[] DETAILS_SECTIONS = { "Overview", "Data", "HL7", "Conformance", "Preparation", "History", "Comparison" };
   protected static final String[] BOX_DETAILS_SECTIONS = { "Overview", "Details", "Improve", "Calculation", "History", "Comparison" };
 
   @Override
@@ -73,6 +74,11 @@ public class PentagonServlet extends HomeServlet
     if (testParticipantSelected == null)
     {
       throw new NullPointerException("Test Conducted did not have Test Participant ");
+    }
+    TestMessage testMessageSelected = null;
+    if (req.getParameter(PARAM_TEST_MESSAGE_ID) != null)
+    {
+      testMessageSelected = (TestMessage) dataSession.get(TestMessage.class, Integer.parseInt(req.getParameter(PARAM_TEST_MESSAGE_ID)));
     }
 
     PentagonReport pentagonReport = PentagonReportLogic.createOrReturnPentagonReport(testConducted, dataSession);
@@ -376,8 +382,8 @@ public class PentagonServlet extends HomeServlet
       int posY = 0;
       out.println("  <span style=\"position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
           + "px; width: 850px; cursor: pointer; cursor: hand; \"><h1 class=\"pentagon\" onClick=\"loadBoxContents('"
-          + "AIRA Interoperability Testing Report', '" + BOX_NAME_REPORT_SELECT + "', '', true)\">" + testConducted.getTestParticipant().getConnectionLabel(userSession)
-          + "</h1></span>");
+          + "AIRA Interoperability Testing Report', '" + BOX_NAME_REPORT_SELECT + "', '', true)\">"
+          + testConducted.getTestParticipant().getConnectionLabel(userSession) + "</h1></span>");
     }
 
     {
@@ -415,11 +421,19 @@ public class PentagonServlet extends HomeServlet
       if (testParticipantSelected.getProfileUsage() == null || testParticipantSelected.getProfileUsage().getLinkGuide() == null
           || testParticipantSelected.getProfileUsage().getLinkGuide().equals(""))
       {
-        out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-            + (posX + offsetX)
-            + "px; width: 43px; height: 55px; cursor: pointer; cursor: hand; \" onmouseout=\"flashOnGrey('box_local')\" onmouseover=\"flashOnLinkYellow('box_local')\"  "
-            + "onClick=\"window.open('guide?profileUsageId=" + testParticipantSelected.getProfileUsage().getProfileUsageId() + "', '_blank')\">"
-            + "<span style=\"font-size: 10pt; font-weight: bold; color: #AAAAAA; \">IIS Guide</span></span>");
+        if (testParticipantSelected.getProfileUsage() == null)
+        {
+          out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY)
+              + "px; left: " + (posX + offsetX) + "px; width: 43px; height: 55px; \">"
+              + "<span style=\"font-size: 10pt; font-weight: bold; color: #AAAAAA; \"></span></span>");
+        } else
+        {
+          out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY)
+              + "px; left: " + (posX + offsetX)
+              + "px; width: 43px; height: 55px; cursor: pointer; cursor: hand; \" onmouseout=\"flashOnGrey('box_local')\" onmouseover=\"flashOnLinkYellow('box_local')\"  "
+              + "onClick=\"window.open('guide?profileUsageId=" + testParticipantSelected.getProfileUsage().getProfileUsageId() + "', '_blank')\">"
+              + "<span style=\"font-size: 10pt; font-weight: bold; color: #AAAAAA; \">IIS Guide</span></span>");
+        }
       } else
       {
         out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
@@ -567,7 +581,8 @@ public class PentagonServlet extends HomeServlet
       int posY = 135;
       out.println("<div id=\"boxDetails\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
           + "px; width: 597px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28;\">");
-      out.println("<a class=\"pentagonMenuLink\" onclick=\"hideReport('boxDetails')\" style=\"float: right;\" href=\"javascript: void(0); \">Close</a>");
+      out.println(
+          "<a class=\"pentagonMenuLink\" onclick=\"hideReport('boxDetails')\" style=\"float: right;\" href=\"javascript: void(0); \">Close</a>");
       out.println("<h2 class=\"pentagon\" id=\"boxDetailsTitle\" ></h2>");
       out.println("<div id=\"boxDetailsMenu\" style=\"text-align: center; margin-bottom: 10px; \">");
       for (int i = 0; i < BOX_DETAILS_SECTIONS.length; i++)
@@ -592,10 +607,18 @@ public class PentagonServlet extends HomeServlet
     {
       int posX = 0;
       int posY = 48;
+      boolean display = testMessageSelected != null;
       out.println("<div id=\"details\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
-          + "px; width: 850px; background-color: #eeeeee; border-size: 2px; display:none; border-style: solid; border-color: #9b0d28; overflow: auto;  \">");
+          + "px; width: 850px; background-color: #eeeeee; border-size: 2px;" + (display ? "" : " display:none;")
+          + " border-style: solid; border-color: #9b0d28; overflow: auto;\">");
       out.println("<a class=\"pentagonMenuLink\" onclick=\"hideReport('details')\" style=\"float: right;\" href=\"javascript: void(0); \">Close</a>");
-      out.println("<h2 class=\"pentagon\" id=\"detailsTitle\" ></h2>");
+      if (testMessageSelected == null)
+      {
+        out.println("<h2 class=\"pentagon\" id=\"detailsTitle\" ></h2>");
+      } else
+      {
+        out.println("<h2 class=\"pentagon\" id=\"detailsTitle\" >" + testMessageSelected.getTestCaseDescription() + "</h2>");
+      }
       out.println("<div id=\"detailsMenu\" style=\"text-align: center; margin-bottom: 10px; \">");
       for (int i = 0; i < DETAILS_SECTIONS.length; i++)
       {
@@ -612,7 +635,12 @@ public class PentagonServlet extends HomeServlet
             + detailsId + "')\" href=\"javascript: void(0); \">" + DETAILS_SECTIONS[i] + "</a>");
       }
       out.println("</div>");
-      out.println("<div id=\"detailsContent\" style=\"height: 700px; overflow: auto; \"></div>");
+      out.println("<div id=\"detailsContent\" style=\"height: 700px; overflow: auto; \">");
+      if (testMessageSelected != null)
+      {
+        ProfileUsage profileUsage = testParticipantSelected.getProfileUsage();
+        PentagonContentServlet.printTestMessage(dataSession, out, profileUsage, testMessageSelected, false, userSession);
+      }
       out.println("</div>");
       out.println("</div>");
     }
