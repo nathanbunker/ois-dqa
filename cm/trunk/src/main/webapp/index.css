@@ -337,9 +337,10 @@ a:active.pentagon {text-decoration:none;  }
 
 p.pentagon {color:#9b0d28; font-size: 10pt; margin-right: 5px; margin-left: 5px;}
 
-ul.pentagon {color:#9b0d28; font-size: 10pt; };
-li.pentagon {color:#9b0d28; font-size: 10pt; };
+ul.pentagon {color:#9b0d28; font-size: 10pt; }
+li.pentagon {color:#9b0d28; font-size: 10pt; }
 
+ol.pentagon {color:#9b0d28; font-size: 10pt; }
 
 a.pentagonTestMessageFail {
 	border-color: black;
