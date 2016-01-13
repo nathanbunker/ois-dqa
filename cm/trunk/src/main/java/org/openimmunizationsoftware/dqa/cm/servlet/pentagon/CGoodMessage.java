@@ -26,19 +26,9 @@ public class CGoodMessage extends PentagonBoxHelper
   @Override
   public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (pentagonBox.getReportScore() == 100)
-    {
-      out.println("<p class=\"pentagon\">All NIST 2014 test messages were accepted, as was expected. "
-          + "Accepting all of these standard IIS messages increase confidence when reading the results of the rest "
-          + "of the testing process. </p> <br/><br/><br/>");
-    } else
-    {
-      out.println("<p class=\"pentagon\">Properly formatted and complete messages should be accepted by the IIS. "
-          + "This measurement starts with the assumption that the IIS can accept good messages "
-          + "and considers success when the IIS indicates the message was accepted.  Criteria for "
-          + "determining whether a messages was accepted or not is determined by the configuration " + "used to connect to the IIS. </p> ");
-    }
-
+    out.println("<p class=\"pentagon\">Properly formatted and complete messages should be accepted by the IIS. "
+        + "This measurement starts with the assumption that the IIS can accept good messages "
+        + "and considers success when the IIS indicates the message was accepted by analyzing the returned ACK message from the IIS.</p> ");
   }
 
   @Override
@@ -46,13 +36,14 @@ public class CGoodMessage extends PentagonBoxHelper
   {
     if (pentagonBox.getReportScore() < 100)
     {
-      out.println("<h4 class=\"pentagon\">Fail - Good Message Was Not Accepted</h4>");
+      out.println("<h4 class=\"pentagon\">Fail - ACK Indicates Key Data Was Not Accepted</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
       query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
+      out.println("<br><br>");
     }
     if (pentagonBox.getReportScore() > 0)
     {
@@ -70,8 +61,7 @@ public class CGoodMessage extends PentagonBoxHelper
   public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">The score is simple percentage of the number of NIST 2014 example messages accepted out of the "
-        + "total possible.   </p>");
+    out.println("<p class=\"pentagon\">The score is the percentage of the number of test case accepted out of the total test cases.</p>");
   }
 
   @Override
@@ -88,10 +78,10 @@ public class CGoodMessage extends PentagonBoxHelper
   public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">Ensure that the Acknowledgement message accurately reflects the position of the IIS. "
-        + "In particular if the IIS indicates that there is an error in a message, the sender must correct and resend. "
+        + "In particular if the IIS indicates that there is an error (ERR-4 valued E) in a message, the sender must correct and resend. "
         + "If an IIS is not able to accept certain types of data (such as reports of refusals or varicella-history-of-disease) "
-        + "the issue should not issue an error. This is because the sender has not made a mistake and a resubmission will not "
-        + "resolve the issue. Instead the IIS out to indicate a warning or informational message to indicate the data could "
+        + "the ACK should not declare this as an error (ERR-4 valued E). This is because the sender has not made a mistake and resending will not "
+        + "resolve the issue. Instead the IIS should indicate an informational or warning (ERR-4 valued I or W)response to indicate the data could "
         + "not be accepted, but continue to process the rest of the message. </p>");
   }
 

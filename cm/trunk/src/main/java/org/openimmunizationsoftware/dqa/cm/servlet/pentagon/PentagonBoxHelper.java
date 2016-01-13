@@ -245,6 +245,11 @@ public abstract class PentagonBoxHelper
     String testMessageLink = createAjaxLink(testMessage, testMessage.getTestCaseDescription(), show);
     return testMessageLink;
   }
+  
+  public static String createExternalLink(String url, String label)
+  {
+    return "<a class=\"pentagonTestMessgePass\" target=\"_blank\" href=\""+url+"\">" + label + "</a>";
+  }
 
   public static String createAjaxLink(TestMessage testMessage, String label)
   {
