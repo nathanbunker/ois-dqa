@@ -99,7 +99,7 @@ public class PentagonServlet extends HomeServlet
           scorePoints[i][0] = pointsBig[i][0] - ((int) ((pointsBig[i][0] - centerPointBig[0]) * ((100 - scores[i]) / 100.0)));
           scorePoints[i][1] = pointsBig[i][1] - ((int) ((pointsBig[i][1] - centerPointBig[1]) * ((100 - scores[i]) / 100.0)));
         }
-        printPentagon(out, scorePoints, "#9b0d28", "2", null);
+        printPentagon(out, scorePoints, "green", "2", null);
       }
     }
 
@@ -678,7 +678,7 @@ public class PentagonServlet extends HomeServlet
     out.println("<svg xmlns=\"http://www.w3.org/2000/svg\"  width=\"110\" height=\"117\">");
     if (score == 100)
     {
-      out.println("  <circle fill=\"#9b0d28\" stroke=\"black\" stroke-width=\"2\" cx=\"50\" cy=\"46\" r=\"45\"/>");
+      out.println("  <circle fill=\"green\" stroke=\"black\" stroke-width=\"2\" cx=\"50\" cy=\"46\" r=\"45\"/>");
       out.println("  <text x=\"12\" y=\"52\" font-size=\"14\" fill=\"white\" font-weight=\"bold\">COMPLETE</text>");
       out.println("  <text x=\"38\" y=\"107\" font-size=\"12\">100%</text>");
     } else
@@ -691,10 +691,10 @@ public class PentagonServlet extends HomeServlet
         int posY = 47 - (int) Math.round((CIRCLE_RADIUS + 1) * Math.cos(Math.toRadians(360.0 * score / 100.0)));
         if (score <= 50)
         {
-          out.println("   <path d=\"M50,47 L50,1 A47,47 0 0,1 " + posX + "," + posY + " z\" fill=\"#9b0d28\" stroke=\"black\" stroke-width=\"2\"/>");
+          out.println("   <path d=\"M50,47 L50,1 A47,47 0 0,1 " + posX + "," + posY + " z\" fill=\"green\" stroke=\"black\" stroke-width=\"1\"/>");
         } else
         {
-          out.println("   <path d=\"M50,47 L50,1 A47,47 0 1,1 " + posX + "," + posY + " z\" fill=\"#9b0d28\" stroke=\"black\" stroke-width=\"2\"/>");
+          out.println("   <path d=\"M50,47 L50,1 A47,47 0 1,1 " + posX + "," + posY + " z\" fill=\"green\" stroke=\"black\" stroke-width=\"1\"/>");
         }
       }
       if (score < 0)

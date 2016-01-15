@@ -135,14 +135,12 @@ public abstract class PentagonBoxHelper
     {
       out.println("<table class=\"pentagon\">");
       out.println("  <tr class=\"pentagon\">");
-      out.println("    <th class=\"pentagon\">Status</th>");
       out.println("    <th class=\"pentagon\">Accepted</th>");
       out.println("    <th class=\"pentagon\">Description</th>");
       out.println("  </tr>");
       for (TestMessage testMessage : testMessageList)
       {
         out.println("  <tr class=\"pentagon\">");
-        out.println("    <td class=\"pentagon\" style=\"text-align: center;\">Fail</td>");
         out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + (testMessage.isResultAccepted() ? "Yes" : "No") + "</td>");
         out.println("    <td class=\"pentagon\"><a class=\"pentagonTestMessageFail\" href=\"javascript: void(0);\" onclick=\"loadDetails('"
             + testMessage.getTestMessageId() + "', '" + testMessage.getTestCaseDescription() + "');\">" + testMessage.getTestCaseDescription()
@@ -170,9 +168,8 @@ public abstract class PentagonBoxHelper
       {
         out.println("<table class=\"pentagon\">");
         out.println("  <tr class=\"pentagon\">");
-        out.println("    <th class=\"pentagon\">Status</th>");
-        out.println("    <th class=\"pentagon\">Result</th>");
-        out.println("    <th class=\"pentagon\">Store Status</th>");
+        out.println("    <th class=\"pentagon\">Result Type</th>");
+        out.println("    <th class=\"pentagon\">VXU and RSP Results</th>");
         out.println("    <th class=\"pentagon\">Forecast Status</th>");
         if (show == Show.DESCRIPTION)
         {
@@ -189,7 +186,6 @@ public abstract class PentagonBoxHelper
         for (TestMessage testMessage : testMessageList)
         {
           out.println("  <tr class=\"pentagon\">");
-          out.println("    <td class=\"pentagon\" style=\"text-align: center;\">Pass</td>");
           out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultQueryType() + "</td>");
           out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultStoreStatusForDisplay() + "</td>");
           out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultForecastStatus() + "</td>");
@@ -209,14 +205,12 @@ public abstract class PentagonBoxHelper
       {
         out.println("<table class=\"pentagon\">");
         out.println("  <tr class=\"pentagon\">");
-        out.println("    <th class=\"pentagon\">Status</th>");
         out.println("    <th class=\"pentagon\">Accepted</th>");
         out.println("    <th class=\"pentagon\">Description</th>");
         out.println("  </tr>");
         for (TestMessage testMessage : testMessageList)
         {
           out.println("  <tr class=\"pentagon\">");
-          out.println("    <td class=\"pentagon\" style=\"text-align: center;\">Pass</td>");
           out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + (testMessage.isResultAccepted() ? "Yes" : "No") + "</td>");
           String testMessageLink;
           if (hardLink)
@@ -314,15 +308,13 @@ public abstract class PentagonBoxHelper
     {
       out.println("<table class=\"pentagon\">");
       out.println("  <tr class=\"pentagon\">");
-      out.println("    <th class=\"pentagon\">Status</th>");
-      out.println("    <th class=\"pentagon\">Response</th>");
-      out.println("    <th class=\"pentagon\">Store Status</th>");
-      out.println("    <th class=\"pentagon\">Description</th>");
+      out.println("    <th class=\"pentagon\">Response Type</th>");
+      out.println("    <th class=\"pentagon\">VXU and RSP Results</th>");
+      out.println("    <th class=\"pentagon\">Test Case Description</th>");
       out.println("  </tr>");
       for (TestMessage testMessage : testMessageList)
       {
         out.println("  <tr class=\"pentagon\">");
-        out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultStatus() + "</td>");
         out.println("    <td class=\"pentagon\" style=\"text-align: center;\">" + testMessage.getResultQueryType() + "</td>");
         out.println("    <td class=\"pentagon\">" + testMessage.getResultStoreStatusForDisplay() + "</td>");
         out.println("    <td class=\"pentagon\"><a class=\"" + classString + "\" href=\"javascript: void(0);\" onclick=\"loadDetails('"

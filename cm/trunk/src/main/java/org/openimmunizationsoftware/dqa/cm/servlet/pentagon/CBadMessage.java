@@ -58,7 +58,6 @@ public class CBadMessage extends PentagonBoxHelper
       query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
-      out.println("<br><br>");
     }
     if (pentagonBox.getReportScore() > 0)
     {
