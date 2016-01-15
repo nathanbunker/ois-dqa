@@ -24,25 +24,11 @@ public class UFVxu2014 extends PentagonBoxHelper
   @Override
   public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (pentagonBox.getReportScore() == 0)
-    {
-      out.println("<p class=\"pentagon\">NIST 2014 certified systems must be able to create seven test messages in order to pass certification. "
-          + "NIST created these messages by carefully reading the requirements in the CDC Implementation Guide release 1.4. IIS should "
-          + "be prepared to receive all of these messages. <br/><br/> </p>");
-    } else if (pentagonBox.getReportScore() == 100)
-    {
-      out.println("<p class=\"pentagon\">NIST 2014 certified systems must be able to create seven test messages in order to pass certification. "
-          + "NIST created these messages by carefully reading the requirements in the CDC Implementation Guide release 1.4. IIS can"
-          + "process these messages. <br/><br/> </p>");
-    } else
-    {
-      out.println("<p class=\"pentagon\">NIST 2014 certified systems must be able to create seven test messages in order to pass certification. "
-          + "NIST created these messages by carefully reading the requirements in the CDC Implementation Guide release 1.4. IIS should "
-          + "be prepared to receive all of these messages. Some IIS may not be able to process all the information (e.g. Varicella "
-          + "history-of-disease, refusuals) but should at the very least accept the other data in the message and not return a hard"
-          + "error. </p>");
-    }
-
+    out.println("<p class=\"pentagon\">NIST 2014 certified systems must be able to create seven test messages in order to pass certification. "
+        + "NIST created these messages by carefully reading the requirements in the CDC Implementation Guide release 1.4. IIS should "
+        + "be prepared to receive all of these messages. Some IIS may not be able to process all the information (e.g. Varicella "
+        + "history-of-disease, refusuals) but should at the very least accept the other data in the message and not return a hard "
+        + "error. </p>");
   }
 
   @Override
@@ -92,11 +78,11 @@ public class UFVxu2014 extends PentagonBoxHelper
   @Override
   public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">Ensure IIS is able to understand and properly accept NIST 2014 test messages. "
-        + "Even if IIS does not accept Refusals or History-of-Disease it should not return an error. An error causes this test "
-        + "to fail and indicates to the sender to correct and resend. However in this case senders who comply with NIST 2014 "
-        + "certification should not be asked to correct and resend when their messages contain good data and conform to the "
-        + "national stanard. The IIS may return a Warning or Informational error indicating that certain non-critical data was not "
-        + "processed, but it should not return an error. </p>");
+    out.println("<p class=\"pentagon\">Ensure that the Acknowledgement message accurately reflects the position of the IIS. "
+        + "In particular if the IIS indicates that there is an error (ERR-4 valued E) in a message, the sender must correct and resend. "
+        + "If an IIS is not able to accept certain types of data (such as reports of refusals or varicella-history-of-disease) "
+        + "the ACK should not declare this as an error (ERR-4 valued E). This is because the sender has not made a mistake and resending will not "
+        + "resolve the issue. Instead the IIS should indicate an informational or warning (ERR-4 valued I or W)response to indicate the data could "
+        + "not be accepted, but continue to process the rest of the message. </p>");
   }
 }

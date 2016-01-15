@@ -85,7 +85,7 @@ public class CAckConform extends PentagonBoxHelper
           out.println("  </tr>");
         }
       }
-      out.println("</table><br><br>");
+      out.println("</table>");
     }
 
     if (pentagonBox.getReportScore() < 100 && countTotal > 0)
@@ -110,7 +110,7 @@ public class CAckConform extends PentagonBoxHelper
           }
         }
       }
-      out.println("</table><br><br>");
+      out.println("</table>");
     }
     
     if (countOk > 0)

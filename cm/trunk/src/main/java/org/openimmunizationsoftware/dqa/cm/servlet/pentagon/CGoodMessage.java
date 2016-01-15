@@ -43,7 +43,6 @@ public class CGoodMessage extends PentagonBoxHelper
       query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
-      out.println("<br><br>");
     }
     if (pentagonBox.getReportScore() > 0)
     {
@@ -61,7 +60,7 @@ public class CGoodMessage extends PentagonBoxHelper
   public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">The score is the percentage of the number of test case accepted out of the total test cases.</p>");
+    out.println("<p class=\"pentagon\">The score is the percentage of the number of test cases accepted out of the total test cases.</p>");
   }
 
   @Override

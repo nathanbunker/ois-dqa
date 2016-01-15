@@ -25,10 +25,13 @@ public class CGoodData extends PentagonBoxHelper
   @Override
   public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">Messages that were accepted by the IIS should return that data when queried. This test verifies that patient "
-        + "was accepted and that all the vaccinations submitted are returned. It does not check every field submitted, rather "
-        + "it verifies basic patient information is returned and that basic vaccination information was returned. "
-        + "This measure helps to determine if the positive acknowledgement is accurate or not. </p> ");
+    out.println("<p class=\"pentagon\">This section is based on the premise that the primary responsibility of an IIS is to store "
+        + "patient and vaccination history in order to capture a complete picture of a patient. IIS have many other functions that "
+        + "go beyond this primary responsibility. However this test verifies that if the IIS indicated positive acceptance that the "
+        + "basic patient and vaccination information was accepted and can be returned in a query. Data that was assumed to be accepted "
+        + "based on the ACK message, but is unable to be returned through a query lowers confidence in the HL7 interface.</p>");
+    out.println("<p class=\"pentagon\">To verify this, the testing process compares the original update message with the query response and "
+        + "confirms that certain fields are returned. </p>");
   }
 
   @Override
@@ -44,7 +47,7 @@ public class CGoodData extends PentagonBoxHelper
       query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
       query.setParameter(2, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
-      printTestMessageListFail(out, testMessageList);
+      printTestMessageListFailForQuery(out, testMessageList);
     }
     if (pentagonBox.getReportScore() > 0)
     {
@@ -56,7 +59,7 @@ public class CGoodData extends PentagonBoxHelper
       query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
       query.setParameter(2, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
-      printTestMessageListPass(out, testMessageList);
+      printTestMessageListPassForQuery(out, testMessageList);
     }
   }
 
@@ -64,14 +67,8 @@ public class CGoodData extends PentagonBoxHelper
   public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">This test is based on the premise that the primary responsibility of an IIS is to store "
-        + "patient and vaccination history in order to capture a complete picture of a patient. IIS have many other functions that "
-        + "go beyond this primary responsibility. However this test verifies that if the IIS indicated positive acceptance that the "
-        + "basic patient and vaccination information was accepted and can be returned in a query. </p>");
-    out.println("<p class=\"pentagon\">To verify this, the testing process compares the original update message with the query response and "
-        + "confirms that certain fields are returned. </p>");
     printCalculatingEssentialDataReturnedExplanation(out);
-    out.println("<p class=\"pentagon\">The score is the percentage of accepted messages (whether good or bad) "
+    out.println("<p class=\"pentagon\">The score is the percentage of accepted messages "
         + "that could retrieved via a query and had the basic data as shown above.</p>");
   }
 

@@ -26,11 +26,13 @@ public class CBadData extends PentagonBoxHelper
   @Override
   public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">Messages that were NOT accepted by the IIS are not expected to return that all data when queried. "
-        + " This test expects that something important, like the a vaccine or patient information is not stored in the IIS. "
-        + "This test has practical limitations as an IIS may indicate a message was not accepted, but accept it anyways. "
-        + "However, doing this reduces the confidence in the meaning of an acknowledgement. Ideally an IIS "
-        + "should use the ACK to provide a view of what data was really accept.  </p> ");
+    out.println("<p class=\"pentagon\">This section is based on the premise that the primary responsibility of an IIS is to store "
+        + "patient and vaccination history in order to capture a complete picture of a patient. IIS have many other functions that "
+        + "go beyond this primary responsibility. However this test verifies that if the IIS did NOT indicated positive acceptance that the "
+        + "basic patient or vaccination information is not available to be returned by query. This test helps to verify the impact and meaning "
+        + "when an update is rejected. </p>");
+    out.println("<p class=\"pentagon\">To verify this, the testing process compares the original update message with the query response and "
+        + "confirms that certain fields or data are not returned.</p>");
   }
 
   @Override
@@ -46,7 +48,7 @@ public class CBadData extends PentagonBoxHelper
       query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
       query.setParameter(2, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
-      printTestMessageListFail(out, testMessageList);
+      printTestMessageListFailForQuery(out, testMessageList);
     }
     if (pentagonBox.getReportScore() > 0)
     {
@@ -58,7 +60,7 @@ public class CBadData extends PentagonBoxHelper
       query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
       query.setParameter(2, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
-      printTestMessageListPass(out, testMessageList);
+      printTestMessageListPassForQuery(out, testMessageList);
     }
   }
 
@@ -66,16 +68,9 @@ public class CBadData extends PentagonBoxHelper
   public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">This test is based on the premise that the primary responsibility of an IIS is to store "
-        + "patient and vaccination history in order to capture a complete picture of a patient. IIS have many other functions that "
-        + "go beyond this primary responsibility. However this test verifies that if the IIS did NOT indicated positive acceptance that either the "
-        + "basic patient or vaccination information is not available to returned by query. This test helps to verify the impact and meaning "
-        + "when an update is rejected. </p>");
-    out.println("<p class=\"pentagon\">To verify this, the testing process compares the original update message with the query response and "
-        + "confirms that certain fields are returned.</p>");
     printCalculatingEssentialDataReturnedExplanation(out);
-    out.println("<p class=\"pentagon\">The score is the percentage of rejected messages (whether good or bad) "
-        + "that could not be completely retrieved via a query.</p>");
+    out.println("<p class=\"pentagon\">The score is the percentage of rejected messages "
+        + "that could not be retrieved via a query as compared to all rejected messages.</p>");
   }
 
   @Override
