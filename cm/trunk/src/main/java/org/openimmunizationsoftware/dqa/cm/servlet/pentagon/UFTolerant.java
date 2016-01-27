@@ -23,11 +23,11 @@ public class UFTolerant extends PentagonBoxHelper
   public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">HL7 requires that receiving systems, such as IIS, give a certain amount of tolerance to received message. "
-        + "Ideally IIS would always receive perfect and consistent messages, but when it does not, it should still try its best to process"
-        + "messages with minor issues. The test examples in section all have minor issues that do not directly affect data quality and which "
-        + "IIS would be expected to cope with. Still this test does not assert that IIS ought to accept every tolerant message proposed here. "
+        + "Ideally IIS would always receive perfect and consistent messages, but when it does not, it should still try its best to process "
+        + "messages with minor issues. These tests all have minor issues that do not directly affect data quality and which "
+        + "IIS would be expected to cope with. Still this section does not assert that IIS ought to accept every tolerant message proposed here. "
         + "A few of these messages may not be accepted by IIS for good reasons. IIS should review closely the ones they do not accept and "
-        + "determine if is possible to be tolerant of these issues. </p>");
+        + "determine if it is possible to be tolerant of these issues. </p>");
   }
 
   @Override
@@ -73,7 +73,7 @@ public class UFTolerant extends PentagonBoxHelper
   @Override
   public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">An IIS's primary goal should be to improve the quality of data being submitted. Many of the issues in these test "
+    out.println("<p class=\"pentagon\">A primary goal of an IIS should be to improve the quality of data being submitted. Many of the issues in these test "
         + "messages are not related to data quality and most IIS should be able to still process them. However, this list is not definitive and there is not "
         + "agreement with which issues the IIS should be tolerant. For this reason it is expected that IIS will be tolerant to most if not all issues "
         + "listed here. </p>");

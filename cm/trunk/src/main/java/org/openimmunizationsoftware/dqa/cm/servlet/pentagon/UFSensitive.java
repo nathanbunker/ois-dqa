@@ -26,10 +26,11 @@ public class UFSensitive extends PentagonBoxHelper
   {
     out.println("<p class=\"pentagon\">IIS must be ensuring that received messages meet basic standards by performing basic checks before "
         + "accepting incoming data. Problems that are found should be messaged back to the sender in the acknowledgement message. "
-        + "Doing so gives sending systems the opportunity to correct mistakes and resend. This test can also help confirm that the IIS"
+        + "Doing so gives sending systems the opportunity to correct mistakes and resend. These tests can also help confirm that the IIS "
         + "is not vulnerable to the receipt of bad data. Success is measured by noting if the introduction of the issue results"
         + "in a substantive change in the acknowledgment message. Due to the different ways IIS message back issues, this measure is "
-        + "somewhat crude and should not be depended on to absolutely establish that an IIS is sensitive to any particular issue.  </p>");
+        + "somewhat crude and should not be depended on to absolutely establish that an IIS is sensitive to any particular issue. "
+        + "Consistently implemented ACK messaging will improve the usability of these tests.</p>");
   }
 
   @Override
@@ -37,7 +38,7 @@ public class UFSensitive extends PentagonBoxHelper
   {
     if (pentagonBox.getReportScore() < 100)
     {
-      out.println("<h4 class=\"pentagon\">Fail - IIS Does Not Recognize Issue</h4>");
+      out.println("<h4 class=\"pentagon\">Fail - IIS Does Not Appear to Recognize Issue</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED);
@@ -47,7 +48,7 @@ public class UFSensitive extends PentagonBoxHelper
     }
     if (pentagonBox.getReportScore() > 0)
     {
-      out.println("<h4 class=\"pentagon\">Pass - IIS Seems to Recognize Issue</h4>");
+      out.println("<h4 class=\"pentagon\">Pass - IIS Appears to Recognize Issue</h4>");
       Query query = dataSession.createQuery(
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_ADVANCED);

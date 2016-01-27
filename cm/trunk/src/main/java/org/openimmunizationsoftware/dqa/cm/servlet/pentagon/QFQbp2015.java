@@ -64,15 +64,15 @@ public class QFQbp2015 extends PentagonBoxHelper
       UserSession userSession)
   {
     out.println("<p class=\"pentagon\">This section tests to see if the IIS can respond with the required information for a given query "
-        + "based on what data was submitted in the update step. In order to receive a positive score the IIS must both pass the test "
-        + "expectation</p>");
-    out.println("<p class=\"pentagon\">The score is the percentage of messages that meets this criteria.  </p>");
-    out.println("<p class=\"pentagon\">Note: Some IIS can not return a list of possible matches due to policy reasons. This test set "
+        + "based on what data was submitted in the update step.  To be considered a pass, the IIS must be able to accept the initial VXU message "
+        + " and respond to the query as expected based on the test case.</p>");
+    out.println("<p class=\"pentagon\">The score is the percentage of messages that meets this criteria.</p>");
+    out.println("<p class=\"pentagon\"><b>Note:</b> Some IIS can not return a list of possible matches due to policy reasons. This test set "
         + "does include a scenario where the IIS is expected to return a list of possible matches. IIS who operate under this "
         + "policy restriction will not be able to pass this test. While there are good reasons for an IIS to have such a policy it "
         + "does impact interoperability and so is scored in this section. IIS that can not support this should still be able to "
-        + "meet all the other requirements and still receive a fairly high score, and the failure can be noted so that "
-        + "trading partners are aware of this unavoidable limitation. </p>");
+        + "meet all the other requirements and still receive a high score, and the failure can be noted so that "
+        + "trading partners are aware of this jurisdictional policy. </p>");
   }
 
   @Override
@@ -107,7 +107,8 @@ public class QFQbp2015 extends PentagonBoxHelper
   @Override
   public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">Provide full support for both Z34 and Z44 queries. Ensure that deduplication process is configured to "
-        + "match patients within 15 minutes of being submitted to the IIS. </p>");
+    out.println("<p class=\"pentagon\">Provide full support for both Z34 and Z44 queries. Ensure that full processing - including patient deduplication - "
+        + " of a message occurs as soon as the message is received by the IIS. Lag time between acceptance of data and full processing into the IIS can lead "
+        + "to erroneous results when queries are unable to find \"accepted\" data.</p>");
   }
 }
