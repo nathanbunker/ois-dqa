@@ -29,8 +29,8 @@ public class UFEhrExamples extends PentagonBoxHelper
         "<p class=\"pentagon\">Certified EHR systems are able to produce messages that meet NIST standards, but may contain minor variations "
             + "that are not seen in the NIST examples. This section contains examples from EHR systems. While an attempt has been made to ensure that "
             + "these are good messages, this test does not assert that an IIS ought to be able accept all of these. Rather an IIS should use "
-            + "this test to help find issues that were not identified in any of the other testing scenarios. In addition this test list will "
-            + "grow as additional examples are found.  </p>");
+            + "this test to help find issues that were not identified in any of the other testing scenarios. The number of tests in this section will "
+            + "continue to grow as additional EHR examples collected.  </p>");
 
   }
 
@@ -67,14 +67,13 @@ public class UFEhrExamples extends PentagonBoxHelper
   {
     out.println("<p class=\"pentagon\">The score is calculated as the percentage of messages that returned a postive response from the IIS. </p>");
   }
-
-  
   
   @Override
   public void calculateScore(Session dataSession, PentagonReport pentagonReport)
   {
     pentagonBox.setReportScore(pentagonReport.getTestConducted().getScoreEhr());
   }
+
   @Override
   public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {

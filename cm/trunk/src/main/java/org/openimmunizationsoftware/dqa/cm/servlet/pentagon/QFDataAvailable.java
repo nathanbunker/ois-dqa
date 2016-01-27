@@ -32,33 +32,8 @@ public class QFDataAvailable extends PentagonBoxHelper
   @Override
   public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    if (pentagonBox.getReportScore() < 100)
-    {
-      out.println("<h4 class=\"pentagon\">Fail - Data Not Returned</h4>");
-      Query query = dataSession.createQuery("from TestMessage where testSection.testConducted = ? and testCaseAssertResult = 'MATCH' "
-          + "and testType = 'query' and resultStoreStatus = 'a-nr' order by testCaseCategory");
-      query.setParameter(0, pentagonReport.getTestConducted());
-      List<TestMessage> testMessageList = query.list();
-      printTestMessageListFailForQuery(out, testMessageList);
-    }
-    if (pentagonBox.getReportScore() > 0)
-    {
-      out.println("<h3 class=\"pentagon\">Pass - Data Returned</h3>");
-      out.println("<p class=\"pentagon\">Test cases where data was returned are not shown. </p>");
-    }
-
-  }
-
-  @Override
-  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
-      UserSession userSession)
-  {
-    out.println("<p class=\"pentagon\">For every query submitted during testing where:</p>");
-    out.println("<ul class=\"pentagon\">");
-    out.println("  <li class=\"pentagon\">The original VXU message(s) were accepted, and </li>");
-    out.println("  <li class=\"pentagon\">The query test case expected to receive back an exact match, and </p>");
-    out.println("  <li class=\"pentagon\">The IIS returned the essential patient and vaccination information submitted </p>");
-    out.println("</ul>");
+    out.println("<p class=\"pentagon\">The following table summarizes the results of the test cases with failed test cases detailed below. "
+              + "Due to the high volume of test cases, passed test cases are not displayed, but can be retrieved upon request.</p>");
     List<Object[]> objectsList = doCounts(pentagonReport.getTestConducted(), dataSession);
     if (objectsList.size() > 0)
     {
@@ -77,13 +52,31 @@ public class QFDataAvailable extends PentagonBoxHelper
       }
       out.println("</table>");
     }
+
+    if (pentagonBox.getReportScore() < 100)
+    {
+      out.println("<h4 class=\"pentagon\">Fail - Accepted Data Not Returned</h4>");
+      Query query = dataSession.createQuery("from TestMessage where testSection.testConducted = ? and testCaseAssertResult = 'MATCH' "
+          + "and testType = 'query' and resultStoreStatus = 'a-nr' order by testCaseCategory");
+      query.setParameter(0, pentagonReport.getTestConducted());
+      List<TestMessage> testMessageList = query.list();
+      printTestMessageListFailForQuery(out, testMessageList);
+    }
+
+  }
+
+  @Override
+  public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
+      UserSession userSession)
+  {
+    out.println("<p class=\"pentagon\">For every query submitted during testing where:</p>");
+    out.println("<ul class=\"pentagon\">");
+    out.println("  <li class=\"pentagon\">The original VXU message(s) were accepted, and </li>");
+    out.println("  <li class=\"pentagon\">The query test case expected to receive back an exact match, and </li>");
+    out.println("  <li class=\"pentagon\">The IIS returned the essential patient and vaccination information submitted </li>");
+    out.println("</ul>");
     printCalculatingEssentialDataReturnedExplanation(out);
-    out.println("<p class=\"pentagon\">The following table shows the counts of the number of messages that returned data in comparison </p>");
-    out.println("<p class=\"pentagon\">This test expects that the IIS is able to return essential information include basic patient information "
-        + "and the basic information for every vaccination submitted. "
-        + "Therefore this test does not verify that every field submitted in the original VXU is returned. Because IIS have varying "
-        + "policies on the amount of details returned this test does not explore these policy differences. Rather it assumes that "
-        + "at the IIS must only return the core patient identify informatin and basic immunization history. </p>");
+    out.println("<p class=\"pentagon\">The score is the percentage of records returning essential data to previously accepted VXU submissions.</p>");
   }
 
   @Override
@@ -120,7 +113,8 @@ public class QFDataAvailable extends PentagonBoxHelper
   @Override
   public void printImprove(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    // TODO Auto-generated method stub
-    
+    out.println("<p class=\"pentagon\">Provide full support for both Z34 and Z44 queries. Ensure that full processing - including patient deduplication - "
+        + " of a message occurs as soon as the message is received by the IIS. Lag time between acceptance of data and full processing into the IIS can lead "
+        + "to erroneous results when queries are unable to find \"accepted\" data.</p>");
   }
 }
