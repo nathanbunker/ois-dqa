@@ -31,6 +31,8 @@ public class UCConstraints extends UCConflicts
             + "constraints to also be conformant to the national specification. However these local constraints can have an impact on interoperability if "
             + "systems designed to only meet the national standard are not prepared to meet the local standard. These contstraints should be reviewed carefully "
             + "to determine the business need in balance with the need for interoperability. </p>");
+    out.println("<p class=\"pentagon\">The section compares the documented usage according to your IG against the detected usage discovered through testing with your interface.</p> ");
+    printDiscoveryProcessForConstraintOrConflict(out);
   }
 
   @Override
@@ -62,7 +64,7 @@ public class UCConstraints extends UCConflicts
             "<p class=\"pentagon\">A review needs to be conducted of constraints to verify business need in balance with interoperability need. </p>");
       } else
       {
-        out.println("<h4 class=\"pentagon\">Constraints Found</h4>");
+        out.println("<h4 class=\"pentagon\">Minor Constraints Found</h4>");
         out.println("<p class=\"pentagon\">A review may be conducted to verify business need in balance with interoperability need. </p>");
       }
       out.println("<table class=\"pentagon\">");
@@ -76,13 +78,13 @@ public class UCConstraints extends UCConflicts
       if (cccConstraint != null)
       {
         out.println("  <tr class=\"pentagon\">");
-        out.println("    <th class=\"pentagon\">Contstraints</th>");
+        out.println("    <th class=\"pentagon\">Minor Contstraints</th>");
         out.println("    <td class=\"pentagon\">" + cccConstraint.getCount() + "</td>");
         out.println("  </tr>");
       }
       out.println("</table>");
       printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccMajorConstraint, "Major Constraint");
-      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConstraint, "Constraint");
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConstraint, "Minor Constraint");
     }
 
   }

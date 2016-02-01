@@ -354,5 +354,63 @@ public abstract class PentagonBoxHelper
     out.println("  </li>");
     out.println("</ul>");
   }
+  
+  public void printDiscoveryProcessForConstraintOrConflict(PrintWriter out)
+  {
+    out.println("<h4 class=\"pentagon\">Discovery Process for These Tests</h4>");
+    out.println("<p class=\"pentagon\">Local Requirements are gathered by reviewing and documenting your local IG.  These differences are then used to create a set of 2 test cases for each difference. "
+              + "One test case with the field populated and one test case without the field populated. In this way the test can determine whether a field: "
+              + "<ul class=\"pentagon\">"
+              + "  <li>Must be present</li> "
+              + "  <li>May or may not be present</li> "
+              + "  <li>Must be absent</li> "
+              + "</ul></p>");
+    out.println("<p class=\"pentagon\">By doing this testing verification can be better understood about R, RE, O, and X requirements and potential difference between IG Documentatin and an actual IIS Interface.</p>");
 
+    out.println("<h4 class=\"pentagon\">Conditional Predicates</h4>");
+    out.println("<p class=\"pentagon\">Implementation Guides use a special conditional predicates (e.g., C(R/X), C(R/O)) to indicate status for fields that must be populated when certain conditions are met. "
+              + "This testing process AIRA does not directly support testing conditional fields as documented in IG's. Rather, conditional requirements are expressed by two or more tests that together "
+              + "express the conditional requirements. For example, PID-25 Birth Order has a status of C(RE/O). When PID-30 is valued Y, indicating the patient is part of a multiple birth, "
+              + "then PID-25 has an usage of RE and the birth order must be populated if known. Otherwise birth order is an optional field. In the AIRA testing process this field is represented by two "
+              + "different tests: "
+              + "<ul class=\"pentagon\">"
+              + "  <li>PID-25 Single, status O</li> "
+              + "  <li>PID-25 Multiple, status RE</li> "
+              + "</ul></p>"
+              + "<p class=\"pentagon\">By doing this, AIRA can test the requirements for this field in both situations. Implementation guide authors should continue to use "
+              + "conditional predicates but be aware that this report breaks them down in this manner.</p>");
+
+    out.println("<h4 class=\"pentagon\">Special Usage Values</h4>");
+    out.println("<p class=\"pentagon\">The usage values (e.g.: R, RE, O, X) indicate the ideal and the intended use of the field but does not capture certain aspects of "
+              + "implemented systems that are sometimes documented in the implementation guide and which are certainly noticed when interacting with "
+              + "real HL7 interfaces. To capture some of these concepts the AIRA testing process has invented the following temporary status codes: "
+              + "<ul class=\"pentagon\">"
+              + "  <li><b>R* Required, but not enforced:</b> The guide indicates the field is required but if the field is left empty the IIS will still "
+              +          "accept the message. For example, PID-1 is documented as required by the IIS but the IIS will accept messages with no value in "
+              +          "PID-1. Please note that IIS may accept a message even if a required field is not valued. The standard only indicates that an IIS "
+              +          "\"shall\" return an error (which can also be a warning) when a required field is empty. While it is recommended that the IIS at "
+              +          "least indicate that required fields were missing, the IIS is free to continue to accept part or all of the data that was sent.</li>"
+              + "  <li><b>R! Required, and enforced even though it is contained in an RE or O element:</b> The testing process assumes that required "
+              +          "elements of required, but may be empty or optional fields can actually be left empty and the message will be accepted. (For example, "
+              +          "if the IIS requires the mother's maiden first name in PID-6 but PID-6 is RE, and the sender only submits the mother's maiden last "
+              +          "name, the IIS is expected to continue processing the rest of the message. If however, the message is not accepted when this field is "
+              +          "empty is empty is required as R! to indicate that the requirement for the field to be present does not follow the expected hierarchy. "
+              +          "Submitters should be careful to include this required field if any part of the containing element is sent, or otherwise leave the "
+              +          "entire field empty.</li>"
+              + "  <li><b>RE* Required, but may be empty and is not read:</b> The guide indicates the field should be valued if known, but that the IIS is "
+              +          "not reading this field. For example, PID-22 Ethnic Group is documented as required if known by the IIS, but the IIS has not yet "
+              +          "implemented support for reading it. The IIS may or may not have plans to implement the field in the future.</li>"
+              + "  <li><b>O* Optional, and is not read:</b> The guide indicates that the field may be valued but the IIS does not read the field. For "
+              +          "example, the PID-15 Primary Language field is documented as optional by the IIS but the IIS does not read this field. The data "
+              +          "may be sent but the data will never be recorded by the IIS.</li>"
+              + "  <li><b>X* Not supported, but not enforced:</b> The guide indicates that a field must not be valued but the IIS will accept the message "
+              +          "even if it is valued. For example, PID-2 Patienet ID is documented as not supported, by the IIS, but the IIS will not generate "
+              +          "an error if PID-2 is valued. Please note that HL7 standards indicate that an IIS \"may\" generate an error if a not supported "
+              +          "field is valued. This means not supported fields are valued.</li>" 
+              + "  <li><b>[R], [RE], [O], [X]:</b> The brackets indicate the requirement was not documented at the local level and has been assumed from "
+              +          "the national level for the purposes of testing. IIS are not expected to document all requirements at the local level, in fact "
+              +          "IIS have been encouraged to keep local documentation to a minimum.</li>" 
+              + "</ul></p>");
+  
+  }
 }
