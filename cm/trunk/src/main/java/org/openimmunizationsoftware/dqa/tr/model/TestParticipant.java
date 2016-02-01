@@ -33,9 +33,20 @@ public class TestParticipant implements Serializable
   private String querySupport = "";
   private String nistStatus = "";
   private String accessPasscode = "";
+  private String publicIdCode = "";
   private Map<String, String> filterValueMap = null;
   private String reportRunStatus = "";
   private ProfileUsage profileUsage = null;
+
+  public String getPublicIdCode()
+  {
+    return publicIdCode;
+  }
+
+  public void setPublicIdCode(String publicIdCode)
+  {
+    this.publicIdCode = publicIdCode;
+  }
 
   public ProfileUsage getProfileUsage()
   {
@@ -321,7 +332,11 @@ public class TestParticipant implements Serializable
     {
       return getConnectionLabel();
     }
-    return "Immunization Information System";
+    if (publicIdCode == null || publicIdCode.equals(""))
+    {
+      return "Immunization Information System";
+    }
+    return "Immunization Information System " + publicIdCode;
   }
 
   public boolean canViewConnectionLabel(UserSession userSession)

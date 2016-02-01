@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TestComment" table="test_comment">
+    <id name="testCommentId" column="test_comment_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="testParticipant" column="test_participant_id" class="TestParticipant"/>
+    <many-to-one name="reply" column="reply_comment_id" class="TestComment"/>
+    <many-to-one name="user" column="user_id" class="org.openimmunizationsoftware.dqa.cm.model.User"/>
+    <many-to-one name="testMessage" column="test_message_id" class="TestMessage"/>
+    <property name="testCaseCategory" column="test_case_category" type="string"/>
+    <property name="commentText" column="comment_text" type="string"/>
+    <property name="commentdate" column="comment_date" type="timestamp"/>
+    <property name="commentMoodString" column="comment_mood" type="string"/>
+  </class>
+</hibernate-mapping>

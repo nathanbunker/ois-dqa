@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.logic.AllowedValueLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.ApplicationLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeAssignedLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeCommentLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeInstanceLogic;
@@ -27,6 +29,7 @@ import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.SupportingInfoLogic;
 import org.openimmunizationsoftware.dqa.cm.model.AcceptStatus;
 import org.openimmunizationsoftware.dqa.cm.model.AllowedValue;
+import org.openimmunizationsoftware.dqa.cm.model.Application;
 import org.openimmunizationsoftware.dqa.cm.model.ApplicationUser;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeAssigned;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeComment;
@@ -44,6 +47,8 @@ import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.Resource;
 import org.openimmunizationsoftware.dqa.cm.model.SupportingInfo;
 import org.openimmunizationsoftware.dqa.cm.model.User;
+import org.openimmunizationsoftware.dqa.cm.model.UserType;
+import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
 public class HomeServlet extends BaseServlet
 {
@@ -61,6 +66,8 @@ public class HomeServlet extends BaseServlet
   protected static final String PARAM_PASSWORD = "password";
 
   protected static final String ACTION_LOGOUT = "Logout";
+
+  protected static final String ACTION_REGISTER = "Register";
 
   protected static final String ACTION_SELECT_APPLICATION = "Select Application";
   protected static final String PARAM_APPLICATION_ID = "applicationId";
@@ -94,11 +101,12 @@ public class HomeServlet extends BaseServlet
   protected static final String VIEW_SEARCH = "search";
   protected static final String VIEW_TABLE = "table";
   protected static final String VIEW_CODE = "code";
-  
-  
+  protected static final String VIEW_REGISTER = "Register";
+
   public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
   public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
 
+  public static final String PARAM_EMAIL_ADDRESS = "emailAddress";
 
   private String paramCodeValue = null;
   private String paramCodeLabel = null;
@@ -291,6 +299,9 @@ public class HomeServlet extends BaseServlet
         printLogin(userSession.getUser(), userSession);
         out.println("</div>");
         out.println("</div>");
+      } else if (view.equals(VIEW_REGISTER))
+      {
+        printRegister(userSession);
       } else if (view.equals(VIEW_DEFAULT))
       {
         out.println("<div class=\"leftColumn\">");
@@ -688,6 +699,54 @@ public class HomeServlet extends BaseServlet
     out.println("</table>");
   }
 
+  protected void printRegister(UserSession userSession)
+  {
+    PrintWriter out = userSession.getOut();
+    out.println("  <form action=\"home\" method=\"POST\">");
+    out.println("  <table>");
+    out.println("    <caption>Register</caption>");
+    out.println("    <tr>");
+    out.println("      <th>Full Name</th>");
+    out.println("      <td><input type=\"text\" name=\"" + PARAM_USER_NAME + "\" size=\"30\"/></td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <th>Email</th>");
+    out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" size=\"30\"/></td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <th>Application</th>");
+    out.println("      <td>");
+    for (Application application : ApplicationLogic.getApplications(userSession.getDataSession()))
+    {
+      out.println("         <input name=\"" + PARAM_APPLICATION_ID + "\" type=\"checkbox\" value=\"" + application.getApplicationId() + "\"> "
+          + application.getApplicationAcronym() + "");
+    }
+    out.println("      </td>");
+    out.println("    </tr>");
+    Query query = userSession.getDataSession().createQuery("from TestParticipant order by connectionLabel");
+    List<TestParticipant> testParticipantList = query.list();
+    out.println("    <tr>");
+    out.println("      <th>IIS</th>");
+    out.println("      <td>");
+    out.println("         <select name=\"" + PARAM_TEST_PARTICIPANT_ID + "\">");
+    for (TestParticipant testParticipant : testParticipantList)
+    {
+      out.println(
+          "           <option value=\"" + testParticipant.getTestParticipantId() + "\">" + testParticipant.getConnectionLabel() + "</option>");
+    }
+    out.println("         </select>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <td colspan=\"2\" align=\"right\">");
+    out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_REGISTER + "\"/>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("  </table>");
+    out.println("  </form>");
+    out.println("  <br/>");
+  }
+
   protected void printLogin(User user, UserSession userSession)
   {
     PrintWriter out = userSession.getOut();
@@ -707,6 +766,7 @@ public class HomeServlet extends BaseServlet
       out.println("  <tr>");
       out.println("    <td colspan=\"2\">");
       out.println("      <span class=\"formButtonFloat\">");
+      out.println("        <input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_REGISTER + "\"/>");
       out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
       out.println("      </span>");
       out.println("    </td>");
