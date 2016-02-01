@@ -17,7 +17,18 @@ public class User implements Serializable {
   private List<ApplicationUser> applicationUserList = null;
   private Map<String, UserSetting> userSettingMap = new HashMap<String, UserSetting>();
   private Map<TestParticipant, ReportUser> reportUserMap = new HashMap<TestParticipant, ReportUser>();
+  private boolean resetPassword = false;
   
+  public boolean isResetPassword()
+  {
+    return resetPassword;
+  }
+
+  public void setResetPassword(boolean resetPassword)
+  {
+    this.resetPassword = resetPassword;
+  }
+
   public Map<TestParticipant, ReportUser> getReportUserMap()
   {
     return reportUserMap;

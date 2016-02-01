@@ -9,11 +9,6 @@
     <property name="userName" column="user_name" type="string"/>
     <property name="password" column="password" type="string"/>
     <property name="emailAddress" column="email_address" type="string"/>
-    
-    <!--
-    <property name="applicationType" column="application_type" type="string"/> 
-    <property name="runThis" column="run_this" type="yes_no"/>
-    <many-to-one name="primaryReportTemplate" column="primary_template_id" class="ReportTemplate"/> -->
-    
+    <property name="resetPassword" column="reset_password" type="yes_no"/>
   </class>
 </hibernate-mapping>

@@ -201,3 +201,28 @@ create table tester_command (
 );
 
 ALTER TABLE test_message ADD COLUMN result_manual_test VARCHAR(1) NOT NULL DEFAULT 'N';
+
+CREATE TABLE test_comment (
+    test_comment_id       INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    test_participant_id   INTEGER NOT NULL,
+    reply_comment_id      INTEGER,
+    user_id               INTEGER NOT NULL,
+    test_message_id       INTEGER,
+    test_case_category    VARCHAR(250),
+    comment_text          TEXT NOT NULL,
+    comment_date          DATETIME NOT NULL,
+    comment_mood          VARCHAR(250) NOT NULL
+);
+
+CREATE TABLE test_case (
+    test_case_id          INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    test_participant_id   INTEGER NOT NULL,
+    author_comment_id     INTEGER NOT NULL,
+    reviewed_comment_id   INTEGER,
+    test_case_content     TEXT NOT NULL,
+    test_section_type     VARCHAR(250) NOT NULL,
+    use_status            VARCHAR(250) NOT NULL    
+);
+
+ALTER TABLE user ADD COLUMN reset_password VARCHAR(1) NOT NULL DEFAULT 'N';
+ALTER TABLE test_participant ADD COLUMN public_id_code VARCHAR(250);

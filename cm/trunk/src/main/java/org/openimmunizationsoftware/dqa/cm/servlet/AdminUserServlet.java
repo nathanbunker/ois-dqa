@@ -225,11 +225,11 @@ public class AdminUserServlet extends BaseServlet
     out.println("    <tr>");
     out.println("      <th>User Name</th>");
     out.println("      <td><input type=\"text\" name=\"" + PARAM_USER_NAME + "\" size=\"30\"/></td>");
-    out.println("    <tr>");
+    out.println("    </tr>");
     out.println("    <tr>");
     out.println("      <th>Email</th>");
     out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" size=\"30\"/></td>");
-    out.println("    <tr>");
+    out.println("    </tr>");
     out.println("    <tr>");
     out.println("      <th>Application</th>");
     out.println("      <td>");
@@ -240,6 +240,7 @@ public class AdminUserServlet extends BaseServlet
     }
     out.println("         </select>");
     out.println("      </td>");
+    out.println("    </tr>");
     out.println("    <tr>");
     out.println("      <th>User Type</th>");
     out.println("      <td>");
@@ -250,11 +251,12 @@ public class AdminUserServlet extends BaseServlet
     }
     out.println("         </select>");
     out.println("      </td>");
+    out.println("    </tr>");
     out.println("    <tr>");
     out.println("      <td colspan=\"2\" align=\"right\">");
     out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD_USER + "\"/>");
     out.println("      </td>");
-    out.println("    <tr>");
+    out.println("    </tr>");
     out.println("  </table>");
     out.println("  </form>");
     out.println("  <br/>");

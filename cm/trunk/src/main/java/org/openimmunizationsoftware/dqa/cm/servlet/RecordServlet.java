@@ -713,6 +713,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
         testParticipant.setQuerySupport(readValue(req, PARAM_TPAR_QUERY_SUPPORT, 250));
         testParticipant.setNistStatus(readValue(req, PARAM_TPAR_NIST_STATUS, 250));
         testParticipant.setAccessPasscode(readValue(req, PARAM_TPAR_ACCESS_PASSCODE, 250));
+        testParticipant.setPublicIdCode(readValue(req, PARAM_TPAR_PUBLIC_ID_CODE, 250));
         if (!testParticipant.getGuideName().equals(""))
         {
           Query query = dataSession.createQuery("from ProfileUsage");

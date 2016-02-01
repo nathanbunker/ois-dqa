@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.openimmunizationsoftware.dqa.tr.model">
+  <class name="TestCase" table="test_case">
+    <id name="testCaseId" column="test_case_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="testParticipant" column="test_participant_id" class="TestParticipant"/>
+    <many-to-one name="authorComment" column="author_comment_id" class="TestComment"/>
+    <many-to-one name="revewiedComment" column="reviewed_comment_id" class="TestComment"/>
+    <property name="testCaseContent" column="test_case_content" type="string"/>
+    <property name="testSectionType" column="test_section_type" type="string"/>
+    <property name="useStatusString" column="use_status" type="string"/>
+  </class>
+</hibernate-mapping>
