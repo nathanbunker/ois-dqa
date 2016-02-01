@@ -32,10 +32,12 @@ public class UCConflicts extends PentagonBoxHelper
   @Override
   public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">A conformant IIS interface must not conflict with the national guide. A conformance HL7 interface "
-        + "may define certain constraints on the national guide, however it can not reverse or change R, RE or X requirements, it can either "
-        + "leave them them the same or strengthen them. In addition, this section differentiates between Conflicts and Major Conflicts, the "
-        + "later being of a much more serious nature. </p>");
+    out.println("<p class=\"pentagon\">A conformant IIS interface must not conflict with the national guide. A conformant HL7 interface "
+        + "may define certain constraints on the national guide, however it can not loosen R or RE requirements, nor can it implement X requirements. "
+        + "It can either leave them them the same or further constrain them. This section further differentiates between Minor Conflicts and Major Conflicts with the "
+        + "latter being more serious in nature. </p>");
+    out.println("<p class=\"pentagon\">The section compares the documented usage according to your IG against the detected usage discovered through testing with your interface.</p> ");
+    printDiscoveryProcessForConstraintOrConflict(out);
   }
 
   @Override
@@ -67,7 +69,7 @@ public class UCConflicts extends PentagonBoxHelper
         out.println("<p class=\"pentagon\">A critical review needs to be conducted to see if this IIS conforms to the national specification. </p>");
       } else
       {
-        out.println("<h4 class=\"pentagon\">Conflicts Found</h4>");
+        out.println("<h4 class=\"pentagon\">Minor Conflicts Found</h4>");
         out.println("<p class=\"pentagon\">A review needs to be conducted to verify that IIS conforms to the national specification. </p>");
       }
       out.println("<table class=\"pentagon\">");
@@ -81,13 +83,13 @@ public class UCConflicts extends PentagonBoxHelper
       if (cccConflict != null)
       {
         out.println("  <tr class=\"pentagon\">");
-        out.println("    <th class=\"pentagon\">Conflicts</th>");
+        out.println("    <th class=\"pentagon\">Minor Conflicts</th>");
         out.println("    <td class=\"pentagon\">" + cccConflict.getCount() + "</td>");
         out.println("  </tr>");
       }
       out.println("</table>");
       printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccMajorConflict, "Major Conflicts");
-      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConflict, "Conflicts");
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConflict, "Minor Conflicts");
     }
 
   }
@@ -156,7 +158,7 @@ public class UCConflicts extends PentagonBoxHelper
   public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
     out.println("<p class=\"pentagon\">The score is first set at 100% and then score is successively reduced by 20% for "
-        + "each Major Conflict and then by 5% for each Conflict. As the score diminishes the absolute size of each reduction "
+        + "each Major Conflict and then by 5% for each Minor Conflict. As the score diminishes the absolute size of each reduction "
         + "is likewise reduced, the first Major Conflict then has the largest negative impact on the score, with each "
         + "additional conflict reducing the score by less. </p>");
   }

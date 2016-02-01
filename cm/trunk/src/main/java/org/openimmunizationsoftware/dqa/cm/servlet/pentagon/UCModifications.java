@@ -25,11 +25,12 @@ public class UCModifications extends PentagonBoxHelper
   @Override
   public void printOverview(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    out.println("<p class=\"pentagon\">Modifications are changes made to each test message to meet local IIS standards. Some of these"
-        + "modifications are for fields that would be expected to be changed, such as identification parameters in the MSH segment. "
-        + "Others are to meet local requirements for form or content. Thus these modifications are identified as either"
+    out.println("<p class=\"pentagon\">Modifications are changes made to each test message to meet local IIS reequirements. Some of these "
+        + "modifications are for fields that would be expected to be changed, such as identification fields in the MSH segment. "
+        + "Others are to meet local requirements for form or content. Thus, modifications are identified as either "
         + "expected or unexpected modifications. IIS should work to reduce the unexpected modifications as much as possible as "
-        + "these are likely to be off-standard or at the very least a difference from the national implementation guide.   </p>");
+        + "these are likely to be off-standard or at the very least a difference from the national implementation guide. Local "
+        + "law and/or policies may prevent removal of all modifications.</p>");
   }
 
   @Override
@@ -53,26 +54,27 @@ public class UCModifications extends PentagonBoxHelper
     }
     if (transformExpected.size() == 0 && transformCustom.size() == 0)
     {
-      out.println("<h4 class=\"pentagon\">No Custom Modifications Needed</h4>");
-      out.println("<p class=\"pentagon\">This interface did not require any modifications to the message in order for it to be accepted. </p>");
+      out.println("<h4 class=\"pentagon\">No Local Requirements Discovered</h4>");
+      out.println("<p class=\"pentagon\">This interface did not require any modifications to messages in order for it to be accepted. </p>");
     } else
     {
-      out.println("<h4 class=\"pentagon\">Custom Modifications Needed</h4>");
-      out.println("<p class=\"pentagon\">This interface requires customized Transformations to modify each message "
-          + "before transmitting them to the IIS. These transformations can range from setting "
+      out.println("<h4 class=\"pentagon\">Local Requirements Discovered</h4>");
+      out.println("<p class=\"pentagon\">This interface has local requirements which must be applied "
+          + "before transmitting them to the IIS. Each test case in the Interoperability Testing Project is built against the National IG. "
+          + "Before submitting a test case to an IIS, the message is transformed to meet local requirements. These transformations can range from setting "
           + "the correct submitter facility in the message header to modifying the structure of "
           + "the HL7 message to meet local requirements. </p>");
       if (transformExpected.size() > 0)
       {
-        out.println("<h4 class=\"pentagon\">Expected Modifications</h4>");
-        out.println("<p class=\"pentagon\">" + "Changes to certain fields such as MSH-4 and RXA-11.4 are expected "
-            + "as IIS may request specific values in these fields.  </p>");
+        out.println("<h4 class=\"pentagon\">Anticipated Local Requirements</h4>");
+        out.println("<p class=\"pentagon\">" + "Changes to certain fields such as MSH-4 and RXA-11.4 are anticipated "
+            + "as IIS may request specific identifier values in these fields. </p>");
         TestReportServlet.printTransforms(out, transformExpected);
       }
       if (transformCustom.size() > 0)
       {
-        out.println("<h4 class=\"pentagon\">Unexpected Modifications</h4>");
-        out.println("<p class=\"pentagon\">These changes were not anticipated in the national standard or in "
+        out.println("<h4 class=\"pentagon\">Unanticipated Local Requirements</h4>");
+        out.println("<p class=\"pentagon\">These changes were not anticipated based on the national standard or in "
             + "NIST testing. Please examine the need for these changes carefully as they are "
             + "likely to result in significant effort by EHR-s and other trading partners to achieve interoperability.</p>");
         TestReportServlet.printTransforms(out, transformCustom);
@@ -84,8 +86,47 @@ public class UCModifications extends PentagonBoxHelper
   public void printCalculation(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession,
       UserSession userSession)
   {
-    // TODO Auto-generated method stub
-
+    out.println("<p>Scoring in this section is based on a raw count of discovered local requirements.</p>");
+    out.println("<p>The score is calculated using the intersection table below.  For example, an interface with 1 unanticipated "
+            + "local requirements and 6 anticipated local requirements would have a score of 65%.</p>");
+    
+    out.println("<table class=\"pentagon\">"
+              + "  <tr class=\"pentagon\" align=\"center\">" 
+              + "    <td style='border:0px;' width=\"20%\">&nbsp;</td>"
+              + "    <td style='border:0px;'>&nbsp;</td>"
+              + "    <td  class=\"pentagon\" colspan=4><b># of Unanticipated Local Requirements</b></td>" 
+              + "  </tr>"
+              + "  <tr class=\"pentagon\" align=\"center\">"
+              + "    <td style='border:0px;'>&nbsp;</td>"
+              + "    <td style='border:0px;'>&nbsp;</td>"
+              + "    <td class=\"pentagon\"><b>0</b></td>" 
+              + "    <td class=\"pentagon\"><b>1</b></td>" 
+              + "    <td class=\"pentagon\"><b>2</b></td>" 
+              + "    <td class=\"pentagon\"><b>3 or more</b></td>" 
+              + "  </tr>"
+              + "  <tr class=\"pentagon\" align=\"center\">"
+              + "    <td class=\"pentagon\" rowspan=3><b># of Anticipated Local Requirements</b></td>"
+              + "    <td class=\"pentagon\"><b>5 or less</b></td>" 
+              + "    <td class=\"pentagon\">100%</td>" 
+              + "    <td class=\"pentagon\">80%</td>" 
+              + "    <td class=\"pentagon\">60%</td>" 
+              + "    <td class=\"pentagon\">30%</td>" 
+              + "  </tr>"
+              + "  <tr class=\"pentagon\" align=\"center\">"
+              + "    <td class=\"pentagon\"><b>6 or 7</b></td>" 
+              + "    <td class=\"pentagon\">85%</td>" 
+              + "    <td class=\"pentagon\">65%</td>" 
+              + "    <td class=\"pentagon\">45%</td>" 
+              + "    <td class=\"pentagon\">15%</td>" 
+              + "  </tr>"
+              + "  <tr class=\"pentagon\" align=\"center\">"
+              + "    <td class=\"pentagon\"><b>8 or more</b></td>" 
+              + "    <td class=\"pentagon\">70%</td>" 
+              + "    <td class=\"pentagon\">50%</td>" 
+              + "    <td class=\"pentagon\">30%</td>" 
+              + "    <td class=\"pentagon\">0%</td>" 
+              + "  </tr>"
+              + "</table>");
   }
 
   @Override
