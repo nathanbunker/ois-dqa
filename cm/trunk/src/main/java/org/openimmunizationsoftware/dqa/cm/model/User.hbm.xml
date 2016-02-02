@@ -10,5 +10,9 @@
     <property name="password" column="password" type="string"/>
     <property name="emailAddress" column="email_address" type="string"/>
     <property name="resetPassword" column="reset_password" type="yes_no"/>
+    <property name="organization" column="organization" type="string"/>
+    <property name="positionTitle" column="position_title" type="string"/>
+    <property name="phoneNumber" column="phone_number" type="string"/>
+    <property name="adminComments" column="admin_comments" type="string"/>
   </class>
 </hibernate-mapping>
