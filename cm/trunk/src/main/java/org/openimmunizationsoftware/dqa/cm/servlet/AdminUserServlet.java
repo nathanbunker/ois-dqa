@@ -57,6 +57,10 @@ public class AdminUserServlet extends BaseServlet
   public static final String ACTION_RESET_PASSWORD = "Reset Password";
   public static final String PARAM_USER_NAME = "userName";
   public static final String PARAM_EMAIL_ADDRESS = "emailAddress";
+  public static final String PARAM_ORGANIZATION = "organization";
+  public static final String PARAM_POSITION_TITLE = "positionTitle";
+  public static final String PARAM_PHONE_NUMBER = "phoneNumber";
+  public static final String PARAM_ADMIN_COMMENTS = "adminComments";
   public static final String PARAM_USER_TYPE = "userType";
   public static final String PARAM_APPLICATION_ID = "applicationId";
   public static final String PARAM_REPORT_ROLE = "reportRole";
@@ -132,6 +136,10 @@ public class AdminUserServlet extends BaseServlet
               userBeingEdited = new User();
               userBeingEdited.setUserName(userName);
               userBeingEdited.setEmailAddress(req.getParameter(PARAM_EMAIL_ADDRESS));
+              userBeingEdited.setOrganization(req.getParameter(PARAM_ORGANIZATION));
+              userBeingEdited.setPositionTitle(req.getParameter(PARAM_POSITION_TITLE));
+              userBeingEdited.setPhoneNumber(req.getParameter(PARAM_PHONE_NUMBER));
+              userBeingEdited.setAdminComments(req.getParameter(PARAM_ADMIN_COMMENTS));
               UserLogic.createUser(userBeingEdited, application, userType, dataSession);
               userSession.setMessageConfirmation("User created, password is " + userBeingEdited.getPassword());
             }
@@ -153,6 +161,10 @@ public class AdminUserServlet extends BaseServlet
           String emailAddress = req.getParameter(PARAM_EMAIL_ADDRESS);
           userBeingEdited.setEmailAddress(emailAddress);
           userBeingEdited.setUserName(userName);
+          userBeingEdited.setOrganization(req.getParameter(PARAM_ORGANIZATION));
+          userBeingEdited.setPositionTitle(req.getParameter(PARAM_POSITION_TITLE));
+          userBeingEdited.setPhoneNumber(req.getParameter(PARAM_PHONE_NUMBER));
+          userBeingEdited.setAdminComments(req.getParameter(PARAM_ADMIN_COMMENTS));
           UserLogic.updateUser(userBeingEdited, dataSession);
 
           for (Application application : ApplicationLogic.getApplications(dataSession))
@@ -310,6 +322,26 @@ public class AdminUserServlet extends BaseServlet
       out.println("    <tr>");
       out.println("      <th>Email</th>");
       out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" value=\"" + userBeingEdited.getEmailAddress()
+          + "\" size=\"30\"/></td>");
+      out.println("    <tr>");
+      out.println("    <tr>");
+      out.println("      <th>Organization</th>");
+      out.println("      <td><input type=\"text\" name=\"" + PARAM_ORGANIZATION + "\" value=\"" + n(userBeingEdited.getOrganization())
+          + "\" size=\"30\"/></td>");
+      out.println("    <tr>");
+      out.println("    <tr>");
+      out.println("      <th>Position Title</th>");
+      out.println("      <td><input type=\"text\" name=\"" + PARAM_POSITION_TITLE + "\" value=\"" + n(userBeingEdited.getPositionTitle())
+          + "\" size=\"30\"/></td>");
+      out.println("    <tr>");
+      out.println("    <tr>");
+      out.println("      <th>Phone</th>");
+      out.println("      <td><input type=\"text\" name=\"" + PARAM_PHONE_NUMBER + "\" value=\"" + n(userBeingEdited.getPhoneNumber())
+          + "\" size=\"12\"/></td>");
+      out.println("    <tr>");
+      out.println("    <tr>");
+      out.println("      <th>Comments</th>");
+      out.println("      <td><input type=\"text\" name=\"" + PARAM_ADMIN_COMMENTS + "\" value=\"" + n(userBeingEdited.getAdminComments())
           + "\" size=\"30\"/></td>");
       out.println("    <tr>");
       boolean isAartUser = false;

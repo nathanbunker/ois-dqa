@@ -226,3 +226,10 @@ CREATE TABLE test_case (
 
 ALTER TABLE user ADD COLUMN reset_password VARCHAR(1) NOT NULL DEFAULT 'N';
 ALTER TABLE test_participant ADD COLUMN public_id_code VARCHAR(250);
+
+
+
+ALTER TABLE user ADD COLUMN organization   VARCHAR(250);
+ALTER TABLE user ADD COLUMN position_title VARCHAR(250);
+ALTER TABLE user ADD COLUMN phone_number   VARCHAR(250);
+ALTER TABLE user ADD COLUMN admin_comments VARCHAR(1200);

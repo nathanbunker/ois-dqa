@@ -318,4 +318,13 @@ public abstract class BaseServlet extends HttpServlet
     }
     out.println("</table>");
   }
+
+  protected static String n(String s)
+  {
+    if (s == null)
+    {
+      return "";
+    }
+    return s;
+  }
 }

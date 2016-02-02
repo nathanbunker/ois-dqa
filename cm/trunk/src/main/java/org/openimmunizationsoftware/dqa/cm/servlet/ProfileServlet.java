@@ -1396,13 +1396,4 @@ public class ProfileServlet extends HomeServlet
     }
   }
 
-  private static String n(String s)
-  {
-    if (s == null)
-    {
-      return "";
-    }
-    return s;
-  }
-
 }

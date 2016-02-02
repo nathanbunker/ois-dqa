@@ -18,7 +18,51 @@ public class User implements Serializable {
   private Map<String, UserSetting> userSettingMap = new HashMap<String, UserSetting>();
   private Map<TestParticipant, ReportUser> reportUserMap = new HashMap<TestParticipant, ReportUser>();
   private boolean resetPassword = false;
+  private String organization = "";
+  private String positionTitle = "";
+  private String phoneNumber = "";
+  private String adminComments = "";
   
+  public String getOrganization()
+  {
+    return organization;
+  }
+
+  public void setOrganization(String organization)
+  {
+    this.organization = organization;
+  }
+
+  public String getPositionTitle()
+  {
+    return positionTitle;
+  }
+
+  public void setPositionTitle(String positionTitle)
+  {
+    this.positionTitle = positionTitle;
+  }
+
+  public String getPhoneNumber()
+  {
+    return phoneNumber;
+  }
+
+  public void setPhoneNumber(String phoneNumber)
+  {
+    this.phoneNumber = phoneNumber;
+  }
+
+  public String getAdminComments()
+  {
+    return adminComments;
+  }
+
+  public void setAdminComments(String adminComments)
+  {
+    this.adminComments = adminComments;
+  }
+
   public boolean isResetPassword()
   {
     return resetPassword;
