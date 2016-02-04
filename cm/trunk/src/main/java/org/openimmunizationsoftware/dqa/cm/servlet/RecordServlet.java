@@ -98,7 +98,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           testConducted.setConnectionConfig(readValue(req, PARAM_TC_CONNECTION_CONFIG));
           testConducted.setQueryType(readValue(req, PARAM_TC_QUERY_TYPE, 250));
           testConducted.setQueryEnabled(readValue(req, PARAM_TC_QUERY_ENABLED, 1));
-          testConducted.setQueryEnabled(readValue(req, PARAM_TC_QUERY_PAUSE, 1));
+          testConducted.setQueryPause(readValue(req, PARAM_TC_QUERY_PAUSE, 1));
           testConducted.setCompleteTest(readValueBoolean(req, PARAM_TC_COMPLETE_TEST));
           testConducted.setManualTest(readValueBoolean(req, PARAM_TC_MANUAL_TEST));
           testConducted.setTestLog(readValue(req, PARAM_TC_TEST_LOG));
