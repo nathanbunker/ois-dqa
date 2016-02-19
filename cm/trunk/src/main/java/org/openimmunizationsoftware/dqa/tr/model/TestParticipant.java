@@ -334,9 +334,9 @@ public class TestParticipant implements Serializable
     }
     if (publicIdCode == null || publicIdCode.equals(""))
     {
-      return "Immunization Information System";
+      return "IIS";
     }
-    return "Immunization Information System " + publicIdCode;
+    return "IIS " + publicIdCode;
   }
 
   public boolean canViewConnectionLabel(UserSession userSession)

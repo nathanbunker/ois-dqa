@@ -93,7 +93,10 @@ public abstract class BaseServlet extends HttpServlet
     {
       userSession = initUserSession(webSession);
     }
-    userSession.getDataSession().clear();
+    if (userSession.getDataSession() != null)
+    {
+      userSession.getDataSession().clear();
+    }
     userSession.setOut(new PrintWriter(resp.getOutputStream()));
     if (userSession.isLoggedIn())
     {
