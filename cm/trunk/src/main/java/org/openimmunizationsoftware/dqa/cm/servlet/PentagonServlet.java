@@ -436,11 +436,19 @@ public class PentagonServlet extends HomeServlet
         }
       } else
       {
-        out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY) + "px; left: "
-            + (posX + offsetX)
-            + "px; width: 43px; height: 55px; cursor: pointer; cursor: hand; \" onmouseout=\"flashOnGrey('box_local')\" onmouseover=\"flashOnLinkYellow('box_local')\"  "
-            + "onClick=\"window.open('guide?profileUsageId=" + testParticipantSelected.getProfileUsage().getProfileUsageId()
-            + "', '_blank')\"><span style=\"font-size: 10pt; font-weight: bold;\">IIS Guide</span></span>");
+        if (testParticipantSelected.canViewConnectionLabel(userSession))
+        {
+          out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY)
+              + "px; left: " + (posX + offsetX)
+              + "px; width: 43px; height: 55px; cursor: pointer; cursor: hand; \" onmouseout=\"flashOnGrey('box_local')\" onmouseover=\"flashOnLinkYellow('box_local')\"  "
+              + "onClick=\"window.open('guide?profileUsageId=" + testParticipantSelected.getProfileUsage().getProfileUsageId()
+              + "', '_blank')\"><span style=\"font-size: 10pt; font-weight: bold;\">IIS Guide</span></span>");
+        } else
+        {
+          out.println("  <span style=\"color: #9b0d28; font-size: 12px; text-align: center; position: absolute; top: " + (posY + offsetY)
+              + "px; left: " + (posX + offsetX) + "px; width: 43px; height: 55px; \">"
+              + "<span style=\"font-size: 10pt; font-weight: bold; color: #AAAAAA; \"></span></span>");
+        }
       }
     }
 

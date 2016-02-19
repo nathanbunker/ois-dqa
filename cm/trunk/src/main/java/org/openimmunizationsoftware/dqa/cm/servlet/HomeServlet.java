@@ -190,8 +190,7 @@ public class HomeServlet extends BaseServlet
               applicationId = userSession.getUser().getApplicationUserList().get(0).getApplication().getApplicationId();
             }
           }
-        }
-        if (action.equals(ACTION_LOGOUT))
+        } else if (action.equals(ACTION_LOGOUT))
         {
           logout(webSession);
           webSession = req.getSession(true);
@@ -205,7 +204,16 @@ public class HomeServlet extends BaseServlet
         } else if (action.equals(ACTION_CHANGE_PASSWORD))
         {
           view = changePassword(req, webSession);
-        } else if (action.equals(ACTION_SELECT_APPLICATION))
+          if (view.equals(VIEW_DEFAULT))
+          {
+            if (userSession.getUser().getApplicationUserList().size() == 1)
+            {
+              action = ACTION_SELECT_APPLICATION;
+              applicationId = userSession.getUser().getApplicationUserList().get(0).getApplication().getApplicationId();
+            }
+          }
+        }
+        if (action.equals(ACTION_SELECT_APPLICATION))
         {
           if (userSession.getUser() != null)
           {
