@@ -545,7 +545,7 @@ INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1
 
 INSERT INTO dqa_database_log VALUES (dqa_change_id_sequence.NEXTVAL, SYSDATE, '1.06', 'Adding column context_value to dqa_code_received table');
 
-ALTER TABLE dqa_code_received DROP CONSTRAINT dqa_uk_code_received1;
+ALTER TABLE dqa_code_received DROP CONSTRAINT dqa_uk_code_received1 INCLUDING INDEX;
 
 ALTER TABLE dqa_code_received ADD 
 (
