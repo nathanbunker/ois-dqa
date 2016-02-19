@@ -21,54 +21,68 @@ public class UserSession implements Serializable
   protected List<CodeInstance> searchResultsWithCodeInstanceList = null;
   private String searchCodeValue = "";
   private String searchCodeLabel = "";
-  
+
   private transient Session dataSession = null;
   private transient PrintWriter out = null;
   private transient String messageError = null;
   private transient String messageConfirmation = null;
   private transient ProfileUsage profileUsageSelected = null;
-  
+  private transient UserActivity userActivity = new UserActivity();
+
+  public UserActivity getUserActivity()
+  {
+    return userActivity;
+  }
+
   public ProfileUsage getProfileUsageSelected()
   {
     return profileUsageSelected;
   }
+
   public void setProfileUsageSelected(ProfileUsage profileUsageSelected)
   {
     this.profileUsageSelected = profileUsageSelected;
   }
+
   public void setOut(PrintWriter out)
   {
     this.out = out;
   }
-  public String getMessageError() {
+
+  public String getMessageError()
+  {
     return messageError;
   }
 
-  public void setMessageError(String messageError) {
+  public void setMessageError(String messageError)
+  {
     this.messageError = messageError;
   }
 
-  public String getMessageConfirmation() {
+  public String getMessageConfirmation()
+  {
     return messageConfirmation;
   }
 
-  public void setMessageConfirmation(String messageConfirmation) {
+  public void setMessageConfirmation(String messageConfirmation)
+  {
     this.messageConfirmation = messageConfirmation;
   }
 
-  public PrintWriter getOut() {
+  public PrintWriter getOut()
+  {
     return out;
   }
 
-  protected boolean isAdmin() {
-    return user != null && user.getApplicationUser() != null
-        && user.getApplicationUser().getUserType() == UserType.ADMIN;
+  protected boolean isAdmin()
+  {
+    return user != null && user.getApplicationUser() != null && user.getApplicationUser().getUserType() == UserType.ADMIN;
   }
 
-  protected boolean isLoggedIn() {
+  protected boolean isLoggedIn()
+  {
     return user != null;
   }
-
 
   public String getSearchCodeValue()
   {

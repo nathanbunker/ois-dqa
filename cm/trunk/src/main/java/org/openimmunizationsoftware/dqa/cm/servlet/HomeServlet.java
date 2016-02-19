@@ -164,6 +164,11 @@ public class HomeServlet extends BaseServlet
       {
         view = VIEW_DEFAULT;
       }
+      int applicationId = 0;
+      if (req.getParameter(PARAM_APPLICATION_ID) != null)
+      {
+        applicationId = Integer.parseInt(req.getParameter(PARAM_APPLICATION_ID));
+      }
       if (action != null)
       {
         if (action.equals(ACTION_LOGIN))
@@ -179,9 +184,14 @@ public class HomeServlet extends BaseServlet
             if (userSession.getUser().isResetPassword())
             {
               view = VIEW_CHANGE_PASSWORD;
+            } else if (userSession.getUser().getApplicationUserList().size() == 1)
+            {
+              action = ACTION_SELECT_APPLICATION;
+              applicationId = userSession.getUser().getApplicationUserList().get(0).getApplication().getApplicationId();
             }
           }
-        } else if (action.equals(ACTION_LOGOUT))
+        }
+        if (action.equals(ACTION_LOGOUT))
         {
           logout(webSession);
           webSession = req.getSession(true);
@@ -200,7 +210,7 @@ public class HomeServlet extends BaseServlet
           if (userSession.getUser() != null)
           {
             userSession.getUser().setApplicationUser(null);
-            int applicationId = Integer.parseInt(req.getParameter(PARAM_APPLICATION_ID));
+
             for (ApplicationUser applicationUser : userSession.getUser().getApplicationUserList())
             {
               if (applicationUser.getApplication().getApplicationId() == applicationId)
@@ -891,28 +901,20 @@ public class HomeServlet extends BaseServlet
       out.println("  <caption>Login</caption>");
       out.println("  <tr>");
       out.println("    <th>Email Address</th>");
-      out.println("    <th>Password</th>");
-      out.println("  </tr>");
-      out.println("  <tr>");
       out.println("    <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" size=\"30\"/></td>");
-      out.println("    <td><input type=\"password\" name=\"" + PARAM_PASSWORD + "\" size=\"15\"/></td>");
       out.println("  </tr>");
       out.println("  <tr>");
-      out.println("    <td colspan=\"2\">");
+      out.println("    <th>Password</th>");
+      out.println("    <td>");
+      out.println("      <input type=\"password\" name=\"" + PARAM_PASSWORD + "\" size=\"15\"/>");
       out.println("      <span class=\"formButtonFloat\">");
       out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
       out.println("      </span>");
       out.println("    </td>");
       out.println("  </tr>");
-      out.println("  <tr>");
-      out.println("    <td colspan=\"2\">");
-      out.println("      <span class=\"formButtonFloat\">");
-      out.println("        <input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_REGISTER + "\"/>");
-      out.println("        <input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_RESET_PASSWORD + "\"/>");
-      out.println("      </span>");
-      out.println("    </td>");
-      out.println("  </tr>");
       out.println("</table>");
+      out.println("<br/><span class=\"formButtonFloat\"><input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_REGISTER + "\"/>");
+      out.println("<input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_RESET_PASSWORD + "\"/></span>");
       out.println("</form>");
     } else
     {

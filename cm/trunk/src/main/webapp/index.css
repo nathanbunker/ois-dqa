@@ -209,6 +209,18 @@ a:hover.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; 
 a:active.fauxbutton {text-decoration:none; margin: 3px; padding:0px 2px 0px 2px; border-width: 2px; border-style: outset; border-color: black; font-size: smaller; background: #eee; color: #666; font-variant: small-caps;}
 
 
+.systemWideMessage
+{
+	color: blue;
+	padding-left: 7px;
+	height: 50px;
+	width: 100%;
+	background-color: #FFE1AA;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #051838;
+}
+
 .messageConfirmation
 {
 	color: blue;

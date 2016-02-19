@@ -2,6 +2,11 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -14,17 +19,14 @@ import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.LoadCdcDataLogic;
-import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
-import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.LoadCdcDataLogic.LoadResult;
+import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.DeleteProposedVersionThread;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.ReleaseNewVersionThread;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.UpdateIssueCountThread;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
-import org.openimmunizationsoftware.dqa.cm.model.User;
-import org.openimmunizationsoftware.dqa.cm.model.UserType;
 import org.openimmunizationsoftware.dqa.tr.profile.ProfileManager;
 
 public class AdminServlet extends BaseServlet
@@ -42,12 +44,14 @@ public class AdminServlet extends BaseServlet
   public static final String PARAM_ACTION = "action";
   public static final String PARAM_RELEASE_ID = "releaseId";
   public static final String PARAM_CDC_TEXT = "cdcText";
+  public static final String PARAM_SYSTEM_WIDE_MESSAGE = "systemWideMessage";
 
   public static final String ACTION_LOAD_CODES = "Load Codes";
   public static final String ACTION_RELEASE_VERSION = "Release Version";
   public static final String ACTION_DELETE_VERSION = "Delete Version";
   public static final String ACTION_UPDATE_ISSUE_COUNTS = "Update Issue Counts";
   public static final String ACTION_RECTIFY_PROFILE_FIELDS = "Rectify Profile Fields";
+  public static final String ACTION_SET_SYSTEM_WIDE_MESSAGE = "Set System Wide Message";
 
   private static ReleaseNewVersionThread releaseNewVersionThread = null;
   private static DeleteProposedVersionThread deleteProposedVersionThread = null;
@@ -94,6 +98,9 @@ public class AdminServlet extends BaseServlet
           String data = req.getParameter(PARAM_CDC_TEXT);
           loadResultList = LoadCdcDataLogic.loadCdcData(codeTableInstance, userSession.getUser(), data, dataSession);
         }
+      } else if (action.equals(ACTION_SET_SYSTEM_WIDE_MESSAGE))
+      {
+        setSystemWideMessage(req.getParameter(PARAM_SYSTEM_WIDE_MESSAGE));
       } else if (action.equals(ACTION_RECTIFY_PROFILE_FIELDS))
       {
         ProfileManager.rectifyProfileFields(dataSession);
@@ -103,13 +110,13 @@ public class AdminServlet extends BaseServlet
     createHeader(webSession);
 
     out.println("<div class=\"leftColumn\">");
+    printUserActivity(userSession, out);
     out.println("</div>");
 
     out.println("<div class=\"centerColumn\">");
     printReleaseMaintenance(out, dataSession);
-
     printUpdateCdcTables(out, dataSession);
-
+    printSystemWideMessageTable(out, dataSession);
     out.println("</div>");
 
     out.println("<div class=\"rightColumn\">");
@@ -147,6 +154,28 @@ public class AdminServlet extends BaseServlet
     out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
     createFooter(webSession);
 
+  }
+
+  public void printUserActivity(UserSession userSession, PrintWriter out)
+  {
+    List<UserActivity> userSessionActivityList = new ArrayList<UserActivity>(getUserActivitySet());
+    Collections.sort(userSessionActivityList);
+    out.println("<table width=\"100%\">");
+    out.println("  <caption>Last User Activity</caption>");
+    out.println("  <tr>");
+    out.println("    <th>User</th>");
+    out.println("    <th>Date/Time</th>");
+    out.println("  </tr>");
+    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm a z");
+    for (UserActivity userActivity : userSessionActivityList)
+    {
+      Date activityDate = new Date(userActivity.getLastWebRequestTimeMillis());
+      out.println("  <tr>");
+      out.println("    <td>" + userActivity.getUserName() + "</td>");
+      out.println("    <td>" + sdf.format(activityDate) + "</td>");
+      out.println("  </tr>");
+    }
+    out.println("</table>");
   }
 
   public void printReleaseMaintenance(PrintWriter out, Session dataSession)
@@ -227,4 +256,26 @@ public class AdminServlet extends BaseServlet
     out.println("  </form>");
     out.println("  <br/>");
   }
+
+  public void printSystemWideMessageTable(PrintWriter out, Session dataSession)
+  {
+    out.println("  <form action=\"admin\" method=\"POST\">");
+    out.println("  <table width=\"100%\">");
+    out.println("    <caption>System Wide Message</caption>");
+    out.println("    <tr>");
+    out.println("      <td>Message</td>");
+    out.println("      <td>");
+    out.println("        <input type=\"text\" name=\"" + PARAM_SYSTEM_WIDE_MESSAGE + "\" value=\"" + getSystemWideMessage() + "\" size=\"30\"/>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <td colspan=\"2\">");
+    out.println("        <input type=\"submit\" name=\"action\" value=\"" + ACTION_SET_SYSTEM_WIDE_MESSAGE + "\"/>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("  </table>");
+    out.println("  </form>");
+    out.println("  <br/>");
+  }
+
 }
