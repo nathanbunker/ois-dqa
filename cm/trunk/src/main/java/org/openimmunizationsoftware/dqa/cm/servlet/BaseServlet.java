@@ -2,7 +2,9 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -40,6 +42,23 @@ public abstract class BaseServlet extends HttpServlet
   public static final String ATTRIBUTE_TEST_MESSAGE = "testMessage";
 
   private String servletTitle = "";
+  private static String systemWideMessage = "";
+  private static Set<UserActivity> userActivitySet = new HashSet<UserActivity>();
+
+  public static Set<UserActivity> getUserActivitySet()
+  {
+    return userActivitySet;
+  }
+
+  public static String getSystemWideMessage()
+  {
+    return systemWideMessage;
+  }
+
+  public static void setSystemWideMessage(String systemWideMessage)
+  {
+    BaseServlet.systemWideMessage = systemWideMessage;
+  }
 
   protected void sendToHome(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
@@ -76,6 +95,13 @@ public abstract class BaseServlet extends HttpServlet
     }
     userSession.getDataSession().clear();
     userSession.setOut(new PrintWriter(resp.getOutputStream()));
+    if (userSession.isLoggedIn())
+    {
+      UserActivity userActivity = userSession.getUserActivity();
+      userActivity.setUserName(userSession.getUser().getUserName());
+      userActivity.setLastWebRequestTimeMillis(System.currentTimeMillis());
+      userActivitySet.add(userActivity);
+    }
     resp.setContentType("text/html");
     return webSession;
   }
@@ -176,12 +202,19 @@ public abstract class BaseServlet extends HttpServlet
   {
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
     Session dataSession = userSession.getDataSession();
+    Application defaultApplication = (Application) dataSession.get(Application.class, 1);
+    createHeader(webSession, defaultApplication);
+  }
+
+  protected void createHeader(HttpSession webSession, Application defaultApplication)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
     PrintWriter out = userSession.getOut();
     out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">");
     out.println("<html>");
     out.println("  <head>");
     out.println("    <meta charset=\"UTF-8\">");
-    Application application = (Application) dataSession.get(Application.class, 1);
+    Application application = defaultApplication;
     if (userSession.getUser() != null && userSession.getUser().getApplicationUser() != null)
     {
       application = userSession.getUser().getApplicationUser().getApplication();
@@ -190,6 +223,10 @@ public abstract class BaseServlet extends HttpServlet
     out.println("    <link rel=\"stylesheet\" type=\"text/css\" href=\"index.css\">");
     out.println("  </head>");
     out.println("  <body>");
+    if (getSystemWideMessage() != null && !getSystemWideMessage().equals(""))
+    {
+      out.println("<div class=\"systemWideMessage\">System Wide Message: " + getSystemWideMessage() + "</div>");
+    }
     out.println("    <div class=\"menu\">");
     if (application.isApplicationDqacm())
     {
@@ -211,7 +248,8 @@ public abstract class BaseServlet extends HttpServlet
       out.println("     |");
       out.println(
           "     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_PENTAGON_REPORTS + "\" class=\"menuLink\">report</a>");
-      if (userSession.getUser().getApplicationUser().getUserType() == UserType.ADMIN)
+      if (userSession.getUser() != null && userSession.getUser().getApplicationUser() != null
+          && userSession.getUser().getApplicationUser().getUserType() == UserType.ADMIN)
       {
         out.println("     |");
         out.println("     <a href=\"manualManage?" + HomeServlet.PARAM_VIEW + "=" + ManualManageServlet.VIEW_HL7_DOWNLOAD
@@ -224,6 +262,10 @@ public abstract class BaseServlet extends HttpServlet
             + "\" class=\"menuLink\">schedule</a>");
         out.println("     |");
         out.println("     <a href=\"profile\" class=\"menuLink\">profile</a>");
+        out.println("     |");
+        out.println("     <a href=\"adminUser\" class=\"menuLink\">users</a>");
+        out.println("     |");
+        out.println("     <a href=\"admin\" class=\"menuLink\">admin</a>");
         out.println("     |");
         out.println(
             "     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP + "\" class=\"menuLink\">old dashboard</a>");

@@ -25,6 +25,10 @@
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.HomeServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>AartServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.AartServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>SetupServlet</servlet-name>
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.SetupServlet</servlet-class>
   </servlet>
@@ -88,6 +92,10 @@
   <servlet-mapping>
     <servlet-name>HomeServlet</servlet-name>
     <url-pattern>/home</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AartServlet</servlet-name>
+    <url-pattern>/aart</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>SetupServlet</servlet-name>
