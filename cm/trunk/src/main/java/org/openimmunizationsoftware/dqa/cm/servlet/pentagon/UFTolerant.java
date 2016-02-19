@@ -53,7 +53,7 @@ public class UFTolerant extends PentagonBoxHelper
       query.setParameter(1, pentagonReport.getTestConducted());
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK + "%");
       List<TestMessage> testMessageList = query.list();
-      printTestMessageListPass(out, testMessageList);
+      printTestMessageListPass(out, testMessageList, userSession);
     }
   }
   

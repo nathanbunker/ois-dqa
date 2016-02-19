@@ -3,8 +3,10 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -25,8 +27,10 @@ import org.openimmunizationsoftware.dqa.cm.logic.CodeInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeMasterLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.MailManager;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.SupportingInfoLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
 import org.openimmunizationsoftware.dqa.cm.model.AcceptStatus;
 import org.openimmunizationsoftware.dqa.cm.model.AllowedValue;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
@@ -64,10 +68,12 @@ public class HomeServlet extends BaseServlet
   protected static final String ACTION_LOGIN = "Login";
   protected static final String PARAM_USER_NAME = "userName";
   protected static final String PARAM_PASSWORD = "password";
+  protected static final String PARAM_PASSWORD_RETYPE = "passwordRetype";
 
   protected static final String ACTION_LOGOUT = "Logout";
-
   protected static final String ACTION_REGISTER = "Register";
+  protected static final String ACTION_RESET_PASSWORD = "Reset Password";
+  protected static final String ACTION_CHANGE_PASSWORD = "Change Password";
 
   protected static final String ACTION_SELECT_APPLICATION = "Select Application";
   protected static final String PARAM_APPLICATION_ID = "applicationId";
@@ -102,11 +108,16 @@ public class HomeServlet extends BaseServlet
   protected static final String VIEW_TABLE = "table";
   protected static final String VIEW_CODE = "code";
   protected static final String VIEW_REGISTER = "Register";
+  protected static final String VIEW_RESET_PASSWORD = "Reset Password";
+  protected static final String VIEW_CHANGE_PASSWORD = "Change Password";
 
   public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
   public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
 
   public static final String PARAM_EMAIL_ADDRESS = "emailAddress";
+  public static final String PARAM_ORGANIZATION = "organization";
+  public static final String PARAM_POSITION_TITLE = "positionTitle";
+  public static final String PARAM_PHONE_NUMBER = "phoneNumber";
 
   private String paramCodeValue = null;
   private String paramCodeLabel = null;
@@ -157,12 +168,33 @@ public class HomeServlet extends BaseServlet
       {
         if (action.equals(ACTION_LOGIN))
         {
-          login(req.getParameter(PARAM_USER_NAME), req.getParameter(PARAM_PASSWORD), webSession);
+          login(req.getParameter(PARAM_EMAIL_ADDRESS), req.getParameter(PARAM_PASSWORD), webSession);
+          if (userSession.isLoggedIn())
+          {
+            // preload, not sure why this is needed
+            for (ApplicationUser applicationUser : userSession.getUser().getApplicationUserList())
+            {
+              applicationUser.getApplication().getApplicationAcronym();
+            }
+            if (userSession.getUser().isResetPassword())
+            {
+              view = VIEW_CHANGE_PASSWORD;
+            }
+          }
         } else if (action.equals(ACTION_LOGOUT))
         {
           logout(webSession);
           webSession = req.getSession(true);
-          userSession = null;
+          userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+        } else if (action.equals(ACTION_REGISTER))
+        {
+          view = register(req, webSession);
+        } else if (action.equals(ACTION_RESET_PASSWORD))
+        {
+          view = resetPassword(req, webSession);
+        } else if (action.equals(ACTION_CHANGE_PASSWORD))
+        {
+          view = changePassword(req, webSession);
         } else if (action.equals(ACTION_SELECT_APPLICATION))
         {
           if (userSession.getUser() != null)
@@ -292,16 +324,22 @@ public class HomeServlet extends BaseServlet
 
       createHeader(webSession);
 
-      if (userSession.getUser() != null && userSession.getUser().getApplicationUser() == null)
+      if (view.equals(VIEW_REGISTER))
+      {
+        printRegister(req, userSession);
+      } else if (view.equals(VIEW_RESET_PASSWORD))
+      {
+        printResetPassword(req, userSession);
+      } else if (view.equals(VIEW_CHANGE_PASSWORD))
+      {
+        printChangePassword(req, userSession);
+      } else if (userSession.getUser() != null && userSession.getUser().getApplicationUser() == null)
       {
         out.println("<div class=\"leftColumn\">");
         out.println("<div class=\"topBox\">");
         printLogin(userSession.getUser(), userSession);
         out.println("</div>");
         out.println("</div>");
-      } else if (view.equals(VIEW_REGISTER))
-      {
-        printRegister(userSession);
       } else if (view.equals(VIEW_DEFAULT))
       {
         out.println("<div class=\"leftColumn\">");
@@ -699,7 +737,52 @@ public class HomeServlet extends BaseServlet
     out.println("</table>");
   }
 
-  protected void printRegister(UserSession userSession)
+  protected void printResetPassword(HttpServletRequest req, UserSession userSession)
+  {
+    PrintWriter out = userSession.getOut();
+    out.println("  <form action=\"home\" method=\"POST\">");
+    out.println("  <table>");
+    out.println("    <caption>Reset Password</caption>");
+    out.println("    <tr>");
+    out.println("      <th>Email</th>");
+    out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" size=\"30\" value=\"" + n(req.getParameter(PARAM_EMAIL_ADDRESS))
+        + "\"/></td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <td colspan=\"2\" align=\"right\">");
+    out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_RESET_PASSWORD + "\"/>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("  </table>");
+    out.println("  </form>");
+    out.println("  <br/>");
+  }
+
+  protected void printChangePassword(HttpServletRequest req, UserSession userSession)
+  {
+    PrintWriter out = userSession.getOut();
+    out.println("  <form action=\"home\" method=\"POST\">");
+    out.println("  <table>");
+    out.println("    <caption>Change Password</caption>");
+    out.println("    <tr>");
+    out.println("      <th>New Password</th>");
+    out.println("      <td><input type=\"password\" name=\"" + PARAM_PASSWORD + "\" size=\"15\"/></td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <th>New Password (retype)</th>");
+    out.println("      <td><input type=\"password\" name=\"" + PARAM_PASSWORD_RETYPE + "\" size=\"15\"/></td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <td colspan=\"2\" align=\"right\">");
+    out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_CHANGE_PASSWORD + "\"/>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("  </table>");
+    out.println("  </form>");
+    out.println("  <br/>");
+  }
+
+  protected void printRegister(HttpServletRequest req, UserSession userSession)
   {
     PrintWriter out = userSession.getOut();
     out.println("  <form action=\"home\" method=\"POST\">");
@@ -707,20 +790,61 @@ public class HomeServlet extends BaseServlet
     out.println("    <caption>Register</caption>");
     out.println("    <tr>");
     out.println("      <th>Full Name</th>");
-    out.println("      <td><input type=\"text\" name=\"" + PARAM_USER_NAME + "\" size=\"30\"/></td>");
+    out.println(
+        "      <td><input type=\"text\" name=\"" + PARAM_USER_NAME + "\" size=\"30\" value=\"" + n(req.getParameter(PARAM_USER_NAME)) + "\"/></td>");
+    out.println("      <td>Your first and last name as you want the community to see them. </td>");
     out.println("    </tr>");
     out.println("    <tr>");
     out.println("      <th>Email</th>");
-    out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" size=\"30\"/></td>");
+    out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" size=\"30\" value=\"" + n(req.getParameter(PARAM_EMAIL_ADDRESS))
+        + "\"/></td>");
+    out.println("      <td>Your email address, we will use this to send you registration information. </td>");
     out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <th>Organization</th>");
+    out.println("      <td><input type=\"text\" name=\"" + PARAM_ORGANIZATION + "\" size=\"30\" value=\"" + n(req.getParameter(PARAM_ORGANIZATION))
+        + "\"/></td>");
+    out.println("      <td>The name of the organization you work for, short name or recognizable acronym preferred. </td>");
+    out.println("    <tr>");
+    out.println("    <tr>");
+    out.println("      <th>Position Title</th>");
+    out.println("      <td><input type=\"text\" name=\"" + PARAM_POSITION_TITLE + "\" size=\"30\" value=\""
+        + n(req.getParameter(PARAM_POSITION_TITLE)) + "\"/></td>");
+    out.println("      <td>Title of professional position held within organization. </td>");
+    out.println("    <tr>");
+    out.println("    <tr>");
+    out.println("      <th>Phone</th>");
+    out.println("      <td><input type=\"text\" name=\"" + PARAM_PHONE_NUMBER + "\" size=\"12\" value=\"" + n(req.getParameter(PARAM_PHONE_NUMBER))
+        + "\"/></td>");
+    out.println("      <td>To be used by AIRA to reach you if they have questions. </td>");
+    out.println("    <tr>");
     out.println("    <tr>");
     out.println("      <th>Application</th>");
     out.println("      <td>");
+    HashSet<String> applicationIdSet = new HashSet<String>();
+    {
+      String[] applicationIds = req.getParameterValues(PARAM_APPLICATION_ID);
+      if (applicationIds != null)
+      {
+        for (String applicationId : applicationIds)
+        {
+          applicationIdSet.add(applicationId);
+        }
+      }
+    }
     for (Application application : ApplicationLogic.getApplications(userSession.getDataSession()))
     {
-      out.println("         <input name=\"" + PARAM_APPLICATION_ID + "\" type=\"checkbox\" value=\"" + application.getApplicationId() + "\"> "
-          + application.getApplicationAcronym() + "");
+      if (applicationIdSet.contains(String.valueOf(application.getApplicationId())))
+      {
+        out.println("         <input name=\"" + PARAM_APPLICATION_ID + "\" type=\"checkbox\" value=\"" + application.getApplicationId()
+            + "\" checked=\"true\"> " + application.getApplicationAcronym() + "");
+      } else
+      {
+        out.println("         <input name=\"" + PARAM_APPLICATION_ID + "\" type=\"checkbox\" value=\"" + application.getApplicationId() + "\"> "
+            + application.getApplicationAcronym() + "");
+      }
     }
+    out.println("      <td>Which application(s) you are requesting access to. For Interoperability testing select AART.  </td>");
     out.println("      </td>");
     out.println("    </tr>");
     Query query = userSession.getDataSession().createQuery("from TestParticipant order by connectionLabel");
@@ -729,16 +853,26 @@ public class HomeServlet extends BaseServlet
     out.println("      <th>IIS</th>");
     out.println("      <td>");
     out.println("         <select name=\"" + PARAM_TEST_PARTICIPANT_ID + "\">");
+    out.println("           <option value=\"\">--select--</option>");
     for (TestParticipant testParticipant : testParticipantList)
     {
-      out.println(
-          "           <option value=\"" + testParticipant.getTestParticipantId() + "\">" + testParticipant.getConnectionLabel() + "</option>");
+      String testParticipantId = req.getParameter(PARAM_TEST_PARTICIPANT_ID);
+      if (testParticipantId != null && testParticipantId.equals(String.valueOf(testParticipant.getTestParticipantId())))
+      {
+        out.println("           <option value=\"" + testParticipant.getTestParticipantId() + "\" selected=\"true\">"
+            + testParticipant.getConnectionLabel() + "</option>");
+      } else
+      {
+        out.println(
+            "           <option value=\"" + testParticipant.getTestParticipantId() + "\">" + testParticipant.getConnectionLabel() + "</option>");
+      }
     }
     out.println("         </select>");
     out.println("      </td>");
+    out.println("      <td>If applicable, the IIS that you are associated with. </td>");
     out.println("    </tr>");
     out.println("    <tr>");
-    out.println("      <td colspan=\"2\" align=\"right\">");
+    out.println("      <td colspan=\"3\" align=\"right\">");
     out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_REGISTER + "\"/>");
     out.println("      </td>");
     out.println("    </tr>");
@@ -756,18 +890,25 @@ public class HomeServlet extends BaseServlet
       out.println("<table width=\"100%\">");
       out.println("  <caption>Login</caption>");
       out.println("  <tr>");
-      out.println("    <th>User Name</th>");
+      out.println("    <th>Email Address</th>");
       out.println("    <th>Password</th>");
       out.println("  </tr>");
       out.println("  <tr>");
-      out.println("    <td><input type=\"text\" name=\"" + PARAM_USER_NAME + "\" size=\"15\"/></td>");
+      out.println("    <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" size=\"30\"/></td>");
       out.println("    <td><input type=\"password\" name=\"" + PARAM_PASSWORD + "\" size=\"15\"/></td>");
       out.println("  </tr>");
       out.println("  <tr>");
       out.println("    <td colspan=\"2\">");
       out.println("      <span class=\"formButtonFloat\">");
-      out.println("        <input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_REGISTER + "\"/>");
       out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
+      out.println("      </span>");
+      out.println("    </td>");
+      out.println("  </tr>");
+      out.println("  <tr>");
+      out.println("    <td colspan=\"2\">");
+      out.println("      <span class=\"formButtonFloat\">");
+      out.println("        <input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_REGISTER + "\"/>");
+      out.println("        <input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_RESET_PASSWORD + "\"/>");
       out.println("      </span>");
       out.println("    </td>");
       out.println("  </tr>");
@@ -1483,6 +1624,133 @@ public class HomeServlet extends BaseServlet
       out.println("    </tr>");
       out.println("  </table>");
       out.println("</form>");
+    }
+  }
+
+  protected String resetPassword(HttpServletRequest req, HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    String emailAddress = req.getParameter(PARAM_EMAIL_ADDRESS);
+    User userBeingEdited = UserLogic.getUserWithEmailAddress(emailAddress, dataSession);
+    if (userBeingEdited == null)
+    {
+      userSession.setMessageError("Unrecognized email. Please register for an account. ");
+      return VIEW_REGISTER;
+    }
+    String password = UserLogic.resetPassword(userBeingEdited, dataSession);
+
+    MailManager mailManager = new MailManager(dataSession);
+    StringBuilder message = new StringBuilder();
+    message.append("<p>" + userBeingEdited.getUserName() + ", </p>");
+    message.append("<p>You have requested to reset the password for your account. Your new temporary password is: " + password + "</p>");
+    message.append(
+        "<p>Please login here <a href=\"http://ois-pt.org/dqacm/home\">http://ois-pt.org/dqacm/home</a> to complete your password reset. </p> ");
+    try
+    {
+      mailManager.sendEmail("AART Password Reset", message.toString(), userBeingEdited.getEmailAddress());
+      userSession.setMessageConfirmation("You have been sent an email with password reset instructions. ");
+    } catch (Exception e)
+    {
+      e.printStackTrace();
+      userSession.setMessageError("We were unable to send you reset instructions. Please contact AIRA for assistance. ");
+    }
+    return VIEW_DEFAULT;
+  }
+
+  protected String changePassword(HttpServletRequest req, HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    String password = req.getParameter(PARAM_PASSWORD);
+    String passwordRetype = req.getParameter(PARAM_PASSWORD_RETYPE);
+    if (password.length() < 5)
+    {
+      userSession.setMessageError("Password must be at least 5 characters. ");
+      return VIEW_CHANGE_PASSWORD;
+    }
+    if (!password.equals(passwordRetype))
+    {
+      userSession.setMessageError("Retyped password does not match password. Please try again. ");
+      return VIEW_CHANGE_PASSWORD;
+    }
+    UserLogic.changePassword(userSession.getUser(), password, dataSession);
+    userSession.setMessageConfirmation("Password has been updated.");
+    return VIEW_DEFAULT;
+  }
+
+  protected String register(HttpServletRequest req, HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    String emailAddress = req.getParameter(PARAM_EMAIL_ADDRESS);
+    if (emailAddress.length() == 0 || emailAddress.indexOf('@') < 1 || emailAddress.endsWith("@") || emailAddress.indexOf(".") < 0)
+    {
+      userSession.setMessageError("Please specify a valid email address.");
+      return VIEW_REGISTER;
+    }
+    User userBeingEdited = UserLogic.getUserWithEmailAddress(emailAddress, dataSession);
+    if (userBeingEdited == null)
+    {
+      String userName = req.getParameter(PARAM_USER_NAME);
+      if (userName.length() == 0 || userName.indexOf(" ") < 0)
+      {
+        userSession.setMessageError("Please specify your full name, as you would like it to appear to other community members. ");
+        return VIEW_REGISTER;
+      }
+      userBeingEdited = UserLogic.getUserWithUsername(userName, dataSession);
+      if (userBeingEdited == null)
+      {
+        String organization = req.getParameter(PARAM_ORGANIZATION);
+        if (organization.length() < 2)
+        {
+          userSession.setMessageError("Please specify your organization name as other community members would recognize it. ");
+          return VIEW_REGISTER;
+        }
+        String positionTitle = req.getParameter(PARAM_POSITION_TITLE);
+        if (positionTitle.length() < 2)
+        {
+          userSession.setMessageError("Please indicate your position title that indicates your main work role. ");
+          return VIEW_REGISTER;
+        }
+        String phoneNumber = req.getParameter(PARAM_PHONE_NUMBER);
+        if (phoneNumber.length() < 10)
+        {
+          userSession.setMessageError("Please indicate your complete phone number where you can be contacted if there are account issues. ");
+          return VIEW_REGISTER;
+        }
+
+        UserType userType = UserType.PENDING;
+        userBeingEdited = new User();
+        userBeingEdited.setUserName(userName);
+        userBeingEdited.setEmailAddress(emailAddress);
+        userBeingEdited.setOrganization(organization);
+        userBeingEdited.setPositionTitle(positionTitle);
+        userBeingEdited.setPhoneNumber(phoneNumber);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss z");
+        userBeingEdited.setAdminComments("Self registration on " + sdf.format(new Date()) + " from remote host " + req.getRemoteHost());
+        userBeingEdited.setResetPassword(true);
+        List<Application> applicationList = new ArrayList<Application>();
+        for (String applicationIdString : req.getParameterValues(PARAM_APPLICATION_ID))
+        {
+          int applicationId = Integer.parseInt(applicationIdString);
+          Application application = ApplicationLogic.getApplication(applicationId, dataSession);
+          applicationList.add(application);
+        }
+        UserLogic.createUser(userBeingEdited, applicationList, userType, dataSession);
+        userSession.setMessageConfirmation("Registration successful. You will receive and email once registration is confirmed. ");
+        return VIEW_DEFAULT;
+      } else
+      {
+        userSession.setMessageError("Someone has already been registered with this name but with a different email address. "
+            + "Perhaps you are already registered under a different email addresss? ");
+        return VIEW_REGISTER;
+      }
+    } else
+    {
+      userSession
+          .setMessageError("Unable to register account, email is already registered. If you have forgotten your password, you can reset it now.");
+      return VIEW_RESET_PASSWORD;
     }
   }
 }

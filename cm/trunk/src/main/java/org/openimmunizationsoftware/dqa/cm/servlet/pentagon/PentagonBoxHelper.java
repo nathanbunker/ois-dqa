@@ -155,12 +155,12 @@ public abstract class PentagonBoxHelper
     DESCRIPTION, CONNECTION_LABEL, TEST_DATE
   }
 
-  public static void printTestMessageListPass(PrintWriter out, List<TestMessage> testMessageList)
+  public static void printTestMessageListPass(PrintWriter out, List<TestMessage> testMessageList, UserSession userSession)
   {
-    printTestMessageListPass(out, testMessageList, Show.DESCRIPTION, false);
+    printTestMessageListPass(out, testMessageList, Show.DESCRIPTION, false, userSession);
   }
 
-  public static void printTestMessageListPass(PrintWriter out, List<TestMessage> testMessageList, Show show, boolean hardLink)
+  public static void printTestMessageListPass(PrintWriter out, List<TestMessage> testMessageList, Show show, boolean hardLink, UserSession userSession)
   {
     if (testMessageList.size() > 0)
     {
@@ -192,10 +192,10 @@ public abstract class PentagonBoxHelper
           String testMessageLink;
           if (hardLink)
           {
-            testMessageLink = createHardLink(testMessage, show);
+            testMessageLink = createHardLink(testMessage, show, userSession);
           } else
           {
-            testMessageLink = createAjaxLink(testMessage, show);
+            testMessageLink = createAjaxLink(testMessage, show, userSession);
           }
           out.println("    <td class=\"pentagon\">" + testMessageLink + "</td>");
           out.println("  </tr>");
@@ -215,10 +215,10 @@ public abstract class PentagonBoxHelper
           String testMessageLink;
           if (hardLink)
           {
-            testMessageLink = createHardLink(testMessage, show);
+            testMessageLink = createHardLink(testMessage, show, userSession);
           } else
           {
-            testMessageLink = createAjaxLink(testMessage, show);
+            testMessageLink = createAjaxLink(testMessage, show, userSession);
           }
           out.println("    <td class=\"pentagon\">" + testMessageLink + "</td>");
           out.println("  </tr>");
@@ -229,14 +229,14 @@ public abstract class PentagonBoxHelper
     }
   }
 
-  public static String createAjaxLink(TestMessage testMessage)
+  public static String createAjaxLink(TestMessage testMessage, UserSession userSession)
   {
-    return createAjaxLink(testMessage, Show.DESCRIPTION);
+    return createAjaxLink(testMessage, Show.DESCRIPTION, userSession);
   }
 
-  public static String createAjaxLink(TestMessage testMessage, Show show)
+  public static String createAjaxLink(TestMessage testMessage, Show show, UserSession userSession)
   {
-    String testMessageLink = createAjaxLink(testMessage, testMessage.getTestCaseDescription(), show);
+    String testMessageLink = createAjaxLink(testMessage, testMessage.getTestCaseDescription(), show, userSession);
     return testMessageLink;
   }
   
@@ -245,12 +245,12 @@ public abstract class PentagonBoxHelper
     return "<a class=\"pentagonTestMessgePass\" target=\"_blank\" href=\""+url+"\">" + label + "</a>";
   }
 
-  public static String createAjaxLink(TestMessage testMessage, String label)
+  public static String createAjaxLink(TestMessage testMessage, String label, UserSession userSession)
   {
-    return createAjaxLink(testMessage, label, Show.DESCRIPTION);
+    return createAjaxLink(testMessage, label, Show.DESCRIPTION, userSession);
   }
 
-  public static String createAjaxLink(TestMessage testMessage, String label, Show show)
+  public static String createAjaxLink(TestMessage testMessage, String label, Show show, UserSession userSession)
   {
     if (show != null)
     {
@@ -258,7 +258,7 @@ public abstract class PentagonBoxHelper
       {
         return "<a class=\"pentagonTestMessagePass\" href=\"javascript: void(0);\" onclick=\"loadDetails('" + testMessage.getTestMessageId() + "', '"
             + testMessage.getTestCaseDescription() + "');\">"
-            + testMessage.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel() + "</a>";
+            + testMessage.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel(userSession) + "</a>";
       }
       if (show == Show.TEST_DATE)
       {
@@ -272,7 +272,7 @@ public abstract class PentagonBoxHelper
         + testMessage.getTestCaseDescription() + "');\">" + label + "</a>";
   }
 
-  public static String createHardLink(TestMessage testMessage, Show show)
+  public static String createHardLink(TestMessage testMessage, Show show, UserSession userSession)
   {
     if (show != null)
     {
@@ -280,7 +280,7 @@ public abstract class PentagonBoxHelper
       {
         return "<a class=\"pentagonTestMessagePass\" href=\"pentagon?" + PentagonServlet.PARAM_TEST_CONDUCTED_ID + "="
             + testMessage.getTestSection().getTestConducted().getTestConductedId() + "&" + PentagonServlet.PARAM_TEST_MESSAGE_ID + "="
-            + testMessage.getTestMessageId() + "\">" + testMessage.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel()
+            + testMessage.getTestMessageId() + "\">" + testMessage.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel(userSession)
             + "</a>";
       }
       if (show == Show.TEST_DATE)

@@ -14,5 +14,6 @@
     <property name="positionTitle" column="position_title" type="string"/>
     <property name="phoneNumber" column="phone_number" type="string"/>
     <property name="adminComments" column="admin_comments" type="string"/>
+    <property name="memberTypeString" column="member_type" type="string"/>
   </class>
 </hibernate-mapping>

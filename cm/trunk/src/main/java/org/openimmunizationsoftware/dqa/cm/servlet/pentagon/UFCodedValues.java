@@ -42,7 +42,7 @@ public class UFCodedValues extends PentagonBoxHelper
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE);
       query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
-      printTestMessageListFailCodes(out, testMessageList);
+      printTestMessageListFailCodes(out, testMessageList, userSession);
     }
     if (pentagonBox.getReportScore() > 0)
     {
@@ -52,11 +52,11 @@ public class UFCodedValues extends PentagonBoxHelper
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE);
       query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
-      printTestMessageListPassCodes(out, testMessageList);
+      printTestMessageListPassCodes(out, testMessageList, userSession);
     }
   }
 
-  public void printTestMessageListPassCodes(PrintWriter out, List<TestMessage> testMessageList)
+  public void printTestMessageListPassCodes(PrintWriter out, List<TestMessage> testMessageList, UserSession userSession)
   {
     if (testMessageList.size() > 0)
     {
@@ -79,7 +79,7 @@ public class UFCodedValues extends PentagonBoxHelper
             tableValue = tableValue.substring(pos + 4);
           }
         }
-        String testMessageLink = createAjaxLink(testMessage, tableValue.trim());
+        String testMessageLink = createAjaxLink(testMessage, tableValue.trim(), userSession);
         if (!tableName.equals(tableNamePrevious))
         {
           if (!tableNamePrevious.equals(""))
@@ -103,7 +103,7 @@ public class UFCodedValues extends PentagonBoxHelper
   }
 
   
-  public void printTestMessageListFailCodes(PrintWriter out, List<TestMessage> testMessageList)
+  public void printTestMessageListFailCodes(PrintWriter out, List<TestMessage> testMessageList, UserSession userSession)
   {
     if (testMessageList.size() > 0)
     {
@@ -126,7 +126,7 @@ public class UFCodedValues extends PentagonBoxHelper
             tableValue = tableValue.substring(pos + 4);
           }
         }
-        String testMessageLink = createAjaxLink(testMessage, tableValue.trim());
+        String testMessageLink = createAjaxLink(testMessage, tableValue.trim(), userSession);
         if (!tableName.equals(tableNamePrevious))
         {
           if (!tableNamePrevious.equals(""))

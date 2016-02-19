@@ -33,7 +33,7 @@ public class CentralControl  {
 	  {
 	    if (updateCountThread == null)
 	    {
-	      User user = UserLogic.getUser(UserLogic.DQACM, dataSession);
+	      User user = UserLogic.getUserWithUsername(UserLogic.DQACM, dataSession);
 	      updateCountThread = new UpdateCountThread(user);
 	      updateCountThread.start();
 	    }

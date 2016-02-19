@@ -159,14 +159,14 @@ public class PentagonContentServlet extends PentagonServlet
             Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'update' order by testCaseCategory");
             query.setParameter(0, testSection);
             List<TestMessage> testMessageList = query.list();
-            PentagonBoxHelper.printTestMessageListPass(out, testMessageList, Show.DESCRIPTION, false);
+            PentagonBoxHelper.printTestMessageListPass(out, testMessageList, Show.DESCRIPTION, false, userSession);
           }
           {
             out.println("<h3 class=\"pentagon\">Queries</h2>");
             Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'query' order by testCaseCategory");
             query.setParameter(0, testSection);
             List<TestMessage> testMessageList = query.list();
-            PentagonBoxHelper.printTestMessageListPass(out, testMessageList, Show.DESCRIPTION, false);
+            PentagonBoxHelper.printTestMessageListPass(out, testMessageList, Show.DESCRIPTION, false, userSession);
           }
         }
         out.println("</div>");
@@ -937,7 +937,7 @@ public class PentagonContentServlet extends PentagonServlet
     query.setParameter(0, true);
     query.setParameter(1, testMessage.getTestCaseCategory());
     List<TestMessage> exampleTestMessageList = query.list();
-    PentagonBoxHelper.printTestMessageListPass(out, exampleTestMessageList, Show.CONNECTION_LABEL, true);
+    PentagonBoxHelper.printTestMessageListPass(out, exampleTestMessageList, Show.CONNECTION_LABEL, true, userSession);
     out.println("</div>");
   }
 
@@ -951,7 +951,7 @@ public class PentagonContentServlet extends PentagonServlet
     query.setParameter(1, testMessage.getTestSection().getTestConducted().getTestParticipant());
     query.setParameter(2, testMessage.getTestCaseCategory());
     List<TestMessage> exampleTestMessageList = query.list();
-    PentagonBoxHelper.printTestMessageListPass(out, exampleTestMessageList, Show.TEST_DATE, true);
+    PentagonBoxHelper.printTestMessageListPass(out, exampleTestMessageList, Show.TEST_DATE, true, userSession);
     out.println("</div>");
   }
 

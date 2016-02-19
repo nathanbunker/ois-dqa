@@ -81,7 +81,7 @@ public class CAckConform extends PentagonBoxHelper
             testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_NOT_RUN))
         {
           out.println("  <tr class=\"pentagon\">");
-          out.println("    <td class=\"pentagon\">" + createAjaxLink(testMessage) + "</td>");
+          out.println("    <td class=\"pentagon\">" + createAjaxLink(testMessage, userSession) + "</td>");
           out.println("  </tr>");
         }
       }
@@ -105,7 +105,7 @@ public class CAckConform extends PentagonBoxHelper
           if (!testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_OK))
           {
             out.println("  <tr class=\"pentagon\">");
-            out.println("    <td class=\"pentagon\">" + createAjaxLink(testMessage) + "</td>");
+            out.println("    <td class=\"pentagon\">" + createAjaxLink(testMessage, userSession) + "</td>");
             out.println("  </tr>");
           }
         }
@@ -130,7 +130,7 @@ public class CAckConform extends PentagonBoxHelper
           if (testMessage.getResultAckConformance().equals(RecordServletInterface.VALUE_RESULT_ACK_CONFORMANCE_OK))
           {
             out.println("  <tr class=\"pentagon\">");
-            out.println("    <td class=\"pentagon\">" + createAjaxLink(testMessage) + "</td>");
+            out.println("    <td class=\"pentagon\">" + createAjaxLink(testMessage, userSession) + "</td>");
             out.println("  </tr>");
           }
         }

@@ -25,6 +25,7 @@ import org.openimmunizationsoftware.dqa.cm.logic.thread.ReleaseNewVersionThread;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.UpdateIssueCountThread;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
 import org.openimmunizationsoftware.dqa.cm.model.ApplicationUser;
+import org.openimmunizationsoftware.dqa.cm.model.MemberType;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.ReportUser;
 import org.openimmunizationsoftware.dqa.cm.model.User;
@@ -61,7 +62,9 @@ public class AdminUserServlet extends BaseServlet
   public static final String PARAM_POSITION_TITLE = "positionTitle";
   public static final String PARAM_PHONE_NUMBER = "phoneNumber";
   public static final String PARAM_ADMIN_COMMENTS = "adminComments";
+  public static final String PARAM_RESET_PASSWORD = "resetPassword";
   public static final String PARAM_USER_TYPE = "userType";
+  public static final String PARAM_MEMBER_TYPE = "memberType";
   public static final String PARAM_APPLICATION_ID = "applicationId";
   public static final String PARAM_REPORT_ROLE = "reportRole";
   public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
@@ -114,7 +117,7 @@ public class AdminUserServlet extends BaseServlet
           userSession.setMessageError("Unable to add user, user name not specified");
         } else
         {
-          userBeingEdited = UserLogic.getUser(userName, dataSession);
+          userBeingEdited = UserLogic.getUserWithUsername(userName, dataSession);
           if (userBeingEdited != null)
           {
             userSession.setMessageError("Unable to add user, user name is already used");
@@ -138,9 +141,14 @@ public class AdminUserServlet extends BaseServlet
               userBeingEdited.setEmailAddress(req.getParameter(PARAM_EMAIL_ADDRESS));
               userBeingEdited.setOrganization(req.getParameter(PARAM_ORGANIZATION));
               userBeingEdited.setPositionTitle(req.getParameter(PARAM_POSITION_TITLE));
+              userBeingEdited.setMemberTypeString(req.getParameter(PARAM_MEMBER_TYPE));
               userBeingEdited.setPhoneNumber(req.getParameter(PARAM_PHONE_NUMBER));
               userBeingEdited.setAdminComments(req.getParameter(PARAM_ADMIN_COMMENTS));
-              UserLogic.createUser(userBeingEdited, application, userType, dataSession);
+              userBeingEdited.setResetPassword(true);
+              List<Application> applicationList = new ArrayList<Application>();
+              applicationList.add(application);
+              UserLogic.createUser(userBeingEdited, applicationList, userType, dataSession);
+              
               userSession.setMessageConfirmation("User created, password is " + userBeingEdited.getPassword());
             }
           }
@@ -150,10 +158,18 @@ public class AdminUserServlet extends BaseServlet
         String userName = req.getParameter(PARAM_USER_NAME);
         if (!userName.equals(userBeingEdited.getUserName()))
         {
-          User otherUser = UserLogic.getUser(userName, dataSession);
+          User otherUser = UserLogic.getUserWithUsername(userName, dataSession);
           if (otherUser != null)
           {
             userSession.setMessageError("Unable to update user, user name is already in used by a different acount");
+          }
+        }
+        if (userSession.getMessageError() == null)
+        {
+          String memberTypeString = req.getParameter(PARAM_MEMBER_TYPE);
+          if (memberTypeString.equals(""))
+          {
+            userSession.setMessageError("Member type must be indicated. ");
           }
         }
         if (userSession.getMessageError() == null)
@@ -163,8 +179,10 @@ public class AdminUserServlet extends BaseServlet
           userBeingEdited.setUserName(userName);
           userBeingEdited.setOrganization(req.getParameter(PARAM_ORGANIZATION));
           userBeingEdited.setPositionTitle(req.getParameter(PARAM_POSITION_TITLE));
+          userBeingEdited.setMemberTypeString(req.getParameter(PARAM_MEMBER_TYPE));
           userBeingEdited.setPhoneNumber(req.getParameter(PARAM_PHONE_NUMBER));
           userBeingEdited.setAdminComments(req.getParameter(PARAM_ADMIN_COMMENTS));
+          userBeingEdited.setResetPassword(req.getParameter(PARAM_RESET_PASSWORD) != null);
           UserLogic.updateUser(userBeingEdited, dataSession);
 
           for (Application application : ApplicationLogic.getApplications(dataSession))
@@ -313,7 +331,7 @@ public class AdminUserServlet extends BaseServlet
       out.println("    <tr>");
       out.println("      <th>User Id</th>");
       out.println("      <td>" + userBeingEdited.getUserId() + "</td>");
-      out.println("    <tr>");
+      out.println("    </tr>");
       out.println("    <tr>");
       out.println("      <th>User Name</th>");
       out.println(
@@ -323,27 +341,46 @@ public class AdminUserServlet extends BaseServlet
       out.println("      <th>Email</th>");
       out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" value=\"" + userBeingEdited.getEmailAddress()
           + "\" size=\"30\"/></td>");
-      out.println("    <tr>");
+      out.println("    </tr>");
       out.println("    <tr>");
       out.println("      <th>Organization</th>");
       out.println("      <td><input type=\"text\" name=\"" + PARAM_ORGANIZATION + "\" value=\"" + n(userBeingEdited.getOrganization())
           + "\" size=\"30\"/></td>");
-      out.println("    <tr>");
+      out.println("    </tr>");
       out.println("    <tr>");
       out.println("      <th>Position Title</th>");
       out.println("      <td><input type=\"text\" name=\"" + PARAM_POSITION_TITLE + "\" value=\"" + n(userBeingEdited.getPositionTitle())
           + "\" size=\"30\"/></td>");
+      out.println("    </tr>");
       out.println("    <tr>");
+      out.println("      <th>Member Type</th>");
+      out.println("      <td>");
+      out.println("         <select name=\"" + PARAM_MEMBER_TYPE+ "\">");
+      MemberType memberTypeSelected = userBeingEdited.getMemberType();
+      out.println("           <option value=\"\"" + (memberTypeSelected == null ? " selected=\"true\"" : "") + ">-select-</option>");
+      for (MemberType memberType : MemberType.values())
+      {
+        out.println("           <option value=\"" + memberType.getId() + "\"" + (memberType == memberTypeSelected ? " selected=\"true\"" : "") + ">"
+            + memberType.getLabel() + "</option>");
+      }
+      out.println("         </select>");
+      out.println("      </td>");
+      out.println("    </tr>");
       out.println("    <tr>");
       out.println("      <th>Phone</th>");
       out.println("      <td><input type=\"text\" name=\"" + PARAM_PHONE_NUMBER + "\" value=\"" + n(userBeingEdited.getPhoneNumber())
           + "\" size=\"12\"/></td>");
-      out.println("    <tr>");
+      out.println("    </tr>");
       out.println("    <tr>");
       out.println("      <th>Comments</th>");
       out.println("      <td><input type=\"text\" name=\"" + PARAM_ADMIN_COMMENTS + "\" value=\"" + n(userBeingEdited.getAdminComments())
           + "\" size=\"30\"/></td>");
+      out.println("    </tr>");
       out.println("    <tr>");
+      out.println("      <th>Reset Password</th>");
+      out.println("      <td><input type=\"checkbox\" name=\"" + PARAM_RESET_PASSWORD + "\" value=\"Y\""
+          + (userBeingEdited.isResetPassword() ? " checked=\"\"" : "") + "/></td>");
+      out.println("    </tr>");
       boolean isAartUser = false;
       for (Application application : ApplicationLogic.getApplications(userSession.getDataSession()))
       {
@@ -372,14 +409,14 @@ public class AdminUserServlet extends BaseServlet
         {
           isAartUser = userTypeSelected == UserType.ADMIN || userTypeSelected == UserType.EXPERT;
         }
+        out.println("    </tr>");
       }
-      out.println("    <tr>");
       out.println("    <tr>");
       out.println("      <td colspan=\"2\" align=\"right\">");
       out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_RESET_PASSWORD + "\"/>");
       out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_UPDATE_USER + "\"/>");
       out.println("      </td>");
-      out.println("    <tr>");
+      out.println("    </tr>");
       out.println("  </table>");
       out.println("  <br/>");
       out.println("  </form>");

@@ -50,12 +50,23 @@ public class UserLogic
     return userList;
   }
 
-  public static User getUser(String userName, Session dataSession)
+  public static User getUserWithUsername(String userName, Session dataSession)
   {
-    User user = null;
     Query query = dataSession.createQuery("from User where userName = ?");
     query.setParameter(0, userName);
-    List<User> userList = query.list();
+    return readUser(dataSession, query.list());
+  }
+
+  public static User getUserWithEmailAddress(String emailAddress, Session dataSession)
+  {
+    Query query = dataSession.createQuery("from User where upper(emailAddress) = ?");
+    query.setParameter(0, emailAddress.toUpperCase());
+    return readUser(dataSession, query.list());
+  }
+
+  public static User readUser(Session dataSession, List<User> userList)
+  {
+    User user = null;
     if (userList.size() > 0)
     {
       user = userList.get(0);
@@ -137,17 +148,39 @@ public class UserLogic
 
   }
 
-  public static void createUser(User user, Application application, UserType userType, Session dataSession)
+  public static void createUser(User user, List<Application> applicationList, UserType userType, Session dataSession)
   {
     Transaction transaction = dataSession.beginTransaction();
     user.setPassword(generatePassword());
     dataSession.save(user);
-    ApplicationUser applicationUser = new ApplicationUser();
-    applicationUser.setApplication(application);
-    applicationUser.setUser(user);
-    applicationUser.setUserType(userType);
-    dataSession.save(applicationUser);
+    for (Application application : applicationList)
+    {
+      ApplicationUser applicationUser = new ApplicationUser();
+      applicationUser.setApplication(application);
+      applicationUser.setUser(user);
+      applicationUser.setUserType(userType);
+      dataSession.save(applicationUser);
+    }
     transaction.commit();
+  }
+
+  public static void changePassword(User user, String password, Session dataSession)
+  {
+    Transaction transaction = dataSession.beginTransaction();
+    try
+    {
+      String passwordHashed = HashManager.generateStrongPasswordHash(password);
+      user.setPassword(passwordHashed);
+      user.setResetPassword(false);
+      dataSession.update(user);
+      transaction.commit();
+    } catch (Exception e)
+    {
+      e.printStackTrace();
+      transaction.rollback();
+      throw new RuntimeException("Unable to save password: " + e.getMessage());
+    }
+
   }
 
   public static void updateUser(User user, Session dataSession)
@@ -164,13 +197,16 @@ public class UserLogic
     }
     transaction.commit();
   }
-  
-  public static void resetPassword(User user, Session dataSession)
+
+  public static String resetPassword(User user, Session dataSession)
   {
+    String password = generatePassword();
     Transaction transaction = dataSession.beginTransaction();
-    user.setPassword(generatePassword());
+    user.setPassword(password);
+    user.setResetPassword(true);
     dataSession.update(user);
     transaction.commit();
+    return password;
   }
 
   private static String generatePassword()

@@ -233,3 +233,14 @@ ALTER TABLE user ADD COLUMN organization   VARCHAR(250);
 ALTER TABLE user ADD COLUMN position_title VARCHAR(250);
 ALTER TABLE user ADD COLUMN phone_number   VARCHAR(250);
 ALTER TABLE user ADD COLUMN admin_comments VARCHAR(1200);
+
+alter table user modify column password varchar(250) not null;
+
+insert into user_setting (user_id, setting_key, setting_value) values (2, 'emailManager.reply', 'aart@ois-pt.org');
+insert into user_setting (user_id, setting_key, setting_value) values (2, 'emailManager.smtpsPassword', 'BloatBeratePatchyAsps96');
+insert into user_setting (user_id, setting_key, setting_value) values (2, 'emailManager.smtpsPort', '0');
+insert into user_setting (user_id, setting_key, setting_value) values (2, 'emailManager.smtpsUsername', 'aart@ois-pt.org');
+insert into user_setting (user_id, setting_key, setting_value) values (2, 'emailManager.useSmtps', 'N');
+insert into user_setting (user_id, setting_key, setting_value) values (2, 'emailManager.address', 'localhost');
+
+ALTER TABLE user ADD COLUMN member_type VARCHAR(250);

@@ -341,6 +341,10 @@ public class TestParticipant implements Serializable
 
   public boolean canViewConnectionLabel(UserSession userSession)
   {
+    if (userSession == null || userSession.getUser() == null)
+    {
+      return false;
+    }
     if (userSession == null || userSession.getUser() == null || userSession.getUser().getApplicationUser().getUserType() == UserType.ADMIN)
     {
       return true;

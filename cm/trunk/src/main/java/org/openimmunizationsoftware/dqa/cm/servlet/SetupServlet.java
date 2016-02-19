@@ -62,7 +62,7 @@ public class SetupServlet extends BaseServlet
       sendToHome(req, resp);
       return;
     }
-    User user = UserLogic.getUser(UserLogic.DQA_INITIAL, dataSession);
+    User user = UserLogic.getUserWithUsername(UserLogic.DQA_INITIAL, dataSession);
     setupLogic = new SetupThread(user);
     setupLogic.start();
     doGet(req, resp);

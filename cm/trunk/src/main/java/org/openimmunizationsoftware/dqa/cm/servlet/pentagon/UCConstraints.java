@@ -83,8 +83,8 @@ public class UCConstraints extends UCConflicts
         out.println("  </tr>");
       }
       out.println("</table>");
-      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccMajorConstraint, "Major Constraint");
-      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConstraint, "Minor Constraint");
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccMajorConstraint, "Major Constraint", userSession);
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConstraint, "Minor Constraint", userSession);
     }
 
   }

@@ -13,8 +13,10 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.cm.CentralControl;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
+import org.openimmunizationsoftware.dqa.cm.logic.HashManager;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
@@ -24,8 +26,6 @@ import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
-import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
-import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 
 public abstract class BaseServlet extends HttpServlet
 {
@@ -105,27 +105,65 @@ public abstract class BaseServlet extends HttpServlet
 
   protected void logout(HttpSession webSession)
   {
+    PrintWriter out = null;
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
     if (userSession != null)
     {
       webSession.removeAttribute(USER_SESSION);
       userSession.getDataSession().close();
+      out = userSession.getOut();
     }
-    webSession.invalidate();
+    userSession = initUserSession(webSession);
+    userSession.setOut(out);
   }
 
-  protected void login(String userName, String password, HttpSession webSession)
+  protected void login(String emailAddress, String password, HttpSession webSession)
   {
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
-    User user = UserLogic.getUser(userName, userSession.getDataSession());
-    if (user == null || !user.getPassword().equals(password))
+    User user = UserLogic.getUserWithEmailAddress(emailAddress, userSession.getDataSession());
+
+    if (user == null || !validatePassword(user, password))
     {
-      userSession.setMessageError("Unable to login, unrecognized user name or password");
+      userSession.setMessageError("Unable to login, unrecognized email or password");
     } else
     {
+      if (!user.getPassword().startsWith("1000:"))
+      {
+        try
+        {
+          String passwordHashed = HashManager.generateStrongPasswordHash(user.getPassword());
+          Transaction tx = userSession.getDataSession().beginTransaction();
+          user.setPassword(passwordHashed);
+          userSession.getDataSession().update(user);
+          tx.commit();
+        } catch (Exception e)
+        {
+          e.printStackTrace();
+        }
+      }
       userSession.setMessageConfirmation("Welcome " + user.getUserName() + "!");
       userSession.setUser(user);
       userSession.setReleaseVersion(ReleaseVersionLogic.getProposedReleaseVersion(userSession.getDataSession()));
+    }
+  }
+
+  protected boolean validatePassword(User user, String password)
+  {
+    String passwordHashed = user.getPassword();
+
+    if (passwordHashed.startsWith("1000:"))
+    {
+      try
+      {
+        return HashManager.validatePassword(password, passwordHashed);
+      } catch (Exception e)
+      {
+        e.printStackTrace();
+        return passwordHashed.equals(password);
+      }
+    } else
+    {
+      return passwordHashed.equals(password);
     }
   }
 
