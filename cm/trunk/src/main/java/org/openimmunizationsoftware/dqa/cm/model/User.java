@@ -8,7 +8,17 @@ import java.util.Map;
 
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
-public class User implements Serializable {
+public class User implements Serializable
+{
+
+  public static final String USER_SETTING_EMAIL_MANAGER_REPLY = "emailManager.reply";
+  public static final String USER_SETTING_EMAIL_MANAGER_SMTPS_PASSWORD = "emailManager.smtpsPassword";
+  public static final String USER_SETTING_EMAIL_MANAGER_SMTPS_PORT = "emailManager.smtpsPort";
+  public static final String USER_SETTING_EMAIL_MANAGER_SMTPS_HOST = "emailManager.smtpsHost";
+  public static final String USER_SETTING_EMAIL_MANAGER_SMTPS_USERNAME = "emailManager.smtpsUsername";
+  public static final String USER_SETTING_EMAIL_MANAGER_USE_SMTPS = "emailManager.useSmtps";
+  public static final String USER_SETTING_EMAIL_MANAGER_ADDRESS = "emailManager.address";
+
   private int userId = 0;
   private String userName = "";
   private String password = "";
@@ -22,7 +32,28 @@ public class User implements Serializable {
   private String positionTitle = "";
   private String phoneNumber = "";
   private String adminComments = "";
-  
+  private MemberType memberType = null;
+
+  public String getMemberTypeString()
+  {
+    return memberType == null ? null : memberType.toString();
+  }
+
+  public void setMemberTypeString(String memberTypeString)
+  {
+    this.memberType = MemberType.get(memberTypeString);
+  }
+
+  public MemberType getMemberType()
+  {
+    return memberType;
+  }
+
+  public void setMemberType(MemberType memberType)
+  {
+    this.memberType = memberType;
+  }
+
   public String getOrganization()
   {
     return organization;
@@ -83,56 +114,108 @@ public class User implements Serializable {
     return userSettingMap;
   }
 
+  public String getUserSetting(String key, String defaultValue)
+  {
+    if (userSettingMap == null)
+    {
+      return defaultValue;
+    }
+    UserSetting value = userSettingMap.get(key);
+    if (value == null)
+    {
+      return defaultValue;
+    }
+    return value.getSettingValue();
+  }
+
+  public int getUserSetting(String key, int defaultValue)
+  {
+    String value = getUserSetting(key,"");
+    if (value.equals(""))
+    {
+      return defaultValue;
+    }
+    try
+    {
+      return Integer.parseInt(value);
+    } catch (NumberFormatException nfe)
+    {
+      return defaultValue;
+    }
+  }
+
+  public boolean getUserSetting(String key, boolean defaultValue)
+  {
+    String value = getUserSetting(key, "N");
+    if (value.equals(""))
+    {
+      return defaultValue;
+    }
+    return value.equalsIgnoreCase("Y") || value.equalsIgnoreCase("YES");
+  }
+
   public boolean isSystemUser()
   {
     return userId == 2 || userId == 3 || userId == 4;
   }
 
-  public List<ApplicationUser> getApplicationUserList() {
+  public List<ApplicationUser> getApplicationUserList()
+  {
     return applicationUserList;
   }
 
-  public void setApplicationUserList(List<ApplicationUser> applicationUserList) {
+  public void setApplicationUserList(List<ApplicationUser> applicationUserList)
+  {
     this.applicationUserList = applicationUserList;
   }
 
-  public ApplicationUser getApplicationUser() {
+  public ApplicationUser getApplicationUser()
+  {
     return applicationUser;
   }
 
-  public void setApplicationUser(ApplicationUser applicationUser) {
+  public void setApplicationUser(ApplicationUser applicationUser)
+  {
     this.applicationUser = applicationUser;
   }
 
-  public int getUserId() {
+  public int getUserId()
+  {
     return userId;
   }
 
-  public void setUserId(int userId) {
+  public void setUserId(int userId)
+  {
     this.userId = userId;
   }
 
-  public String getUserName() {
+  public String getUserName()
+  {
     return userName;
   }
 
-  public void setUserName(String userName) {
+  public void setUserName(String userName)
+  {
     this.userName = userName;
   }
 
-  public String getPassword() {
+  public String getPassword()
+  {
     return password;
   }
 
-  public void setPassword(String password) {
+  public void setPassword(String password)
+  {
     this.password = password;
   }
 
-  public String getEmailAddress() {
+  public String getEmailAddress()
+  {
     return emailAddress;
   }
 
-  public void setEmailAddress(String emailAddress) {
+  public void setEmailAddress(String emailAddress)
+  {
     this.emailAddress = emailAddress;
   }
 

@@ -167,6 +167,13 @@ public class QCSoapConforms extends PentagonBoxHelper
         {
           score += 10;
         }
+        if (score == 0)
+        {
+          if (transportWsdlCdc.getPassEyeTest().equals("Yes"))
+          {
+            score += 30;
+          }
+        }
         pentagonBox.setReportScore(score);
       }
     }

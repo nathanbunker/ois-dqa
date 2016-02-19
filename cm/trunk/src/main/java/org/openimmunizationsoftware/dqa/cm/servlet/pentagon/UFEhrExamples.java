@@ -57,7 +57,7 @@ public class UFEhrExamples extends PentagonBoxHelper
       query.setParameter(1, pentagonReport.getTestConducted());
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
       List<TestMessage> testMessageList = query.list();
-      printTestMessageListPass(out, testMessageList);
+      printTestMessageListPass(out, testMessageList, userSession);
     }
   }
 

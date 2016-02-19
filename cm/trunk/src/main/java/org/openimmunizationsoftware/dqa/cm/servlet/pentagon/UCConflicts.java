@@ -88,13 +88,13 @@ public class UCConflicts extends PentagonBoxHelper
         out.println("  </tr>");
       }
       out.println("</table>");
-      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccMajorConflict, "Major Conflicts");
-      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConflict, "Minor Conflicts");
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccMajorConflict, "Major Conflicts", userSession);
+      printCCCTable(out, dataSession, pentagonReport.getTestConducted(), cccConflict, "Minor Conflicts", userSession);
     }
 
   }
 
-  public void printCCCTable(PrintWriter out, Session dataSession, TestConducted testConducted, CompatibilityConformanceCount ccc, String label)
+  public void printCCCTable(PrintWriter out, Session dataSession, TestConducted testConducted, CompatibilityConformanceCount ccc, String label, UserSession userSession)
   {
     if (ccc != null)
     {
@@ -123,33 +123,33 @@ public class UCConflicts extends PentagonBoxHelper
         out.println("    <td class=\"pentagon\">" + testProfile.getProfileField().getDescription() + "</td>");
         out.println("    <td class=\"pentagon\">" + (profileUsageValueBase == null ? "" : profileUsageValueBase.getUsage()) + "</td>");
         out.println("    <td class=\"pentagon\">" + testProfile.getUsageDetected() + "</td>");
-        out.println("    <td class=\"pentagon\">" + createLink(testProfile.getTestMessagePresent()) + "</td>");
-        out.println("    <td class=\"pentagon\">" + createLink(testProfile.getTestMessageAbsent()) + "</td>");
+        out.println("    <td class=\"pentagon\">" + createLink(testProfile.getTestMessagePresent(), userSession) + "</td>");
+        out.println("    <td class=\"pentagon\">" + createLink(testProfile.getTestMessageAbsent(), userSession) + "</td>");
         out.println("  </tr>");
       }
       out.println("</table>");
     }
   }
 
-  public static String createLink(TestMessage testMessage)
+  public static String createLink(TestMessage testMessage, UserSession userSession)
   {
     if (testMessage.getResultStatus().equals("PASS"))
     {
       if (testMessage.isResultAccepted())
       {
-        return PentagonBoxHelper.createAjaxLink(testMessage, "Accepted");
+        return PentagonBoxHelper.createAjaxLink(testMessage, "Accepted", userSession);
       } else
       {
-        return PentagonBoxHelper.createAjaxLink(testMessage, "Rejected as Expected");
+        return PentagonBoxHelper.createAjaxLink(testMessage, "Rejected as Expected", userSession);
       }
     } else
     {
       if (testMessage.isResultAccepted())
       {
-        return PentagonBoxHelper.createAjaxLink(testMessage, "Accepted, Not Expected");
+        return PentagonBoxHelper.createAjaxLink(testMessage, "Accepted, Not Expected", userSession);
       } else
       {
-        return PentagonBoxHelper.createAjaxLink(testMessage, "Rejected, Not Expected");
+        return PentagonBoxHelper.createAjaxLink(testMessage, "Rejected, Not Expected", userSession);
       }
     }
   }

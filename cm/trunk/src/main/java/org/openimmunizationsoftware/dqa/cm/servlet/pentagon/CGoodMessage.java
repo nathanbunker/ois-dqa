@@ -52,7 +52,7 @@ public class CGoodMessage extends PentagonBoxHelper
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
       query.setParameter(1, pentagonReport.getTestConducted());
       List<TestMessage> testMessageList = query.list();
-      printTestMessageListPass(out, testMessageList);
+      printTestMessageListPass(out, testMessageList, userSession);
     }
   }
 
