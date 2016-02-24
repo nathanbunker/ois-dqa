@@ -36,10 +36,10 @@ import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
 public class TestReportServlet extends HomeServlet {
 
-  private static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
-  private static final String PARAM_CONNECTION_LABEL = "connectionLabel";
-  private static final String PARAM_TEST_MESSAGE_ID = "testMessageId";
-  private static final String PARAM_COMPARISON_FIELD_ID = "comparisonFieldId";
+  public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
+  public static final String PARAM_CONNECTION_LABEL = "connectionLabel";
+  public static final String PARAM_TEST_MESSAGE_ID = "testMessageId";
+  public static final String PARAM_COMPARISON_FIELD_ID = "comparisonFieldId";
 
   private static final String ACTION_VIEW_DETAIL = "View Detail";
   private static final String ACTION_VIEW_CLOSE = "Close";
@@ -1712,6 +1712,11 @@ public class TestReportServlet extends HomeServlet {
       out.println("<p><a href=\"" + link + "\">Pentagon Report</a></p>");
     } else {
       out.println("<p><em>Full Test Report is Not Available<em/></p>");
+    }
+    
+    if (userSession.isAdmin())
+    {
+      out.println("<p><a href=\"assertion\">All Assertions</a></p>");
     }
 
   }

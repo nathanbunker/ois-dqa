@@ -227,14 +227,12 @@ CREATE TABLE test_case (
 ALTER TABLE user ADD COLUMN reset_password VARCHAR(1) NOT NULL DEFAULT 'N';
 ALTER TABLE test_participant ADD COLUMN public_id_code VARCHAR(250);
 
-
-
 ALTER TABLE user ADD COLUMN organization   VARCHAR(250);
 ALTER TABLE user ADD COLUMN position_title VARCHAR(250);
 ALTER TABLE user ADD COLUMN phone_number   VARCHAR(250);
 ALTER TABLE user ADD COLUMN admin_comments VARCHAR(1200);
 
-alter table user modify column password varchar(250) not null;
+ALTER TABLE user MODIFY COLUMN password varchar(250) not null;
 
 insert into user_setting (user_id, setting_key, setting_value) values (2, 'emailManager.reply', 'aart@ois-pt.org');
 insert into user_setting (user_id, setting_key, setting_value) values (2, 'emailManager.smtpsPassword', 'BloatBeratePatchyAsps96');
