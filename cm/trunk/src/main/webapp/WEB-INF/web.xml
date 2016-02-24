@@ -49,6 +49,10 @@
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.TestReportServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>AssertionServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.AssertionServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>ProfileServlet</servlet-name>
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.ProfileServlet</servlet-class>
   </servlet>
@@ -80,6 +84,10 @@
   <servlet-mapping>
     <servlet-name>AttributeServlet</servlet-name>
     <url-pattern>/attribute</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AssertionServlet</servlet-name>
+    <url-pattern>/assertion</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>AdminTableServlet</servlet-name>

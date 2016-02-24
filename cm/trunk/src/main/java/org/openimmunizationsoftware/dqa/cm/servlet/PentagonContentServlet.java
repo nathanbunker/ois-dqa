@@ -208,7 +208,13 @@ public class PentagonContentServlet extends PentagonServlet
               out.println("<span style=\"margin-left: 10px; margin-right: 10px; float: left; padding: 0px; width: 100px; height: 115px; \">");
               printScoreChart(out, pb.getScore());
               out.println("</span>");
+              if (pb.getScore() < 0)
+              {
+                out.println("<p class=\"pentagon\"><b>Section Score:</b> Not Evaluated</p>");
+              }
+              else {
               out.println("<p class=\"pentagon\"><b>Section Score:</b> " + pb.getScore() + "%</p>");
+              }
               pb.printImprove(out, dataSession, pentagonReport, webSession, userSession);
               String improvementLevel = getImprovementLevelText(pb.getPentagonBox().getReportScoreGap());
               out.println("<p class=\"pentagon\"><b>Score Gap:</b> " + +pb.getPentagonBox().getReportScoreGap() + "%</p>");
