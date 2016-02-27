@@ -1729,6 +1729,11 @@ public class HomeServlet extends BaseServlet
           userSession.setMessageError("Please indicate your complete phone number where you can be contacted if there are account issues. ");
           return VIEW_REGISTER;
         }
+        if (req.getParameterValues(PARAM_APPLICATION_ID) == null)
+        {
+          userSession.setMessageError("Please select at least one application to register with.");
+          return VIEW_REGISTER;
+        }
 
         UserType userType = UserType.PENDING;
         userBeingEdited = new User();
@@ -1748,7 +1753,8 @@ public class HomeServlet extends BaseServlet
           applicationList.add(application);
         }
         UserLogic.createUser(userBeingEdited, applicationList, userType, dataSession);
-        userSession.setMessageConfirmation("Registration successful. You will receive and email once registration is confirmed. ");
+        // todo send emails to everyone
+        userSession.setMessageConfirmation("Registration successful. You will receive an email once registration is confirmed. ");
         return VIEW_DEFAULT;
       } else
       {

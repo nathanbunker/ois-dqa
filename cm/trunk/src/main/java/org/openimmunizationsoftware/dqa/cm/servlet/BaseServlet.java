@@ -103,6 +103,7 @@ public abstract class BaseServlet extends HttpServlet
       UserActivity userActivity = userSession.getUserActivity();
       userActivity.setUserName(userSession.getUser().getUserName());
       userActivity.setLastWebRequestTimeMillis(System.currentTimeMillis());
+      System.out.println("--> Setting use");
       userActivitySet.add(userActivity);
     }
     resp.setContentType("text/html");
@@ -270,8 +271,7 @@ public abstract class BaseServlet extends HttpServlet
         out.println("     |");
         out.println("     <a href=\"admin\" class=\"menuLink\">admin</a>");
         out.println("     |");
-        out.println(
-            "     <a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP + "\" class=\"menuLink\">old dashboard</a>");
+        out.println("     <a href=\"tools\" class=\"menuLink\">tools</a>");
       }
     } else
     {
