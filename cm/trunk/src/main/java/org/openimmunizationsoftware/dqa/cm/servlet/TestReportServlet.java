@@ -34,7 +34,8 @@ import org.openimmunizationsoftware.dqa.tr.model.TestProfile;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
-public class TestReportServlet extends HomeServlet {
+public class TestReportServlet extends HomeServlet
+{
 
   public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
   public static final String PARAM_CONNECTION_LABEL = "connectionLabel";
@@ -108,7 +109,8 @@ public class TestReportServlet extends HomeServlet {
 
   private static final Map<String, String[]> MAP_STATUS_PASSING_VALUES = new HashMap<String, String[]>();
 
-  static {
+  static
+  {
     MAP_STATUS_PASSING_VALUES.put(MAP_STATUS_PHASE1_PARTICIPATION, new String[] { "Yes - Direct", "Yes - Report Only" });
     MAP_STATUS_PASSING_VALUES.put(MAP_STATUS_PHASE1_STATUS, new String[] { "Complete" });
     MAP_STATUS_PASSING_VALUES.put(MAP_STATUS_PHASE2_PARTICIPATION, new String[] { "Yes - AIRA & NIST", "Yes - AIRA Only" });
@@ -123,27 +125,32 @@ public class TestReportServlet extends HomeServlet {
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+  {
     doGet(req, resp);
   }
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+  {
     HttpSession webSession = setup(req, resp);
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
     Session dataSession = userSession.getDataSession();
     PrintWriter out = userSession.getOut();
     if (userSession.getUser() == null || userSession.getUser().getApplicationUser() == null
-        || !userSession.getUser().getApplicationUser().getApplication().isApplicationAart()) {
+        || !userSession.getUser().getApplicationUser().getApplication().isApplicationAart())
+    {
       sendToHome(req, resp);
       return;
     }
     String view = req.getParameter(PARAM_VIEW);
-    if (view == null) {
+    if (view == null)
+    {
       view = VIEW_HOME;
     }
     String connectionLabel = req.getParameter(PARAM_CONNECTION_LABEL);
-    if (connectionLabel == null) {
+    if (connectionLabel == null)
+    {
       connectionLabel = "";
     }
     TestConducted testConducted = (TestConducted) webSession.getAttribute(ATTRIBUTE_TEST_CONDUCTED);
@@ -151,17 +158,23 @@ public class TestReportServlet extends HomeServlet {
     int testConnectedId = 0;
     {
       String testConnectedIdString = req.getParameter(PARAM_TEST_CONDUCTED_ID);
-      if (testConnectedIdString != null) {
+      if (testConnectedIdString != null)
+      {
         testConnectedId = Integer.parseInt(testConnectedIdString);
       }
-      if (testConnectedId != 0) {
+      if (testConnectedId != 0)
+      {
         testConducted = (TestConducted) dataSession.get(TestConducted.class, testConnectedId);
       }
-      if (testConducted != null) {
-        if (connectionLabel.equals("")) {
+      if (testConducted != null)
+      {
+        if (connectionLabel.equals(""))
+        {
           connectionLabel = testConducted.getTestParticipant().getConnectionLabel();
-        } else {
-          if (!testConducted.getTestParticipant().getConnectionLabel().equals(connectionLabel)) {
+        } else
+        {
+          if (!testConducted.getTestParticipant().getConnectionLabel().equals(connectionLabel))
+          {
             webSession.removeAttribute(ATTRIBUTE_TEST_CONDUCTED);
             testConducted = null;
           }
@@ -169,81 +182,102 @@ public class TestReportServlet extends HomeServlet {
       }
     }
     TestParticipant testParticipantSelected = (TestParticipant) webSession.getAttribute(ATTRIBUTE_TEST_PARTICIPANT);
-    if (req.getParameter(PARAM_TEST_PARTICIPANT_ID) != null) {
+    if (req.getParameter(PARAM_TEST_PARTICIPANT_ID) != null)
+    {
       int testParticipantId = Integer.parseInt(req.getParameter(PARAM_TEST_PARTICIPANT_ID));
       testParticipantSelected = (TestParticipant) dataSession.get(TestParticipant.class, testParticipantId);
       connectionLabel = testParticipantSelected.getConnectionLabel();
     }
-    if (testParticipantSelected != null) {
+    if (testParticipantSelected != null)
+    {
       webSession.setAttribute(ATTRIBUTE_TEST_PARTICIPANT, testParticipantSelected);
-    } else {
+    } else
+    {
       webSession.removeAttribute(ATTRIBUTE_TEST_PARTICIPANT);
     }
 
     ProfileUsage profileUsage = null;
-    if (testParticipantSelected != null) {
+    if (testParticipantSelected != null)
+    {
       profileUsage = testParticipantSelected.getProfileUsage();
     }
 
-    if (profileUsage == null) {
+    if (profileUsage == null)
+    {
       profileUsage = ProfileUsage.getBaseProfileUsage(dataSession);
     }
-    if (testConducted == null && !connectionLabel.equals("")) {
+    if (testConducted == null && !connectionLabel.equals(""))
+    {
       testConducted = getLatestTestConducted(connectionLabel, dataSession);
     }
 
-    if (testConducted != null && testParticipantSelected != null) {
-      if (!testConducted.getTestParticipant().getConnectionLabel().equals(testParticipantSelected.getConnectionLabel())) {
+    if (testConducted != null && testParticipantSelected != null)
+    {
+      if (!testConducted.getTestParticipant().getConnectionLabel().equals(testParticipantSelected.getConnectionLabel()))
+      {
         testConducted = null;
       }
     }
 
-    if (testConducted != null) {
+    if (testConducted != null)
+    {
       webSession.setAttribute(ATTRIBUTE_TEST_CONDUCTED, testConducted);
-    } else {
+    } else
+    {
       webSession.removeAttribute(ATTRIBUTE_TEST_CONDUCTED);
     }
 
     TestMessage testMessage = null;
     {
       String testMessageIdString = req.getParameter(PARAM_TEST_MESSAGE_ID);
-      if (testMessageIdString != null) {
-        if (!testMessageIdString.equals("")) {
+      if (testMessageIdString != null)
+      {
+        if (!testMessageIdString.equals(""))
+        {
           testMessage = (TestMessage) dataSession.get(TestMessage.class, Integer.parseInt(testMessageIdString));
         }
-        if (testMessage != null) {
+        if (testMessage != null)
+        {
           webSession.setAttribute(ATTRIBUTE_TEST_MESSAGE, testMessage);
-        } else {
+        } else
+        {
           webSession.removeAttribute(ATTRIBUTE_TEST_MESSAGE);
         }
-      } else {
+      } else
+      {
         testMessage = (TestMessage) webSession.getAttribute(ATTRIBUTE_TEST_MESSAGE);
-        if (testMessage != null && testConducted != null && !testMessage.getTestSection().getTestConducted().equals(testConducted)) {
+        if (testMessage != null && testConducted != null && !testMessage.getTestSection().getTestConducted().equals(testConducted))
+        {
           webSession.removeAttribute(ATTRIBUTE_TEST_MESSAGE);
           testMessage = null;
         }
       }
     }
 
-    if (testConducted != null && connectionLabel.equals("")) {
+    if (testConducted != null && connectionLabel.equals(""))
+    {
       connectionLabel = testConducted.getTestParticipant().getConnectionLabel();
     }
 
     ComparisonField comparisonField = null;
-    if (req.getParameter(PARAM_COMPARISON_FIELD_ID) != null) {
+    if (req.getParameter(PARAM_COMPARISON_FIELD_ID) != null)
+    {
       int comparisonFieldId = Integer.parseInt(req.getParameter(PARAM_COMPARISON_FIELD_ID));
       comparisonField = (ComparisonField) dataSession.get(ComparisonField.class, comparisonFieldId);
     }
 
-    try {
+    try
+    {
       createHeader(webSession);
-      if (view.equals(VIEW_HOME)) {
+      if (view.equals(VIEW_HOME))
+      {
         out.println("<div class=\"leftColumn\">");
         out.println("<div class=\"topBox\">");
         printLogin(userSession.getUser(), userSession);
         out.println("</div>");
         out.println("</div>");
-      } else if (view.equals(VIEW_REPORTS)) {
+      } else if (view.equals(VIEW_REPORTS))
+      {
         out.println("<div class=\"leftColumn\">");
         {
           Query query = dataSession
@@ -256,12 +290,14 @@ public class TestReportServlet extends HomeServlet {
           out.println("    <th>Date</th>");
           out.println("  </tr>");
           SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-          for (Object[] connectionLabelAndDate : connectionLabelAndDateList) {
+          for (Object[] connectionLabelAndDate : connectionLabelAndDateList)
+          {
             String string = (String) connectionLabelAndDate[0];
             Date date = (Date) connectionLabelAndDate[1];
             String link = "testReport?" + PARAM_VIEW + "=" + VIEW_REPORTS + "&" + PARAM_CONNECTION_LABEL + "=" + URLEncoder.encode(string, "UTF-8");
             String selected = "";
-            if (connectionLabel.equals(string)) {
+            if (connectionLabel.equals(string))
+            {
               selected = " class=\"selected\"";
             }
             out.println("  <tr>");
@@ -274,7 +310,8 @@ public class TestReportServlet extends HomeServlet {
         out.println("</div>");
 
         printReport(connectionLabel, testConducted, VIEW_REPORTS, userSession);
-      } else if (view.equals(VIEW_FIELD_COMPARISON) && testMessage != null) {
+      } else if (view.equals(VIEW_FIELD_COMPARISON) && testMessage != null)
+      {
         out.println("<div class=\"leftColumn\">");
         printTestConductedNavigationBox(testConducted, userSession);
 
@@ -283,17 +320,21 @@ public class TestReportServlet extends HomeServlet {
           query.setParameter(0, testMessage);
           List<Comparison> comparisonList = query.list();
           String lastSegment = "XXXX";
-          for (Comparison c : comparisonList) {
+          for (Comparison c : comparisonList)
+          {
             ComparisonField cf = c.getComparisonField();
             String currentSegment = cf.getFieldName();
             {
               int pos = currentSegment.indexOf("-");
-              if (pos != -1) {
+              if (pos != -1)
+              {
                 currentSegment = currentSegment.substring(0, pos);
               }
             }
-            if (!currentSegment.equals(lastSegment)) {
-              if (!lastSegment.equals("XXXX")) {
+            if (!currentSegment.equals(lastSegment))
+            {
+              if (!lastSegment.equals("XXXX"))
+              {
                 out.println("</table>");
                 out.println("<br/>");
               }
@@ -305,7 +346,8 @@ public class TestReportServlet extends HomeServlet {
             String link = "testReport?" + PARAM_VIEW + "=" + VIEW_FIELD_COMPARISON + "&" + PARAM_COMPARISON_FIELD_ID + "="
                 + cf.getComparisonFieldId();
             String selected = "";
-            if (cf == comparisonField) {
+            if (cf == comparisonField)
+            {
               selected = " class=\"selected\"";
             }
             out.println("  <tr>");
@@ -313,35 +355,43 @@ public class TestReportServlet extends HomeServlet {
             out.println("    <td" + selected + "><a href=\"" + link + "\">" + cf.getFieldLabel() + "</a></td>");
             out.println("  </tr>");
           }
-          if (!lastSegment.equals("XXXX")) {
+          if (!lastSegment.equals("XXXX"))
+          {
             out.println("</table>");
             out.println("<br/>");
           }
         }
         out.println("</div>");
-        if (comparisonField != null) {
+        if (comparisonField != null)
+        {
           out.println("<div class=\"rightFullColumn\">");
           printComparisons(comparisonField, testMessage, userSession);
           out.println("</div>");
         }
-      } else if (view.equals(VIEW_TEST_MESSAGES)) {
+      } else if (view.equals(VIEW_TEST_MESSAGES))
+      {
         out.println("<div class=\"leftColumn\">");
         printTestConductedNavigationBox(testConducted, userSession);
 
         Map<String, TestSection> testSectionMap = createTestSectionMap(testConducted, dataSession);
-        for (String testSectionType : TEST_SECTIONS_TO_DISPLAY) {
+        for (String testSectionType : TEST_SECTIONS_TO_DISPLAY)
+        {
           TestSection testSection = testSectionMap.get(testSectionType);
-          if (testSection != null) {
+          if (testSection != null)
+          {
             Query query = dataSession.createQuery("from TestMessage where testSection = ? order by testCaseCategory");
             query.setParameter(0, testSection);
             List<TestMessage> testMessageList = query.list();
-            if (testMessageList.size() > 0) {
+            if (testMessageList.size() > 0)
+            {
               out.println("<table width=\"100%\">");
               out.println("  <caption>" + testSectionType + "</caption>");
-              for (TestMessage tm : testMessageList) {
+              for (TestMessage tm : testMessageList)
+              {
                 String link = "testReport?" + PARAM_VIEW + "=" + VIEW_TEST_MESSAGES + "&" + PARAM_TEST_MESSAGE_ID + "=" + tm.getTestMessageId();
                 String selected = "";
-                if (tm == testMessage) {
+                if (tm == testMessage)
+                {
                   selected = " class=\"selected\"";
                 }
                 out.println("  <tr>");
@@ -356,7 +406,8 @@ public class TestReportServlet extends HomeServlet {
         }
         out.println("</div>");
         out.println("<div class=\"rightFullColumn\">");
-        if (testMessage != null) {
+        if (testMessage != null)
+        {
           out.println("<h3>" + testMessage.getTestCaseDescription() + "</h3>");
           out.println(
               "<p>Here is an example of one of the messages that was submitted to each IIS. (Every IIS received the same message with slightly different data and perhaps additional modifications required by the IIS.)</p>");
@@ -376,7 +427,8 @@ public class TestReportServlet extends HomeServlet {
             out.println("    <th>Status</th>");
             out.println("  </tr>");
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-            for (TestMessage exampleTm : exampleTestMessageList) {
+            for (TestMessage exampleTm : exampleTestMessageList)
+            {
               String link = "testReport?" + PARAM_VIEW + "=" + VIEW_BASIC + "&" + PARAM_CONNECTION_LABEL + "="
                   + URLEncoder.encode(exampleTm.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel(), "UTF-8") + "&"
                   + PARAM_TEST_MESSAGE_ID + "=" + exampleTm.getTestMessageId();
@@ -384,9 +436,11 @@ public class TestReportServlet extends HomeServlet {
               String label = exampleTm.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel();
               out.println("    <td><a href=\"" + link + "\">" + label + "</a></td>");
               out.println("    <td>" + sdf.format(exampleTm.getTestSection().getTestConducted().getTestStartedTime()) + "</td>");
-              if (exampleTm.isResultAccepted()) {
+              if (exampleTm.isResultAccepted())
+              {
                 out.println("    <td class=\"pass\">Accepted</td>");
-              } else {
+              } else
+              {
                 out.println("    <td class=\"fail\">NOT Accepted</td>");
               }
               out.println("  </tr>");
@@ -395,11 +449,14 @@ public class TestReportServlet extends HomeServlet {
             out.println("<br/>");
           }
 
-          for (TestMessage exampleTm : exampleTestMessageList) {
+          for (TestMessage exampleTm : exampleTestMessageList)
+          {
             String label = exampleTm.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel();
-            if (exampleTm.isResultAccepted()) {
+            if (exampleTm.isResultAccepted())
+            {
               label += " <span class=\"pass\">Accepted</span>";
-            } else {
+            } else
+            {
               label += " <span class=\"fail\">NOT Accepted</span>";
             }
             out.println("<h3>" + label + "</h3>");
@@ -407,7 +464,8 @@ public class TestReportServlet extends HomeServlet {
           }
         }
         out.println("</div>");
-      } else if (view.equals(VIEW_DASHBOARD) && testParticipantSelected != null) {
+      } else if (view.equals(VIEW_DASHBOARD) && testParticipantSelected != null)
+      {
         out.println("<div class=\"leftColumn\">");
         out.println("<table width=\"100%\">");
         out.println("  <caption>" + testParticipantSelected.getOrganizationName() + "</caption>");
@@ -419,12 +477,14 @@ public class TestReportServlet extends HomeServlet {
         out.println("    <th>Vendor</th>");
         out.println("    <td>" + testParticipantSelected.getVendorLabel() + "</td>");
         out.println("  </tr>");
-        if (!testParticipantSelected.getGeneralComments().equals("")) {
+        if (!testParticipantSelected.getGeneralComments().equals(""))
+        {
           out.println("  <tr>");
           out.println("    <td colspan=\"2\">" + testParticipantSelected.getGeneralComments() + "</td>");
           out.println("  </tr>");
         }
-        if (!testParticipantSelected.getInternalComments().equals("")) {
+        if (!testParticipantSelected.getInternalComments().equals(""))
+        {
           out.println("  <tr>");
           out.println("    <td colspan=\"2\">" + testParticipantSelected.getInternalComments() + "</td>");
           out.println("  </tr>");
@@ -442,7 +502,8 @@ public class TestReportServlet extends HomeServlet {
         out.println("    <th>Status</th>");
         out.println("    <td>" + testParticipantSelected.getPhase1Status() + "</td>");
         out.println("  </tr>");
-        if (!testParticipantSelected.getPhase1Comments().equals("")) {
+        if (!testParticipantSelected.getPhase1Comments().equals(""))
+        {
           out.println("  <tr>");
           out.println("    <td colspan=\"2\">" + testParticipantSelected.getPhase1Comments() + "</td>");
           out.println("  </tr>");
@@ -460,7 +521,8 @@ public class TestReportServlet extends HomeServlet {
         out.println("    <th>Status</th>");
         out.println("    <td>" + testParticipantSelected.getPhase2Status() + "</td>");
         out.println("  </tr>");
-        if (!testParticipantSelected.getPhase2Comments().equals("")) {
+        if (!testParticipantSelected.getPhase2Comments().equals(""))
+        {
           out.println("  <tr>");
           out.println("    <td colspan=\"2\">" + testParticipantSelected.getPhase2Comments() + "</td>");
           out.println("  </tr>");
@@ -494,7 +556,8 @@ public class TestReportServlet extends HomeServlet {
         out.println("</div>");
 
         printReport(connectionLabel, testConducted, VIEW_DASHBOARD, userSession);
-      } else if (view.equals(VIEW_FULL_REPORT) && testParticipantSelected != null) {
+      } else if (view.equals(VIEW_FULL_REPORT) && testParticipantSelected != null)
+      {
         printFullReportNavigation(dataSession, out, connectionLabel, testConducted, testParticipantSelected, null, testMessage, view);
 
         out.println("<div class=\"rightFullColumn\">");
@@ -578,22 +641,26 @@ public class TestReportServlet extends HomeServlet {
           query.setParameter(1, false);
           transformCustom = query.list();
         }
-        if (transformExpected.size() == 0 && transformCustom.size() == 0) {
+        if (transformExpected.size() == 0 && transformCustom.size() == 0)
+        {
           out.println("<h3>Custom Modifications</h3>");
           out.println("<p>This interface did not require any modifications to the message in order for it to be accepted. </p>");
-        } else {
+        } else
+        {
           out.println("<h3>Custom Modifications</h3>");
           out.println("<p>This interface requires customized Transformations to modify each message "
               + "before transmitting them to the IIS. These transformations can range from setting "
               + "the correct submitter facility in the message header to modifying the structure of "
               + "the HL7 message to meet local requirements. </p>");
-          if (transformExpected.size() > 0) {
+          if (transformExpected.size() > 0)
+          {
             out.println("<h4>Expected Modifications</h4>");
             out.println("<p>" + "Changes to certain fields such as MSH-4 and RXA-11.4 are expected "
                 + "as IIS may request specific values in these fields.  </p>");
             printTransforms(out, transformExpected);
           }
-          if (transformCustom.size() > 0) {
+          if (transformCustom.size() > 0)
+          {
             out.println("<h4>Unexpected Modifications</h4>");
             out.println("<p>These changes were not anticipated in the national standard or in "
                 + "NIST testing. Please examine the need for these changes carefully as they are "
@@ -603,22 +670,26 @@ public class TestReportServlet extends HomeServlet {
         }
         out.println("</div>");
 
-      } else if (view.equals(VIEW_MAP) || (view.equals(VIEW_DASHBOARD) && testParticipantSelected == null)) {
+      } else if (view.equals(VIEW_MAP) || (view.equals(VIEW_DASHBOARD) && testParticipantSelected == null))
+      {
 
         String mapStatusSelected = req.getParameter(PARAM_MAP_STATUS);
-        if (mapStatusSelected == null) {
+        if (mapStatusSelected == null)
+        {
           mapStatusSelected = MAP_STATUS_PHASE1_PARTICIPATION;
         }
         Map<String, List<String>> filterOptionListMap = new HashMap<String, List<String>>();
         Map<String, Map<String, Integer>> filterOptionCountMapMap = new HashMap<String, Map<String, Integer>>();
         Map<String, String> filterStatusMap = new HashMap<String, String>();
 
-        for (int i = 0; i < MAP_STATUS.length; i++) {
+        for (int i = 0; i < MAP_STATUS.length; i++)
+        {
           String mapStatus = MAP_STATUS[i];
           filterOptionListMap.put(mapStatus, new ArrayList<String>());
           filterOptionCountMapMap.put(mapStatus, new HashMap<String, Integer>());
           String filterValue = req.getParameter(PARAM_MAP_FILTER + i);
-          if (filterValue == null) {
+          if (filterValue == null)
+          {
             filterValue = "";
           }
           filterStatusMap.put(mapStatus, filterValue);
@@ -629,31 +700,40 @@ public class TestReportServlet extends HomeServlet {
         TestParticipant[][] testParticipantGrid = new TestParticipant[maxCols][maxRows];
         Query query = dataSession.createQuery("from TestParticipant where mapRow > 0 and mapCol > 0");
         List<TestParticipant> testParticipantList = query.list();
-        for (TestParticipant testParticipant : testParticipantList) {
-          if (testParticipant.getMapCol() <= maxCols && testParticipant.getMapRow() <= maxRows) {
+        for (TestParticipant testParticipant : testParticipantList)
+        {
+          if (testParticipant.getMapCol() <= maxCols && testParticipant.getMapRow() <= maxRows)
+          {
             Map<String, String> filterValueMap = createFilterValueMap(testParticipant, dataSession);
             boolean okayToShow = true;
-            for (int i = 0; i < MAP_STATUS.length; i++) {
+            for (int i = 0; i < MAP_STATUS.length; i++)
+            {
               String mapStatus = MAP_STATUS[i];
-              if (!filterStatusMap.get(mapStatus).equals("")) {
-                if (!filterValueMap.get(mapStatus).equals(filterStatusMap.get(mapStatus))) {
+              if (!filterStatusMap.get(mapStatus).equals(""))
+              {
+                if (!filterValueMap.get(mapStatus).equals(filterStatusMap.get(mapStatus)))
+                {
                   okayToShow = false;
                   break;
                 }
               }
             }
-            if (okayToShow) {
+            if (okayToShow)
+            {
               testParticipant.setFilterValueMap(filterValueMap);
               testParticipantGrid[testParticipant.getMapCol() - 1][testParticipant.getMapRow() - 1] = testParticipant;
-              for (int i = 0; i < MAP_STATUS.length; i++) {
+              for (int i = 0; i < MAP_STATUS.length; i++)
+              {
                 String mapStatus = MAP_STATUS[i];
                 String statusValue = filterValueMap.get(mapStatus);
                 addToList(filterOptionListMap, mapStatus, statusValue);
                 Map<String, Integer> filterOptionCountMap = filterOptionCountMapMap.get(mapStatus);
                 Integer count = filterOptionCountMap.get(statusValue);
-                if (count == null) {
+                if (count == null)
+                {
                   count = new Integer(1);
-                } else {
+                } else
+                {
                   count = count + 1;
                 }
                 filterOptionCountMap.put(statusValue, count);
@@ -661,7 +741,8 @@ public class TestReportServlet extends HomeServlet {
             }
           }
         }
-        for (int i = 0; i < MAP_STATUS.length; i++) {
+        for (int i = 0; i < MAP_STATUS.length; i++)
+        {
           String mapStatus = MAP_STATUS[i];
           Collections.sort(filterOptionListMap.get(mapStatus));
         }
@@ -671,19 +752,22 @@ public class TestReportServlet extends HomeServlet {
         out.println("<input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_MAP + "\"/>");
         out.println("<table width=\"100%\">");
         out.println("  <caption>Show Dashboard</caption>");
-        for (int i = 0; i < MAP_STATUS.length; i++) {
+        for (int i = 0; i < MAP_STATUS.length; i++)
+        {
           out.println("  <tr>");
           String mapStatus = MAP_STATUS[i];
           out.println("    <td>");
           out.println("      <center><input type=\"submit\" name=\"" + PARAM_MAP_STATUS + "\" value=\"" + mapStatus + "\"/></center>");
           out.println("    </td>");
           i++;
-          if (i < MAP_STATUS.length) {
+          if (i < MAP_STATUS.length)
+          {
             mapStatus = MAP_STATUS[i];
             out.println("    <td>");
             out.println("      <center><input type=\"submit\" name=\"" + PARAM_MAP_STATUS + "\" value=\"" + mapStatus + "\"/></center>");
             out.println("    </td>");
-          } else {
+          } else
+          {
             out.println("    <td></td>");
           }
           out.println("  </tr>");
@@ -693,7 +777,8 @@ public class TestReportServlet extends HomeServlet {
 
         out.println("<table width=\"100%\">");
         out.println("  <caption>Filter By</caption>");
-        for (int i = 0; i < MAP_STATUS.length; i++) {
+        for (int i = 0; i < MAP_STATUS.length; i++)
+        {
           String mapStatus = MAP_STATUS[i];
           List<String> filterOptionList = filterOptionListMap.get(mapStatus);
           out.println("  <tr>");
@@ -701,11 +786,14 @@ public class TestReportServlet extends HomeServlet {
           out.println("    <td>");
           out.println("      <select name=\"" + PARAM_MAP_FILTER + i + "\">");
           out.println("        <option value=\"\">-</option>");
-          for (String filterOption : filterOptionList) {
-            if (filterStatusMap.get(mapStatus).equals(filterOption)) {
+          for (String filterOption : filterOptionList)
+          {
+            if (filterStatusMap.get(mapStatus).equals(filterOption))
+            {
               out.println("        <option value=\"" + filterOption + "\" selected=\"true\">" + filterOption + " ("
                   + filterOptionCountMapMap.get(mapStatus).get(filterOption) + ")</option>");
-            } else {
+            } else
+            {
               out.println("        <option value=\"" + filterOption + "\">" + filterOption + " ("
                   + filterOptionCountMapMap.get(mapStatus).get(filterOption) + ")</option>");
             }
@@ -715,13 +803,15 @@ public class TestReportServlet extends HomeServlet {
           out.println("  </tr>");
         }
         out.println("</table>");
-        for (int i = 0; i < MAP_STATUS.length; i++) {
+        for (int i = 0; i < MAP_STATUS.length; i++)
+        {
           String mapStatus = MAP_STATUS[i];
           List<String> filterOptionList = filterOptionListMap.get(mapStatus);
           out.println("<br/>");
           out.println("<table>");
           out.println("  <caption>" + mapStatus + "</caption>");
-          for (String filterOption : filterOptionList) {
+          for (String filterOption : filterOptionList)
+          {
             out.println("  <tr>");
             out.println("    <td>" + filterOption + "</td>");
             out.println("    <td>" + filterOptionCountMapMap.get(mapStatus).get(filterOption) + "</td>");
@@ -735,39 +825,52 @@ public class TestReportServlet extends HomeServlet {
         {
           out.println("<table>");
           out.println("  <caption>" + mapStatusSelected + "</caption>");
-          for (int row = 0; row < maxRows; row++) {
+          for (int row = 0; row < maxRows; row++)
+          {
             out.println("  <tr>");
-            for (int col = 0; col < maxCols; col++) {
-              if (testParticipantGrid[col][row] == null) {
+            for (int col = 0; col < maxCols; col++)
+            {
+              if (testParticipantGrid[col][row] == null)
+              {
                 out.println("    <td class=\"mapEmpty\"></td>");
-              } else {
+              } else
+              {
                 TestParticipant testParticipant = testParticipantGrid[col][row];
                 Map<String, String> filterValueMap = testParticipant.getFilterValueMap();
                 String mapValue = filterValueMap.get(mapStatusSelected);
-                if (mapValue.equals("")) {
+                if (mapValue.equals(""))
+                {
                   out.println("    <td class=\"map\">");
-                } else {
+                } else
+                {
                   boolean pass = false;
-                  for (String passValue : MAP_STATUS_PASSING_VALUES.get(mapStatusSelected)) {
-                    if (passValue.equalsIgnoreCase(mapValue)) {
+                  for (String passValue : MAP_STATUS_PASSING_VALUES.get(mapStatusSelected))
+                  {
+                    if (passValue.equalsIgnoreCase(mapValue))
+                    {
                       pass = true;
                       break;
                     }
                   }
-                  if (pass) {
+                  if (pass)
+                  {
                     out.println("    <td class=\"mapPass\">");
-                  } else {
+                  } else
+                  {
                     out.println("    <td class=\"mapFail\">");
                   }
                 }
                 String link = "testReport?" + PARAM_VIEW + "=" + VIEW_DASHBOARD + "&" + PARAM_TEST_PARTICIPANT_ID + "="
                     + testParticipant.getTestParticipantId();
-                if (testParticipant.getOrganizationName().length() == 2) {
+                if (testParticipant.getOrganizationName().length() == 2)
+                {
                   out.println("<font size=\"+2\"><b><a href=\"" + link + "\">" + testParticipant.getOrganizationName() + "</a></b></font>");
-                } else {
+                } else
+                {
                   out.println("<font size=\"+1\"><b><a href=\"" + link + "\">" + testParticipant.getOrganizationName() + "</a></font></b>");
                 }
-                if (!mapStatusSelected.equals("")) {
+                if (!mapStatusSelected.equals(""))
+                {
                   out.println("<br/>");
                   out.println("<br/>");
                   out.println("<font size=\"-1\">" + mapValue + "</font>");
@@ -780,10 +883,12 @@ public class TestReportServlet extends HomeServlet {
         }
         out.println("</div>");
 
-      } else if (view.equals(VIEW_PENTAGON_REPORTS)) {
+      } else if (view.equals(VIEW_PENTAGON_REPORTS))
+      {
         List<TestConducted> testConductedList = PentagonContentServlet.getOtherIISTestReports(dataSession);
         PentagonContentServlet.printReportsRun(dataSession, out, testConductedList, userSession);
-      } else if (view.equals(VIEW_CONNECTION)) {
+      } else if (view.equals(VIEW_CONNECTION))
+      {
         out.println("<div class=\"leftColumn\">");
         printTestConductedNavigationBox(testConducted, userSession);
         out.println("</div>");
@@ -809,7 +914,8 @@ public class TestReportServlet extends HomeServlet {
           out.println("<br/>");
         }
         out.println("</div>");
-      } else if (view.equals(VIEW_STATUS)) {
+      } else if (view.equals(VIEW_STATUS))
+      {
         out.println("<div class=\"leftColumn\">");
         printTestConductedNavigationBox(testConducted, userSession);
         out.println("</div>");
@@ -824,9 +930,11 @@ public class TestReportServlet extends HomeServlet {
           out.println("  </tr>");
           out.println("  <tr>");
           out.println("    <th>Finish Time</th>");
-          if (testConducted.getTestFinishedTime() == null) {
+          if (testConducted.getTestFinishedTime() == null)
+          {
             out.println("    <td></td>");
-          } else {
+          } else
+          {
             out.println("    <td>" + sdf.format(testConducted.getTestFinishedTime()) + "</td>");
           }
           out.println("  </tr>");
@@ -838,7 +946,8 @@ public class TestReportServlet extends HomeServlet {
           out.println("    <th>Query Enabled</th>");
           out.println("    <td>" + testConducted.getQueryEnabled() + "</td>");
           out.println("  </tr>");
-          if (testConducted.getQueryEnabled().equals("Y")) {
+          if (testConducted.getQueryEnabled().equals("Y"))
+          {
             out.println("  <tr>");
             out.println("    <th>Query Type</th>");
             out.println("    <td>" + testConducted.getQueryType() + "</td>");
@@ -865,13 +974,15 @@ public class TestReportServlet extends HomeServlet {
           out.println("<pre>" + testConducted.getTestLog() + "</pre>");
         }
         out.println("</div>");
-      } else if (view.equals(VIEW_PERFORMANCE)) {
+      } else if (view.equals(VIEW_PERFORMANCE))
+      {
         out.println("<div class=\"leftColumn\">");
         printTestConductedNavigationBox(testConducted, userSession);
         out.println("</div>");
         out.println("<div class=\"centerColumn\">");
         {
-          if (testConducted.getPerUpdateCount() > 0) {
+          if (testConducted.getPerUpdateCount() > 0)
+          {
             int average = (int) (((double) testConducted.getPerUpdateTotal()) / testConducted.getPerUpdateCount() + 0.5);
             out.println("<table width=\"100%\">");
             out.println("  <caption>Update Performance</caption>");
@@ -895,7 +1006,8 @@ public class TestReportServlet extends HomeServlet {
           }
         }
         out.println("</div>");
-      } else if (view.equals(VIEW_LOCAL)) {
+      } else if (view.equals(VIEW_LOCAL))
+      {
         printFullReportNavigation(dataSession, out, connectionLabel, testConducted, testParticipantSelected,
             RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING, testMessage, view);
 
@@ -903,24 +1015,29 @@ public class TestReportServlet extends HomeServlet {
         out.println("<h2>Local Requirement Implementation</h2>");
         String testSectionType = RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING;
         TestSection testSection = getTestSection(testConducted, testSectionType, dataSession);
-        if (testSection != null && testMessage == null) {
+        if (testSection != null && testMessage == null)
+        {
           Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
           query.setParameter(0, testSection);
           query.setParameter(1, RecordServletInterface.VALUE_TEST_TYPE_PREP);
           List<TestMessage> testMessageList = query.list();
-          if (testMessageList.size() > 0) {
+          if (testMessageList.size() > 0)
+          {
             out.println("<h3>Base Message</h3>");
             TestMessage testMessageBase = testMessageList.get(0);
             String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + testMessageBase.getTestMessageId();
-            if (testMessageBase.isResultAccepted()) {
+            if (testMessageBase.isResultAccepted())
+            {
               out.println("<p class=\"pass\"><a href=\"" + link + "\">Base Message was acccepted.</a></p>");
-            } else {
+            } else
+            {
               out.println("<p class=\"fail\"><a href=\"" + link + "\">Base Message was NOT acccepted.</a></p>");
             }
           }
         }
 
-        if (testSection != null) {
+        if (testSection != null)
+        {
           Query query = dataSession.createQuery("from TestProfile where testSection = ? and testProfileStatus = ? order by profileField.fieldName");
           query.setParameter(0, testSection);
           query.setParameter(1, TestProfile.TEST_PROFILE_STATUS_NOT_EXPECTED);
@@ -934,10 +1051,12 @@ public class TestReportServlet extends HomeServlet {
           out.println("    <th>Field Present</th>");
           out.println("    <th>Field Absent</th>");
           out.println("  </tr>");
-          for (TestProfile testProfile : testProfileList) {
+          for (TestProfile testProfile : testProfileList)
+          {
             String selected = "";
             if ((testProfile.getTestMessageAbsent() != null && testProfile.getTestMessageAbsent().equals(testMessage))
-                || (testProfile.getTestMessagePresent() != null && testProfile.getTestMessagePresent().equals(testMessage))) {
+                || (testProfile.getTestMessagePresent() != null && testProfile.getTestMessagePresent().equals(testMessage)))
+            {
               selected = " class=\"selected\"";
             }
             out.println("  <tr>");
@@ -954,14 +1073,16 @@ public class TestReportServlet extends HomeServlet {
 
         printTestMessageDetails(testMessage, userSession, req.getParameter(PARAM_SHOW_DETAIL), view, profileUsage);
         out.println("</div>");
-      } else if (view.equals(VIEW_INTEROP)) {
+      } else if (view.equals(VIEW_INTEROP))
+      {
         printFullReportNavigation(dataSession, out, connectionLabel, testConducted, testParticipantSelected,
             RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC, testMessage, view);
 
         out.println("<div class=\"rightFullColumn\">");
         String testSectionType = RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC;
         TestSection testSection = getTestSection(testConducted, testSectionType, dataSession);
-        if (testSection != null && testMessage == null) {
+        if (testSection != null && testMessage == null)
+        {
           Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
           query.setParameter(0, testSection);
           query.setParameter(1, RecordServletInterface.VALUE_TEST_TYPE_UPDATE);
@@ -974,28 +1095,36 @@ public class TestReportServlet extends HomeServlet {
           out.println("    <th>Changed</th>");
           out.println("    <th>Accepted</th>");
           out.println("  </tr>");
-          for (TestMessage tm : testMessageList) {
+          for (TestMessage tm : testMessageList)
+          {
 
             String selected = "";
-            if (tm == testMessage) {
+            if (tm == testMessage)
+            {
               selected = " class=\"selected\"";
             }
             String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + tm.getTestMessageId();
             out.println("  <tr>");
             out.println("    <td" + selected + "><a href=\"" + link + "\">" + tm.getTestCaseCategory() + "</a></td>");
             out.println("    <td" + selected + "><a href=\"" + link + "\">" + tm.getTestCaseDescription() + "</a></td>");
-            if (tm.getPrepMajorChagnesMade().equals("Y")) {
+            if (tm.getPrepMajorChagnesMade().equals("Y"))
+            {
               out.println("    <td class=\"fail\">Yes</td>");
-            } else if (tm.getPrepMajorChagnesMade().equals("N")) {
+            } else if (tm.getPrepMajorChagnesMade().equals("N"))
+            {
               out.println("    <td class=\"pass\">No</td>");
-            } else {
+            } else
+            {
               out.println("    <td></td>");
             }
-            if (tm.getResultStatus().equals("FAIL")) {
+            if (tm.getResultStatus().equals("FAIL"))
+            {
               out.println("    <td class=\"fail\">No</td>");
-            } else if (tm.getResultStatus().equals("PASS")) {
+            } else if (tm.getResultStatus().equals("PASS"))
+            {
               out.println("    <td class=\"pass\">Yes</td>");
-            } else if (tm.getResultStatus().equals("PASS")) {
+            } else if (tm.getResultStatus().equals("PASS"))
+            {
               out.println("    <td></td>");
             }
             out.println("  </tr>");
@@ -1005,12 +1134,14 @@ public class TestReportServlet extends HomeServlet {
 
         printTestMessageDetails(testMessage, userSession, req.getParameter(PARAM_SHOW_DETAIL), view, profileUsage);
         out.println("</div>");
-      } else if (view.equals(VIEW_TOLERANCE) || view.equals(VIEW_EHR)) {
+      } else if (view.equals(VIEW_TOLERANCE) || view.equals(VIEW_EHR))
+      {
         out.println("<div class=\"leftColumn\">");
         printTestConductedNavigationBox(testConducted, userSession);
         String testSectionType = RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL;
         TestSection testSection = getTestSection(testConducted, testSectionType, dataSession);
-        if (testSection != null) {
+        if (testSection != null)
+        {
           Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
           query.setParameter(0, testSection);
           query.setParameter(1, RecordServletInterface.VALUE_TEST_TYPE_UPDATE);
@@ -1022,35 +1153,46 @@ public class TestReportServlet extends HomeServlet {
           out.println("    <th>Changed</th>");
           out.println("    <th>Accepted</th>");
           out.println("  </tr>");
-          for (TestMessage tm : testMessageList) {
+          for (TestMessage tm : testMessageList)
+          {
             String description = null;
             if (view.equals(VIEW_TOLERANCE)
-                && tm.getTestCaseDescription().startsWith(RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK)) {
+                && tm.getTestCaseDescription().startsWith(RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK))
+            {
               description = tm.getTestCaseDescription().substring(RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_TOLERANCE_CHECK.length()).trim();
             } else if (view.equals(VIEW_EHR)
-                && tm.getTestCaseDescription().startsWith(RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE)) {
+                && tm.getTestCaseDescription().startsWith(RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE))
+            {
               description = tm.getTestCaseDescription().substring(RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE.length()).trim();
             }
-            if (description != null) {
+            if (description != null)
+            {
               String selected = "";
-              if (tm == testMessage) {
+              if (tm == testMessage)
+              {
                 selected = " class=\"selected\"";
               }
               String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + tm.getTestMessageId();
               out.println("  <tr>");
               out.println("    <td" + selected + "><a href=\"" + link + "\">" + description + "</a></td>");
-              if (tm.getPrepMajorChagnesMade().equals("Y")) {
+              if (tm.getPrepMajorChagnesMade().equals("Y"))
+              {
                 out.println("    <td class=\"fail\">Yes</td>");
-              } else if (tm.getPrepMajorChagnesMade().equals("N")) {
+              } else if (tm.getPrepMajorChagnesMade().equals("N"))
+              {
                 out.println("    <td class=\"pass\">No</td>");
-              } else {
+              } else
+              {
                 out.println("    <td></td>");
               }
-              if (tm.getResultStatus().equals("FAIL")) {
+              if (tm.getResultStatus().equals("FAIL"))
+              {
                 out.println("    <td class=\"fail\">No</td>");
-              } else if (tm.getResultStatus().equals("PASS")) {
+              } else if (tm.getResultStatus().equals("PASS"))
+              {
                 out.println("    <td class=\"pass\">Yes</td>");
-              } else if (tm.getResultStatus().equals("PASS")) {
+              } else if (tm.getResultStatus().equals("PASS"))
+              {
                 out.println("    <td></td>");
               }
               out.println("  </tr>");
@@ -1063,7 +1205,8 @@ public class TestReportServlet extends HomeServlet {
         out.println("<div class=\"rightFullColumn\">");
         printTestMessageDetails(testMessage, userSession, req.getParameter(PARAM_SHOW_DETAIL), view, profileUsage);
         out.println("</div>");
-      } else if (view.equals(VIEW_CODED_VALUES)) {
+      } else if (view.equals(VIEW_CODED_VALUES))
+      {
         printFullReportNavigation(dataSession, out, connectionLabel, testConducted, testParticipantSelected,
             RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE, testMessage, view);
 
@@ -1071,24 +1214,29 @@ public class TestReportServlet extends HomeServlet {
         printTestConductedNavigationBox(testConducted, userSession);
         String testSectionType = RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE;
         TestSection testSection = getTestSection(testConducted, testSectionType, dataSession);
-        if (testSection != null) {
+        if (testSection != null)
+        {
           Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
           query.setParameter(0, testSection);
           query.setParameter(1, RecordServletInterface.VALUE_TEST_TYPE_UPDATE);
           List<TestMessage> testMessageList = query.list();
           String lastField = "";
-          for (TestMessage tm : testMessageList) {
+          for (TestMessage tm : testMessageList)
+          {
             String currentField = tm.getTestCaseDescription();
             String label = currentField;
             {
               int pos = currentField.indexOf(" is ");
-              if (pos != -1) {
+              if (pos != -1)
+              {
                 label = currentField.substring(pos + 4);
                 currentField = currentField.substring(0, pos);
               }
             }
-            if (!currentField.equals(lastField)) {
-              if (!lastField.equals("")) {
+            if (!currentField.equals(lastField))
+            {
+              if (!lastField.equals(""))
+              {
                 out.println("</table>");
                 out.println("<br/>");
               }
@@ -1102,29 +1250,37 @@ public class TestReportServlet extends HomeServlet {
               lastField = currentField;
             }
             String selected = "";
-            if (tm == testMessage) {
+            if (tm == testMessage)
+            {
               selected = " class=\"selected\"";
             }
             String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + tm.getTestMessageId();
             out.println("  <tr>");
             out.println("    <td" + selected + "><a href=\"" + link + "\">" + label + "</a></td>");
-            if (tm.getPrepMajorChagnesMade().equals("Y")) {
+            if (tm.getPrepMajorChagnesMade().equals("Y"))
+            {
               out.println("    <td class=\"fail\">Yes</td>");
-            } else if (tm.getPrepMajorChagnesMade().equals("N")) {
+            } else if (tm.getPrepMajorChagnesMade().equals("N"))
+            {
               out.println("    <td class=\"pass\">No</td>");
-            } else {
+            } else
+            {
               out.println("    <td></td>");
             }
-            if (tm.getResultStatus().equals("FAIL")) {
+            if (tm.getResultStatus().equals("FAIL"))
+            {
               out.println("    <td class=\"fail\">No</td>");
-            } else if (tm.getResultStatus().equals("PASS")) {
+            } else if (tm.getResultStatus().equals("PASS"))
+            {
               out.println("    <td class=\"pass\">Yes</td>");
-            } else if (tm.getResultStatus().equals("PASS")) {
+            } else if (tm.getResultStatus().equals("PASS"))
+            {
               out.println("    <td></td>");
             }
             out.println("  </tr>");
           }
-          if (!lastField.equals("")) {
+          if (!lastField.equals(""))
+          {
             out.println("</table>");
             out.println("<br/>");
           }
@@ -1135,11 +1291,13 @@ public class TestReportServlet extends HomeServlet {
       } else if (view.equals(VIEW_BASIC) || view.equals(VIEW_INTERMEDIATE) || view.equals(VIEW_ADVANCED) || view.equals(VIEW_PROFILING)
           || view.equals(VIEW_EXCEPTIONAL) || view.equals(VIEW_FORECAST_PREP) || view.equals(VIEW_FORECAST) || view.equals(VIEW_ONC_2015)
           || view.equals(VIEW_NOT_ACCEPTED) || view.equals(VIEW_EXTRA) || view.equals(VIEW_DEDUPLICATION_ENGAGED)
-          || view.equals(VIEW_FORECASTER_ENGAGED) || view.equals(VIEW_QBP_SUPPORT) || view.equals(VIEW_TRANSFORM)) {
+          || view.equals(VIEW_FORECASTER_ENGAGED) || view.equals(VIEW_QBP_SUPPORT) || view.equals(VIEW_TRANSFORM))
+      {
         out.println("<div class=\"leftColumn\">");
         printTestConductedNavigationBox(testConducted, userSession);
         TestSection testSection = getTestSection(testConducted, view, dataSession);
-        if (testSection != null) {
+        if (testSection != null)
+        {
           printMessages(view, testMessage, testSection, RecordServletInterface.VALUE_TEST_TYPE_PREP, "Prep Messages", userSession);
           printMessages(view, testMessage, testSection, RecordServletInterface.VALUE_TEST_TYPE_UPDATE, "Update Messages", userSession);
           printMessages(view, testMessage, testSection, RecordServletInterface.VALUE_TEST_TYPE_QUERY, "Query Messages", userSession);
@@ -1147,13 +1305,15 @@ public class TestReportServlet extends HomeServlet {
 
         out.println("</div>");
         out.println("<div class=\"rightFullColumn\">");
-        if (testMessage != null) {
+        if (testMessage != null)
+        {
           printTestMessageDetails(testMessage, userSession, req.getParameter(PARAM_SHOW_DETAIL), view, profileUsage);
         }
         out.println("</div>");
       }
 
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       e.printStackTrace();
       out.println("<pre>");
       e.printStackTrace(out);
@@ -1162,30 +1322,43 @@ public class TestReportServlet extends HomeServlet {
     createFooter(webSession);
   }
 
-  public void printProfileTestMessage(PrintWriter out, String view, String selected, TestMessage tm) {
-    if (tm == null) {
+  public void printProfileTestMessage(PrintWriter out, String view, String selected, TestMessage tm)
+  {
+    if (tm == null)
+    {
       out.println("    <td" + selected + ">Not Run</td>");
-    } else {
+    } else
+    {
       String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + tm.getTestMessageId();
       boolean testPassed = tm.getResultStatus().equals("PASS");
       selected = testPassed ? " class=\"pass\"" : " class=\"fail\"";
-      if (tm.getResultStatus().equals("PASS")) {
-        if (tm.getTestType().equals(RecordServletInterface.VALUE_TEST_TYPE_PREP)) {
+      if (tm.getResultStatus().equals("PASS"))
+      {
+        if (tm.getTestType().equals(RecordServletInterface.VALUE_TEST_TYPE_PREP))
+        {
           out.println("    <td" + selected + "><a href=\"" + link + "\">Accepted Base Message</a></td>");
-        } else {
-          if (tm.isResultAccepted()) {
+        } else
+        {
+          if (tm.isResultAccepted())
+          {
             out.println("    <td" + selected + "><a href=\"" + link + "\">Accepted as was Expected</a></td>");
-          } else {
+          } else
+          {
             out.println("    <td" + selected + "><a href=\"" + link + "\">Not Accepted as was Expected</a></td>");
           }
         }
-      } else {
-        if (tm.getTestType().equals(RecordServletInterface.VALUE_TEST_TYPE_PREP)) {
+      } else
+      {
+        if (tm.getTestType().equals(RecordServletInterface.VALUE_TEST_TYPE_PREP))
+        {
           out.println("    <td" + selected + "><a href=\"" + link + "\">Not Accepted Base Message</a></td>");
-        } else {
-          if (tm.isResultAccepted()) {
+        } else
+        {
+          if (tm.isResultAccepted())
+          {
             out.println("    <td" + selected + "><a href=\"" + link + "\">Accepted (Expecting NOT Accepted)</a></td>");
-          } else {
+          } else
+          {
             out.println("    <td" + selected + "><a href=\"" + link + "\">Not Accepted (Expecting Accepted)</a></td>");
           }
         }
@@ -1194,10 +1367,12 @@ public class TestReportServlet extends HomeServlet {
   }
 
   public void printFullReportNavigation(Session dataSession, PrintWriter out, String connectionLabel, TestConducted testConducted,
-      TestParticipant testParticipantSelected, String testSectionType, TestMessage testMessage, String view) {
+      TestParticipant testParticipantSelected, String testSectionType, TestMessage testMessage, String view)
+  {
     out.println("<div class=\"leftColumn\">");
 
-    if (!connectionLabel.equals("")) {
+    if (!connectionLabel.equals(""))
+    {
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm aa zz");
       List<TestConducted> testConductedList = null;
       Query query = dataSession
@@ -1205,16 +1380,19 @@ public class TestReportServlet extends HomeServlet {
       query.setParameter(0, connectionLabel);
       query.setParameter(1, true);
       testConductedList = query.list();
-      if (testConductedList.size() > 0) {
+      if (testConductedList.size() > 0)
+      {
         out.println("<table width=\"100%\">");
         out.println("  <caption>" + testParticipantSelected.getOrganizationName() + " Tests Conducted</caption>");
         out.println("  <tr>");
         out.println("    <th>Date</th>");
         out.println("    <th>Score</th>");
         out.println("  </tr>");
-        for (TestConducted tc : testConductedList) {
+        for (TestConducted tc : testConductedList)
+        {
           String selected = "";
-          if (tc.equals(testConducted)) {
+          if (tc.equals(testConducted))
+          {
             selected = " class=\"selected\"";
           }
           String link = "testReport?" + PARAM_VIEW + "=" + VIEW_FULL_REPORT + "&" + PARAM_TEST_CONDUCTED_ID + "=" + tc.getTestConductedId();
@@ -1244,15 +1422,20 @@ public class TestReportServlet extends HomeServlet {
       out.println("</table>");
       out.println("<br/>");
     }
-    if (testSectionType != null) {
+    if (testSectionType != null)
+    {
       TestSection testSection = getTestSection(testConducted, testSectionType, dataSession);
-      if (testSection != null) {
+      if (testSection != null)
+      {
         String title = "Update Messages";
-        if (view.equals(VIEW_LOCAL)) {
+        if (view.equals(VIEW_LOCAL))
+        {
           title = "Local Requirement Implementation";
-        } else if (view.equals(VIEW_CODED_VALUES)) {
+        } else if (view.equals(VIEW_CODED_VALUES))
+        {
           title = "Interoperability";
-        } else if (view.equals(VIEW_INTEROP)) {
+        } else if (view.equals(VIEW_INTEROP))
+        {
           title = "Interoperability";
         }
         Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
@@ -1265,22 +1448,29 @@ public class TestReportServlet extends HomeServlet {
         out.println("    <th>Description</th>");
         out.println("    <th>Accepted</th>");
         out.println("  </tr>");
-        for (TestMessage tm : testMessageList) {
+        for (TestMessage tm : testMessageList)
+        {
           String selected = "";
-          if (tm == testMessage) {
+          if (tm == testMessage)
+          {
             selected = " class=\"selected\"";
           }
           String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + tm.getTestMessageId();
           out.println("  <tr>");
           out.println("    <td" + selected + "><a href=\"" + link + "\">" + tm.getTestCaseDescription() + "</a></td>");
-          if (tm.getPrepMajorChagnesMade().equals("Y")) {
+          if (tm.getPrepMajorChagnesMade().equals("Y"))
+          {
             out.println("    <td class=\"fail\">Changed</td>");
-          } else {
-            if (tm.getResultStatus().equals("FAIL")) {
+          } else
+          {
+            if (tm.getResultStatus().equals("FAIL"))
+            {
               out.println("    <td class=\"fail\">No</td>");
-            } else if (tm.getResultStatus().equals("PASS")) {
+            } else if (tm.getResultStatus().equals("PASS"))
+            {
               out.println("    <td class=\"pass\">Yes</td>");
-            } else if (tm.getResultStatus().equals("PASS")) {
+            } else if (tm.getResultStatus().equals("PASS"))
+            {
               out.println("    <td></td>");
             }
           }
@@ -1293,12 +1483,16 @@ public class TestReportServlet extends HomeServlet {
     out.println("</div>");
   }
 
-  public static void printTransforms(PrintWriter out, List<Transform> transformExpected) {
+  public static void printTransforms(PrintWriter out, List<Transform> transformExpected)
+  {
     out.println("<ul>");
-    for (Transform transform : transformExpected) {
-      if (transform.getScenarioName().equals("")) {
+    for (Transform transform : transformExpected)
+    {
+      if (transform.getScenarioName().equals(""))
+      {
         out.println("  <li>" + transform.getTransformField().getTransformText() + "</li>");
-      } else {
+      } else
+      {
         out.println(
             "  <li>" + transform.getTransformField().getTransformText() + " [only for scenario \"" + transform.getScenarioName() + "\"]</li>");
       }
@@ -1306,21 +1500,23 @@ public class TestReportServlet extends HomeServlet {
     out.println("</ul>");
   }
 
-  private TestSection getTestSection(TestConducted testConducted, String testSectionType, Session dataSession) {
+  private TestSection getTestSection(TestConducted testConducted, String testSectionType, Session dataSession)
+  {
     {
       Query query = dataSession.createQuery("from TestSection where testConducted = ? and testSectionType = ?");
       query.setParameter(0, testConducted);
       query.setParameter(1, testSectionType);
       List<TestSection> testSectionList = query.list();
-      if (testSectionList.size() > 0) {
+      if (testSectionList.size() > 0)
+      {
         return testSectionList.get(0);
       }
     }
     return null;
   }
 
-  private void printComparisons(ComparisonField comparisonField, TestMessage testMessage, UserSession userSession)
-      throws UnsupportedEncodingException {
+  private void printComparisons(ComparisonField comparisonField, TestMessage testMessage, UserSession userSession) throws UnsupportedEncodingException
+  {
     PrintWriter out = userSession.getOut();
     Session dataSession = userSession.getDataSession();
     List<Comparison> comparisonList;
@@ -1332,7 +1528,8 @@ public class TestReportServlet extends HomeServlet {
       query.setParameter(2, testMessage.getTestCaseCategory());
       comparisonList = query.list();
     }
-    if (comparisonList.size() > 0) {
+    if (comparisonList.size() > 0)
+    {
       out.println("<table>");
       out.println("  <caption>" + comparisonField.getFieldName() + " " + comparisonField.getFieldLabel() + "</caption>");
       out.println("  <tr>");
@@ -1344,7 +1541,8 @@ public class TestReportServlet extends HomeServlet {
       out.println("  </tr>");
 
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-      for (Comparison comparison : comparisonList) {
+      for (Comparison comparison : comparisonList)
+      {
         TestMessage exampleTm = comparison.getTestMessage();
         String link = "testReport?" + PARAM_VIEW + "=" + VIEW_BASIC + "&" + PARAM_CONNECTION_LABEL + "="
             + URLEncoder.encode(exampleTm.getTestSection().getTestConducted().getTestParticipant().getConnectionLabel(), "UTF-8") + "&"
@@ -1355,13 +1553,17 @@ public class TestReportServlet extends HomeServlet {
         out.println("    <td>" + sdf.format(exampleTm.getTestSection().getTestConducted().getTestStartedTime()) + "</td>");
         out.println("    <td>" + comparison.getValueOriginal() + "</td>");
         out.println("    <td>" + comparison.getValueCompare() + "</td>");
-        if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_PASS)) {
+        if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_PASS))
+        {
           out.println("    <td class=\"pass\">Pass</td>");
-        } else if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_FAIL)) {
+        } else if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_FAIL))
+        {
           out.println("    <td class=\"fail\">Fail</td>");
-        } else if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_NOT_TESTED)) {
+        } else if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_NOT_TESTED))
+        {
           out.println("    <td>Not Tested</td>");
-        } else {
+        } else
+        {
           out.println("    <td></td>");
         }
         out.println("  </tr>");
@@ -1371,7 +1573,8 @@ public class TestReportServlet extends HomeServlet {
     }
   }
 
-  private TestConducted getLatestTestConducted(String connectionLabel, Session dataSession) {
+  private TestConducted getLatestTestConducted(String connectionLabel, Session dataSession)
+  {
     TestConducted testConducted = null;
     List<TestConducted> testConductedList = null;
     Query query = dataSession
@@ -1379,26 +1582,30 @@ public class TestReportServlet extends HomeServlet {
     query.setParameter(0, connectionLabel);
     query.setParameter(1, true);
     testConductedList = query.list();
-    if (testConductedList.size() > 0) {
+    if (testConductedList.size() > 0)
+    {
       testConducted = testConductedList.get(0);
     }
     return testConducted;
   }
 
   private void printReport(String connectionLabel, TestConducted testConducted, String view, UserSession userSession)
-      throws UnsupportedEncodingException {
+      throws UnsupportedEncodingException
+  {
     PrintWriter out = userSession.getOut();
     Session dataSession = userSession.getDataSession();
     {
       out.println("<div class=\"centerColumn\">");
       printTestConductedNavigationBox(testConducted, userSession);
-      if (!connectionLabel.equals("")) {
+      if (!connectionLabel.equals(""))
+      {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm aa zz");
         List<TestConducted> testConductedList = null;
         Query query = dataSession.createQuery("from TestConducted where testParticipant.connectionLabel = ? order by testStartedTime desc");
         query.setParameter(0, connectionLabel);
         testConductedList = query.list();
-        if (testConductedList.size() > 0) {
+        if (testConductedList.size() > 0)
+        {
           out.println("<table width=\"100%\">");
           out.println("  <caption>Tests Conducted</caption>");
           out.println("  <tr>");
@@ -1407,9 +1614,11 @@ public class TestReportServlet extends HomeServlet {
           out.println("    <th>Score</th>");
           out.println("    <th>Count</th>");
           out.println("  </tr>");
-          for (TestConducted tc : testConductedList) {
+          for (TestConducted tc : testConductedList)
+          {
             String selected = "";
-            if (tc.equals(testConducted)) {
+            if (tc.equals(testConducted))
+            {
               selected = " class=\"selected\"";
             }
             String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_CONNECTION_LABEL + "="
@@ -1418,9 +1627,11 @@ public class TestReportServlet extends HomeServlet {
             out.println("  <tr>");
             out.println("    <td" + selected + "><a href=\"" + link + "\">" + sdf.format(tc.getTestStartedTime()) + "</a></td>");
             out.println("    <td" + selected + "><a href=\"" + link + "\">" + tc.getTestStatus() + "</a></td>");
-            if (tc.isCompleteTest()) {
+            if (tc.isCompleteTest())
+            {
               out.println("    <td" + selected + "><a href=\"" + link + "\">" + tc.getScoreOverall() + "</a></td>");
-            } else {
+            } else
+            {
               out.println("    <td" + selected + "><a href=\"" + link + "\">-</a></td>");
             }
             out.println("    <td" + selected + "><a href=\"" + link + "\">" + tc.getCountUpdate() + "/" + tc.getCountQuery() + "</a></td>");
@@ -1433,13 +1644,15 @@ public class TestReportServlet extends HomeServlet {
     }
 
     out.println("<div class=\"rightColumn\">");
-    if (testConducted != null) {
+    if (testConducted != null)
+    {
       printTestConductedOverview(testConducted, userSession);
     }
     out.println("</div>");
   }
 
-  private Map<String, String> createFilterValueMap(TestParticipant testParticipant, Session dataSession) {
+  private Map<String, String> createFilterValueMap(TestParticipant testParticipant, Session dataSession)
+  {
     Map<String, String> filterValueMap = new HashMap<String, String>();
     {
       filterValueMap.put(MAP_STATUS_PHASE1_PARTICIPATION, testParticipant.getPhase1Participation());
@@ -1452,12 +1665,15 @@ public class TestReportServlet extends HomeServlet {
       filterValueMap.put(MAP_STATUS_IHS, testParticipant.getIhsStatus());
       filterValueMap.put(MAP_STATUS_TRANSPORT, testParticipant.getTransportType());
       filterValueMap.put(MAP_STATUS_QUERY, testParticipant.getQuerySupport());
-      if (testParticipant.getReportRunStatus().equals("")) {
+      if (testParticipant.getReportRunStatus().equals(""))
+      {
 
         TestConducted testConducted = getLatestTestConducted(testParticipant.getConnectionLabel(), dataSession);
-        if (testConducted == null) {
+        if (testConducted == null)
+        {
           filterValueMap.put(MAP_STATUS_REPORT_RESULTS, "Never Ran");
-        } else {
+        } else
+        {
           Calendar calendar = Calendar.getInstance();
           calendar.add(Calendar.DAY_OF_MONTH, -4);
           Date recentDate = calendar.getTime();
@@ -1465,11 +1681,14 @@ public class TestReportServlet extends HomeServlet {
           calendar.add(Calendar.MONTH, -1);
           Date overdueDate = calendar.getTime();
           int scoreOverall = testConducted.getScoreOverall();
-          if (recentDate.before(testConducted.getTestStartedTime())) {
+          if (recentDate.before(testConducted.getTestStartedTime()))
+          {
             testParticipant.setReportRunStatus("Up-to-date");
-          } else if (overdueDate.before(testConducted.getTestStartedTime())) {
+          } else if (overdueDate.before(testConducted.getTestStartedTime()))
+          {
             testParticipant.setReportRunStatus("Recently Ran");
-          } else if (scoreOverall >= 70) {
+          } else if (scoreOverall >= 70)
+          {
             testParticipant.setReportRunStatus("Overdue");
           }
           filterValueMap.put(MAP_STATUS_REPORT_RESULTS, testParticipant.getReportRunStatus());
@@ -1479,15 +1698,18 @@ public class TestReportServlet extends HomeServlet {
     return filterValueMap;
   }
 
-  private void addToList(Map<String, List<String>> filterOptionListMap, String mapStatus, String statusValue) {
+  private void addToList(Map<String, List<String>> filterOptionListMap, String mapStatus, String statusValue)
+  {
     List<String> filterOptionList = filterOptionListMap.get(mapStatus);
-    if (!statusValue.equals("") && !filterOptionList.contains(statusValue)) {
+    if (!statusValue.equals("") && !filterOptionList.contains(statusValue))
+    {
       filterOptionList.add(statusValue);
     }
   }
 
   private void printTestMessageDetails(TestMessage testMessage, UserSession userSession, String showDetail, String view, ProfileUsage profileUsage)
-      throws IOException {
+      throws IOException
+  {
     PrintWriter out = userSession.getOut();
     Session dataSession = userSession.getDataSession();
 
@@ -1495,13 +1717,16 @@ public class TestReportServlet extends HomeServlet {
     PentagonContentServlet.printTestMessage(dataSession, out, profileUsage, testMessage, false, userSession);
     out.println("</div>");
 
-    if (testMessage != null) {
+    if (testMessage != null)
+    {
 
       Query query = dataSession.createQuery("from Comparison where testMessage = ? order by comparisonField.fieldName");
       query.setParameter(0, testMessage);
       List<Comparison> comparisonList = query.list();
-      if (comparisonList.size() > 0) {
-        if (showDetail == null || !showDetail.equals(SHOW_DETAIL_COMPARISON)) {
+      if (comparisonList.size() > 0)
+      {
+        if (showDetail == null || !showDetail.equals(SHOW_DETAIL_COMPARISON))
+        {
           query = dataSession.createQuery("from Comparison where testMessage = ? and comparisonStatus = ? order by comparisonField.fieldName");
           query.setParameter(0, testMessage);
           query.setParameter(1, RecordServletInterface.VALUE_COMPARISON_STATUS_FAIL);
@@ -1509,21 +1734,25 @@ public class TestReportServlet extends HomeServlet {
         }
         String detailLink = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + testMessage.getTestMessageId() + "&"
             + PARAM_SHOW_DETAIL + "=" + SHOW_DETAIL_COMPARISON;
-        if (comparisonList.size() == 0) {
+        if (comparisonList.size() == 0)
+        {
           out.println("<h3 class=\"pass\">Request Message Not Changed</h3>");
           out.println("<p>Submitted message contains essentially the same data as the original test case. "
               + "If there were any custom modifications they made no substantial changes. ");
-          if (showDetail == null || !showDetail.equals(SHOW_DETAIL_COMPARISON)) {
+          if (showDetail == null || !showDetail.equals(SHOW_DETAIL_COMPARISON))
+          {
             out.println("<a href=\"" + detailLink + "\">See details.</a>");
           }
           out.println("</p>");
-        } else {
+        } else
+        {
           out.println("<h3 class=\"fail\">Request Message Changed</h3>");
           out.println("<p> <a href=\"" + detailLink + "\">See details.</a></p>");
           out.println("<p>Submitted message does not contain the same data as the original test case. "
               + "Some custom modifications were made in the process of preparing the test message for submission."
               + "These custom modifications were necessary to ensure IIS accepted the test message. ");
-          if (showDetail == null || !showDetail.equals(SHOW_DETAIL_COMPARISON)) {
+          if (showDetail == null || !showDetail.equals(SHOW_DETAIL_COMPARISON))
+          {
             out.println("<a href=\"" + detailLink + "\">See details.</a>");
           }
           out.println("</p>");
@@ -1537,13 +1766,16 @@ public class TestReportServlet extends HomeServlet {
           out.println("    <th>Compare Value</th>");
           out.println("    <th>Status</th>");
           out.println("  </tr>");
-          for (Comparison comparison : comparisonList) {
+          for (Comparison comparison : comparisonList)
+          {
             String link = "testReport?" + PARAM_VIEW + "=" + VIEW_FIELD_COMPARISON + "&" + PARAM_COMPARISON_FIELD_ID + "="
                 + comparison.getComparisonField().getComparisonFieldId();
             String classString = "";
-            if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_FAIL)) {
+            if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_FAIL))
+            {
               classString = " class=\"fail\"";
-            } else if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_PASS)) {
+            } else if (comparison.getComparisonStatus().equals(RecordServletInterface.VALUE_COMPARISON_STATUS_PASS))
+            {
               classString = " class=\"pass\"";
             }
             out.println("  <tr>");
@@ -1564,63 +1796,83 @@ public class TestReportServlet extends HomeServlet {
     }
   }
 
-  private void printMessages(String view, TestMessage testMessage, TestSection testSection, String testType, String label, UserSession userSession) {
+  private void printMessages(String view, TestMessage testMessage, TestSection testSection, String testType, String label, UserSession userSession)
+  {
     PrintWriter out = userSession.getOut();
     Session dataSession = userSession.getDataSession();
     Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = ? order by testPosition");
     query.setParameter(0, testSection);
     query.setParameter(1, testType);
     List<TestMessage> testMessageList = query.list();
-    if (testMessageList.size() > 0) {
+    if (testMessageList.size() > 0)
+    {
       out.println("<table width=\"100%\">");
       out.println("  <caption>" + label + "</caption>");
       out.println("  <tr>");
       out.println("    <th>Test Case</th>");
-      if (label.equals("Query Messages")) {
+      if (label.equals("Query Messages"))
+      {
         out.println("    <th>Result</th>");
         out.println("    <th>Store Status</th>");
-      } else {
+      } else
+      {
         out.println("    <th>Changed</th>");
         out.println("    <th>Accepted</th>");
       }
       out.println("  </tr>");
-      for (TestMessage tm : testMessageList) {
+      for (TestMessage tm : testMessageList)
+      {
 
         String selected = "";
-        if (tm == testMessage) {
+        if (tm == testMessage)
+        {
           selected = " class=\"selected\"";
         }
         String link = "testReport?" + PARAM_VIEW + "=" + view + "&" + PARAM_TEST_MESSAGE_ID + "=" + tm.getTestMessageId();
         out.println("  <tr>");
         out.println("    <td" + selected + "><a href=\"" + link + "\">" + tm.getTestCaseCategory() + "</a></td>");
-        if (label.equals("Query Messages")) {
-          if (tm.getResultStatus() == null) {
+        if (label.equals("Query Messages"))
+        {
+          if (tm.getResultStatus() == null)
+          {
             out.println("    <td></td>");
-          } else if (tm.getResultStatus().equals("FAIL")) {
+          } else if (tm.getResultStatus().equals("FAIL"))
+          {
             out.println("    <td class=\"fail\">" + tm.getResultQueryType() + "</td>");
-          } else {
+          } else
+          {
             out.println("    <td class=\"pass\">" + tm.getResultQueryType() + "</td>");
           }
-          if (tm.getResultStoreStatus() == null) {
+          if (tm.getResultStoreStatus() == null)
+          {
             out.println("    <td></td>");
-          } else if (tm.getResultStoreStatus().equals("a-r")) {
+          } else if (tm.getResultStoreStatus().equals("a-r"))
+          {
             out.println("    <td class=\"pass\">" + tm.getResultStoreStatusForDisplay() + "</td>");
-          } else {
+          } else
+          {
             out.println("    <td class=\"fail\">" + tm.getResultStoreStatusForDisplay() + "</td>");
           }
-        } else {
-          if (tm.getPrepMajorChagnesMade().equals("Y")) {
+        } else
+        {
+          if (tm.getPrepMajorChagnesMade().equals("Y"))
+          {
             out.println("    <td class=\"fail\">Yes</td>");
-          } else if (tm.getPrepMajorChagnesMade().equals("N")) {
+          } else if (tm.getPrepMajorChagnesMade().equals("N"))
+          {
             out.println("    <td class=\"pass\">No</td>");
-          } else {
+          } else
+          {
             out.println("    <td></td>");
           }
-          if (tm.getResultStatus().equals("FAIL")) {
+          if (tm.getResultStatus().equals("FAIL"))
+          {
             out.println("    <td class=\"fail\">No</td>");
-          } else if (tm.getResultStatus().equals("PASS")) {
+          } else if (tm.getResultStatus().equals("PASS"))
+          {
             out.println("    <td class=\"pass\">Yes</td>");
-          } else if (tm.getResultStatus().equals("PASS")) {
+          } else if (tm.getResultStatus().equals("PASS"))
+          {
             out.println("    <td></td>");
           }
         }
@@ -1631,11 +1883,13 @@ public class TestReportServlet extends HomeServlet {
     }
   }
 
-  private void printTestConductedNavigationBox(TestConducted testConducted, UserSession userSession) {
+  private void printTestConductedNavigationBox(TestConducted testConducted, UserSession userSession)
+  {
     PrintWriter out = userSession.getOut();
     Session dataSession = userSession.getDataSession();
     out.println("<div class=\"topBox\">");
-    if (testConducted != null) {
+    if (testConducted != null)
+    {
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm aa zz");
       out.println("<table width=\"100%\">");
       out.println("  <caption>" + testConducted.getTestParticipant().getConnectionLabel() + "</caption>");
@@ -1674,7 +1928,8 @@ public class TestReportServlet extends HomeServlet {
       RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXTRA, RecordServletInterface.VALUE_TEST_SECTION_TYPE_DEDUPLICATION_ENGAGED,
       RecordServletInterface.VALUE_TEST_SECTION_TYPE_FORECASTER_ENGAGED };
 
-  private void printTestConductedOverview(TestConducted testConducted, UserSession userSession) {
+  private void printTestConductedOverview(TestConducted testConducted, UserSession userSession)
+  {
     PrintWriter out = userSession.getOut();
     Session dataSession = userSession.getDataSession();
     Map<String, TestSection> testSectionMap = createTestSectionMap(testConducted, dataSession);
@@ -1686,9 +1941,11 @@ public class TestReportServlet extends HomeServlet {
     out.println("    <th>Level 2</th>");
     out.println("    <th>Level 3</th>");
     out.println("  </tr>");
-    for (String testSectionType : TEST_SECTIONS_TO_DISPLAY) {
+    for (String testSectionType : TEST_SECTIONS_TO_DISPLAY)
+    {
       TestSection testSection = testSectionMap.get(testSectionType);
-      if (testSection != null) {
+      if (testSection != null)
+      {
         out.println("  <tr>");
         {
           String link = "testReport?" + PARAM_VIEW + "=" + testSectionType;
@@ -1703,17 +1960,19 @@ public class TestReportServlet extends HomeServlet {
     out.println("</table>");
     out.println("<br/>");
 
-    if (testConducted.isCompleteTest()) {
+    if (testConducted.isCompleteTest())
+    {
       printTopReportSection(testConducted, out, "100%");
       out.println("<br/>");
       String link = "testReport?" + PARAM_VIEW + "=" + VIEW_FULL_REPORT + "&" + PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId();
       out.println("<p><a href=\"" + link + "\">Full Test Report</a></p>");
       link = "pentagon?" + PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId();
       out.println("<p><a href=\"" + link + "\">Pentagon Report</a></p>");
-    } else {
+    } else
+    {
       out.println("<p><em>Full Test Report is Not Available<em/></p>");
     }
-    
+
     if (userSession.isAdmin())
     {
       out.println("<p><a href=\"assertion\">All Assertions</a></p>");
@@ -1721,7 +1980,8 @@ public class TestReportServlet extends HomeServlet {
 
   }
 
-  public void printTopReportSection(TestConducted testConducted, PrintWriter out, String width) {
+  public void printTopReportSection(TestConducted testConducted, PrintWriter out, String width)
+  {
     out.println("<table width=\"" + width + "\">");
     out.println("  <caption>Overall Score: " + testConducted.getScoreOverall() + "%</caption>");
     out.println("  <tr>");
@@ -1752,42 +2012,52 @@ public class TestReportServlet extends HomeServlet {
     out.println("</table>");
   }
 
-  private Map<String, TestSection> createTestSectionMap(TestConducted testConducted, Session dataSession) {
+  private Map<String, TestSection> createTestSectionMap(TestConducted testConducted, Session dataSession)
+  {
     Map<String, TestSection> testSectionMap = new HashMap<String, TestSection>();
     {
       Query query = dataSession.createQuery("from TestSection where testConducted = ? and testEnabled = ?");
       query.setParameter(0, testConducted);
       query.setParameter(1, true);
       List<TestSection> testSectionList = query.list();
-      for (TestSection testSection : testSectionList) {
+      for (TestSection testSection : testSectionList)
+      {
         testSectionMap.put(testSection.getTestSectionType(), testSection);
       }
     }
     return testSectionMap;
   }
 
-  private void printProgressOrScore(int progress, int score, PrintWriter out) {
+  private void printProgressOrScore(int progress, int score, PrintWriter out)
+  {
     String classStyle = "";
     String status = "-";
-    if (progress == 100) {
-      if (score == 100) {
+    if (progress == 100)
+    {
+      if (score == 100)
+      {
         classStyle = "pass";
         status = score + "% pass";
-      } else if (score < 0) {
+      } else if (score < 0)
+      {
         status = "complete";
-      } else {
+      } else
+      {
         classStyle = "fail";
         status = score + "% pass";
       }
-    } else if (progress <= 0) {
+    } else if (progress <= 0)
+    {
       status = "-";
-    } else {
+    } else
+    {
       status = progress + "%...";
     }
     out.println("    <td class=\"" + classStyle + "\">" + status + "</td>");
   }
 
-  private void printScoreLine(String label, int score, String view, PrintWriter out) {
+  private void printScoreLine(String label, int score, String view, PrintWriter out)
+  {
     {
       out.println("  <tr>");
       {
@@ -1797,23 +2067,30 @@ public class TestReportServlet extends HomeServlet {
       out.println("    <td>" + score + "%</td>");
       {
         String message = "Problem";
-        if (score >= 90) {
+        if (score >= 90)
+        {
           message = "Excellent";
-        } else if (score >= 80) {
+        } else if (score >= 80)
+        {
           message = "Well";
-        } else if (score >= 70) {
+        } else if (score >= 70)
+        {
           message = "Okay";
-        } else if (score >= 60) {
+        } else if (score >= 60)
+        {
           message = "Poor";
-        } else if (score >= 40) {
+        } else if (score >= 40)
+        {
           message = "Prob";
         }
-        if (score >= 60) {
+        if (score >= 60)
+        {
           out.println("    <td>&nbsp;</td>");
           out.println("    <td>");
           out.println("<div style=\"width: " + ((int) (score)) + "px; text-align: center;\" class=\"pass\">" + message + "</div>");
           out.println("    </td>");
-        } else {
+        } else
+        {
           out.println("    <td>");
           out.println("<div style=\"width: " + ((int) ((100 - score))) + "px; text-align: center; position: relative; float: right;\" class=\"fail\">"
               + message + "</div>");
@@ -1828,9 +2105,11 @@ public class TestReportServlet extends HomeServlet {
     }
   }
 
-  private void printScoreLineLimited(String label, int score, String view, PrintWriter out, String viewSelected) {
+  private void printScoreLineLimited(String label, int score, String view, PrintWriter out, String viewSelected)
+  {
     String selected = "";
-    if (view.equals(viewSelected)) {
+    if (view.equals(viewSelected))
+    {
       selected = " class=\"selected\"";
     }
     out.println("  <tr>");
@@ -1842,64 +2121,83 @@ public class TestReportServlet extends HomeServlet {
     out.println("  </tr>");
   }
 
-  public static String createTime(double ms) {
-    if (ms < 500) {
+  public static String createTime(double ms)
+  {
+    if (ms < 500)
+    {
       return ((int) ms) + " ms";
-    } else {
+    } else
+    {
       String seconds = String.valueOf((int) ((ms + 50) / 100));
-      if (seconds.length() == 1) {
+      if (seconds.length() == 1)
+      {
         seconds = "0" + seconds;
       }
       return seconds.substring(0, seconds.length() - 1) + "." + seconds.substring(seconds.length() - 1) + " s";
     }
   }
 
-  private String createYesNo(String yesno) {
-    if (yesno.equalsIgnoreCase("Y")) {
+  private String createYesNo(String yesno)
+  {
+    if (yesno.equalsIgnoreCase("Y"))
+    {
       return "Yes";
-    } else if (yesno.equalsIgnoreCase("N")) {
+    } else if (yesno.equalsIgnoreCase("N"))
+    {
       return "No";
     }
     return "";
   }
 
-  public static String addHovers(String message) throws IOException {
+  public static String addHovers(String message) throws IOException
+  {
     return addHovers(message, null);
   }
 
-  public static String addHovers(String message, ProfileUsage profileUsage) throws IOException {
+  public static String addHovers(String message, ProfileUsage profileUsage) throws IOException
+  {
     StringBuilder sb = new StringBuilder();
     BufferedReader reader = new BufferedReader(new StringReader(message));
     String line;
     String segmentName = "";
     int fieldCount = 0;
-    while ((line = reader.readLine()) != null) {
-      if (!line.startsWith("   ") && line.length() > 3 && line.charAt(3) == '|') {
+    while ((line = reader.readLine()) != null)
+    {
+      if (!line.startsWith("   ") && line.length() > 3 && line.charAt(3) == '|')
+      {
         segmentName = line.substring(0, 3);
         fieldCount = 0;
       }
-      for (int i = 0; i < line.length(); i++) {
+      for (int i = 0; i < line.length(); i++)
+      {
         char c = line.charAt(i);
-        if (line.charAt(i) == '|') {
-          if (fieldCount > 0) {
+        if (line.charAt(i) == '|')
+        {
+          if (fieldCount > 0)
+          {
             sb.append("</a>");
-          } else {
-            if (segmentName.equals("MSH") || segmentName.equals("FHS") || segmentName.equals("BHS")) {
+          } else
+          {
+            if (segmentName.equals("MSH") || segmentName.equals("FHS") || segmentName.equals("BHS"))
+            {
               fieldCount++;
             }
           }
           fieldCount++;
-          if (profileUsage != null) {
+          if (profileUsage != null)
+          {
             String link = "guide?" + GuideServlet.PARAM_PROFILE_USAGE_ID + "=" + profileUsage.getProfileUsageId() + "&"
                 + GuideServlet.PARAM_FIELD_NAME + "=" + segmentName + "-" + fieldCount;
             sb.append("<a class=\"hl7\" title=\"" + segmentName + "-" + fieldCount + "\" href=\"" + link + "\" target=\"guide\">");
-          } else {
+          } else
+          {
             sb.append("<a class=\"hl7\" title=\"" + segmentName + "-" + fieldCount + "\">");
           }
         }
         sb.append(line.charAt(i));
       }
-      if (fieldCount > 0) {
+      if (fieldCount > 0)
+      {
         sb.append("</a>");
       }
       sb.append("\n");
@@ -1908,4 +2206,11 @@ public class TestReportServlet extends HomeServlet {
     return sb.toString();
   }
 
+  public static String createTestLink(TestMessage testMessage) throws UnsupportedEncodingException
+  {
+    String link = "testReport?" + PARAM_VIEW + "=" + URLEncoder.encode(testMessage.getTestSection().getTestSectionType(), "UTF-8") + "&"
+        + PARAM_TEST_MESSAGE_ID + "=" + testMessage.getTestMessageId() + "&" + PARAM_TEST_CONDUCTED_ID + "="
+        + testMessage.getTestSection().getTestConducted().getTestConductedId();
+    return link;
+  }
 }

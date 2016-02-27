@@ -724,7 +724,11 @@ public class PentagonContentServlet extends PentagonServlet
       }
       out.println("<table class=\"pentagon\">");
       out.println("  <tr class=\"pentagon\">");
-      out.println("    <th class=\"pentagon\">Test Id</th>");
+      out.println("    <th class=\"pentagon\">General Test Id</th>");
+      out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseCategory() + "</td>");
+      out.println("  </tr>");
+      out.println("  <tr class=\"pentagon\">");
+      out.println("    <th class=\"pentagon\">Specific Test Id</th>");
       out.println("    <td class=\"pentagon\">" + testMessage.getTestCaseNumber() + "</td>");
       out.println("  </tr>");
       out.println("  <tr class=\"pentagon\">");
