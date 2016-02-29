@@ -41,4 +41,21 @@ public class Application {
 	public void setApplicationAcronym(String applicationAcronym) {
 		this.applicationAcronym = applicationAcronym;
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+	  if (obj instanceof Application)
+	  {
+	    Application app = (Application) obj;
+	    return this.getApplicationId() == app.getApplicationId();
+	  }
+	  return super.equals(obj);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+	  return getApplicationId();
+	}
 }

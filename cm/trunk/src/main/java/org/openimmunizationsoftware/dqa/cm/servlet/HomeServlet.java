@@ -184,7 +184,9 @@ public class HomeServlet extends BaseServlet
             if (userSession.getUser().isResetPassword())
             {
               view = VIEW_CHANGE_PASSWORD;
-            } else if (userSession.getUser().getApplicationUserList().size() == 1)
+            } else if (userSession.getUser().getApplicationUserList().size() == 1
+                && userSession.getUser().getApplicationUserList().get(0).getUserType() != UserType.PENDING
+                && userSession.getUser().getApplicationUserList().get(0).getUserType() != UserType.DELETED)
             {
               action = ACTION_SELECT_APPLICATION;
               applicationId = userSession.getUser().getApplicationUserList().get(0).getApplication().getApplicationId();
@@ -206,7 +208,9 @@ public class HomeServlet extends BaseServlet
           view = changePassword(req, webSession);
           if (view.equals(VIEW_DEFAULT))
           {
-            if (userSession.getUser().getApplicationUserList().size() == 1)
+            if (userSession.getUser().getApplicationUserList().size() == 1
+                && userSession.getUser().getApplicationUserList().get(0).getUserType() != UserType.PENDING
+                && userSession.getUser().getApplicationUserList().get(0).getUserType() != UserType.DELETED)
             {
               action = ACTION_SELECT_APPLICATION;
               applicationId = userSession.getUser().getApplicationUserList().get(0).getApplication().getApplicationId();
@@ -926,27 +930,47 @@ public class HomeServlet extends BaseServlet
       out.println("</form>");
     } else
     {
-      out.println("<form method=\"POST\" action=\"home\">");
-      out.println("<table width=\"100%\">");
-      out.println("  <caption>" + user.getUserName() + "</caption>");
+      boolean applicationToSelect = false;
       for (ApplicationUser applicationUser : user.getApplicationUserList())
       {
-        String link = "home?" + PARAM_ACTION + "=" + ACTION_SELECT_APPLICATION + "&" + PARAM_APPLICATION_ID + "="
-            + applicationUser.getApplication().getApplicationId();
-        out.println("  <tr>");
-        out.println("    <td><a href=\"" + link + "\">" + applicationUser.getApplication().getApplicationAcronym() + "</a></td>");
-        out.println("    <td><a href=\"" + link + "\">" + applicationUser.getUserType() + "</a></td>");
-        out.println("  </tr>");
+        if (applicationUser.getUserType() != UserType.PENDING && applicationUser.getUserType() != UserType.DELETED)
+        {
+          applicationToSelect = true;
+        }
       }
-      out.println("  <tr>");
-      out.println("    <td colspan=\"2\">");
-      out.println("      <span class=\"formButtonFloat\">");
-      out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGOUT + "\"/>");
-      out.println("      </span>");
-      out.println("    </td>");
-      out.println("  </tr>");
-      out.println("</table>");
-      out.println("</form>");
+      if (applicationToSelect)
+      {
+        out.println("<form method=\"POST\" action=\"home\">");
+        out.println("<table width=\"100%\">");
+        out.println("  <caption>" + user.getUserName() + "</caption>");
+        for (ApplicationUser applicationUser : user.getApplicationUserList())
+        {
+          if (applicationUser.getUserType() != UserType.PENDING && applicationUser.getUserType() != UserType.DELETED)
+          {
+            String link = "home?" + PARAM_ACTION + "=" + ACTION_SELECT_APPLICATION + "&" + PARAM_APPLICATION_ID + "="
+                + applicationUser.getApplication().getApplicationId();
+            out.println("  <tr>");
+            out.println("    <td><a href=\"" + link + "\">" + applicationUser.getApplication().getApplicationAcronym() + "</a></td>");
+            out.println("    <td><a href=\"" + link + "\">" + applicationUser.getUserType() + "</a></td>");
+            out.println("  </tr>");
+          }
+        }
+        out.println("  <tr>");
+        out.println("    <td colspan=\"2\">");
+        out.println("      <span class=\"formButtonFloat\">");
+        out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGOUT + "\"/>");
+        out.println("      </span>");
+        out.println("    </td>");
+        out.println("  </tr>");
+        out.println("</table>");
+        out.println("</form>");
+      } else
+      {
+        out.println("<form method=\"POST\" action=\"home\">");
+        out.println("  <p>Your request for access is pending admin approval. You will receive an email once your registration is approved. </p>");
+        out.println("  <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGOUT + "\"/>");
+        out.println("</form>");
+      }
 
     }
   }
@@ -1654,11 +1678,10 @@ public class HomeServlet extends BaseServlet
     StringBuilder message = new StringBuilder();
     message.append("<p>" + userBeingEdited.getUserName() + ", </p>");
     message.append("<p>You have requested to reset the password for your account. Your new temporary password is: " + password + "</p>");
-    message.append(
-        "<p>Please login here <a href=\"http://ois-pt.org/dqacm/home\">http://ois-pt.org/dqacm/home</a> to complete your password reset. </p> ");
+    message.append("<p>Please login here <a href=\"http://ois-pt.org/dqacm/home\">http://ois-pt.org/dqacm/home</a> to set your password. </p> ");
     try
     {
-      mailManager.sendEmail("AART Password Reset", message.toString(), userBeingEdited.getEmailAddress());
+      mailManager.sendEmail("AART/DQAcm Password Reset", message.toString(), userBeingEdited.getEmailAddress());
       userSession.setMessageConfirmation("You have been sent an email with password reset instructions. ");
     } catch (Exception e)
     {
@@ -1746,15 +1769,47 @@ public class HomeServlet extends BaseServlet
         userBeingEdited.setAdminComments("Self registration on " + sdf.format(new Date()) + " from remote host " + req.getRemoteHost());
         userBeingEdited.setResetPassword(true);
         List<Application> applicationList = new ArrayList<Application>();
+        UserSearchOptions userSearchOptions = new UserSearchOptions();
         for (String applicationIdString : req.getParameterValues(PARAM_APPLICATION_ID))
         {
           int applicationId = Integer.parseInt(applicationIdString);
           Application application = ApplicationLogic.getApplication(applicationId, dataSession);
           applicationList.add(application);
+          userSearchOptions.getApplicationUserTypeMap().put(application, UserType.ADMIN);
         }
         UserLogic.createUser(userBeingEdited, applicationList, userType, dataSession);
-        // todo send emails to everyone
-        userSession.setMessageConfirmation("Registration successful. You will receive an email once registration is confirmed. ");
+        {
+          MailManager mailManager = new MailManager(dataSession);
+          StringBuilder useMessage = new StringBuilder();
+          useMessage.append("<p>" + userBeingEdited.getUserName() + ", </p>");
+          useMessage
+              .append("<p>You have been registered pending authorization. Your temporary password is: " + userBeingEdited.getPassword() + "</p>");
+          useMessage.append(
+              "<p>Please login here <a href=\"http://ois-pt.org/dqacm/home\">http://ois-pt.org/dqacm/home</a> to complete your password reset. </p> ");
+          StringBuilder adminMessage = new StringBuilder();
+          adminMessage.append("<p>" + userBeingEdited.getUserName() + " has just registered in the AART/DQAcm tool. "
+              + "Please login to the admin screen to confirm registration. </p>");
+          try
+          {
+            mailManager.sendEmail("AART/DQAcm Registration Confirmation", useMessage.toString(), userBeingEdited.getEmailAddress());
+            List<User> adminUserList = AdminUserServlet.searchUsers(userSearchOptions, dataSession);
+            if (adminUserList.size() > 0)
+            {
+              String sendTo = adminUserList.get(0).getEmailAddress();
+              for (int i = 1; i < adminUserList.size(); i++)
+              {
+                sendTo += "," + adminUserList.get(i).getEmailAddress();
+              }
+              mailManager.sendEmail("AART/DQAcm Registration Needs Approval", adminMessage.toString(), sendTo);
+            }
+            userSession.setMessageConfirmation("Registration successful. You will receive an email once registration is confirmed. ");
+          } catch (Exception e)
+          {
+            e.printStackTrace();
+            userSession.setMessageError("We were unable to register you. Please contact AIRA for assistance. ");
+          }
+
+        }
         return VIEW_DEFAULT;
       } else
       {
