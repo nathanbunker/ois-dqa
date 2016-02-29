@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +54,7 @@ public class AdminUserServlet extends BaseServlet
   public static final String ACTION_UPDATE_ISSUE_COUNTS = "Update Issue Counts";
 
   public static final String ACTION_ADD_USER = "Add User";
+  public static final String ACTION_SEARCH_USER = "Search User";
   public static final String PARAM_USER_ID = "userId";
   public static final String ACTION_UPDATE_USER = "Update User";
   public static final String ACTION_UPDATE_REPORT_USER = "Update Report Access";
@@ -109,6 +112,31 @@ public class AdminUserServlet extends BaseServlet
         ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
         deleteProposedVersionThread = new DeleteProposedVersionThread(userSession.getUser(), rv);
         deleteProposedVersionThread.start();
+      } else if (action.equals(ACTION_SEARCH_USER))
+      {
+        UserSearchOptions userSearchOptions = userSession.getUserSearchOptions();
+        userSearchOptions.setEmailAddress(req.getParameter(PARAM_EMAIL_ADDRESS));
+        if (req.getParameter(PARAM_MEMBER_TYPE).equals(""))
+        {
+          userSearchOptions.setMemberType(null);
+        } else
+        {
+          userSearchOptions.setMemberType(MemberType.get(req.getParameter(PARAM_MEMBER_TYPE)));
+        }
+        userSearchOptions.setOrganization(req.getParameter(PARAM_ORGANIZATION));
+        userSearchOptions.setUserName(req.getParameter(PARAM_USER_NAME));
+        for (Application application : ApplicationLogic.getApplications(dataSession))
+        {
+          String userTypeString = req.getParameter(PARAM_USER_TYPE + "." + application.getApplicationId());
+          if (userTypeString.equals(""))
+          {
+            userSearchOptions.getApplicationUserTypeMap().remove(application);
+          } else
+          {
+            UserType userType = UserType.get(userTypeString);
+            userSearchOptions.getApplicationUserTypeMap().put(application, userType);
+          }
+        }
       } else if (action.equals(ACTION_ADD_USER))
       {
         String userName = req.getParameter(PARAM_USER_NAME);
@@ -148,7 +176,7 @@ public class AdminUserServlet extends BaseServlet
               List<Application> applicationList = new ArrayList<Application>();
               applicationList.add(application);
               UserLogic.createUser(userBeingEdited, applicationList, userType, dataSession);
-              
+
               userSession.setMessageConfirmation("User created, password is " + userBeingEdited.getPassword());
             }
           }
@@ -164,9 +192,9 @@ public class AdminUserServlet extends BaseServlet
             userSession.setMessageError("Unable to update user, user name is already in used by a different acount");
           }
         }
+        String memberTypeString = req.getParameter(PARAM_MEMBER_TYPE);
         if (userSession.getMessageError() == null)
         {
-          String memberTypeString = req.getParameter(PARAM_MEMBER_TYPE);
           if (memberTypeString.equals(""))
           {
             userSession.setMessageError("Member type must be indicated. ");
@@ -179,7 +207,7 @@ public class AdminUserServlet extends BaseServlet
           userBeingEdited.setUserName(userName);
           userBeingEdited.setOrganization(req.getParameter(PARAM_ORGANIZATION));
           userBeingEdited.setPositionTitle(req.getParameter(PARAM_POSITION_TITLE));
-          userBeingEdited.setMemberTypeString(req.getParameter(PARAM_MEMBER_TYPE));
+          userBeingEdited.setMemberTypeString(memberTypeString);
           userBeingEdited.setPhoneNumber(req.getParameter(PARAM_PHONE_NUMBER));
           userBeingEdited.setAdminComments(req.getParameter(PARAM_ADMIN_COMMENTS));
           userBeingEdited.setResetPassword(req.getParameter(PARAM_RESET_PASSWORD) != null);
@@ -230,6 +258,7 @@ public class AdminUserServlet extends BaseServlet
     createHeader(webSession);
 
     out.println("<div class=\"leftColumn\">");
+    printSearchUser(userSession);
     printCreateUser(userSession);
     out.println("</div>");
 
@@ -292,16 +321,101 @@ public class AdminUserServlet extends BaseServlet
     out.println("  <br/>");
   }
 
+  public void printSearchUser(UserSession userSession)
+  {
+    UserSearchOptions userSearchOptions = userSession.getUserSearchOptions();
+    PrintWriter out = userSession.getOut();
+    out.println("  <form action=\"adminUser\" method=\"POST\">");
+    out.println("  <table width=\"100%\">");
+    out.println("    <caption>Search User</caption>");
+    out.println("    <tr>");
+    out.println("      <th>User Name</th>");
+    out.println(
+        "      <td><input type=\"text\" name=\"" + PARAM_USER_NAME + "\" size=\"30\" value=\"" + userSearchOptions.getUserName() + "\"/></td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <th>Email</th>");
+    out.println("      <td><input type=\"text\" name=\"" + PARAM_EMAIL_ADDRESS + "\" size=\"30\" value=\"" + userSearchOptions.getEmailAddress()
+        + "\"/></td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <th>Organization</th>");
+    out.println("      <td><input type=\"text\" name=\"" + PARAM_ORGANIZATION + "\" size=\"30\" value=\"" + userSearchOptions.getOrganization()
+        + "\"/></td>");
+    out.println("    </tr>");
+    out.println("    <tr>");
+    out.println("      <th>Member Type</th>");
+    out.println("      <td>");
+    out.println("         <select name=\"" + PARAM_MEMBER_TYPE + "\">");
+    MemberType memberTypeSelected = userSearchOptions.getMemberType();
+    out.println("           <option value=\"\"" + (memberTypeSelected == null ? " selected=\"true\"" : "") + ">-select-</option>");
+    for (MemberType memberType : MemberType.values())
+    {
+      out.println("           <option value=\"" + memberType.getId() + "\"" + (memberType == memberTypeSelected ? " selected=\"true\"" : "") + ">"
+          + memberType.getLabel() + "</option>");
+    }
+    out.println("         </select>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    for (Application application : ApplicationLogic.getApplications(userSession.getDataSession()))
+    {
+      UserType userTypeSelected = userSearchOptions.getApplicationUserTypeMap().get(application);
+      out.println("    <tr>");
+      out.println("      <th>" + application.getApplicationAcronym() + " User Type</th>");
+      out.println("      <td>");
+      out.println("         <select name=\"" + PARAM_USER_TYPE + "." + application.getApplicationId() + "\">");
+      out.println("           <option value=\"\"" + (userTypeSelected == null ? " selected=\"true\"" : "") + ">-select-</option>");
+      for (UserType userType : UserType.values())
+      {
+        out.println("           <option value=\"" + userType.getId() + "\"" + (userType == userTypeSelected ? " selected=\"true\"" : "") + ">"
+            + userType.getLabel() + "</option>");
+      }
+      out.println("         </select>");
+      out.println("      </td>");
+      out.println("    </tr>");
+    }
+
+    out.println("    <tr>");
+    out.println("      <td colspan=\"2\" align=\"right\">");
+    out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_SEARCH_USER + "\"/>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("  </table>");
+    out.println("  </form>");
+    out.println("  <br/>");
+  }
+
   public void printUsers(User userBeingEdited, UserSession userSession)
   {
     PrintWriter out = userSession.getOut();
+    List<User> userList;
+    UserSearchOptions userSearchOptions = userSession.getUserSearchOptions();
+    Session dataSession = userSession.getDataSession();
+    boolean showingPending = false;
+    if (!userSearchOptions.isSearchOptionsSet())
+    {
+      showingPending = true;
+      userSearchOptions = new UserSearchOptions();
+      for (Application application : ApplicationLogic.getApplications(userSession.getDataSession()))
+      {
+        userSearchOptions.getApplicationUserTypeMap().put(application, UserType.PENDING);
+      }
+    }
+    userList = searchUsers(userSearchOptions, dataSession);
+
     out.println("  <table width=\"100%\">");
-    out.println("    <caption>Users</caption>");
+    if (showingPending)
+    {
+      out.println("    <caption>Pending Users</caption>");
+    } else
+    {
+      out.println("    <caption>Users Matching Search</caption>");
+    }
     out.println("    <tr>");
+    out.println("      <th>Organization</th>");
     out.println("      <th>User Name</th>");
     // out.println(" <th>User Type</th>");
     out.println("    <tr>");
-    List<User> userList = UserLogic.getUserList(userSession.getDataSession());
     for (User u : userList)
     {
       String link = "adminUser?userId=" + u.getUserId();
@@ -311,12 +425,126 @@ public class AdminUserServlet extends BaseServlet
         classString = "selected";
       }
       out.println("    <tr>");
+      out.println("      <td class=\"" + classString + "\"><a href=\"" + link + "\">" + n(u.getOrganization()) + "</a></td>");
       out.println("      <td class=\"" + classString + "\"><a href=\"" + link + "\">" + u.getUserName() + "</a></td>");
-      // out.println(" <td class=\"" + classString + "\"><a href=\""
-      // + link + "\">" + u.getUserType() + "</a></td>");
       out.println("    <tr>");
     }
     out.println("  </table>");
+  }
+
+  public static List<User> searchUsers(UserSearchOptions userSearchOptions, Session dataSession)
+  {
+    List<User> userList;
+    if (userSearchOptions.getApplicationUserTypeMap().size() == 0)
+    {
+      StringBuilder queryString = new StringBuilder();
+      queryString.append("from User where ");
+      addSearchOptions(userSearchOptions, queryString, "");
+      queryString.append("order by organization, userName");
+      Query query = dataSession.createQuery(queryString.toString());
+      setParameters(userSearchOptions, query);
+      userList = query.list();
+    } else
+    {
+      StringBuilder queryString = new StringBuilder();
+      queryString.append("from ApplicationUser where ");
+      boolean first = addSearchOptions(userSearchOptions, queryString, "user.");
+      first = addAnd(queryString, first);
+      queryString.append("(");
+      first = true;
+      for (Application application : userSearchOptions.getApplicationUserTypeMap().keySet())
+      {
+        first = addOr(queryString, first);
+        queryString.append("(application = ? and userTypeString = ?) ");
+      }
+      queryString.append(") ");
+      queryString.append("order by user.organization, user.userName");
+
+      Query query = dataSession.createQuery(queryString.toString());
+      int pos = setParameters(userSearchOptions, query);
+      for (Application application : userSearchOptions.getApplicationUserTypeMap().keySet())
+      {
+        String userTypeString = userSearchOptions.getApplicationUserTypeMap().get(application).getId();
+        query.setParameter(pos++, application);
+        query.setParameter(pos++, userTypeString);
+      }
+      userList = new ArrayList<User>();
+      List<ApplicationUser> applicationUserList = query.list();
+      for (ApplicationUser applicationUser : applicationUserList)
+      {
+        if (!userList.contains(applicationUser.getUser()))
+        {
+          userList.add(applicationUser.getUser());
+        }
+      }
+    }
+    return userList;
+  }
+
+  public static int setParameters(UserSearchOptions userSearchOptions, Query query)
+  {
+    int pos = 0;
+    if (!userSearchOptions.getUserName().equals(""))
+    {
+      query.setParameter(pos++, "%" + userSearchOptions.getUserName() + "%");
+    }
+    if (!userSearchOptions.getEmailAddress().equals(""))
+    {
+      query.setParameter(pos++, "%" + userSearchOptions.getEmailAddress() + "%");
+    }
+    if (!userSearchOptions.getOrganization().equals(""))
+    {
+      query.setParameter(pos++, "%" + userSearchOptions.getOrganization() + "%");
+    }
+    if (userSearchOptions.getMemberType() != null)
+    {
+      query.setParameter(pos++, userSearchOptions.getMemberType().getId());
+    }
+    return pos;
+  }
+
+  public static boolean addSearchOptions(UserSearchOptions userSearchOptions, StringBuilder queryString, String prepend)
+  {
+    boolean first = true;
+    if (!userSearchOptions.getUserName().equals(""))
+    {
+      first = addAnd(queryString, first);
+      queryString.append(prepend + "userName like ? ");
+    }
+    if (!userSearchOptions.getEmailAddress().equals(""))
+    {
+      first = addAnd(queryString, first);
+      queryString.append(prepend + "emailAddress like ? ");
+    }
+    if (!userSearchOptions.getOrganization().equals(""))
+    {
+      first = addAnd(queryString, first);
+      queryString.append(prepend + "organization like ? ");
+    }
+    if (userSearchOptions.getMemberType() != null)
+    {
+      first = addAnd(queryString, first);
+      queryString.append(prepend + "memberTypeString = ? ");
+    }
+    return first;
+  }
+
+  public static boolean addAnd(StringBuilder queryString, boolean first)
+  {
+    if (!first)
+    {
+      queryString.append("and ");
+    }
+    return false;
+  }
+
+  public static boolean addOr(StringBuilder queryString, boolean first)
+  {
+    if (!first)
+    {
+      queryString.append("or ");
+    }
+    return false;
   }
 
   public void printEditUser(User userBeingEdited, UserSession userSession)
@@ -355,7 +583,7 @@ public class AdminUserServlet extends BaseServlet
       out.println("    <tr>");
       out.println("      <th>Member Type</th>");
       out.println("      <td>");
-      out.println("         <select name=\"" + PARAM_MEMBER_TYPE+ "\">");
+      out.println("         <select name=\"" + PARAM_MEMBER_TYPE + "\">");
       MemberType memberTypeSelected = userBeingEdited.getMemberType();
       out.println("           <option value=\"\"" + (memberTypeSelected == null ? " selected=\"true\"" : "") + ">-select-</option>");
       for (MemberType memberType : MemberType.values())
@@ -373,8 +601,8 @@ public class AdminUserServlet extends BaseServlet
       out.println("    </tr>");
       out.println("    <tr>");
       out.println("      <th>Comments</th>");
-      out.println("      <td><input type=\"text\" name=\"" + PARAM_ADMIN_COMMENTS + "\" value=\"" + n(userBeingEdited.getAdminComments())
-          + "\" size=\"30\"/></td>");
+      out.println("      <td><textarea name=\"" + PARAM_ADMIN_COMMENTS + "\" rows=\"3\" cols=\"35\">" + n(userBeingEdited.getAdminComments())
+          + "</textarea></td>");
       out.println("    </tr>");
       out.println("    <tr>");
       out.println("      <th>Reset Password</th>");

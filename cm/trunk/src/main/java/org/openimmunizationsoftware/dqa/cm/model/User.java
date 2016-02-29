@@ -36,7 +36,7 @@ public class User implements Serializable
 
   public String getMemberTypeString()
   {
-    return memberType == null ? null : memberType.toString();
+    return memberType == null ? null : memberType.getId();
   }
 
   public void setMemberTypeString(String memberTypeString)

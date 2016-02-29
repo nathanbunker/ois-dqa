@@ -103,7 +103,7 @@ public abstract class BaseServlet extends HttpServlet
       UserActivity userActivity = userSession.getUserActivity();
       userActivity.setUserName(userSession.getUser().getUserName());
       userActivity.setLastWebRequestTimeMillis(System.currentTimeMillis());
-      System.out.println("--> Setting use");
+      userActivitySet.remove(userActivity);
       userActivitySet.add(userActivity);
     }
     resp.setContentType("text/html");

@@ -140,6 +140,28 @@ public class UserLogic
       transaction.commit();
     } else if (userType != null && applicationUser != null)
     {
+      if (applicationUser.getUserType() == UserType.PENDING && (userType == UserType.ADMIN || userType == UserType.EXPERT))
+      {
+        MailManager mailManager = new MailManager(dataSession);
+        StringBuilder message = new StringBuilder();
+        message.append("<p>" + user.getUserName() + ", </p>");
+        message.append("<p>Your request for access to the " + application.getApplicationLabel() + " ( " + application.getApplicationAcronym()
+            + ") system has been granted. </p>");
+        if (application.getApplicationId() == 2)
+        {
+          message.append("<p>Please login here <a href=\"http://ois-pt.org/dqacm/aart\">http://ois-pt.org/dqacm/aart</a>.</p> ");
+        } else
+        {
+          message.append("<p>Please login here <a href=\"http://ois-pt.org/dqacm/home\">http://ois-pt.org/dqacm/home</a>.</p> ");
+        }
+        try
+        {
+          mailManager.sendEmail(application.getApplicationAcronym() + " Access Granted", message.toString(), user.getEmailAddress());
+        } catch (Exception e)
+        {
+          e.printStackTrace();
+        }
+      }
       Transaction transaction = dataSession.beginTransaction();
       applicationUser.setUserType(userType);
       dataSession.update(applicationUser);

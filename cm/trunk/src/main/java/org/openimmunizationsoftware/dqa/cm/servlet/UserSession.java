@@ -2,9 +2,12 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Session;
+import org.openimmunizationsoftware.dqa.cm.model.Application;
 import org.openimmunizationsoftware.dqa.cm.model.CodeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
@@ -28,6 +31,16 @@ public class UserSession implements Serializable
   private transient String messageConfirmation = null;
   private transient ProfileUsage profileUsageSelected = null;
   private transient UserActivity userActivity = new UserActivity();
+  private transient UserSearchOptions userSearchOptions = null;
+
+  public UserSearchOptions getUserSearchOptions()
+  {
+    if (userSearchOptions == null)
+    {
+      userSearchOptions = new UserSearchOptions();
+    }
+    return userSearchOptions;
+  }
 
   public UserActivity getUserActivity()
   {
