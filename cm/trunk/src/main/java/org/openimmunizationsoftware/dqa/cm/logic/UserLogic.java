@@ -1,5 +1,6 @@
 package org.openimmunizationsoftware.dqa.cm.logic;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -175,6 +176,8 @@ public class UserLogic
     Transaction transaction = dataSession.beginTransaction();
     user.setPassword(generatePassword());
     dataSession.save(user);
+    List<ApplicationUser> applicationUserList = new ArrayList<ApplicationUser>();
+    user.setApplicationUserList(applicationUserList);
     for (Application application : applicationList)
     {
       ApplicationUser applicationUser = new ApplicationUser();
@@ -182,6 +185,7 @@ public class UserLogic
       applicationUser.setUser(user);
       applicationUser.setUserType(userType);
       dataSession.save(applicationUser);
+      applicationUserList.add(applicationUser);
     }
     transaction.commit();
   }
