@@ -36,6 +36,8 @@ import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
 public class TestReportServlet extends HomeServlet
 {
+  
+  public static final boolean SHOW_ANONYMOUS_REPORTS = false;
 
   public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
   public static final String PARAM_CONNECTION_LABEL = "connectionLabel";

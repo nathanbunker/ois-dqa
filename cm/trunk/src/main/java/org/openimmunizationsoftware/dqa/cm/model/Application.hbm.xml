@@ -8,5 +8,6 @@
     </id>
     <property name="applicationLabel" column="application_label" type="string"/>
     <property name="applicationAcronym" column="application_acronym" type="string"/>
+    <many-to-one name="agreement" column="agreement_id" class="Agreement"/> 
   </class>
 </hibernate-mapping>

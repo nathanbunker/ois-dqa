@@ -47,6 +47,7 @@ public class HL7DownloadServlet extends HomeServlet
       String type = req.getParameter(PARAM_TYPE);
       TestConducted testConducted = (TestConducted) dataSession.get(TestConducted.class, Integer.parseInt(testConductedIdString));
       boolean anonymize = !testConducted.getTestParticipant().canViewConnectionLabel(userSession);
+      boolean hidePatientId = !userSession.isAdmin();
       resp.setContentType("text/plain");
       if (testSectionIdString != null)
       {
@@ -64,7 +65,7 @@ public class HL7DownloadServlet extends HomeServlet
           query.setParameter(1, "query");
         }
         List<TestMessage> testMessageList = query.list();
-        printMessages(out, type, anonymize, testMessageList);
+        printMessages(out, type, anonymize, hidePatientId, testMessageList);
       } else
       {
         String filename = "Test " + testConducted.getTestConductedId() + " " + type + " " + sdf.format(testConducted.getTestStartedTime()) + ".hl7.txt";
@@ -79,7 +80,7 @@ public class HL7DownloadServlet extends HomeServlet
           query.setParameter(1, "query");
         }
         List<TestMessage> testMessageList = query.list();
-        printMessages(out, type, anonymize, testMessageList);
+        printMessages(out, type, anonymize, hidePatientId, testMessageList);
       }
 
     } catch (Exception e)
@@ -90,7 +91,7 @@ public class HL7DownloadServlet extends HomeServlet
     out.close();
   }
 
-  public void printMessages(PrintWriter out, String type, boolean anonymize, List<TestMessage> testMessageList)
+  public void printMessages(PrintWriter out, String type, boolean anonymize, boolean hidePatientId, List<TestMessage> testMessageList)
   {
     for (TestMessage testMessage : testMessageList)
     {
@@ -105,6 +106,10 @@ public class HL7DownloadServlet extends HomeServlet
       if (anonymize)
       {
         message = PentagonContentServlet.anonymizeHL7(message);
+      }
+      if (hidePatientId && (type.equals(TYPE_ACKS) || type.equals(TYPE_RESPONSES)))
+      {
+        message = PentagonContentServlet.removePatientIdentifyingSegments(message);
       }
       out.print(message);
     }

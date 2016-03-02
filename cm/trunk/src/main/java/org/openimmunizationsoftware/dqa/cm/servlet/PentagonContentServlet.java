@@ -1,13 +1,16 @@
 package org.openimmunizationsoftware.dqa.cm.servlet;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
+import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -211,9 +214,9 @@ public class PentagonContentServlet extends PentagonServlet
               if (pb.getScore() < 0)
               {
                 out.println("<p class=\"pentagon\"><b>Section Score:</b> Not Evaluated</p>");
-              }
-              else {
-              out.println("<p class=\"pentagon\"><b>Section Score:</b> " + pb.getScore() + "%</p>");
+              } else
+              {
+                out.println("<p class=\"pentagon\"><b>Section Score:</b> " + pb.getScore() + "%</p>");
               }
               pb.printImprove(out, dataSession, pentagonReport, webSession, userSession);
               String improvementLevel = getImprovementLevelText(pb.getPentagonBox().getReportScoreGap());
@@ -309,33 +312,34 @@ public class PentagonContentServlet extends PentagonServlet
                 if (position == 1)
                 {
                   out.println("<p class=\"pentagon\">" + improvementLevel + "This section has the biggest potential for a improving the "
-                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire " + pentagonRowHelper.getLabel() + " Score by "
-                      + scoreGap + " percentage points.</p>");
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire "
+                      + pentagonRowHelper.getLabel() + " Score by " + scoreGap + " percentage points.</p>");
                 } else if (position == 2)
                 {
                   out.println("<p class=\"pentagon\">" + improvementLevel + "This section has the second biggest potential for a improving the "
-                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire " + pentagonRowHelper.getLabel() + " Score by "
-                      + scoreGap + " percentage points.</p>");
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire "
+                      + pentagonRowHelper.getLabel() + " Score by " + scoreGap + " percentage points.</p>");
                 } else if (position == pentagonRowHelper.size())
                 {
                   out.println("<p class=\"pentagon\">" + improvementLevel + "This section has the lowest potential for a improving the "
-                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire " + pentagonRowHelper.getLabel() + " Score by "
-                      + scoreGap + " percentage points. " + "It would be best to focus on other areas first. </p>");
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire "
+                      + pentagonRowHelper.getLabel() + " Score by " + scoreGap + " percentage points. "
+                      + "It would be best to focus on other areas first. </p>");
                 } else
                 {
                   out.println("<p class=\"pentagon\">" + improvementLevel + "This section has some potential for a improving the "
-                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire " + pentagonRowHelper.getLabel() + " Score by "
-                      + scoreGap + " percentage points. </p>");
+                      + pentagonRowHelper.getLabel() + " Score. If this section were improved to pass all tests it would raise the entire "
+                      + pentagonRowHelper.getLabel() + " Score by " + scoreGap + " percentage points. </p>");
                 }
                 pentagonBoxHelper.printImprove(out, dataSession, pentagonReport, webSession, userSession);
               }
               out.println("<p class=\"pentagon\">The following list shows the improvement potential for each section. "
                   + "This lists suggests a starting point for priorities. Items with the highest improvement potential should "
                   + "generally be given more attention and concern over areas with the lowest improvement potential. </p>");
-              out.println("<p class=\"pentagon\"><b>Improvement Potential</b>: The percentage point improvement possible for the " + pentagonRowHelper.getLabel().toLowerCase() + " score if "
-                  + "this section were improved to pass all tests. </p>");
-              out.println("<p class=\"pentagon\"><b>Weight</b>: The total weight this section's score counts towards the overall " + pentagonRowHelper.getLabel().toLowerCase() + " score. "
-                  + "This value is fixed by the Interoperability Testing Project. </p>");
+              out.println("<p class=\"pentagon\"><b>Improvement Potential</b>: The percentage point improvement possible for the "
+                  + pentagonRowHelper.getLabel().toLowerCase() + " score if " + "this section were improved to pass all tests. </p>");
+              out.println("<p class=\"pentagon\"><b>Weight</b>: The total weight this section's score counts towards the overall "
+                  + pentagonRowHelper.getLabel().toLowerCase() + " score. " + "This value is fixed by the Interoperability Testing Project. </p>");
 
               out.println("<table class=\"pentagon\">");
               out.println("  <tr class=\"pentagon\">");
@@ -589,16 +593,16 @@ public class PentagonContentServlet extends PentagonServlet
   public static void printTestMessage(Session dataSession, PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize,
       UserSession userSession) throws IOException
   {
-
     if (testMessage != null)
     {
       printOverview(out, testMessage);
+      boolean hidePatientId = !userSession.isAdmin();
       if (testMessage.getTestType().equals("prep") || testMessage.getTestType().equals("update"))
       {
-        printHL7ForUpdate(out, profileUsage, testMessage, anonymize);
+        printHL7ForUpdate(out, profileUsage, testMessage, anonymize, hidePatientId);
       } else if (testMessage.getTestType().equals("query"))
       {
-        printHl7ForQuery(out, profileUsage, testMessage, anonymize);
+        printHl7ForQuery(out, profileUsage, testMessage, anonymize, hidePatientId);
       }
       printConformance(dataSession, out, testMessage);
       printPreparationDetails(out, profileUsage, testMessage);
@@ -611,7 +615,8 @@ public class PentagonContentServlet extends PentagonServlet
     }
   }
 
-  public static void printHl7ForQuery(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize) throws IOException
+  public static void printHl7ForQuery(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize, boolean hidePatientId)
+      throws IOException
   {
     String prepMessageDerivedFrom = testMessage.getPrepMessageDerivedFrom();
     String prepMessageOriginalResponse = testMessage.getPrepMessageOriginalResponse();
@@ -623,6 +628,11 @@ public class PentagonContentServlet extends PentagonServlet
       prepMessageOriginalResponse = anonymizeHL7(prepMessageOriginalResponse);
       prepMessageActual = anonymizeHL7(prepMessageActual);
       resultMessageActual = anonymizeHL7(resultMessageActual);
+    }
+    if (hidePatientId)
+    {
+      prepMessageOriginalResponse = removePatientIdentifyingSegments(prepMessageOriginalResponse);
+      resultMessageActual = removePatientIdentifyingSegments(resultMessageActual);
     }
 
     out.println("<div id=\"detailsHL7\">");
@@ -672,14 +682,76 @@ public class PentagonContentServlet extends PentagonServlet
     return tcm.getMessageText();
   }
 
-  public static void printHL7ForUpdate(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize) throws IOException
+  private static final Set<String> ID_SEGMENTS_TO_REMOVE = new HashSet<String>();
+
+  static
+  {
+    ID_SEGMENTS_TO_REMOVE.add("PID");
+    ID_SEGMENTS_TO_REMOVE.add("NK1");
+    ID_SEGMENTS_TO_REMOVE.add("GT1");
+    ID_SEGMENTS_TO_REMOVE.add("GT2");
+    ID_SEGMENTS_TO_REMOVE.add("IN1");
+    ID_SEGMENTS_TO_REMOVE.add("IN2");
+  };
+
+  public static final String removePatientIdentifyingSegments(String message)
+  {
+    System.out.println("--> calling");
+    System.out.println("--> " + message);
+    StringBuilder sb = new StringBuilder();
+    BufferedReader in = new BufferedReader(new StringReader(message));
+    String line;
+    try
+    {
+      while ((line = in.readLine()) != null)
+      {
+        String segmentName = line;
+        if (line.length() > 3)
+        {
+          segmentName = line.substring(0, 3);
+        }
+        if (ID_SEGMENTS_TO_REMOVE.contains(segmentName))
+        {
+          sb.append(segmentName);
+          for (int i = 3; i < line.length(); i++)
+          {
+            if (line.charAt(i) == '|')
+            {
+              sb.append('|');
+            } else
+            {
+              sb.append('-');
+            }
+          }
+          sb.append("\r");
+        } else
+        {
+          sb.append(line);
+          sb.append("\r");
+        }
+      }
+    } catch (IOException ioe)
+    {
+      ioe.printStackTrace();
+      // not expecting when reading string
+    }
+    System.out.println("--> " + sb.toString());
+    return sb.toString();
+  }
+
+  public static void printHL7ForUpdate(PrintWriter out, ProfileUsage profileUsage, TestMessage testMessage, boolean anonymize, boolean hidePatientId)
+      throws IOException
   {
     String prepMessageActual = testMessage.getPrepMessageActual();
-    String reaultMessageActual = testMessage.getResultMessageActual();
+    String resultMessageActual = testMessage.getResultMessageActual();
     if (anonymize)
     {
       prepMessageActual = anonymizeHL7(prepMessageActual);
-      reaultMessageActual = anonymizeHL7(reaultMessageActual);
+      resultMessageActual = anonymizeHL7(resultMessageActual);
+    }
+    if (hidePatientId)
+    {
+      resultMessageActual = removePatientIdentifyingSegments(resultMessageActual);
     }
 
     out.println("<div id=\"detailsHL7\">");
@@ -692,7 +764,7 @@ public class PentagonContentServlet extends PentagonServlet
     {
       out.println("<h4 class=\"pentagon\">NOT Accepted by IIS" + (anonymize ? " *" : "") + "</h4>");
     }
-    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(reaultMessageActual, profileUsage) + "</pre>");
+    out.println("<pre class=\"pentagon\">" + TestReportServlet.addHovers(resultMessageActual, profileUsage) + "</pre>");
     printAnonymizedStatement(out, anonymize);
     out.println("</div>");
   }
@@ -890,16 +962,19 @@ public class PentagonContentServlet extends PentagonServlet
       }
       printReportTable(dataSession, out, testConductedListCanView, userSession);
     }
-    if (testConductedListAnonymous.size() > 0)
+    if (TestReportServlet.SHOW_ANONYMOUS_REPORTS)
     {
-      if (testConductedListAnonymous.size() == 1)
+      if (testConductedListAnonymous.size() > 0)
       {
-        out.println("<h4 class=\"pentagon\">Other IIS Report</h4>");
-      } else
-      {
-        out.println("<h4 class=\"pentagon\">Other IIS Reports</h4>");
+        if (testConductedListAnonymous.size() == 1)
+        {
+          out.println("<h4 class=\"pentagon\">Other IIS Report</h4>");
+        } else
+        {
+          out.println("<h4 class=\"pentagon\">Other IIS Reports</h4>");
+        }
+        printReportTable(dataSession, out, testConductedListAnonymous, userSession);
       }
-      printReportTable(dataSession, out, testConductedListAnonymous, userSession);
     }
   }
 

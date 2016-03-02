@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.cm.logic.AllowedValueLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.ApplicationLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.AttributeAssignedLogic;
@@ -32,6 +33,7 @@ import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.SupportingInfoLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
 import org.openimmunizationsoftware.dqa.cm.model.AcceptStatus;
+import org.openimmunizationsoftware.dqa.cm.model.Agreement;
 import org.openimmunizationsoftware.dqa.cm.model.AllowedValue;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
 import org.openimmunizationsoftware.dqa.cm.model.ApplicationUser;
@@ -75,6 +77,9 @@ public class HomeServlet extends BaseServlet
   protected static final String ACTION_RESET_PASSWORD = "Reset Password";
   protected static final String ACTION_CHANGE_PASSWORD = "Change Password";
 
+  protected static final String ACTION_AGREE = "Agree";
+  protected static final String PARAM_AGREEMENT_SIGNATURE = "Agreement Signature";
+
   protected static final String ACTION_SELECT_APPLICATION = "Select Application";
   protected static final String PARAM_APPLICATION_ID = "applicationId";
 
@@ -110,6 +115,8 @@ public class HomeServlet extends BaseServlet
   protected static final String VIEW_REGISTER = "Register";
   protected static final String VIEW_RESET_PASSWORD = "Reset Password";
   protected static final String VIEW_CHANGE_PASSWORD = "Change Password";
+  protected static final String VIEW_AGREE = "Agree";
+  protected static final String VIEW_AGREE_SIGNED = "AgreeSigned";
 
   public static final String PARAM_TEST_CONDUCTED_ID = "testConductedId";
   public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
@@ -197,6 +204,14 @@ public class HomeServlet extends BaseServlet
           logout(webSession);
           webSession = req.getSession(true);
           userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+        } else if (action.equals(ACTION_AGREE))
+        {
+          view = agree(req, webSession);
+          if (view == null)
+          {
+            view = VIEW_DEFAULT;
+            action = ACTION_SELECT_APPLICATION;
+          }
         } else if (action.equals(ACTION_REGISTER))
         {
           view = register(req, webSession);
@@ -222,16 +237,30 @@ public class HomeServlet extends BaseServlet
           if (userSession.getUser() != null)
           {
             userSession.getUser().setApplicationUser(null);
+            Application application = (Application) dataSession.get(Application.class, applicationId);
 
             for (ApplicationUser applicationUser : userSession.getUser().getApplicationUserList())
             {
-              if (applicationUser.getApplication().getApplicationId() == applicationId)
+              if (applicationUser.getApplication().equals(application))
               {
-                userSession.getUser().setApplicationUser(applicationUser);
-                if (applicationUser.getApplication().isApplicationAart())
+                if (application.getAgreement() == null
+                    || (applicationUser.getAgreement() != null && application.getAgreement().equals(application.getAgreement())))
                 {
-                  sendToApplication(req, resp, applicationUser.getApplication());
-                  return;
+                  if (applicationUser.getAgreement() != null)
+                  {
+                    String link = "home?" + PARAM_VIEW + "=" + VIEW_AGREE_SIGNED + "&" + PARAM_APPLICATION_ID + "=" + application.getApplicationId();
+                    userSession
+                        .setMessageConfirmation("Access to this application allowed under these <a href=\"" + link + "\">Terms and Conditions</a>.");
+                  }
+                  userSession.getUser().setApplicationUser(applicationUser);
+                  if (applicationUser.getApplication().isApplicationAart())
+                  {
+                    sendToApplication(req, resp, applicationUser.getApplication());
+                    return;
+                  }
+                } else
+                {
+                  view = VIEW_AGREE;
                 }
                 break;
               }
@@ -349,13 +378,20 @@ public class HomeServlet extends BaseServlet
       if (view.equals(VIEW_REGISTER))
       {
         printRegister(req, userSession);
+      } else if (view.equals(VIEW_AGREE))
+      {
+        printAgree(req, userSession, applicationId);
+      } else if (view.equals(VIEW_AGREE_SIGNED))
+      {
+        printAgreeSigned(req, userSession, applicationId);
       } else if (view.equals(VIEW_RESET_PASSWORD))
       {
         printResetPassword(req, userSession);
       } else if (view.equals(VIEW_CHANGE_PASSWORD))
       {
         printChangePassword(req, userSession);
-      } else if (userSession.getUser() != null && userSession.getUser().getApplicationUser() == null)
+      } else if (userSession.getUser() != null
+          && (userSession.getUser().getApplicationUser() == null || userSession.getUser().getApplicationUser().getUserType() == UserType.PENDING))
       {
         out.println("<div class=\"leftColumn\">");
         out.println("<div class=\"topBox\">");
@@ -778,6 +814,63 @@ public class HomeServlet extends BaseServlet
     out.println("  </table>");
     out.println("  </form>");
     out.println("  <br/>");
+  }
+
+  protected void printAgree(HttpServletRequest req, UserSession userSession, int applicationId)
+  {
+    Application application = (Application) req.getAttribute("application");
+    if (application == null)
+    {
+      application = (Application) userSession.getDataSession().get(Application.class, applicationId);
+    }
+    Agreement agreement = application.getAgreement();
+    PrintWriter out = userSession.getOut();
+    out.println("  <form action=\"home\" method=\"POST\">");
+    out.println("  <table width=\"700\">");
+    out.println("    <caption>" + agreement.getAgreementTitle() + "</caption>");
+    out.println("    <tr>");
+    out.println("      <td>" + agreement.getAgreementText() + "</td>");
+    out.println("    <tr>");
+    out.println("      <td>");
+    out.println("        Type your full name as your signature: <input type=\"text\" name=\"" + PARAM_AGREEMENT_SIGNATURE + "\" size=\"30\"/>");
+    out.println("        <input type=\"hidden\" name=\"" + PARAM_APPLICATION_ID + "\" value=\"" + applicationId + "\"/>");
+    out.println("        <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_AGREE + "\"/>");
+    out.println("      </td>");
+    out.println("    </tr>");
+    out.println("  </table>");
+    out.println("  </form>");
+    out.println("  <br/>");
+  }
+
+  protected void printAgreeSigned(HttpServletRequest req, UserSession userSession, int applicationId)
+  {
+    Application application = (Application) userSession.getDataSession().get(Application.class, applicationId);
+    Session dataSession = userSession.getDataSession();
+    Query query = dataSession.createQuery("from ApplicationUser where user = ? and application = ?");
+    query.setParameter(0, userSession.getUser());
+    query.setParameter(1, application);
+    List<ApplicationUser> applicationUserList = query.list();
+    if (applicationUserList.size() > 0)
+    {
+      ApplicationUser applicationUser = applicationUserList.get(0);
+      Agreement agreement = applicationUser.getAgreement();
+      PrintWriter out = userSession.getOut();
+      out.println("  <form action=\"home\" method=\"POST\">");
+      out.println("  <table width=\"700\">");
+      out.println("    <caption>" + agreement.getAgreementTitle() + "</caption>");
+      out.println("    <tr>");
+      out.println("      <td>" + agreement.getAgreementText() + "</td>");
+      out.println("    <tr>");
+      out.println("      <td>");
+      SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy");
+      out.println("        This agreement was signed by " + applicationUser.getAgreementSignature() + " on "
+          + sdf.format(applicationUser.getAgreementDate()));
+      out.println("      </td>");
+      out.println("    </tr>");
+      out.println("  </table>");
+      out.println("  </form>");
+      out.println("  <br/>");
+    }
   }
 
   protected void printChangePassword(HttpServletRequest req, UserSession userSession)
@@ -1712,6 +1805,48 @@ public class HomeServlet extends BaseServlet
     return VIEW_DEFAULT;
   }
 
+  protected String agree(HttpServletRequest req, HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    String agreementSignature = req.getParameter(PARAM_AGREEMENT_SIGNATURE);
+    if (agreementSignature.equals("") || agreementSignature.length() < 3 || agreementSignature.indexOf(" ") < 1)
+    {
+      userSession.setMessageError("Signature must be your complete name (first and last) ");
+      return VIEW_AGREE;
+    }
+    if (agreementSignature.length() > 250)
+    {
+      agreementSignature = agreementSignature.substring(0, 250);
+    }
+    Session dataSession = userSession.getDataSession();
+    int applicationId = Integer.parseInt(req.getParameter(PARAM_APPLICATION_ID));
+    Application application = (Application) dataSession.get(Application.class, applicationId);
+    Transaction transaction = dataSession.beginTransaction();
+    try
+    {
+      for (ApplicationUser applicationUser : userSession.getUser().getApplicationUserList())
+      {
+        if (applicationUser.getApplication().equals(application))
+        {
+          applicationUser.setAgreement(application.getAgreement());
+          applicationUser.setAgreementDate(new Date());
+          applicationUser.setAgreementSignature(agreementSignature);
+          dataSession.update(applicationUser);
+          if (applicationUser.getUserType() == UserType.PENDING)
+          {
+            userSession.setMessageConfirmation("Agreement has been recorded. Your registration and access is pending approval. ");
+            return VIEW_DEFAULT;
+          }
+          return null;
+        }
+      }
+    } finally
+    {
+      transaction.commit();
+    }
+    return VIEW_AGREE;
+  }
+
   protected String register(HttpServletRequest req, HttpSession webSession)
   {
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
@@ -1757,6 +1892,15 @@ public class HomeServlet extends BaseServlet
           userSession.setMessageError("Please select at least one application to register with.");
           return VIEW_REGISTER;
         }
+        List<Application> applicationList = new ArrayList<Application>();
+        UserSearchOptions userSearchOptions = new UserSearchOptions();
+        for (String applicationIdString : req.getParameterValues(PARAM_APPLICATION_ID))
+        {
+          int applicationId = Integer.parseInt(applicationIdString);
+          Application application = ApplicationLogic.getApplication(applicationId, dataSession);
+          applicationList.add(application);
+          userSearchOptions.getApplicationUserTypeMap().put(application, UserType.ADMIN);
+        }
 
         UserType userType = UserType.PENDING;
         userBeingEdited = new User();
@@ -1768,15 +1912,6 @@ public class HomeServlet extends BaseServlet
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss z");
         userBeingEdited.setAdminComments("Self registration on " + sdf.format(new Date()) + " from remote host " + req.getRemoteHost());
         userBeingEdited.setResetPassword(true);
-        List<Application> applicationList = new ArrayList<Application>();
-        UserSearchOptions userSearchOptions = new UserSearchOptions();
-        for (String applicationIdString : req.getParameterValues(PARAM_APPLICATION_ID))
-        {
-          int applicationId = Integer.parseInt(applicationIdString);
-          Application application = ApplicationLogic.getApplication(applicationId, dataSession);
-          applicationList.add(application);
-          userSearchOptions.getApplicationUserTypeMap().put(application, UserType.ADMIN);
-        }
         UserLogic.createUser(userBeingEdited, applicationList, userType, dataSession);
         {
           MailManager mailManager = new MailManager(dataSession);
@@ -1802,14 +1937,26 @@ public class HomeServlet extends BaseServlet
               }
               mailManager.sendEmail("AART/DQAcm Registration Needs Approval", adminMessage.toString(), sendTo);
             }
-            userSession.setMessageConfirmation("Registration successful. You will receive an email once registration is confirmed. ");
+            for (Application application : applicationList)
+            {
+              if (application.getAgreement() != null)
+              {
+                userSession.setMessageConfirmation(
+                    "Registration successful. You have been sent an email with your temporary password. Please read and sign agreement now. ");
+                req.setAttribute("application", application);
+                userSession.setUser(userBeingEdited);
+                return VIEW_AGREE;
+              }
+            }
+            userSession.setMessageConfirmation(
+                "Registration successful. You have been sent an email with your temporary password. Your registration will be reviewed for approval. ");
           } catch (Exception e)
           {
             e.printStackTrace();
             userSession.setMessageError("We were unable to register you. Please contact AIRA for assistance. ");
           }
-
         }
+
         return VIEW_DEFAULT;
       } else
       {

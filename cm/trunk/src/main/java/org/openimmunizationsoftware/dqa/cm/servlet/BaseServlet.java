@@ -2,6 +2,7 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,11 +18,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.cm.CentralControl;
+import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.HashManager;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
+import org.openimmunizationsoftware.dqa.cm.model.ApplicationUser;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
@@ -219,14 +222,26 @@ public abstract class BaseServlet extends HttpServlet
     out.println("  <head>");
     out.println("    <meta charset=\"UTF-8\">");
     Application application = defaultApplication;
+    ApplicationUser applicationUser = null;
     if (userSession.getUser() != null && userSession.getUser().getApplicationUser() != null)
     {
-      application = userSession.getUser().getApplicationUser().getApplication();
+      applicationUser = userSession.getUser().getApplicationUser();
+      application = applicationUser.getApplication();
     }
     out.println("    <title>" + application.getApplicationAcronym() + " - " + servletTitle + "</title>");
     out.println("    <link rel=\"stylesheet\" type=\"text/css\" href=\"index.css\">");
     out.println("  </head>");
     out.println("  <body>");
+    if (applicationUser != null && applicationUser.getAgreement() != null)
+    {
+
+      SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy");
+      String link = "home?" + HomeServlet.PARAM_VIEW + "=" + HomeServlet.VIEW_AGREE_SIGNED + "&" + HomeServlet.PARAM_APPLICATION_ID + "="
+          + application.getApplicationId();
+      out.println("    <span class=\"aggreement\"><a href=\"" + link + "\">This use of this information is restricted to the Terms and Conditions "
+          + applicationUser.getAgreementSignature() + " agreed to on " + sdf.format(applicationUser.getAgreementDate()) + ". </a></span>");
+    }
+
     if (getSystemWideMessage() != null && !getSystemWideMessage().equals(""))
     {
       out.println("<div class=\"systemWideMessage\">System Wide Message: " + getSystemWideMessage() + "</div>");

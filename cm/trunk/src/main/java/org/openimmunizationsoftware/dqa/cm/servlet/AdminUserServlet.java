@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -265,7 +266,7 @@ public class AdminUserServlet extends BaseServlet
     out.println("</div>");
 
     out.println("<div class=\"rightColumn\">");
-    printEditUser(userBeingEdited, userSession);
+    printEditUser(userBeingEdited, userSession, req);
     out.println("</div>");
 
     out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
@@ -545,7 +546,7 @@ public class AdminUserServlet extends BaseServlet
     return false;
   }
 
-  public void printEditUser(User userBeingEdited, UserSession userSession)
+  public void printEditUser(User userBeingEdited, UserSession userSession, HttpServletRequest req)
   {
     PrintWriter out = userSession.getOut();
     if (userBeingEdited != null)
@@ -615,13 +616,20 @@ public class AdminUserServlet extends BaseServlet
         out.println("      <td>");
         out.println("         <select name=\"" + PARAM_USER_TYPE + "." + application.getApplicationId() + "\">");
         UserType userTypeSelected = null;
-        for (ApplicationUser applicationUser : userBeingEdited.getApplicationUserList())
+        String userTypeString = req.getParameter(PARAM_USER_TYPE + "." + application.getApplicationId());
+        if (userTypeString == null)
         {
-          if (applicationUser.getApplication() == application)
+          for (ApplicationUser applicationUser : userBeingEdited.getApplicationUserList())
           {
-            userTypeSelected = applicationUser.getUserType();
-            break;
+            if (applicationUser.getApplication() == application)
+            {
+              userTypeSelected = applicationUser.getUserType();
+              break;
+            }
           }
+        } else
+        {
+          userTypeSelected = UserType.get(userTypeString);
         }
         out.println("           <option value=\"\"" + (userTypeSelected == null ? " selected=\"true\"" : "") + ">none</option>");
         for (UserType userType : UserType.values())
