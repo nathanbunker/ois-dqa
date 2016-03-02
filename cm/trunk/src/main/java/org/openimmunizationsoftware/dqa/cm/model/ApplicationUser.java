@@ -1,12 +1,47 @@
 package org.openimmunizationsoftware.dqa.cm.model;
 
+import java.util.Date;
+
 public class ApplicationUser {
 	private int applicationUserId = 0;
 	private Application application = null;
 	private User user = null;
 	private UserType userType = null;
+	private Agreement agreement = null;
+	private Date agreementDate = null;
+	private String agreementSignature = "";
 
-	public int getApplicationUserId() {
+	public String getAgreementSignature()
+  {
+    return agreementSignature;
+  }
+
+  public void setAgreementSignature(String agreementSignature)
+  {
+    this.agreementSignature = agreementSignature;
+  }
+
+  public Agreement getAgreement()
+  {
+    return agreement;
+  }
+
+  public void setAgreement(Agreement agreement)
+  {
+    this.agreement = agreement;
+  }
+
+  public Date getAgreementDate()
+  {
+    return agreementDate;
+  }
+
+  public void setAgreementDate(Date agreementDate)
+  {
+    this.agreementDate = agreementDate;
+  }
+
+  public int getApplicationUserId() {
 		return applicationUserId;
 	}
 

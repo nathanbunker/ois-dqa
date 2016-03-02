@@ -180,6 +180,21 @@ a:active.menuLink {text-decoration:none; color: #FFE1AA; }
     font-size: small;
 }
 
+.aggreement {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	color: #3300FF;
+	border-width: 1px;
+	border-color: #3300FF;
+	border-top-style: solid;
+	border-right-style: solid;
+	padding: 2px;
+    background-color: #FFFFCC;
+    font-size: medium;
+}
+
+
 caption {
 	background-color: #33CCFF;
 	
