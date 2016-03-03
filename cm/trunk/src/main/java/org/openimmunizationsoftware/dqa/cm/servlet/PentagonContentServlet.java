@@ -548,6 +548,13 @@ public class PentagonContentServlet extends PentagonServlet
 
     for (TestConducted testConductedDisplay : testConductedList)
     {
+      if (!TestReportServlet.SHOW_ANONYMOUS_REPORTS)
+      {
+        if (!testConductedDisplay.getTestParticipant().canViewConnectionLabel(userSession))
+        {
+          continue;
+        }
+      }
       out.println("  <tr class=\"pentagon\">");
       PentagonReport pentagonReportDisplay = PentagonReportLogic.createOrReturnPentagonReport(testConductedDisplay, dataSession);
       if (pentagonReportDisplay.getScore(pentagonBoxHelper.getBoxName()) < 0)
@@ -696,8 +703,6 @@ public class PentagonContentServlet extends PentagonServlet
 
   public static final String removePatientIdentifyingSegments(String message)
   {
-    System.out.println("--> calling");
-    System.out.println("--> " + message);
     StringBuilder sb = new StringBuilder();
     BufferedReader in = new BufferedReader(new StringReader(message));
     String line;
@@ -735,7 +740,6 @@ public class PentagonContentServlet extends PentagonServlet
       ioe.printStackTrace();
       // not expecting when reading string
     }
-    System.out.println("--> " + sb.toString());
     return sb.toString();
   }
 
