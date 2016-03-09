@@ -19,7 +19,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.cm.CentralControl;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
-import org.openimmunizationsoftware.dqa.tr.logic.PentagonReportLogic;
 import org.openimmunizationsoftware.dqa.tr.logic.ProfileUsageValueLogic;
 import org.openimmunizationsoftware.dqa.tr.model.Assertion;
 import org.openimmunizationsoftware.dqa.tr.model.AssertionField;
@@ -29,7 +28,6 @@ import org.openimmunizationsoftware.dqa.tr.model.Evaluation;
 import org.openimmunizationsoftware.dqa.tr.model.EvaluationField;
 import org.openimmunizationsoftware.dqa.tr.model.Forecast;
 import org.openimmunizationsoftware.dqa.tr.model.ForecastField;
-import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileField;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsageValue;
@@ -45,10 +43,11 @@ import org.openimmunizationsoftware.dqa.tr.profile.MessageAcceptStatus;
 import org.openimmunizationsoftware.dqa.tr.profile.ProfileManager;
 import org.openimmunizationsoftware.dqa.tr.profile.Usage;
 
+@SuppressWarnings("serial")
 public class RecordServlet extends BaseServlet implements RecordServletInterface
 {
 
-  private String[] expectedStarts = { "MSH-3=", "MSH-4=", "MSH-5=", "MSH-6=", "MSH-22=", "RXA-11.4=", "RXA-11.4*=" };
+  private static final String[] EXPECTED_STARTS = { "MSH-3=", "MSH-4=", "MSH-5=", "MSH-6=", "MSH-22=", "RXA-11.4=", "RXA-11.4*=" };
 
   public RecordServlet() {
     super("Home");
@@ -73,6 +72,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
           Query query = dataSession.createQuery("from TestConducted where testParticipant.connectionLabel = ? and testStartedTime = ?");
           query.setParameter(0, connectionLabel);
           query.setParameter(1, testStartedTime);
+          @SuppressWarnings("unchecked")
           List<TestConducted> testConductedList = query.list();
           if (testConductedList.size() > 0)
           {
@@ -142,7 +142,6 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
 
               BufferedReader customTransformsIn = new BufferedReader(new StringReader(transforms));
               String transformText = "";
-              String[] expectedStarts = { "MSH-3=", "MSH-4=", "MSH-5=", "MSH-6=", "MSH-22=", "RXA-11.4=", "RXA-11.4*=" };
               String scenarioName = customTransformsIn.readLine();
               if (scenarioName != null)
               {
@@ -154,11 +153,12 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                     {
                       Query query = dataSession.createQuery("from TransformField where transformText = ?");
                       query.setParameter(0, transformText);
+                      @SuppressWarnings("unchecked")
                       List<TransformField> transformFieldList = query.list();
                       if (transformFieldList.size() == 0)
                       {
                         boolean transformExpected = false;
-                        for (String expectedStart : expectedStarts)
+                        for (String expectedStart : EXPECTED_STARTS)
                         {
                           if (transformText.startsWith(expectedStart))
                           {
@@ -180,6 +180,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                     Query query = dataSession.createQuery("from Transform where transformField = ? and testConducted = ? ");
                     query.setParameter(0, transformField);
                     query.setParameter(1, testConducted);
+                    @SuppressWarnings("unchecked")
                     List<Transform> transformList = query.list();
                     if (transformList.size() == 0)
                     {
@@ -204,6 +205,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
             Query query = dataSession.createQuery("from TestConducted where testParticipant.connectionLabel = ? and latestTest = ?");
             query.setParameter(0, testConducted.getTestParticipant().getConnectionLabel());
             query.setParameter(1, true);
+            @SuppressWarnings("unchecked")
             List<TestConducted> latestList = query.list();
             for (TestConducted latest : latestList)
             {
@@ -227,6 +229,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
               Query query = dataSession.createQuery("from TestSection where testConducted = ? and testSectionType = ?");
               query.setParameter(0, testConducted);
               query.setParameter(1, testSectionType);
+              @SuppressWarnings("unchecked")
               List<TestSection> testSectionList = query.list();
               if (testSectionList.size() > 0)
               {
@@ -265,6 +268,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
               Query query = dataSession.createQuery("from TestMessage where testSection = ? and testPosition = ?");
               query.setParameter(0, testSection);
               query.setParameter(1, testPosition);
+              @SuppressWarnings("unchecked")
               List<TestMessage> testMessageList = query.list();
               if (testMessageList.size() > 0)
               {
@@ -330,6 +334,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                       Query query = dataSession.createQuery("from ComparisonField where fieldName = ? and priorityLabel = ?");
                       query.setParameter(0, fieldName);
                       query.setParameter(1, priorityLabel);
+                      @SuppressWarnings("unchecked")
                       List<ComparisonField> comparisonFieldList = query.list();
                       if (comparisonFieldList.size() > 0)
                       {
@@ -385,6 +390,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                       Query query = dataSession.createQuery("from AssertionField where assertionType = ? and assertionDescription = ?");
                       query.setParameter(0, assertionType);
                       query.setParameter(1, assertionDescription);
+                      @SuppressWarnings("unchecked")
                       List<AssertionField> assertionFieldList = query.list();
                       if (assertionFieldList.size() > 0)
                       {
@@ -435,6 +441,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                       query.setParameter(0, componentCode);
                       query.setParameter(1, vaccineCode);
                       query.setParameter(2, vaccineDate);
+                      @SuppressWarnings("unchecked")
                       List<EvaluationField> evaluationFieldList = query.list();
                       if (evaluationFieldList.size() > 0)
                       {
@@ -483,6 +490,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                   {
                     Query query = dataSession.createQuery("from ForecastField where vaccineCode = ?");
                     query.setParameter(0, vaccineCode);
+                    @SuppressWarnings("unchecked")
                     List<ForecastField> forecastFieldList = query.list();
                     if (forecastFieldList.size() > 0)
                     {
@@ -536,6 +544,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                 {
                   Query query = dataSession.createQuery("from ProfileField where fieldName = ?");
                   query.setParameter(0, profileFieldName);
+                  @SuppressWarnings("unchecked")
                   List<ProfileField> profileFieldList = query.list();
                   if (profileFieldList.size() > 0)
                   {
@@ -550,6 +559,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                     Query query = dataSession.createQuery("from TestProfile where profileField = ? and testSection = ?");
                     query.setParameter(0, profileField);
                     query.setParameter(1, testSection);
+                    @SuppressWarnings("unchecked")
                     List<TestProfile> testProfileList = query.list();
                     if (testProfileList.size() > 0)
                     {
@@ -603,7 +613,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
                       {
                         masDetected = MessageAcceptStatus.IF_PRESENT_OR_ABSENT;
                       }
-                      String debug = ProfileManager.determineMessageAcceptStatus(profileUsageValue, dataSession);
+                      ProfileManager.determineMessageAcceptStatus(profileUsageValue, dataSession);
                       MessageAcceptStatus masExpected = profileUsageValue.getMessageAcceptStatus();
                       Usage usageExpected = ProfileUsageValueLogic.rectifyUsageForDetection(profileUsageValue);
                       Usage usageDetected = usageExpected;
@@ -717,6 +727,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
         if (!testParticipant.getGuideName().equals(""))
         {
           Query query = dataSession.createQuery("from ProfileUsage");
+          @SuppressWarnings("unchecked")
           List<ProfileUsage> profileUsageList = query.list();
           for (ProfileUsage profileUsage : profileUsageList)
           {
@@ -750,6 +761,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     {
       Query query = dataSession.createQuery("from TestParticipant where organizationName = ?");
       query.setParameter(0, organizationName);
+      @SuppressWarnings("unchecked")
       List<TestParticipant> testParticipantList = query.list();
       if (testParticipantList.size() > 0)
       {
@@ -765,6 +777,7 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
     {
       Query query = dataSession.createQuery("from TestParticipant where connectionLabel = ?");
       query.setParameter(0, connectionLabel);
+      @SuppressWarnings("unchecked")
       List<TestParticipant> testParticipantList = query.list();
       if (testParticipantList.size() > 0)
       {
@@ -867,7 +880,6 @@ public class RecordServlet extends BaseServlet implements RecordServletInterface
   {
     HttpSession webSession = setup(req, resp);
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
-    Session dataSession = userSession.getDataSession();
     PrintWriter out = userSession.getOut();
     createHeader(webSession);
     out.println("<form method=\"POST\" action=\"record\">");

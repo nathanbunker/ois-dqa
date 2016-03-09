@@ -13,7 +13,6 @@ import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
-import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
@@ -26,8 +25,8 @@ public class QFForecaster extends PentagonBoxHelper
   @Override
   public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
-    List<TestMessage> failList = new ArrayList();
-    List<TestMessage> passList = new ArrayList();
+    List<TestMessage> failList = new ArrayList<TestMessage>();
+    List<TestMessage> passList = new ArrayList<TestMessage>();
 
     List<TestMessage> testMessageList = getTestMessages(dataSession, pentagonReport);
     for (TestMessage testMessage : testMessageList)
@@ -111,6 +110,7 @@ public class QFForecaster extends PentagonBoxHelper
               + "when queried.</p>");
   }
   
+  @SuppressWarnings("unchecked")
   private List<TestMessage> getTestMessages(Session dataSession, PentagonReport pentagonReport)
   {
     Map<String, TestSection> testSectionMap =  pentagonReport.getTestSectionMap();

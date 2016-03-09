@@ -7,7 +7,8 @@ import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
 
 public class ApplicationLogic {
-	public static List<Application> getApplications(Session dataSession) {
+	@SuppressWarnings("unchecked")
+  public static List<Application> getApplications(Session dataSession) {
 		Query query = dataSession.createQuery("from Application");
 		return query.list();
 	}

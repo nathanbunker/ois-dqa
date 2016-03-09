@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
+@SuppressWarnings("serial")
 public class ReportUser implements Serializable
 {
   private int reportUserId = 0;

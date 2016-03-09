@@ -2,20 +2,19 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Session;
-import org.openimmunizationsoftware.dqa.cm.model.Application;
 import org.openimmunizationsoftware.dqa.cm.model.CodeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
+import org.openimmunizationsoftware.dqa.cm.model.UserLog;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 
+@SuppressWarnings("serial")
 public class UserSession implements Serializable
 {
   private User user = null;
@@ -32,6 +31,28 @@ public class UserSession implements Serializable
   private transient ProfileUsage profileUsageSelected = null;
   private transient UserActivity userActivity = new UserActivity();
   private transient UserSearchOptions userSearchOptions = null;
+  private transient UserLog userLog = null;
+  private transient boolean headerCreated = false;
+  
+  public boolean isHeaderCreated()
+  {
+    return headerCreated;
+  }
+
+  public void setHeaderCreated(boolean headerCreated)
+  {
+    this.headerCreated = headerCreated;
+  }
+
+  public UserLog getUserLog()
+  {
+    return userLog;
+  }
+
+  public void setUserLog(UserLog userLog)
+  {
+    this.userLog = userLog;
+  }
 
   public UserSearchOptions getUserSearchOptions()
   {

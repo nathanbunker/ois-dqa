@@ -15,6 +15,7 @@ public class ReleaseVersionLogic
   {
     Query query = dataSession.createQuery("from ReleaseVersion where releaseStatusString = ? order by majorVersionNum desc, minorVersionNum desc");
     query.setParameter(0, ReleaseStatus.CURRENT.getId());
+    @SuppressWarnings("unchecked")
     List<ReleaseVersion> releaseVersionList = query.list();
     if (releaseVersionList.size() > 0)
     {
@@ -29,6 +30,7 @@ public class ReleaseVersionLogic
     ReleaseVersion releaseVersion = null;
     Query query = dataSession.createQuery("from ReleaseVersion where releaseStatusString = ? order by majorVersionNum desc, minorVersionNum desc");
     query.setParameter(0, ReleaseStatus.PROPOSED.getId());
+    @SuppressWarnings("unchecked")
     List<ReleaseVersion> releaseVersionList = query.list();
     if (releaseVersionList.size() > 0)
     {
@@ -46,6 +48,7 @@ public class ReleaseVersionLogic
   {
     Query query = dataSession.createQuery("from ReleaseVersion where releaseStatusString = ? order by majorVersionNum desc, minorVersionNum desc");
     query.setParameter(0, releaseStatus.getId());
+    @SuppressWarnings("unchecked")
     List<ReleaseVersion> releaseVersionList = query.list();
     return releaseVersionList;
   }
@@ -53,6 +56,7 @@ public class ReleaseVersionLogic
   public static List<ReleaseVersion> getReleaseVersions(Session dataSession)
   {
     Query query = dataSession.createQuery("from ReleaseVersion order by majorVersionNum desc, minorVersionNum desc");
+    @SuppressWarnings("unchecked")
     List<ReleaseVersion> releaseVersionList = query.list();
     return releaseVersionList;
   }

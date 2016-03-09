@@ -3,6 +3,8 @@ package org.openimmunizationsoftware.dqa.cm.servlet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +23,7 @@ import org.openimmunizationsoftware.dqa.cm.CentralControl;
 import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.HashManager;
+import org.openimmunizationsoftware.dqa.cm.logic.MailManager;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
@@ -30,8 +33,10 @@ import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
+import org.openimmunizationsoftware.dqa.cm.model.UserLog;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
 
+@SuppressWarnings("serial")
 public abstract class BaseServlet extends HttpServlet
 {
 
@@ -47,6 +52,8 @@ public abstract class BaseServlet extends HttpServlet
   private String servletTitle = "";
   private static String systemWideMessage = "";
   private static Set<UserActivity> userActivitySet = new HashSet<UserActivity>();
+
+  private static final String ERROR_EMAIL = "nbunker@immregistries.org";
 
   public static Set<UserActivity> getUserActivitySet()
   {
@@ -108,7 +115,24 @@ public abstract class BaseServlet extends HttpServlet
       userActivity.setLastWebRequestTimeMillis(System.currentTimeMillis());
       userActivitySet.remove(userActivity);
       userActivitySet.add(userActivity);
+      UserLog userLog = new UserLog();
+      userLog.setUser(userSession.getUser());
+      userLog.setStartTime(new Date());
+      userLog.setServletName(req.getRequestURI());
+      @SuppressWarnings("unchecked")
+      Enumeration<String> e = req.getParameterNames();
+      while (e.hasMoreElements())
+      {
+        String name = e.nextElement();
+        String[] values = req.getParameterValues(name);
+        for (String value : values)
+        {
+          userLog.addRequestParameters(name, value);
+        }
+      }
+      userSession.setUserLog(userLog);
     }
+    userSession.setHeaderCreated(false);
     resp.setContentType("text/html");
     return webSession;
   }
@@ -122,6 +146,7 @@ public abstract class BaseServlet extends HttpServlet
       userSession = initUserSession(webSession);
     }
     userSession.getDataSession().clear();
+    userSession.setHeaderCreated(false);
     return webSession;
   }
 
@@ -204,13 +229,41 @@ public abstract class BaseServlet extends HttpServlet
   {
     return Integer.parseInt(req.getParameter(param));
   }
-
+  
   protected void createHeader(HttpSession webSession)
   {
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
     Session dataSession = userSession.getDataSession();
     Application defaultApplication = (Application) dataSession.get(Application.class, 1);
     createHeader(webSession, defaultApplication);
+  }
+
+  protected void handleError(Throwable e, HttpSession webSession)
+  {
+    e.printStackTrace();
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    if (userSession != null)
+    {
+      PrintWriter out = userSession.getOut();
+      if (out != null)
+      {
+        if (!userSession.isHeaderCreated())
+        {
+          createHeader(webSession);
+        }
+        out.println("<div class=\"leftColumn\">");
+        out.println("<h2>Oops!</h2>");
+        out.println("<p>Our apologies, an unexpected internal problem ocurred. Information about the problem "
+            + "has been sent for review by the technical support system. "
+            + "We are sorry for the inconvience but your request could not be completed. </p>");
+        out.println("</div>");
+      }
+      if (userSession.getUserLog() != null)
+      {
+        userSession.getUserLog().setException(e);
+      }
+    }
+
   }
 
   protected void createHeader(HttpSession webSession, Application defaultApplication)
@@ -309,13 +362,12 @@ public abstract class BaseServlet extends HttpServlet
       userSession.setMessageConfirmation(null);
     }
     out.println("    <div class=\"contents\">");
-
+    userSession.setHeaderCreated(true);
   }
 
   protected void createHeaderForGuide(HttpSession webSession)
   {
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
-    Session dataSession = userSession.getDataSession();
     PrintWriter out = userSession.getOut();
     out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">");
     out.println("<html>");
@@ -344,11 +396,60 @@ public abstract class BaseServlet extends HttpServlet
     {
       PrintWriter out = userSession.getOut();
       out.println("    </div>");
+      out.println("    <span class=\"cmVersion\">Software Version " + SoftwareVersion.VERSION + "</span>");
       out.println("  </body>");
       out.println("</html>");
       out.close();
       out = null;
+      try
+      {
+        if (userSession.getUserLog() != null)
+        {
+          Session dataSession = userSession.getDataSession();
+          UserLog userLog = userSession.getUserLog();
+          if (dataSession != null)
+          {
+            Transaction trans = dataSession.beginTransaction();
+            userLog.setEndTime(new Date());
+            userLog.setResponseMs((int) (userLog.getEndTime().getTime() - userLog.getStartTime().getTime()));
+            dataSession.save(userLog);
+            trans.commit();
+          }
+          if (userLog.getException() != null)
+          {
+            Throwable exception = userLog.getException();
+            MailManager mailManager = new MailManager(dataSession);
+            StringBuilder message = new StringBuilder();
+            message.append("<h2>" + exception.getMessage() + "</h2>");
+            message.append("<pre>");
+            message.append(userLog.getExceptionText());
+            message.append("</pre>");
+            message.append("<h2>Other Details</h2>");
+            message.append("<p>User: " + userLog.getUser().getUserName() + " (" + userLog.getUser().getUserId() + ")</p> ");
+            message.append("<p>Servlet: " + userLog.getServletName() + "</p> ");
+            if (userLog.getRequestParameters() != null && userLog.getRequestParameters().length() > 0)
+            {
+              message.append("<p>Parameters: " + userLog.getRequestParameters() + "</p> ");
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a z");
+            message.append("<p>Start Time: " + sdf.format(userLog.getStartTime()) + "</p>");
+            message.append("<p>End Time: " + sdf.format(userLog.getEndTime()) + "</p>");
+            message.append("<p>Elapsed Time (ms): " + userLog.getResponseMs() + "</p>");
+            try
+            {
+              mailManager.sendEmail("AART/DQAcm Exception Occurred", message.toString(), ERROR_EMAIL);
+            } catch (Exception e)
+            {
+              e.printStackTrace();
+            }
+          }
+        }
+      } catch (Exception e)
+      {
+        e.printStackTrace();
+      }
     }
+    userSession.setHeaderCreated(false);
   }
 
   public void printCodeTables(CodeTableInstance codeTableInstance, ReleaseVersion releaseVersion, String baseLink, HttpSession webSession)

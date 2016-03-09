@@ -10,6 +10,7 @@ import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 
 public class CodeTableLogic
 {
+  @SuppressWarnings("unchecked")
   public static List<CodeTableInstance> getCodeTables(ReleaseVersion releaseVersion, Session dataSession)
   {
     List<CodeTableInstance> codeTableInstanceList = null;
@@ -29,6 +30,7 @@ public class CodeTableLogic
     Query query = dataSession.createQuery("from CodeTableInstance where table = ? and release = ?");
     query.setParameter(0, codeTable);
     query.setParameter(1, releaseVersion);
+    @SuppressWarnings("unchecked")
     List<CodeTableInstance> codeTableInstanceList = query.list();
     if (codeTableInstanceList.size() > 0)
     {

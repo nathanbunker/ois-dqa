@@ -33,6 +33,7 @@ public class UserLogic
     return user;
   }
 
+  @SuppressWarnings("unchecked")
   public static List<User> getUserList(Session dataSession)
   {
     List<User> userList;
@@ -51,6 +52,7 @@ public class UserLogic
     return userList;
   }
 
+  @SuppressWarnings("unchecked")
   public static User getUserWithUsername(String userName, Session dataSession)
   {
     Query query = dataSession.createQuery("from User where userName = ?");
@@ -58,6 +60,7 @@ public class UserLogic
     return readUser(dataSession, query.list());
   }
 
+  @SuppressWarnings("unchecked")
   public static User getUserWithEmailAddress(String emailAddress, Session dataSession)
   {
     Query query = dataSession.createQuery("from User where upper(emailAddress) = ?");
@@ -87,6 +90,7 @@ public class UserLogic
       user.getUserSettingMap().clear();
       Query query = dataSession.createQuery("from UserSetting where user = ?");
       query.setParameter(0, user);
+      @SuppressWarnings("unchecked")
       List<UserSetting> userSettingList = query.list();
       for (UserSetting userSetting : userSettingList)
       {
@@ -97,6 +101,7 @@ public class UserLogic
       user.getReportUserMap().clear();
       Query query = dataSession.createQuery("from ReportUser where user = ?");
       query.setParameter(0, user);
+      @SuppressWarnings("unchecked")
       List<ReportUser> reportUserList = query.list();
       for (ReportUser reportUser : reportUserList)
       {
@@ -105,6 +110,7 @@ public class UserLogic
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static List<ApplicationUser> getApplicationUserList(User user, Session dataSession)
   {
     Query query = dataSession.createQuery("from ApplicationUser where user = ?");

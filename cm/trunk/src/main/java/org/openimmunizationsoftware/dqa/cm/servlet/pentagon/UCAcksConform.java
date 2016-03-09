@@ -19,7 +19,6 @@ import org.openimmunizationsoftware.dqa.tr.model.AssertionIdentified;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
-import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UCAcksConform extends PentagonBoxHelper

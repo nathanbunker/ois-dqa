@@ -13,6 +13,7 @@ import org.openimmunizationsoftware.dqa.cm.model.CodeTable;
 public class AttributeAssignedLogic
 {
 
+  @SuppressWarnings("unchecked")
   public static List<AttributeAssigned> getAttributeAssignedList(CodeTable codeTable, Session dataSession)
   {
     List<AttributeAssigned> attributeAssignedList = null;
@@ -27,6 +28,7 @@ public class AttributeAssignedLogic
     return getAttributeAssigned(attributeInstance.getCodeInstance().getTableInstance().getTable(), attributeType, dataSession);
   }
 
+  @SuppressWarnings("unchecked")
   public static AttributeAssigned getAttributeAssigned(CodeTable codeTable, AttributeType attributeType, Session dataSession)
   {
     List<AttributeAssigned> attributeAssignedList = null;

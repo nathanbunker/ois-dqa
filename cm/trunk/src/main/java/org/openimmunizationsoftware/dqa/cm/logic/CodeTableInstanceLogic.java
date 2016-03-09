@@ -14,6 +14,7 @@ public class CodeTableInstanceLogic
   {
     Query query = dataSession.createQuery("from CodeInstance where tableInstance = ?");
     query.setParameter(0, codeTableInstance);
+    @SuppressWarnings("unchecked")
     List<CodeInstance> codeInstanceList = query.list();
     int issueCount = 0;
     for (CodeInstance codeInstance : codeInstanceList)

@@ -175,7 +175,10 @@ a:active.menuLink {text-decoration:none; color: #FFE1AA; }
 	border-color: #3300FF;
 	border-top-style: solid;
 	border-left-style: solid;
-	padding: 2px;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 2px;
+	padding-bottom: 2px;
     background-color: #FFFFCC;
     font-size: small;
 }

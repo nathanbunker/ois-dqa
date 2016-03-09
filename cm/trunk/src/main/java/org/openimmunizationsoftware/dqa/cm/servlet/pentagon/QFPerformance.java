@@ -1,7 +1,6 @@
 package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 
 import java.io.PrintWriter;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -11,7 +10,6 @@ import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
-import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class QFPerformance extends PentagonBoxHelper
 {

@@ -24,6 +24,7 @@ import org.openimmunizationsoftware.dqa.tr.profile.Implementation;
 import org.openimmunizationsoftware.dqa.tr.profile.ProfileCategory;
 import org.openimmunizationsoftware.dqa.tr.profile.Usage;
 
+@SuppressWarnings("serial")
 public class GuideServlet extends HomeServlet
 {
   public static final String PARAM_FIELD_NAME = "fieldName";
@@ -84,6 +85,7 @@ public class GuideServlet extends HomeServlet
         Query query = dataSession.createQuery("from ProfileUsageValue where profileField = ? and profileUsage = ?");
         query.setParameter(0, profileField);
         query.setParameter(1, profileUsage);
+        @SuppressWarnings("unchecked")
         List<ProfileUsageValue> profileUsageValueList = query.list();
         if (profileUsageValueList.size() > 0)
         {
@@ -110,6 +112,7 @@ public class GuideServlet extends HomeServlet
           // must be a segment or data type name
           Query query = dataSession.createQuery("from ProfileField where fieldName = ?");
           query.setParameter(0, fieldName);
+          @SuppressWarnings("unchecked")
           List<ProfileField> profileFieldList = query.list();
           if (profileFieldList.size() > 0)
           {
@@ -232,6 +235,7 @@ public class GuideServlet extends HomeServlet
       out.println("<h4>All IIS Guides</h4>");
       out.println("<ul style=\"font-size: 0.9em; \">");
       Query query = dataSession.createQuery("from ProfileUsage where category = 'IIS' order by label, version");
+      @SuppressWarnings("unchecked")
       List<ProfileUsage> profileUsageList = query.list();
       for (ProfileUsage pu : profileUsageList)
       {
@@ -241,11 +245,12 @@ public class GuideServlet extends HomeServlet
       }
       out.println("</ul>");
       out.println("</div>");
-
-      createFooter(webSession);
+    } catch (Exception e)
+    {
+      handleError(e, webSession);
     } finally
     {
-      out.close();
+      createFooter(webSession);
     }
 
   }
@@ -407,6 +412,7 @@ public class GuideServlet extends HomeServlet
     Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField = ?");
     query.setParameter(0, profileUsage);
     query.setParameter(1, profileField);
+    @SuppressWarnings("unchecked")
     List<ProfileUsageValue> profileUsageValueList = query.list();
     if (profileUsageValueList.size() > 0)
     {

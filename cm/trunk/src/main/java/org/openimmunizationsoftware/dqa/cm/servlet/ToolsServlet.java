@@ -17,6 +17,7 @@ import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 
+@SuppressWarnings("serial")
 public class ToolsServlet extends HomeServlet
 {
 
@@ -45,87 +46,102 @@ public class ToolsServlet extends HomeServlet
       sendToHome(req, resp);
       return;
     }
-    String view = req.getParameter(PARAM_VIEW);
-    if (view == null)
-    {
-      view = VIEW_DEFAULT;
-    }
+    String view = getView(req);
     try
     {
       createHeader(webSession);
       if (view.equals(VIEW_DEFAULT))
       {
-        out.println("<h3>Tools</h3>");
-        out.println("<ul>");
-        out.println("  <li><a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP + "\">Old Dashboard</a></li>");
-        out.println("  <li><a href=\"assertion\">Conformance Assertions</a></li>");
-        out.println("  <li><a href=\"tools?" + HomeServlet.PARAM_VIEW + "=" + VIEW_TEST_CASES + "\">Search Test Cases</a></li>");
-        out.println("</ul>");
+        printDefault(out);
       } else if (view.equals(VIEW_TEST_CASES))
       {
-        String testType = req.getParameter(PARAM_TEST_TYPE);
-        if (testType == null)
-        {
-          testType = "update";
-        }
-        String testCaseCategory = req.getParameter(PARAM_TEST_CASE_CATEGORY);
-        if (testCaseCategory == null)
-        {
-          testCaseCategory = "";
-        }
-        String testSectionType = req.getParameter(PARAM_TEST_SECTION_TYPE);
-        if (testSectionType == null)
-        {
-          testSectionType = "";
-        }
-        out.println("<h3>Search Test Cases</h3>");
-        out.println("<form method=\"GET\" action=\"tools\">");
-        out.println("  Test Type:");
-        out.println("  <input type=\"radio\" name=\"" + PARAM_TEST_TYPE + "\" value=\"update\""
-            + (testType.equals("update") ? " checked=\"true\"" : "") + "/> Update");
-        out.println("  <input type=\"radio\" name=\"" + PARAM_TEST_TYPE + "\" value=\"query\""
-            + (testType.equals("query") ? " checked=\"true\"" : "") + "/> Query<br/>");
-        out.println("  Global Test Id: <input type=\"text\" name=\"" + PARAM_TEST_CASE_CATEGORY + "\" value=\"" + testCaseCategory + "\"/>");
-        out.println("  Global Test Id: <select name=\"" + PARAM_TEST_SECTION_TYPE + "\"/>");
-        out.println("  <br/>");
-        out.println("  <input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_TEST_CASES + "\"/>");
-        out.println("</form>");
-        if (!testCaseCategory.equals(""))
-        {
-          out.println("<table>");
-          out.println("  <caption>Test Messages</caption>");
-          out.println("  <tr>");
-          out.println("    <th>Connection</th>");
-          out.println("    <th>Date</th>");
-          out.println("    <th>Result</th>");
-          out.println("  </tr>");
-          Query query = dataSession.createQuery(
-              "from TestMessage where testCaseCategory = ? and testSection.testConducted.latestTest = 'Y' order by testSection.testConducted.testParticipant.connectionLabel");
-          query.setParameter(0, testCaseCategory);
-          List<TestMessage> testMessageList = query.list();
-          SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-          for (TestMessage testMessage : testMessageList)
-          {
-            TestConducted testConducted = testMessage.getTestSection().getTestConducted();
-            String link = createTestLink(testMessage);
-            out.println("  <tr>");
-            out.println("    <td><a href=\"" + link + "\">" + testConducted.getTestParticipant().getConnectionLabel() + "</a></td>");
-            out.println("    <td>" + sdf.format(testConducted.getTestStartedTime()) + "</td>");
-            out.println("    <td>" + testMessage.getResultStatus() + "</td>");
-            out.println("  </tr>");
-          }
-          out.println("</table>");
-        }
+        printViewTestCases(req, dataSession, out);
       }
-      createFooter(webSession);
     } catch (Exception e)
     {
-      e.printStackTrace();
-      out.println("<pre>");
-      e.printStackTrace(out);
-      out.println("</pre>");
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
     }
-    createFooter(webSession);
+  }
+
+  public void printViewTestCases(HttpServletRequest req, Session dataSession, PrintWriter out) throws UnsupportedEncodingException
+  {
+    String testType = req.getParameter(PARAM_TEST_TYPE);
+    if (testType == null)
+    {
+      testType = "update";
+    }
+    String testCaseCategory = req.getParameter(PARAM_TEST_CASE_CATEGORY);
+    if (testCaseCategory == null)
+    {
+      testCaseCategory = "";
+    }
+    String testSectionType = req.getParameter(PARAM_TEST_SECTION_TYPE);
+    if (testSectionType == null)
+    {
+      testSectionType = "";
+    }
+    out.println("<h3>Search Test Cases</h3>");
+    out.println("<form method=\"GET\" action=\"tools\">");
+    out.println("  Test Type:");
+    out.println("  <input type=\"radio\" name=\"" + PARAM_TEST_TYPE + "\" value=\"update\"" + (testType.equals("update") ? " checked=\"true\"" : "")
+        + "/> Update");
+    out.println("  <input type=\"radio\" name=\"" + PARAM_TEST_TYPE + "\" value=\"query\"" + (testType.equals("query") ? " checked=\"true\"" : "")
+        + "/> Query<br/>");
+    out.println("  Global Test Id: <input type=\"text\" name=\"" + PARAM_TEST_CASE_CATEGORY + "\" value=\"" + testCaseCategory + "\"/>");
+    out.println("  Global Test Id: <select name=\"" + PARAM_TEST_SECTION_TYPE + "\"/>");
+    out.println("  <br/>");
+    out.println("  <input type=\"submit\" name=\"" + PARAM_VIEW + "\" value=\"" + VIEW_TEST_CASES + "\"/>");
+    out.println("</form>");
+    if (!testCaseCategory.equals(""))
+    {
+      out.println("<table>");
+      out.println("  <caption>Test Messages</caption>");
+      out.println("  <tr>");
+      out.println("    <th>Connection</th>");
+      out.println("    <th>Date</th>");
+      out.println("    <th>Result</th>");
+      out.println("  </tr>");
+      Query query = dataSession.createQuery(
+          "from TestMessage where testCaseCategory = ? and testSection.testConducted.latestTest = 'Y' order by testSection.testConducted.testParticipant.connectionLabel");
+      query.setParameter(0, testCaseCategory);
+      @SuppressWarnings("unchecked")
+      List<TestMessage> testMessageList = query.list();
+      SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+      for (TestMessage testMessage : testMessageList)
+      {
+        TestConducted testConducted = testMessage.getTestSection().getTestConducted();
+        String link = createTestLink(testMessage);
+        out.println("  <tr>");
+        out.println("    <td><a href=\"" + link + "\">" + testConducted.getTestParticipant().getConnectionLabel() + "</a></td>");
+        out.println("    <td>" + sdf.format(testConducted.getTestStartedTime()) + "</td>");
+        out.println("    <td>" + testMessage.getResultStatus() + "</td>");
+        out.println("  </tr>");
+      }
+      out.println("</table>");
+    }
+  }
+
+  public void printDefault(PrintWriter out)
+  {
+    out.println("<h3>Tools</h3>");
+    out.println("<ul>");
+    out.println("  <li><a href=\"testReport?" + HomeServlet.PARAM_VIEW + "=" + TestReportServlet.VIEW_MAP + "\">Old Dashboard</a></li>");
+    out.println("  <li><a href=\"assertion\">Conformance Assertions</a></li>");
+    out.println("  <li><a href=\"tools?" + HomeServlet.PARAM_VIEW + "=" + VIEW_TEST_CASES + "\">Search Test Cases</a></li>");
+    out.println("</ul>");
+  }
+
+  public String getView(HttpServletRequest req)
+  {
+    String view = req.getParameter(PARAM_VIEW);
+    if (view == null)
+    {
+      view = VIEW_DEFAULT;
+    }
+    return view;
   }
 
   public String createTestLink(TestMessage testMessage) throws UnsupportedEncodingException

@@ -12,7 +12,6 @@ import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
-import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
@@ -41,6 +40,7 @@ public class CGoodMessage extends PentagonBoxHelper
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
       query.setParameter(1, pentagonReport.getTestConducted());
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
     }
@@ -51,6 +51,7 @@ public class CGoodMessage extends PentagonBoxHelper
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
       query.setParameter(1, pentagonReport.getTestConducted());
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPass(out, testMessageList, userSession);
     }

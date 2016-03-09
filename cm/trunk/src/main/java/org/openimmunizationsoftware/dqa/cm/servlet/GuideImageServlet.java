@@ -1,11 +1,9 @@
 package org.openimmunizationsoftware.dqa.cm.servlet;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.tr.model.ProfileUsage;
 
+@SuppressWarnings("serial")
 public class GuideImageServlet extends HomeServlet
 {
 

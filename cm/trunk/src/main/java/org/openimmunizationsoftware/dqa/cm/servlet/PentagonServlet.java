@@ -22,6 +22,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
+@SuppressWarnings("serial")
 public class PentagonServlet extends HomeServlet
 {
 
@@ -35,10 +36,12 @@ public class PentagonServlet extends HomeServlet
   public static final String BOX_NAME_REPORT_SELECT = "_reportSelect";
   public static final String BOX_NAME_TEST_SECTIONS = "_testSections";
 
-  private static final String VIEW_CONFORMANCE1 = "c1";
-
   protected static final String[] DETAILS_SECTIONS = { "Overview", "Data", "HL7", "Conformance", "Preparation", "History", "Comparison" };
   protected static final String[] BOX_DETAILS_SECTIONS = { "Overview", "Details", "Improve", "Calculation", "History", "Comparison" };
+
+  public PentagonServlet() {
+    super("Report");
+  }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
@@ -59,31 +62,27 @@ public class PentagonServlet extends HomeServlet
       sendToHome(req, resp);
       return;
     }
-    String view = req.getParameter(PARAM_VIEW);
-    if (view == null)
-    {
-      view = "";
-    }
-    TestConducted testConducted;
-    {
-      String testConnectedIdString = req.getParameter(PARAM_TEST_CONDUCTED_ID);
-      int testConductedId = Integer.parseInt(testConnectedIdString);
-      testConducted = (TestConducted) dataSession.get(TestConducted.class, testConductedId);
-    }
-    TestParticipant testParticipantSelected = testConducted.getTestParticipant();
-    if (testParticipantSelected == null)
-    {
-      throw new NullPointerException("Test Conducted did not have Test Participant ");
-    }
-    TestMessage testMessageSelected = null;
-    if (req.getParameter(PARAM_TEST_MESSAGE_ID) != null)
-    {
-      testMessageSelected = (TestMessage) dataSession.get(TestMessage.class, Integer.parseInt(req.getParameter(PARAM_TEST_MESSAGE_ID)));
-    }
 
-    PentagonReport pentagonReport = PentagonReportLogic.createOrReturnPentagonReport(testConducted, dataSession);
+    try
+    {
+      TestConducted testConducted = getTestConducted(req, dataSession);
+      TestParticipant testParticipantSelected = getTestParticipantSelected(testConducted);
+      TestMessage testMessageSelected = getTestMessageSelected(req, dataSession);
+      PentagonReport pentagonReport = PentagonReportLogic.createOrReturnPentagonReport(testConducted, dataSession);
+      createHeader(webSession);
+      printPentagonReport(userSession, dataSession, out, testConducted, testParticipantSelected, testMessageSelected, pentagonReport);
+    } catch (Exception e)
+    {
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
+    }
+  }
 
-    createHeader(webSession);
+  public void printPentagonReport(UserSession userSession, Session dataSession, PrintWriter out, TestConducted testConducted,
+      TestParticipant testParticipantSelected, TestMessage testMessageSelected, PentagonReport pentagonReport) throws IOException
+  {
     out.println("<svg xmlns=\"http://www.w3.org/2000/svg\"  width=\"850\" height=\"850\">");
     int[] centerPointBig = { 425, 438 };
     int[][] pointsBig = new int[5][2];
@@ -653,7 +652,60 @@ public class PentagonServlet extends HomeServlet
       out.println("</div>");
     }
 
-    createFooter(webSession);
+    {
+      int posX = 900;
+      int posY = 48;
+      boolean display = testMessageSelected != null;
+      out.println("<div id=\"details\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
+          + "px; width: 850px; background-color: #eeeeee; border-size: 2px; border-style: solid; border-color: #9b0d28; overflow: auto;\">");
+      out.println("<a class=\"pentagonMenuLink\" onclick=\"hideReport('details')\" style=\"float: right;\" href=\"javascript: void(0); \">Close</a>");
+      out.println("<h2 class=\"pentagon\" id=\"detailsTitle\" >Beta Testing Feedback</h2>");
+      out.println("<p class=\"pentagon\">Please note that this report is not complete and needs your feedback so we can make improvements. "
+          + "You may use the information in this report, but you must know that it has limitations: </p>");
+      out.println("<ul>");
+      out.println("  <li>This report shows the results of a testing discovery process which is still evolving and improving. Expect this report to change and improve. </li>");
+      out.println("  <li>The scoring and graphics shown in the report are to focus the reader on aspects that are felt to be most critical. They are not defnitive and subject to revision and improvement as the testing process improves. </li>");
+      out.println("  <li>We need your help to make this report better. Notice a problem? Please tell us!</li>");
+      out.println("</ul>");
+      out.println("<h3 class=\"pentagon\" id=\"detailsTitle\" >Your Comments or Questions</h3>");
+      out.println("<form>");
+      out.println("<textarea name=\"\" cols=\"60\" rows=\"10\"></textarea>");
+      out.println("<br/>");
+      out.println("<input name=\"submit\" type=\"submit\" value=\"Send\" />");
+      out.println("<form>");
+      out.println("</div>");
+    }
+  }
+
+  public TestParticipant getTestParticipantSelected(TestConducted testConducted)
+  {
+    TestParticipant testParticipantSelected = testConducted.getTestParticipant();
+    if (testParticipantSelected == null)
+    {
+      throw new NullPointerException("Test Conducted did not have Test Participant ");
+    }
+    return testParticipantSelected;
+  }
+
+  public TestMessage getTestMessageSelected(HttpServletRequest req, Session dataSession)
+  {
+    TestMessage testMessageSelected = null;
+    if (req.getParameter(PARAM_TEST_MESSAGE_ID) != null)
+    {
+      testMessageSelected = (TestMessage) dataSession.get(TestMessage.class, Integer.parseInt(req.getParameter(PARAM_TEST_MESSAGE_ID)));
+    }
+    return testMessageSelected;
+  }
+
+  public TestConducted getTestConducted(HttpServletRequest req, Session dataSession)
+  {
+    TestConducted testConducted;
+    {
+      String testConnectedIdString = req.getParameter(PARAM_TEST_CONDUCTED_ID);
+      int testConductedId = Integer.parseInt(testConnectedIdString);
+      testConducted = (TestConducted) dataSession.get(TestConducted.class, testConductedId);
+    }
+    return testConducted;
   }
 
   public static void setupAndPrintSmallPentagon(PrintWriter out, PentagonReport pentagonReport, int offsetY, int offsetX)

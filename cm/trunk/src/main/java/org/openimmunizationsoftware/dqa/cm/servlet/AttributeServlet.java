@@ -48,6 +48,7 @@ import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.PositionStatus;
 
+@SuppressWarnings("serial")
 public class AttributeServlet extends HomeServlet
 {
 
@@ -115,231 +116,247 @@ public class AttributeServlet extends HomeServlet
       {
         if (action.equals(ACTION_UPDATE) || action.equals(ACTION_ADD))
         {
-          if (!paramValueNew.equals(""))
-          {
-            AttributeFormat attributeFormat = null;
-            if (attributeInstance != null)
-            {
-              attributeFormat = attributeInstance.getValue().getAttributeType().getAttributeFormat();
-            } else
-            {
-              attributeFormat = attributeType.getAttributeFormat();
-            }
-            switch (attributeFormat) {
-            case CODE_MASTER:
-              // no validation needed, should be in drop down
-              break;
-            case DATE:
-              SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-              try
-              {
-                sdf.setLenient(false);
-                Date date = sdf.parse(paramValueNew);
-                paramValueNew = sdf.format(date);
-              } catch (ParseException pe)
-              {
-                userSession.setMessageError("Invalid date format, must be MM/DD/YYYY");
-              }
-              break;
-            case FREE_TEXT:
-              // No validation needed
-              break;
-            case CODE_TABLE:
-              // No validation needed
-              break;
-            case INTEGER:
-              try
-              {
-                Integer.parseInt(paramValueNew);
-              } catch (NumberFormatException nfe)
-              {
-                userSession.setMessageError("Invalid format, must be a whole number");
-              }
-              break;
-            case LONG_TEXT:
-              // No validation needed
-              break;
-            case SELECT_TEXT:
-              // No validation needed, should be from drop down list
-              break;
-            }
-          }
-
-          if (action.equals(ACTION_ADD))
-          {
-            if (paramValueNew.equals(""))
-            {
-              userSession.setMessageError("Unable to add new code, value was not defined.");
-            } else if (paramCommentTextNew.equals(""))
-            {
-              userSession.setMessageError("Unable to add new code, you did not indicate the reason for your position.");
-            }
-            if (userSession.getMessageError() == null)
-            {
-              AttributeValue attributeValue = new AttributeValue();
-              attributeValue.setAttributeType(attributeType);
-              attributeValue.setCode(codeInstance.getCode());
-              attributeValue.setAttributeValue(paramValueNew);
-              AttributeValueLogic.saveAttributeValue(attributeValue, dataSession);
-
-              AttributeComment attributeComment = new AttributeComment();
-              attributeComment.setValue(attributeValue);
-              attributeComment.setUser(userSession.getUser());
-              attributeComment.setCommentText(paramCommentTextNew);
-              attributeComment.setEntryDate(new Date());
-              attributeComment.setPositionStatus(PositionStatus.FOR);
-              AttributeCommentLogic.saveAttributeComment(attributeComment, dataSession);
-
-              attributeInstance = new AttributeInstance();
-              attributeInstance.setValue(attributeValue);
-              attributeInstance.setCodeInstance(codeInstance);
-              attributeInstance.setAcceptStatus(AcceptStatus.PROPOSED);
-              AttributeInstanceLogic.saveAttributeInstance(attributeInstance, dataSession);
-
-              paramPositionStatus = "";
-              paramCommentText = "";
-              paramValueNew = "";
-              paramCommentTextNew = "";
-            }
-
-          } else if (action.equals(ACTION_UPDATE))
-          {
-            if (userSession.getMessageError() == null)
-            {
-              if (paramPositionStatus.equals(""))
-              {
-                userSession.setMessageError("Unable to update your position, you did not indicate your position.");
-              } else if (paramCommentText.equals(""))
-              {
-                userSession.setMessageError("Unable to update your position, you did not indicate the reason for your position.");
-              } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff") && paramValueNew.equals(""))
-              {
-                userSession.setMessageError("Unable to update your position, you did not indicate the proposed value to use instead. ");
-              } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff")
-                  && paramValueNew.equals(attributeInstance.getValue().getAttributeValue()))
-              {
-                userSession.setMessageError( "Unable to update your position, your proposed value is the same as the current value. ");
-              } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff") && paramCommentTextNew.equals(""))
-              {
-                userSession.setMessageError( "Unable to update new proposed value, you did not indicate the reason for the new proposed value.");
-              } else
-              {
-                AttributeComment attributeComment = new AttributeComment();
-                attributeComment.setValue(attributeInstance.getValue());
-                attributeComment.setUser(userSession.getUser());
-                attributeComment.setCommentText(paramCommentText);
-                attributeComment.setEntryDate(new Date());
-                attributeComment.setPositionStatus(PositionStatus.get(paramPositionStatus));
-                AttributeCommentLogic.saveAttributeComment(attributeComment, dataSession);
-                AttributeInstanceLogic.updateAttributeInstanceAcceptStatus(attributeInstance, dataSession);
-
-                
-                if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff"))
-                {
-                  AttributeValue attributeValueNew = AttributeValueLogic.getAttributeValue(attributeInstance.getValue().getCode(), attributeInstance.getValue().getAttributeType(), paramValueNew,
-                      dataSession);
-                  if (attributeValueNew == null)
-                  {
-                    attributeValueNew = new AttributeValue();
-                    attributeValueNew.setAttributeType(attributeInstance.getValue().getAttributeType());
-                    attributeValueNew.setCode(attributeInstance.getValue().getCode());
-                    attributeValueNew.setAttributeValue(paramValueNew);
-                    AttributeValueLogic.saveAttributeValue(attributeValueNew, dataSession);
-                  }
-                  AttributeInstance attributeInstanceNew = AttributeInstanceLogic.getAttributeInstance(userSession.getReleaseVersion(),
-                      attributeValueNew, dataSession);
-                  if (attributeInstanceNew == null)
-                  {
-                    attributeInstanceNew = new AttributeInstance();
-                    attributeInstanceNew.setValue(attributeValueNew);
-                    attributeInstanceNew.setCodeInstance(codeInstance);
-                    attributeInstanceNew.setAcceptStatus(AcceptStatus.PROPOSED);
-                    AttributeInstanceLogic.saveAttributeInstance(attributeInstanceNew, dataSession);
-                  }
-                  AttributeComment attributeCommentNew = new AttributeComment();
-                  attributeCommentNew.setValue(attributeValueNew);
-                  attributeCommentNew.setUser(userSession.getUser());
-                  attributeCommentNew.setCommentText(paramCommentTextNew);
-                  attributeCommentNew.setEntryDate(new Date());
-                  attributeCommentNew.setPositionStatus(PositionStatus.FOR);
-                  AttributeCommentLogic.saveAttributeComment(attributeCommentNew, dataSession);
-                  AttributeInstanceLogic.updateAttributeInstanceAcceptStatus(attributeInstanceNew, dataSession);
-                }
-                paramPositionStatus = "";
-                paramCommentText = "";
-                paramValueNew = "";
-                paramCommentTextNew = "";
-                CodeInstanceLogic.populateAttributeValueList(codeInstance, dataSession);
-                CodeInstanceLogic.populateTableValuesFromAttributeInstance(codeInstance, dataSession);
-                CodeInstanceLogic.updateCodeInstance(codeInstance, dataSession);
-                CentralControl.getUpdateCountThread(dataSession).addItem(codeInstance.getCodeInstanceId());
-              }
-            }
-          }
+          attributeInstance = doAddOrUpdate(userSession, dataSession, codeInstance, attributeInstance, attributeType, action);
         }
       }
       createHeader(webSession);
 
       if (attributeInstance == null)
       {
-
-        out.println("<div class=\"leftColumn\">");
-        printTopBoxForCode(codeInstance, userSession);
-        printCodeAttributes(codeInstance, attributeInstance, attributeType, "attribute?", userSession);
-        out.println("</div>");
-
-        out.println("<div class=\"centerColumn\">");
-
-        out.println("<div class=\"topBox\">");
-        out.println("  <form action=\"attribute\" method=\"POST\">");
-        out.println("  <input type=\"hidden\" name=\"" + PARAM_ATTRIBUTE_TYPE_ID + "\" value=\"" + attributeType.getAttributeTypeId() + "\"/>");
-        out.println("  <input type=\"hidden\" name=\"" + PARAM_CODE_INSTANCE_ID + "\" value=\"" + codeInstance.getCodeInstanceId() + "\"/>");
-
-        out.println("    <table width=\"100%\">");
-        out.println("      <caption>Add " + attributeType.getAttributeLabel() + "</caption>");
-        printProposedValueAndBecause(paramValueNew, attributeType, "", userSession);
-        out.println("    <tr>");
-        out.println("      <td colspan=\"2\"><span class=\"formButtonFloat\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
-            + ACTION_ADD + "\"/></span></td>");
-        out.println("    </tr>");
-        out.println("    </table>");
-        out.println("  </form>");
-        out.println("</div>");
-        // printTopBoxForComments(attributeInstance);
-        // printComments(attributeInstance);
-
-        out.println("</div>");
-
-        out.println("<div class=\"rightColumn\">");
-        // printTopBoxForCommentPosition(attributeInstance);
-        // printCommentForm(attributeInstance, req);
-        out.println("</div>");
+        printNoAttributeInstance(userSession, out, codeInstance, attributeInstance, attributeType);
       } else
       {
-        out.println("<div class=\"leftColumn\">");
-        printTopBoxForCode(codeInstance, userSession);
-        printCodeAttributes(codeInstance, attributeInstance, null, "attribute?", userSession);
-        out.println("</div>");
-
-        out.println("<div class=\"centerColumn\">");
-        printTopBoxForComments(attributeInstance, userSession);
-        printComments(attributeInstance, userSession);
-
-        out.println("</div>");
-
-        out.println("<div class=\"rightColumn\">");
-        printTopBoxForCommentPosition(attributeInstance, userSession);
-        printCommentForm(attributeInstance, req, userSession);
-        out.println("</div>");
+        printAttributeInstance(req, userSession, out, codeInstance, attributeInstance);
       }
     } catch (Exception e)
     {
-      e.printStackTrace();
-      out.println("<pre>");
-      e.printStackTrace(out);
-      out.println("</pre>");
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
     }
-    createFooter(webSession);
+  }
+
+  public void printAttributeInstance(HttpServletRequest req, UserSession userSession, PrintWriter out, CodeInstance codeInstance,
+      AttributeInstance attributeInstance)
+  {
+    out.println("<div class=\"leftColumn\">");
+    printTopBoxForCode(codeInstance, userSession);
+    printCodeAttributes(codeInstance, attributeInstance, null, "attribute?", userSession);
+    out.println("</div>");
+
+    out.println("<div class=\"centerColumn\">");
+    printTopBoxForComments(attributeInstance, userSession);
+    printComments(attributeInstance, userSession);
+
+    out.println("</div>");
+
+    out.println("<div class=\"rightColumn\">");
+    printTopBoxForCommentPosition(attributeInstance, userSession);
+    printCommentForm(attributeInstance, req, userSession);
+    out.println("</div>");
+  }
+
+  public void printNoAttributeInstance(UserSession userSession, PrintWriter out, CodeInstance codeInstance, AttributeInstance attributeInstance,
+      AttributeType attributeType)
+  {
+    out.println("<div class=\"leftColumn\">");
+    printTopBoxForCode(codeInstance, userSession);
+    printCodeAttributes(codeInstance, attributeInstance, attributeType, "attribute?", userSession);
+    out.println("</div>");
+
+    out.println("<div class=\"centerColumn\">");
+
+    out.println("<div class=\"topBox\">");
+    out.println("  <form action=\"attribute\" method=\"POST\">");
+    out.println("  <input type=\"hidden\" name=\"" + PARAM_ATTRIBUTE_TYPE_ID + "\" value=\"" + attributeType.getAttributeTypeId() + "\"/>");
+    out.println("  <input type=\"hidden\" name=\"" + PARAM_CODE_INSTANCE_ID + "\" value=\"" + codeInstance.getCodeInstanceId() + "\"/>");
+
+    out.println("    <table width=\"100%\">");
+    out.println("      <caption>Add " + attributeType.getAttributeLabel() + "</caption>");
+    printProposedValueAndBecause(paramValueNew, attributeType, "", userSession);
+    out.println("    <tr>");
+    out.println("      <td colspan=\"2\"><span class=\"formButtonFloat\"><input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_ADD
+        + "\"/></span></td>");
+    out.println("    </tr>");
+    out.println("    </table>");
+    out.println("  </form>");
+    out.println("</div>");
+    // printTopBoxForComments(attributeInstance);
+    // printComments(attributeInstance);
+
+    out.println("</div>");
+
+    out.println("<div class=\"rightColumn\">");
+    // printTopBoxForCommentPosition(attributeInstance);
+    // printCommentForm(attributeInstance, req);
+    out.println("</div>");
+  }
+
+  public AttributeInstance doAddOrUpdate(UserSession userSession, Session dataSession, CodeInstance codeInstance, AttributeInstance attributeInstance,
+      AttributeType attributeType, String action)
+  {
+    if (!paramValueNew.equals(""))
+    {
+      AttributeFormat attributeFormat = null;
+      if (attributeInstance != null)
+      {
+        attributeFormat = attributeInstance.getValue().getAttributeType().getAttributeFormat();
+      } else
+      {
+        attributeFormat = attributeType.getAttributeFormat();
+      }
+      switch (attributeFormat) {
+      case CODE_MASTER:
+        // no validation needed, should be in drop down
+        break;
+      case DATE:
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        try
+        {
+          sdf.setLenient(false);
+          Date date = sdf.parse(paramValueNew);
+          paramValueNew = sdf.format(date);
+        } catch (ParseException pe)
+        {
+          userSession.setMessageError("Invalid date format, must be MM/DD/YYYY");
+        }
+        break;
+      case FREE_TEXT:
+        // No validation needed
+        break;
+      case CODE_TABLE:
+        // No validation needed
+        break;
+      case INTEGER:
+        try
+        {
+          Integer.parseInt(paramValueNew);
+        } catch (NumberFormatException nfe)
+        {
+          userSession.setMessageError("Invalid format, must be a whole number");
+        }
+        break;
+      case LONG_TEXT:
+        // No validation needed
+        break;
+      case SELECT_TEXT:
+        // No validation needed, should be from drop down list
+        break;
+      }
+    }
+
+    if (action.equals(ACTION_ADD))
+    {
+      if (paramValueNew.equals(""))
+      {
+        userSession.setMessageError("Unable to add new code, value was not defined.");
+      } else if (paramCommentTextNew.equals(""))
+      {
+        userSession.setMessageError("Unable to add new code, you did not indicate the reason for your position.");
+      }
+      if (userSession.getMessageError() == null)
+      {
+        AttributeValue attributeValue = new AttributeValue();
+        attributeValue.setAttributeType(attributeType);
+        attributeValue.setCode(codeInstance.getCode());
+        attributeValue.setAttributeValue(paramValueNew);
+        AttributeValueLogic.saveAttributeValue(attributeValue, dataSession);
+
+        AttributeComment attributeComment = new AttributeComment();
+        attributeComment.setValue(attributeValue);
+        attributeComment.setUser(userSession.getUser());
+        attributeComment.setCommentText(paramCommentTextNew);
+        attributeComment.setEntryDate(new Date());
+        attributeComment.setPositionStatus(PositionStatus.FOR);
+        AttributeCommentLogic.saveAttributeComment(attributeComment, dataSession);
+
+        attributeInstance = new AttributeInstance();
+        attributeInstance.setValue(attributeValue);
+        attributeInstance.setCodeInstance(codeInstance);
+        attributeInstance.setAcceptStatus(AcceptStatus.PROPOSED);
+        AttributeInstanceLogic.saveAttributeInstance(attributeInstance, dataSession);
+
+        paramPositionStatus = "";
+        paramCommentText = "";
+        paramValueNew = "";
+        paramCommentTextNew = "";
+      }
+
+    } else if (action.equals(ACTION_UPDATE))
+    {
+      if (userSession.getMessageError() == null)
+      {
+        if (paramPositionStatus.equals(""))
+        {
+          userSession.setMessageError("Unable to update your position, you did not indicate your position.");
+        } else if (paramCommentText.equals(""))
+        {
+          userSession.setMessageError("Unable to update your position, you did not indicate the reason for your position.");
+        } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff") && paramValueNew.equals(""))
+        {
+          userSession.setMessageError("Unable to update your position, you did not indicate the proposed value to use instead. ");
+        } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff")
+            && paramValueNew.equals(attributeInstance.getValue().getAttributeValue()))
+        {
+          userSession.setMessageError("Unable to update your position, your proposed value is the same as the current value. ");
+        } else if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff") && paramCommentTextNew.equals(""))
+        {
+          userSession.setMessageError("Unable to update new proposed value, you did not indicate the reason for the new proposed value.");
+        } else
+        {
+          AttributeComment attributeComment = new AttributeComment();
+          attributeComment.setValue(attributeInstance.getValue());
+          attributeComment.setUser(userSession.getUser());
+          attributeComment.setCommentText(paramCommentText);
+          attributeComment.setEntryDate(new Date());
+          attributeComment.setPositionStatus(PositionStatus.get(paramPositionStatus));
+          AttributeCommentLogic.saveAttributeComment(attributeComment, dataSession);
+          AttributeInstanceLogic.updateAttributeInstanceAcceptStatus(attributeInstance, dataSession);
+
+          if (paramPositionStatus.equals(PositionStatus.AGAINST.getId()) && paramChangeTo.equals("Diff"))
+          {
+            AttributeValue attributeValueNew = AttributeValueLogic.getAttributeValue(attributeInstance.getValue().getCode(),
+                attributeInstance.getValue().getAttributeType(), paramValueNew, dataSession);
+            if (attributeValueNew == null)
+            {
+              attributeValueNew = new AttributeValue();
+              attributeValueNew.setAttributeType(attributeInstance.getValue().getAttributeType());
+              attributeValueNew.setCode(attributeInstance.getValue().getCode());
+              attributeValueNew.setAttributeValue(paramValueNew);
+              AttributeValueLogic.saveAttributeValue(attributeValueNew, dataSession);
+            }
+            AttributeInstance attributeInstanceNew = AttributeInstanceLogic.getAttributeInstance(userSession.getReleaseVersion(), attributeValueNew,
+                dataSession);
+            if (attributeInstanceNew == null)
+            {
+              attributeInstanceNew = new AttributeInstance();
+              attributeInstanceNew.setValue(attributeValueNew);
+              attributeInstanceNew.setCodeInstance(codeInstance);
+              attributeInstanceNew.setAcceptStatus(AcceptStatus.PROPOSED);
+              AttributeInstanceLogic.saveAttributeInstance(attributeInstanceNew, dataSession);
+            }
+            AttributeComment attributeCommentNew = new AttributeComment();
+            attributeCommentNew.setValue(attributeValueNew);
+            attributeCommentNew.setUser(userSession.getUser());
+            attributeCommentNew.setCommentText(paramCommentTextNew);
+            attributeCommentNew.setEntryDate(new Date());
+            attributeCommentNew.setPositionStatus(PositionStatus.FOR);
+            AttributeCommentLogic.saveAttributeComment(attributeCommentNew, dataSession);
+            AttributeInstanceLogic.updateAttributeInstanceAcceptStatus(attributeInstanceNew, dataSession);
+          }
+          paramPositionStatus = "";
+          paramCommentText = "";
+          paramValueNew = "";
+          paramCommentTextNew = "";
+          CodeInstanceLogic.populateAttributeValueList(codeInstance, dataSession);
+          CodeInstanceLogic.populateTableValuesFromAttributeInstance(codeInstance, dataSession);
+          CodeInstanceLogic.updateCodeInstance(codeInstance, dataSession);
+          CentralControl.getUpdateCountThread(dataSession).addItem(codeInstance.getCodeInstanceId());
+        }
+      }
+    }
+    return attributeInstance;
   }
 
   public void populateTableValuesFromAttributeInstance(CodeInstance codeInstance, UserSession userSession)
@@ -452,8 +469,8 @@ public class AttributeServlet extends HomeServlet
     out.println("  --> ");
     out.println("</script>");
     out.println("<form action=\"attribute\" method=\"POST\">");
-    out.println("  <input type=\"hidden\" name=\"" + PARAM_ATTRIBUTE_INSTANCE_ID + "\" value=\"" + attributeInstance.getAttributeInstanceId()
-        + "\"/>");
+    out.println(
+        "  <input type=\"hidden\" name=\"" + PARAM_ATTRIBUTE_INSTANCE_ID + "\" value=\"" + attributeInstance.getAttributeInstanceId() + "\"/>");
     out.println("  <table width=\"100%\">");
     out.println("    <caption>Edit " + at.getAttributeLabel() + "</caption>");
     out.println("    <tr>");
@@ -620,7 +637,8 @@ public class AttributeServlet extends HomeServlet
   public void printTopBoxForCommentPosition(AttributeInstance attributeInstance, UserSession userSession)
   {
     PrintWriter out = userSession.getOut();
-    List<AttributeComment> attributeCommentList = AttributeCommentLogic.getAttributeCommentMostRecentList(attributeInstance, userSession.getDataSession());
+    List<AttributeComment> attributeCommentList = AttributeCommentLogic.getAttributeCommentMostRecentList(attributeInstance,
+        userSession.getDataSession());
     out.println("<div class=\"topBox\">");
     out.println("  <table width=\"100%\">");
     out.println("    <caption>Position Summary</caption>");

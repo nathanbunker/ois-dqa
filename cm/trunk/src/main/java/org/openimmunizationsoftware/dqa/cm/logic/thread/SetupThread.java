@@ -1,32 +1,48 @@
 package org.openimmunizationsoftware.dqa.cm.logic.thread;
 
-import java.util.ArrayList;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_CHANGE_PRIORITY;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_CODE_LABEL;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_CODE_STATUS;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_CODE_TABLE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_CONCEPT_TYPE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_CONTEXT_CODE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_CVX_CODE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_FIELD_VALUE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_HL7_CODE_TABLE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_HL7_ERROR_CODE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_HL7_REFERENCE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_INCLUSION_STATUS;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_INDICATES_TABLE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_ISSUE_DESCRIPTION;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_ISSUE_TYPE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_LICENSED_USE_START_DATE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_LICENSED_VALID_END_DATE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_LICENSED_VALID_START_DATE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_MVX_CODE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_REPORT_DENOMINATOR;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_TARGET_FIELD;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_TARGET_OBJECT;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_TEST_AGE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_USE_MONTH_END;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_USE_MONTH_START;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_USE_VALUE;
+import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.AT_lICENSED_USE_END_DATE;
 
-import java.util.Date;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeInstanceLogic;
-import org.openimmunizationsoftware.dqa.cm.model.AcceptStatus;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeAssigned;
-import org.openimmunizationsoftware.dqa.cm.model.AttributeComment;
-import org.openimmunizationsoftware.dqa.cm.model.AttributeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeStatus;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeType;
-import org.openimmunizationsoftware.dqa.cm.model.AttributeValue;
 import org.openimmunizationsoftware.dqa.cm.model.CodeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.CodeMaster;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTable;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
-import org.openimmunizationsoftware.dqa.cm.model.PositionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.cm.model.User;
-
-import static org.openimmunizationsoftware.dqa.cm.logic.AttributeTypeLogic.*;
 
 public class SetupThread extends LogicThread
 {
@@ -46,6 +62,7 @@ public class SetupThread extends LogicThread
     {
       Query query = dataSession.createQuery("from CodeTableInstance where release = ? order by tableLabel");
       query.setParameter(0, dataSession.get(ReleaseVersion.class, 1));
+      @SuppressWarnings("unchecked")
       List<CodeTableInstance> codeTableInstanceList = query.list();
 
       out.println("<h1>Running Setup</h2>");
@@ -183,9 +200,11 @@ public class SetupThread extends LogicThread
     {
       query = dataSession.createQuery("from CodeInstance where tableInstance.table = ?");
       query.setParameter(0, codeTable);
+      @SuppressWarnings("unchecked")
       List<CodeInstance> codeInstanceList = query.list();
       query = dataSession.createQuery("from AttributeAssigned where table = ? ");
       query.setParameter(0, codeTable);
+      @SuppressWarnings("unchecked")
       List<AttributeAssigned> attributeAssignedlIst = query.list();
       for (AttributeAssigned attributeAssigned : attributeAssignedlIst)
       {
@@ -207,13 +226,13 @@ public class SetupThread extends LogicThread
 
   public void trimValues(CodeTableInstance codeTableInstance)
   {
-    List<AttributeType> attributeTypeList;
     Query query;
     out.println("<p>Triming values to remove extra spaces in all text values </p>");
     CodeTable codeTable = codeTableInstance.getTable();
     {
       query = dataSession.createQuery("from CodeInstance where tableInstance.table = ?");
       query.setParameter(0, codeTable);
+      @SuppressWarnings("unchecked")
       List<CodeInstance> codeInstanceList = query.list();
       int saveCount = 0;
       for (CodeInstance codeInstance : codeInstanceList)
@@ -250,6 +269,7 @@ public class SetupThread extends LogicThread
     query = dataSession.createQuery("from AttributeAssigned where table = ? and attributeType = ? ");
     query.setParameter(0, codeTable);
     query.setParameter(1, attributeType);
+    @SuppressWarnings("unchecked")
     List<AttributeAssigned> attributeAssignedList = query.list();
     if (attributeAssignedList.size() == 0)
     {

@@ -11,21 +11,15 @@ import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.SoftwareVersion;
-import org.openimmunizationsoftware.dqa.cm.logic.CodeInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableInstanceLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.CodeTableLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.ReleaseVersionLogic;
-import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
-import org.openimmunizationsoftware.dqa.cm.logic.thread.DeleteProposedVersionThread;
-import org.openimmunizationsoftware.dqa.cm.logic.thread.ReleaseNewVersionThread;
-import org.openimmunizationsoftware.dqa.cm.logic.thread.UpdateIssueCountThread;
 import org.openimmunizationsoftware.dqa.cm.model.CodeTableInstance;
 import org.openimmunizationsoftware.dqa.cm.model.InclusionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
-import org.openimmunizationsoftware.dqa.cm.model.User;
-import org.openimmunizationsoftware.dqa.cm.model.UserType;
 
+@SuppressWarnings("serial")
 public class AdminTableServlet extends BaseServlet
 {
   public AdminTableServlet() {
@@ -62,61 +56,91 @@ public class AdminTableServlet extends BaseServlet
       sendToHome(req, resp);
       return;
     }
-    CodeTableInstance codeTableInstance = null;
-    if (req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID) != null)
+    try
     {
-      int codeTableInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID));
-      codeTableInstance = CodeTableInstanceLogic.getCodeTableInstance(codeTableInstanceId, dataSession);
-    }
-    String action = req.getParameter(PARAM_ACTION);
-    if (action != null)
-    {
-      if (action.equals(ACTION_CHANGE_VERSION))
+      CodeTableInstance codeTableInstance = null;
+      if (req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID) != null)
       {
-        int releaseId = readInt(PARAM_RELEASE_ID, req);
-        userSession.setReleaseVersion(ReleaseVersionLogic.getReleaseVersion(releaseId, dataSession));
-      } else if (action.equals(ACTION_UPDATE))
+        int codeTableInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID));
+        codeTableInstance = CodeTableInstanceLogic.getCodeTableInstance(codeTableInstanceId, dataSession);
+      }
+      String action = req.getParameter(PARAM_ACTION);
+      if (action != null)
       {
-        if (req.getParameter(PARAM_TABLE_LABEL).equals(""))
+        if (action.equals(ACTION_CHANGE_VERSION))
         {
-          userSession.setMessageError("Table label must be specified");
-        } else
+          int releaseId = readInt(PARAM_RELEASE_ID, req);
+          userSession.setReleaseVersion(ReleaseVersionLogic.getReleaseVersion(releaseId, dataSession));
+        } else if (action.equals(ACTION_UPDATE))
         {
-          codeTableInstance.setTableLabel(req.getParameter(PARAM_TABLE_LABEL));
-          codeTableInstance.setEnforceUniqe(req.getParameter(PARAM_ENFORCE_UNIQUE) != null);
+          if (req.getParameter(PARAM_TABLE_LABEL).equals(""))
+          {
+            userSession.setMessageError("Table label must be specified");
+          } else
+          {
+            codeTableInstance.setTableLabel(req.getParameter(PARAM_TABLE_LABEL));
+            codeTableInstance.setEnforceUniqe(req.getParameter(PARAM_ENFORCE_UNIQUE) != null);
+            CodeTableInstanceLogic.updateCodeTableInstance(codeTableInstance, dataSession);
+          }
+        } else if (action.equals(ACTION_INCLUDE))
+        {
+          codeTableInstance.setInclusionStatus(InclusionStatus.INCLUDE);
+          CodeTableInstanceLogic.updateCodeTableInstance(codeTableInstance, dataSession);
+        } else if (action.equals(ACTION_REMOVE))
+        {
+          codeTableInstance.setInclusionStatus(InclusionStatus.REMOVE);
+          CodeTableInstanceLogic.updateCodeTableInstance(codeTableInstance, dataSession);
+        } else if (action.equals(ACTION_PROPOSE_INCUDE))
+        {
+          codeTableInstance.setInclusionStatus(InclusionStatus.PROPOSED_INCLUDE);
+          CodeTableInstanceLogic.updateCodeTableInstance(codeTableInstance, dataSession);
+        } else if (action.equals(ACTION_PROPOSE_REMOVE))
+        {
+          codeTableInstance.setInclusionStatus(InclusionStatus.PROPOSED_REMOVE);
           CodeTableInstanceLogic.updateCodeTableInstance(codeTableInstance, dataSession);
         }
-      } else if (action.equals(ACTION_INCLUDE))
-      {
-        codeTableInstance.setInclusionStatus(InclusionStatus.INCLUDE);
-        CodeTableInstanceLogic.updateCodeTableInstance(codeTableInstance, dataSession);
-      } else if (action.equals(ACTION_REMOVE))
-      {
-        codeTableInstance.setInclusionStatus(InclusionStatus.REMOVE);
-        CodeTableInstanceLogic.updateCodeTableInstance(codeTableInstance, dataSession);
-      } else if (action.equals(ACTION_PROPOSE_INCUDE))
-      {
-        codeTableInstance.setInclusionStatus(InclusionStatus.PROPOSED_INCLUDE);
-        CodeTableInstanceLogic.updateCodeTableInstance(codeTableInstance, dataSession);
-      } else if (action.equals(ACTION_PROPOSE_REMOVE))
-      {
-        codeTableInstance.setInclusionStatus(InclusionStatus.PROPOSED_REMOVE);
-        CodeTableInstanceLogic.updateCodeTableInstance(codeTableInstance, dataSession);
       }
-    }
 
-    createHeader(webSession);
+      createHeader(webSession);
 
-    out.println("<div class=\"leftColumn\">");
+      out.println("<div class=\"leftColumn\">");
 
-    List<ReleaseVersion> releaseVersionList = ReleaseVersionLogic.getReleaseVersions(ReleaseStatus.PROPOSED, dataSession);
-    ReleaseVersion releaseVersion = userSession.getReleaseVersion();
-    if (releaseVersion.getReleaseStatus() != ReleaseStatus.PROPOSED)
+      List<ReleaseVersion> releaseVersionList = ReleaseVersionLogic.getReleaseVersions(ReleaseStatus.PROPOSED, dataSession);
+      ReleaseVersion releaseVersion = userSession.getReleaseVersion();
+      if (releaseVersion.getReleaseStatus() != ReleaseStatus.PROPOSED)
+      {
+        releaseVersion = releaseVersionList.get(0);
+      }
+
+      out.println("<div class=\"topBox\">");
+      printReleaseVersionForm(dataSession, out, releaseVersion);
+      out.println("</div>");
+
+      printCodeTables(codeTableInstance, releaseVersion, "adminTable?", webSession);
+      out.println("</div>");
+
+      out.println("<div class=\"centerColumn\">");
+      if (codeTableInstance != null)
+      {
+        printTopBoxForTable(codeTableInstance, userSession);
+      }
+      out.println("</div>");
+
+      out.println("<div class=\"rightColumn\">");
+      out.println("</div>");
+
+      out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
+    } catch (Exception e)
     {
-      releaseVersion = releaseVersionList.get(0);
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
     }
+  }
 
-    out.println("<div class=\"topBox\">");
+  public void printReleaseVersionForm(Session dataSession, PrintWriter out, ReleaseVersion releaseVersion)
+  {
     out.println("  <form action=\"adminTable\" method=\"POST\">");
     out.println("  <table width=\"100%\">");
     out.println("    <caption>Release Version</caption>");
@@ -141,26 +165,6 @@ public class AdminTableServlet extends BaseServlet
     out.println("    </tr>");
     out.println("  </table>");
     out.println("  </form>");
-    out.println("</div>");
-
-    printCodeTables(codeTableInstance, releaseVersion, "adminTable?", webSession);
-    out.println("</div>");
-
-    out.println("<div class=\"centerColumn\">");
-    if (codeTableInstance != null)
-    {
-      printTopBoxForTable(codeTableInstance, userSession);
-
-    }
-    out.println("</div>");
-
-    out.println("<div class=\"rightColumn\">");
-    
-    out.println("</div>");
-
-    out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
-    createFooter(webSession);
-
   }
 
   public void printTopBoxForTable(CodeTableInstance codeTableInstance, UserSession userSession)

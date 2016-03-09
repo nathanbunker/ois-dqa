@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +28,7 @@ import org.openimmunizationsoftware.dqa.cm.model.ReleaseStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
 import org.openimmunizationsoftware.dqa.tr.profile.ProfileManager;
 
+@SuppressWarnings("serial")
 public class AdminServlet extends BaseServlet
 {
   public AdminServlet() {
@@ -45,7 +45,7 @@ public class AdminServlet extends BaseServlet
   public static final String PARAM_RELEASE_ID = "releaseId";
   public static final String PARAM_CDC_TEXT = "cdcText";
   public static final String PARAM_SYSTEM_WIDE_MESSAGE = "systemWideMessage";
-
+  
   public static final String ACTION_LOAD_CODES = "Load Codes";
   public static final String ACTION_RELEASE_VERSION = "Release Version";
   public static final String ACTION_DELETE_VERSION = "Delete Version";
@@ -70,56 +70,61 @@ public class AdminServlet extends BaseServlet
       sendToHome(req, resp);
       return;
     }
-    String action = req.getParameter(PARAM_ACTION);
-    if (action != null)
+    try
     {
-      if (action.equals(ACTION_RELEASE_VERSION) && (releaseNewVersionThread == null || releaseNewVersionThread.isComplete()))
+      String action = req.getParameter(PARAM_ACTION);
+      if (action != null)
       {
-        ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
-        releaseNewVersionThread = new ReleaseNewVersionThread(rv, userSession.getUser());
-        releaseNewVersionThread.start();
-      } else if (action.equals(ACTION_UPDATE_ISSUE_COUNTS) && (updateIssueCountThread == null || updateIssueCountThread.isComplete()))
-      {
-        ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
-        updateIssueCountThread = new UpdateIssueCountThread(rv, userSession.getUser());
-        updateIssueCountThread.start();
-      } else if (action.equals(ACTION_DELETE_VERSION))
-      {
-        ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
-        deleteProposedVersionThread = new DeleteProposedVersionThread(userSession.getUser(), rv);
-        deleteProposedVersionThread.start();
-      } else if (action.equals(ACTION_LOAD_CODES))
-      {
-        CodeTableInstance codeTableInstance = null;
-        if (!req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID).equals(""))
+        if (action.equals(ACTION_RELEASE_VERSION) && (releaseNewVersionThread == null || releaseNewVersionThread.isComplete()))
         {
-          int codeTableInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID));
-          codeTableInstance = CodeTableInstanceLogic.getCodeTableInstance(codeTableInstanceId, dataSession);
-          String data = req.getParameter(PARAM_CDC_TEXT);
-          loadResultList = LoadCdcDataLogic.loadCdcData(codeTableInstance, userSession.getUser(), data, dataSession);
+          releaseVersion(req, userSession, dataSession);
+        } else if (action.equals(ACTION_UPDATE_ISSUE_COUNTS) && (updateIssueCountThread == null || updateIssueCountThread.isComplete()))
+        {
+          updateIssueCounts(req, userSession, dataSession);
+        } else if (action.equals(ACTION_DELETE_VERSION))
+        {
+          deleteVersion(req, userSession, dataSession);
+        } else if (action.equals(ACTION_LOAD_CODES))
+        {
+          loadResultList = loadCodes(req, loadResultList, userSession, dataSession);
+        } else if (action.equals(ACTION_SET_SYSTEM_WIDE_MESSAGE))
+        {
+          setSystemWideMessage(req.getParameter(PARAM_SYSTEM_WIDE_MESSAGE));
+        } else if (action.equals(ACTION_RECTIFY_PROFILE_FIELDS))
+        {
+          ProfileManager.rectifyProfileFields(dataSession);
         }
-      } else if (action.equals(ACTION_SET_SYSTEM_WIDE_MESSAGE))
-      {
-        setSystemWideMessage(req.getParameter(PARAM_SYSTEM_WIDE_MESSAGE));
-      } else if (action.equals(ACTION_RECTIFY_PROFILE_FIELDS))
-      {
-        ProfileManager.rectifyProfileFields(dataSession);
       }
+
+      createHeader(webSession);
+      
+      out.println("<div class=\"leftColumn\">");
+      printUserActivity(userSession, out);
+      out.println("</div>");
+
+      out.println("<div class=\"centerColumn\">");
+      printReleaseMaintenance(out, dataSession);
+      printUpdateCdcTables(out, dataSession);
+      printSystemWideMessageTable(out, dataSession);
+      out.println("</div>");
+
+      out.println("<div class=\"rightColumn\">");
+      printLoadedCodes(loadResultList, out);
+      // out.println("<p><a href=\"setup\">Initial DQAcm Setup</a></p>");
+      out.println("<p><a href=\"admin?action=" + ACTION_RECTIFY_PROFILE_FIELDS + "\">Rectify Profile Field</a></p>");
+      out.println("</div>");
+
+    } catch (Exception e)
+    {
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
     }
+  }
 
-    createHeader(webSession);
-
-    out.println("<div class=\"leftColumn\">");
-    printUserActivity(userSession, out);
-    out.println("</div>");
-
-    out.println("<div class=\"centerColumn\">");
-    printReleaseMaintenance(out, dataSession);
-    printUpdateCdcTables(out, dataSession);
-    printSystemWideMessageTable(out, dataSession);
-    out.println("</div>");
-
-    out.println("<div class=\"rightColumn\">");
+  public void printLoadedCodes(List<LoadResult> loadResultList, PrintWriter out)
+  {
     if (loadResultList != null)
     {
       out.println("<table width=\"100%\">");
@@ -147,13 +152,40 @@ public class AdminServlet extends BaseServlet
       }
       out.println("</table>");
     }
-    // out.println("<p><a href=\"setup\">Initial DQAcm Setup</a></p>");
-    out.println("<p><a href=\"admin?action=" + ACTION_RECTIFY_PROFILE_FIELDS + "\">Rectify Profile Field</a></p>");
-    out.println("</div>");
+  }
 
-    out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
-    createFooter(webSession);
+  public List<LoadResult> loadCodes(HttpServletRequest req, List<LoadResult> loadResultList, UserSession userSession, Session dataSession)
+  {
+    CodeTableInstance codeTableInstance = null;
+    if (!req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID).equals(""))
+    {
+      int codeTableInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID));
+      codeTableInstance = CodeTableInstanceLogic.getCodeTableInstance(codeTableInstanceId, dataSession);
+      String data = req.getParameter(PARAM_CDC_TEXT);
+      loadResultList = LoadCdcDataLogic.loadCdcData(codeTableInstance, userSession.getUser(), data, dataSession);
+    }
+    return loadResultList;
+  }
 
+  public void deleteVersion(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
+    deleteProposedVersionThread = new DeleteProposedVersionThread(userSession.getUser(), rv);
+    deleteProposedVersionThread.start();
+  }
+
+  public void updateIssueCounts(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
+    updateIssueCountThread = new UpdateIssueCountThread(rv, userSession.getUser());
+    updateIssueCountThread.start();
+  }
+
+  public void releaseVersion(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
+    releaseNewVersionThread = new ReleaseNewVersionThread(rv, userSession.getUser());
+    releaseNewVersionThread.start();
   }
 
   public void printUserActivity(UserSession userSession, PrintWriter out)

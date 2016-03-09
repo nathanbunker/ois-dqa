@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.openimmunizationsoftware.dqa.cm.model.Application;
 
+@SuppressWarnings("serial")
 public class AartServlet extends HomeServlet
 {
 
@@ -32,12 +33,11 @@ public class AartServlet extends HomeServlet
       out.println("</div>");
     } catch (Exception e)
     {
-      e.printStackTrace();
-      out.println("<pre>");
-      e.printStackTrace(out);
-      out.println("</pre>");
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
     }
-    createFooter(webSession);
   }
 
 }

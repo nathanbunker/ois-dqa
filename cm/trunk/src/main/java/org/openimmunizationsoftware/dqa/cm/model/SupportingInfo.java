@@ -3,6 +3,7 @@ package org.openimmunizationsoftware.dqa.cm.model;
 import java.io.Serializable;
 import java.util.Date;
 
+@SuppressWarnings("serial")
 public class SupportingInfo implements Serializable
 {
 

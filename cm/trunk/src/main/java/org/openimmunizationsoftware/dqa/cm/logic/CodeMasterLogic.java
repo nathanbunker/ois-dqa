@@ -22,6 +22,7 @@ public class CodeMasterLogic
     Query query = dataSession.createQuery("from CodeMaster where table = ? and codeValue = ?");
     query.setParameter(0, codeTable);
     query.setParameter(1, codeValue);
+    @SuppressWarnings("unchecked")
     List<CodeMaster> codeMasterList = query.list();
     if (codeMasterList.size() > 0)
     {
@@ -34,6 +35,7 @@ public class CodeMasterLogic
   {
     Query query = dataSession.createQuery("from CodeInstance where tableInstance = ? order by codeLabel, code.codeValue");
     query.setParameter(0, codeTableInstance);
+    @SuppressWarnings("unchecked")
     List<CodeInstance> codeInstanceList = query.list();
     return codeInstanceList;
   }
@@ -43,6 +45,7 @@ public class CodeMasterLogic
     Query query = dataSession.createQuery("from CodeInstance where tableInstance = ? and context = ? order by codeLabel, code.codeValue");
     query.setParameter(0, codeTableInstance);
     query.setParameter(1, contextCodeInstance.getCode());
+    @SuppressWarnings("unchecked")
     List<CodeInstance> codeInstanceList = query.list();
     return codeInstanceList;
   }
@@ -78,6 +81,7 @@ public class CodeMasterLogic
     // etc. This gives an effective cap of 1,000 tables with 10,010,000 codes in each. Should be more than enough room.
     Query query = dataSession.createQuery("from CodeMaster where table = ? order by codeId desc");
     query.setParameter(0, codeMaster.getTable());
+    @SuppressWarnings("unchecked")
     List<CodeMaster> codeMasterList = query.list();
     int codeId;
     if (codeMasterList.size() == 0)

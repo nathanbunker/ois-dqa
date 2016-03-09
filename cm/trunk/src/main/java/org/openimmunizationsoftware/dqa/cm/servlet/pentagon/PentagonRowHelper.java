@@ -9,6 +9,7 @@ import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
+@SuppressWarnings("serial")
 public abstract class PentagonRowHelper extends ArrayList<PentagonBoxHelper>
 {
   private PentagonReport pentagonReport = null;

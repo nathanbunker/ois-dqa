@@ -38,6 +38,7 @@ public class CAckConform extends PentagonBoxHelper
         + "Update Conformance below, but with a different purpose and scoring metric and test cases.</p> ");
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
@@ -161,6 +162,7 @@ public class CAckConform extends PentagonBoxHelper
       Query query = dataSession.createQuery("from TestMessage where (testSection = ? or testSection = ?) and testType = 'update' ");
       query.setParameter(0, testSectionBasic);
       query.setParameter(1, testSectionNotAccepted);
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       for (TestMessage testMessage : testMessageList)
       {

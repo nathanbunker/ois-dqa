@@ -2,6 +2,7 @@ package org.openimmunizationsoftware.dqa.cm.model;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class Resource implements Serializable
 {
   private int resourceId = 0;

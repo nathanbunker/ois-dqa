@@ -36,6 +36,7 @@ import org.openimmunizationsoftware.dqa.tr.profile.ProfileFieldType;
 import org.openimmunizationsoftware.dqa.tr.profile.ProfileManager;
 import org.openimmunizationsoftware.dqa.tr.profile.Usage;
 
+@SuppressWarnings("serial")
 public class ProfileServlet extends HomeServlet
 {
 
@@ -73,16 +74,739 @@ public class ProfileServlet extends HomeServlet
       return;
     }
 
-    String action = req.getParameter(PARAM_ACTION);
-    if (action == null)
-    {
-      action = "";
-    }
-
+    String action = getAction(req);
     try
     {
 
-      ProfileUsage profileUsageSelected = null;
+      ProfileUsage profileUsageSelected = getProfileUsageSelected(req, userSession, dataSession);
+      ProfileUsageValue profileUsageValueSelected = null;
+      ProfileField profileFieldSelected = null;
+      if (req.getParameter(PARAM_PROFILE_USAGE_VALUE_ID) != null)
+      {
+        int profileUsageValueId = Integer.parseInt(req.getParameter(PARAM_PROFILE_USAGE_VALUE_ID));
+        profileUsageValueSelected = (ProfileUsageValue) dataSession.get(ProfileUsageValue.class, profileUsageValueId);
+        profileFieldSelected = profileUsageValueSelected.getProfileField();
+        profileUsageSelected = profileUsageValueSelected.getProfileUsage();
+      }
+      profileFieldSelected = getPorfileFieldSelected(req, dataSession, profileFieldSelected);
+      setProfileUsageSelected(userSession, profileUsageSelected);
+      ProfileUsage profileUsageCompare = getProfileUsageCompare(req, dataSession);
+
+      createHeader(webSession);
+      String comparisonType = getComparisonType(req);
+      printCompareProfilesForm(userSession, dataSession, out, profileUsageSelected, profileUsageCompare, comparisonType);
+      String show = getShow(req);
+      if (show.equals(SHOW_COMPARE))
+      {
+        printShow(dataSession, out, profileUsageSelected, profileUsageCompare, comparisonType);
+      } else if (show.equals(SHOW_VIEW))
+      {
+        printView(dataSession, out, profileUsageSelected);
+      } else if (show.equals(SHOW_EDIT))
+      {
+        printEdit(req, dataSession, out, action, profileUsageSelected, profileUsageValueSelected);
+      } else if (show.equals(SHOW_TRANSFORMS))
+      {
+        printTransforms(req, dataSession, out, action, profileFieldSelected);
+      }
+    }
+    catch (Exception e)
+    {
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
+    }
+
+  }
+
+  public void printTransforms(HttpServletRequest req, Session dataSession, PrintWriter out, String action, ProfileField profileFieldSelected)
+      throws IOException
+  {
+    if (profileFieldSelected != null)
+    {
+      TestCaseMessage tcmFull = createTestCaseMessage(SCENARIO_FULL_RECORD_FOR_PROFILING);
+      Transformer transformer = new Transformer();
+      transformer.transform(tcmFull);
+      TestCaseMessage testCaseMessagePresent = ProfileManager.getPresentTestCase(profileFieldSelected, tcmFull);
+      TestCaseMessage testCaseMessageAbsent = ProfileManager.getAbsentTestCase(profileFieldSelected, tcmFull);
+      out.println("<h2>" + profileFieldSelected.getFieldName() + "</h2>");
+      String edit = req.getParameter("edit");
+      if (edit == null)
+      {
+        edit = "";
+      }
+      out.println("<h3>Present Test Case</h3>");
+      if (edit.equals("present"))
+      {
+        if (action.equals("Refresh") || action.equals("Save"))
+        {
+          boolean useTcmFull = req.getParameter("tcmFull") != null;
+          if (useTcmFull)
+          {
+            testCaseMessagePresent = tcmFull;
+            profileFieldSelected.setTransformsPresent(ProfileManager.USE_FULL_TEST_CASE);
+          } else
+          {
+            String additionalTransformations = req.getParameter("additionalTransformations");
+            profileFieldSelected.setTransformsPresent(additionalTransformations);
+            if (testCaseMessagePresent == tcmFull)
+            {
+              testCaseMessagePresent = ProfileManager.getPresentTestCase(profileFieldSelected, tcmFull);
+            } else
+            {
+              testCaseMessagePresent.setAdditionalTransformations(additionalTransformations);
+            }
+          }
+          if (action.equals("Save"))
+          {
+            Transaction transaction = dataSession.beginTransaction();
+            dataSession.update(profileFieldSelected);
+            transaction.commit();
+          }
+        }
+        String transformedMessage = null;
+        String originalMessage = formatMessage(tcmFull.getMessageText());
+        if (testCaseMessagePresent != tcmFull)
+        {
+          transformedMessage = formatMessage(transformer.transformAddition(tcmFull, testCaseMessagePresent.getAdditionalTransformations()));
+        }
+        out.println("<p>Starting Message</p>");
+        if (transformedMessage != null)
+        {
+          out.println("<pre>" + addHovers(showDiff(originalMessage, transformedMessage)) + "</pre>");
+        } else
+        {
+          out.println("<pre>" + originalMessage + "</pre>");
+        }
+        out.println("<p>Transforms</p>");
+        out.println("<form action=\"profile\" method=\"POST\">");
+        out.println("  <textarea name=\"additionalTransformations\" cols=\"70\" rows=\"10\" wrap=\"off\">"
+            + testCaseMessagePresent.getAdditionalTransformations() + "</textarea></td>");
+        out.println("  <br/>");
+        out.println("  <input type=\"checkbox\" name=\"tcmFull\" value=\"true\"" + (testCaseMessagePresent == tcmFull ? " checked" : "")
+            + "/> Use Full Message");
+        out.println("  <input type=\"hidden\" name=\"" + PARAM_SHOW + "\" value=\"" + SHOW_TRANSFORMS + "\"/>");
+        out.println(
+            "  <input type=\"hidden\" name=\"" + PARAM_PROFILE_FIELD_ID + "\" value=\"" + profileFieldSelected.getProfileFieldId() + "\"/>");
+        out.println("  <input type=\"hidden\" name=\"edit\" value=\"present\"/>");
+        out.println("  <br/>");
+        out.println("  <input type=\"submit\" name=\"action\" value=\"Refresh\"/>");
+        out.println("  <input type=\"submit\" name=\"action\" value=\"Save\"/>");
+        out.println("</form>");
+        if (testCaseMessagePresent != tcmFull)
+        {
+          out.println("<p>Final Message</p>");
+          out.println("<pre>" + addHovers(showDiff(transformedMessage, originalMessage)) + "</pre>");
+        }
+      } else
+      {
+        if (testCaseMessagePresent == tcmFull)
+        {
+          out.println("<p>Full Test Case</p>");
+        } else if (!testCaseMessagePresent.hasIssue())
+        {
+          out.println("<p>Not Defined</p>");
+        } else
+        {
+          out.println("<pre>" + testCaseMessagePresent.getAdditionalTransformations() + "</pre>");
+        }
+        String link = "profile?" + PARAM_SHOW + "=" + SHOW_TRANSFORMS + "&" + PARAM_PROFILE_FIELD_ID + "="
+            + profileFieldSelected.getProfileFieldId() + "&edit=present";
+        out.println("<p><a href=\"" + link + "\">Edit</a></p>");
+      }
+      out.println("<h3>Absent Test Case</h3>");
+      if (edit.equals("absent"))
+      {
+        if (action.equals("Refresh") || action.equals("Save"))
+        {
+          boolean useTcmFull = req.getParameter("tcmFull") != null;
+          if (useTcmFull)
+          {
+            testCaseMessagePresent = tcmFull;
+            profileFieldSelected.setTransformsAbsent(ProfileManager.USE_FULL_TEST_CASE);
+          } else
+          {
+            String additionalTransformations = req.getParameter("additionalTransformations");
+            profileFieldSelected.setTransformsAbsent(additionalTransformations);
+            if (testCaseMessageAbsent == tcmFull)
+            {
+              testCaseMessageAbsent = ProfileManager.getAbsentTestCase(profileFieldSelected, tcmFull);
+            } else
+            {
+              testCaseMessageAbsent.setAdditionalTransformations(additionalTransformations);
+            }
+          }
+          if (action.equals("Save"))
+          {
+            Transaction transaction = dataSession.beginTransaction();
+            dataSession.update(profileFieldSelected);
+            transaction.commit();
+          }
+        }
+        String transformedMessage = null;
+        String originalMessage = formatMessage(tcmFull.getMessageText());
+        if (testCaseMessageAbsent != tcmFull)
+        {
+          transformedMessage = formatMessage(transformer.transformAddition(tcmFull, testCaseMessageAbsent.getAdditionalTransformations()));
+        }
+        out.println("<p>Starting Message</p>");
+        if (transformedMessage != null)
+        {
+          out.println("<pre>" + addHovers(showDiff(originalMessage, transformedMessage)) + "</pre>");
+        } else
+        {
+          out.println("<pre>" + originalMessage + "</pre>");
+        }
+        out.println("<p>Transforms</p>");
+        out.println("<form action=\"profile\" method=\"POST\">");
+        out.println("  <textarea name=\"additionalTransformations\" cols=\"70\" rows=\"10\" wrap=\"off\">"
+            + testCaseMessageAbsent.getAdditionalTransformations() + "</textarea></td>");
+        out.println("  <input type=\"hidden\" name=\"" + PARAM_SHOW + "\" value=\"" + SHOW_TRANSFORMS + "\"/>");
+        out.println(
+            "  <input type=\"hidden\" name=\"" + PARAM_PROFILE_FIELD_ID + "\" value=\"" + profileFieldSelected.getProfileFieldId() + "\"/>");
+        out.println("  <input type=\"hidden\" name=\"edit\" value=\"absent\"/>");
+        out.println("  <br/>");
+        out.println("  <input type=\"checkbox\" name=\"tcmFull\" value=\"true\"" + (testCaseMessageAbsent == tcmFull ? " checked" : "")
+            + "/> Use Full Message");
+        out.println("  <br/>");
+        out.println("  <input type=\"submit\" name=\"action\" value=\"Refresh\"/>");
+        out.println("  <input type=\"submit\" name=\"action\" value=\"Save\"/>");
+        out.println("</form>");
+        if (testCaseMessageAbsent != tcmFull)
+        {
+          out.println("<p>Final Message</p>");
+          out.println("<pre>" + addHovers(showDiff(transformedMessage, originalMessage)) + "</pre>");
+        }
+      } else
+      {
+        if (testCaseMessageAbsent == tcmFull)
+        {
+          out.println("<p>Full Test Case</p>");
+        } else if (!testCaseMessageAbsent.hasIssue())
+        {
+          out.println("<p>Not Defined</p>");
+        } else
+        {
+          out.println("<pre>" + testCaseMessageAbsent.getAdditionalTransformations() + "</pre>");
+        }
+        String link = "profile?" + PARAM_SHOW + "=" + SHOW_TRANSFORMS + "&" + PARAM_PROFILE_FIELD_ID + "="
+            + profileFieldSelected.getProfileFieldId() + "&edit=absent";
+        out.println("<p><a href=\"" + link + "\">Edit</a></p>");
+      }
+    }
+  }
+
+  public void printEdit(HttpServletRequest req, Session dataSession, PrintWriter out, String action, ProfileUsage profileUsageSelected,
+      ProfileUsageValue profileUsageValueSelected) throws UnsupportedEncodingException
+  {
+    ProfileField copyFrom = null;
+    if (action.equals("Save") || action.equals("Return"))
+    {
+      int i = 1;
+      while (req.getParameter(PARAM_PROFILE_FIELD_ID + i) != null)
+      {
+        int profileFieldId = Integer.parseInt(req.getParameter(PARAM_PROFILE_FIELD_ID + i));
+        ProfileField profileField = (ProfileField) dataSession.get(ProfileField.class, profileFieldId);
+        String usage = req.getParameter("usage" + i);
+        if (usage != null && !usage.equals(""))
+        {
+          ProfileUsageValue profileUsageValue = ProfileManager.getProfileUsageValue(dataSession, profileUsageSelected, profileField);
+          if (profileUsageValue == null)
+          {
+            profileUsageValue = new ProfileUsageValue();
+            profileUsageValue.setProfileField(profileField);
+            profileUsageValue.setProfileUsage(profileUsageSelected);
+          }
+          String enforcement = req.getParameter("enforcement" + i);
+          String implementation = req.getParameter("implementation" + i);
+          String value = req.getParameter("value" + i);
+          String comments = req.getParameter("comments" + i);
+          String notes = req.getParameter("notes" + i);
+          String linkDefinition = req.getParameter("linkDefinition" + i);
+          String linkDetail = req.getParameter("linkDetail" + i);
+          String linkClarification = req.getParameter("linkClarification" + i);
+          String linkSupplement = req.getParameter("linkSupplement" + i);
+          profileUsageValue.setUsage(Usage.readUsage(usage));
+          profileUsageValue.setEnforcement(Enforcement.readEnforcement(enforcement));
+          profileUsageValue.setImplementation(Implementation.readImplementation(implementation));
+          profileUsageValue.setValue(value);
+          profileUsageValue.setComments(comments);
+          profileUsageValue.setNotes(notes);
+          profileUsageValue.setLinkDefinition(linkDefinition);
+          profileUsageValue.setLinkDetail(linkDetail);
+          profileUsageValue.setLinkClarification(linkClarification);
+          profileUsageValue.setLinkSupplement(linkSupplement);
+          String debug = ProfileManager.determineMessageAcceptStatus(profileUsageValue, dataSession);
+          profileUsageValue.setMessageAcceptStatusDebug(debug);
+          Transaction transaction = dataSession.beginTransaction();
+          dataSession.saveOrUpdate(profileUsageValue);
+          transaction.commit();
+        }
+        i++;
+      }
+      if (action.equals("Return"))
+      {
+        ProfileField parent = profileUsageValueSelected.getProfileField().getParent();
+        if (parent == null)
+        {
+          profileUsageValueSelected = null;
+        } else
+        {
+          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField = ?");
+          query.setParameter(0, profileUsageSelected);
+          query.setParameter(1, parent);
+          @SuppressWarnings("unchecked")
+          List<ProfileUsageValue> profileUsageValueList = query.list();
+          if (profileUsageValueList.size() > 0)
+          {
+            profileUsageValueSelected = profileUsageValueList.get(0);
+          }
+        }
+      }
+    } else if (action.equals("Copy"))
+    {
+      if (!req.getParameter(PARAM_PROFILE_FIELD_ID_COPY_FROM).equals(""))
+      {
+        int profileFieldIdCopyFrom = Integer.parseInt(req.getParameter(PARAM_PROFILE_FIELD_ID_COPY_FROM));
+        copyFrom = (ProfileField) dataSession.get(ProfileField.class, profileFieldIdCopyFrom);
+      }
+    }
+    out.println("<h2>Edit Profile for " + profileUsageSelected + "</h2>");
+    if (profileUsageValueSelected == null)
+    {
+      printEditTable(out, dataSession, profileUsageSelected, ProfileFieldType.SEGMENT, ProfileFieldType.SEGMENT_GROUP);
+    } else
+    {
+      printEditTable(out, dataSession, profileUsageValueSelected, copyFrom);
+    }
+  }
+
+  public void printView(Session dataSession, PrintWriter out, ProfileUsage profileUsageSelected) throws UnsupportedEncodingException
+  {
+    out.println("<h2>Profile for " + profileUsageSelected + "</h2>");
+    {
+      Query query = dataSession.createQuery("from ProfileUsageValue "
+          + "where profileUsage = ? and (profileField.profileFieldType = ? or profileField.profileFieldType = ?) order by profileField.pos");
+      query.setParameter(0, profileUsageSelected);
+      query.setParameter(1, ProfileFieldType.DATA_TYPE.toString());
+      query.setParameter(2, ProfileFieldType.DATA_TYPE_FIELD.toString());
+      @SuppressWarnings("unchecked")
+      List<ProfileUsageValue> profileUsageValueList = query.list();
+      String lastDataTypeDef = "";
+      boolean skip = false;
+      for (ProfileUsageValue profileUsageValue : profileUsageValueList)
+      {
+        ProfileField profileField = profileUsageValue.getProfileField();
+        if (!lastDataTypeDef.equals(profileField.getDataTypeDef()))
+        {
+          if (!lastDataTypeDef.equals("") && !skip)
+          {
+            out.println("</table>");
+          }
+          out.println("<h3>" + profileField.getDataTypeDef() + " Data Type</h3>");
+          out.println("<table border=\"1\" cellspacing=\"0\">");
+          out.println("  <tr>");
+          out.println("    <th>Field Name</th>");
+          out.println("    <th>Description</th>");
+          out.println("    <th>Type</th>");
+          out.println("    <th>Usage</th>");
+          out.println("    <th>Links</th>");
+          out.println("  </tr>");
+        }
+        out.println("  <tr>");
+        out.println("    <td>" + profileField.getFieldName() + "</td>");
+        if (profileField.getType() == ProfileFieldType.DATA_TYPE_FIELD)
+        {
+          out.println("    <td>&nbsp;" + profileField.getDescription() + "</td>");
+        } else
+        {
+          out.println("    <td>" + profileField.getDescription() + "</td>");
+        }
+        out.println("    <td>" + profileField.getType() + "</td>");
+        out.println("    <td>" + profileUsageValue.getUsage() + "</td>");
+        printLink(out, profileUsageValue);
+        out.println("  </tr>");
+        lastDataTypeDef = profileField.getDataTypeDef();
+      }
+      if (!lastDataTypeDef.equals(""))
+      {
+        out.println("</table>");
+      }
+    }
+
+    {
+      Query query = dataSession.createQuery("from ProfileUsageValue "
+          + "where profileUsage = ? and profileField.profileFieldType <> ? and profileField.profileFieldType <> ? order by profileField.pos");
+      query.setParameter(0, profileUsageSelected);
+      query.setParameter(1, ProfileFieldType.DATA_TYPE.toString());
+      query.setParameter(2, ProfileFieldType.DATA_TYPE_FIELD.toString());
+      @SuppressWarnings("unchecked")
+      List<ProfileUsageValue> profileUsageValueList = query.list();
+
+      ProfileManager.updateMessageAcceptStatus(profileUsageValueList);
+
+      boolean skip = false;
+      String lastSegmentName = "";
+      for (ProfileUsageValue profileUsageValue : profileUsageValueList)
+      {
+        ProfileField profileField = profileUsageValue.getProfileField();
+        {
+          if (!lastSegmentName.equals(profileField.getSegmentName()))
+          {
+            if (!lastSegmentName.equals("") && !skip)
+            {
+              out.println("</table>");
+            }
+            out.println("<h3>" + profileField.getSegmentName() + " Segment</h3>");
+            out.println("<table border=\"1\" cellspacing=\"0\">");
+            out.println("  <tr>");
+            out.println("    <th>Field</th>");
+            out.println("    <th>Description</th>");
+            out.println("    <th>Type</th>");
+            out.println("    <th>Usage</th>");
+            out.println("    <th>Links</th>");
+            out.println("    <th>Expect Error</th>");
+            out.println("    <th>Test Cases</th>");
+            out.println("  </tr>");
+          }
+          out.println("  <tr>");
+          out.println("    <td>" + profileField.getFieldName() + "</td>");
+          if (profileField.getType() == ProfileFieldType.FIELD_PART || profileField.getType() == ProfileFieldType.FIELD_SUB_PART
+              || profileField.getType() == ProfileFieldType.FIELD_VALUE || profileField.getType() == ProfileFieldType.FIELD_PART_VALUE
+              || profileField.getType() == ProfileFieldType.FIELD_SUB_PART_VALUE)
+          {
+            out.println("    <td>&nbsp;" + profileField.getDescription() + "</td>");
+          } else
+          {
+            out.println("    <td>" + profileField.getDescription() + "</td>");
+          }
+          out.println("    <td>" + profileField.getType() + "</td>");
+          out.println("    <td>" + profileUsageValue.getUsage() + "</td>");
+          printLink(out, profileUsageValue);
+          if (profileUsageValue.getMessageAcceptStatus() == MessageAcceptStatus.ONLY_IF_PRESENT)
+          {
+            out.println("    <td>If Empty</td>");
+          } else if (profileUsageValue.getMessageAcceptStatus() == MessageAcceptStatus.ONLY_IF_ABSENT)
+          {
+            out.println("    <td>If Valued</td>");
+          } else
+          {
+            out.println("    <td>-</td>");
+          }
+          String link = "profile?" + PARAM_SHOW + "=transforms&" + PARAM_PROFILE_USAGE_VALUE_ID + "="
+              + profileUsageValue.getProfileUsageValueId();
+          if (!profileField.isTransformPresentDefined() || !profileField.isTransformAbsentDefined())
+          {
+            out.println("    <td><a href=\"" + link + "\">-</a></td>");
+          } else
+          {
+            out.println("    <td><a href=\"" + link + "\">Defined</a></td>");
+          }
+          out.println("  </tr>");
+          lastSegmentName = profileField.getSegmentName();
+        }
+      }
+      if (!lastSegmentName.equals(""))
+      {
+        out.println("</table>");
+      }
+
+      out.println("<h2>Notes</h2>");
+      out.println("<table border=\"1\" cellspacing=\"0\">");
+      out.println("  <tr>");
+      out.println("    <th>Field</th>");
+      out.println("    <th>Description</th>");
+      out.println("    <th>Type</th>");
+      out.println("    <th>Usage</th>");
+      out.println("    <th>Value</th>");
+      out.println("    <th>Comments</th>");
+      out.println("    <th>Notes</th>");
+      out.println("  </tr>");
+      for (ProfileUsageValue profileUsageValue : profileUsageValueList)
+      {
+        ProfileField profileField = profileUsageValue.getProfileField();
+        if (!profileUsageValue.getNotes().equals(""))
+        {
+          out.println("  <tr>");
+          out.println("    <td>" + profileField.getFieldName() + "</td>");
+          if (profileField.getType() == ProfileFieldType.FIELD_PART || profileField.getType() == ProfileFieldType.FIELD_SUB_PART
+              || profileField.getType() == ProfileFieldType.FIELD_VALUE || profileField.getType() == ProfileFieldType.FIELD_PART_VALUE
+              || profileField.getType() == ProfileFieldType.FIELD_SUB_PART_VALUE)
+          {
+            out.println("    <td>&nbsp;" + profileField.getDescription() + "</td>");
+          } else
+          {
+            out.println("    <td>" + profileField.getDescription() + "</td>");
+          }
+          out.println("    <td>" + profileField.getType() + "</td>");
+          out.println("    <td>" + profileUsageValue.getUsage() + "</td>");
+          out.println("    <td>" + profileUsageValue.getValue() + "</td>");
+          out.println("    <td>" + profileUsageValue.getComments() + "</td>");
+          out.println("    <td>" + profileUsageValue.getNotes() + "</td>");
+          out.println("  </tr>");
+
+        }
+      }
+      out.println("</table>");
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void printShow(Session dataSession, PrintWriter out, ProfileUsage profileUsageSelected, ProfileUsage profileUsageCompare,
+      String comparisonType)
+  {
+    if (profileUsageCompare != null)
+    {
+      boolean compareConformance = comparisonType.equals("C");
+
+      if (compareConformance)
+      {
+        Map<CompatibilityConformance, List<ProfileUsageValue>> compatibilityMap = new HashMap<CompatibilityConformance, List<ProfileUsageValue>>();
+        List<ProfileUsageValue> profileUsageValueList;
+        {
+          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ?");
+          query.setParameter(0, profileUsageSelected);
+          profileUsageValueList = query.list();
+        }
+        for (ProfileUsageValue profileUsageValue : profileUsageValueList)
+        {
+          ProfileUsageValue profileUsageValueConformance = null;
+          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField = ?");
+          query.setParameter(0, profileUsageCompare);
+          query.setParameter(1, profileUsageValue.getProfileField());
+          List<ProfileUsageValue> profileUsageValueConformanceList = query.list();
+          if (profileUsageValueConformanceList.size() > 0)
+          {
+            profileUsageValueConformance = profileUsageValueConformanceList.get(0);
+          }
+          profileUsageValue.setProfileUsageValueCompare(profileUsageValueConformance);
+          if (profileUsageValueConformance != null)
+          {
+
+            CompatibilityConformance compatibility;
+            compatibility = ProfileManager.getCompatibilityConformance(profileUsageValue.getUsage(), profileUsageValueConformance.getUsage());
+            List<ProfileUsageValue> pll = compatibilityMap.get(compatibility);
+            if (pll == null)
+            {
+              pll = new ArrayList<ProfileUsageValue>();
+              compatibilityMap.put(compatibility, pll);
+            }
+            pll.add(profileUsageValue);
+          }
+        }
+        out.println("<h2>Conformance of " + profileUsageSelected + " in regards to " + profileUsageCompare + "</h2>");
+        out.println("<table border=\"1\" cellspacing=\"0\">");
+        out.println("  <tr>");
+        out.println("    <th>Conformance</th>");
+        out.println("    <th>Count</th>");
+        out.println("  </tr>");
+        printTotalRow(out, compatibilityMap, CompatibilityConformance.COMPATIBLE);
+        printTotalRow(out, compatibilityMap, CompatibilityConformance.ALLOWANCE);
+        printTotalRow(out, compatibilityMap, CompatibilityConformance.MAJOR_CONSTRAINT);
+        printTotalRow(out, compatibilityMap, CompatibilityConformance.CONFLICT);
+        printTotalRow(out, compatibilityMap, CompatibilityConformance.MAJOR_CONFLICT);
+        printTotalRow(out, compatibilityMap, CompatibilityConformance.UNABLE_TO_DETERMINE);
+        printTotalRow(out, compatibilityMap, CompatibilityConformance.NOT_DEFINED);
+        out.println("</table>");
+
+        printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.MAJOR_CONFLICT, profileUsageSelected, profileUsageCompare);
+        printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.CONFLICT, profileUsageSelected, profileUsageCompare);
+        printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.MAJOR_CONSTRAINT, profileUsageSelected,
+            profileUsageCompare);
+        printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.CONSTRAINT, profileUsageSelected, profileUsageCompare);
+        printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.ALLOWANCE, profileUsageSelected, profileUsageCompare);
+        printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.UNABLE_TO_DETERMINE, profileUsageSelected,
+            profileUsageCompare);
+      } else
+      {
+        Map<CompatibilityInteroperability, List<ProfileUsageValue>> compatibilityMap = new HashMap<CompatibilityInteroperability, List<ProfileUsageValue>>();
+        List<ProfileUsageValue> profileUsageValueList;
+        {
+          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ?");
+          query.setParameter(0, profileUsageSelected);
+          profileUsageValueList = query.list();
+        }
+        for (ProfileUsageValue profileUsageValue : profileUsageValueList)
+        {
+          ProfileUsageValue profileUsageValueConformance = null;
+          Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField = ?");
+          query.setParameter(0, profileUsageCompare);
+          query.setParameter(1, profileUsageValue.getProfileField());
+          List<ProfileUsageValue> profileUsageValueConformanceList = query.list();
+          if (profileUsageValueConformanceList.size() > 0)
+          {
+            profileUsageValueConformance = profileUsageValueConformanceList.get(0);
+          }
+          profileUsageValue.setProfileUsageValueCompare(profileUsageValueConformance);
+          if (profileUsageValueConformance != null)
+          {
+            CompatibilityInteroperability compatibility;
+            compatibility = ProfileManager.getCompatibilityInteroperability(profileUsageValue, profileUsageValueConformance);
+            List<ProfileUsageValue> pll = compatibilityMap.get(compatibility);
+            if (pll == null)
+            {
+              pll = new ArrayList<ProfileUsageValue>();
+              compatibilityMap.put(compatibility, pll);
+            }
+            pll.add(profileUsageValue);
+          }
+        }
+
+        out.println("<h2>Interoperability of " + profileUsageSelected + " with " + profileUsageCompare + "</h2>");
+        out.println("<table border=\"1\" cellspacing=\"0\">");
+        out.println("  <tr>");
+        out.println("    <th>Conformance</th>");
+        out.println("    <th>Count</th>");
+        out.println("  </tr>");
+        printTotalRow(out, compatibilityMap, CompatibilityInteroperability.COMPATIBLE);
+        printTotalRow(out, compatibilityMap, CompatibilityInteroperability.DATA_LOSS);
+        printTotalRow(out, compatibilityMap, CompatibilityInteroperability.IF_CONFIGURED);
+        printTotalRow(out, compatibilityMap, CompatibilityInteroperability.IF_POPULATED);
+        printTotalRow(out, compatibilityMap, CompatibilityInteroperability.NO_PROBLEM);
+        printTotalRow(out, compatibilityMap, CompatibilityInteroperability.PROBLEM);
+        printTotalRow(out, compatibilityMap, CompatibilityInteroperability.MAJOR_PROBLEM);
+        out.println("</table>");
+
+        printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.MAJOR_PROBLEM, profileUsageSelected,
+            profileUsageCompare);
+        printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.PROBLEM, profileUsageSelected, profileUsageCompare);
+        printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.IF_CONFIGURED, profileUsageSelected,
+            profileUsageCompare);
+        printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.IF_POPULATED, profileUsageSelected,
+            profileUsageCompare);
+        printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.DATA_LOSS, profileUsageSelected,
+            profileUsageCompare);
+      }
+    }
+  }
+
+  public String getShow(HttpServletRequest req)
+  {
+    String show = req.getParameter(PARAM_SHOW);
+    if (show == null)
+    {
+      show = "";
+    }
+    return show;
+  }
+
+  public String getComparisonType(HttpServletRequest req)
+  {
+    String comparisonType = req.getParameter(PARAM_COMPARISON_TYPE);
+    if (comparisonType == null)
+    {
+      comparisonType = "C";
+    }
+    return comparisonType;
+  }
+
+  @SuppressWarnings("unchecked")
+  public void printCompareProfilesForm(UserSession userSession, Session dataSession, PrintWriter out, ProfileUsage profileUsageSelected,
+      ProfileUsage profileUsageCompare, String comparisonType)
+  {
+    List<ProfileUsage> profileUsageList;
+    {
+      Query query = dataSession.createQuery("from ProfileUsage order by category, label, version");
+      profileUsageList = query.list();
+    }
+    out.println("    <h2>Compare Profiles</h2>");
+    out.println("    <form action=\"profile\" method=\"GET\">");
+    out.println("      <table border=\"1\">");
+    out.println("        <tr>");
+    out.println("          <td>Usage Profile</td>");
+    out.println("          <td>");
+    out.println("            <select name=\"" + PARAM_PROFILE_USAGE_ID + "\">");
+    out.println("              <option value=\"\">select</option>");
+    {
+      for (ProfileUsage profileUsage : profileUsageList)
+      {
+        if (profileUsageSelected != null && profileUsageSelected.getProfileUsageId() == profileUsage.getProfileUsageId())
+        {
+          out.println("              <option value=\"" + profileUsage.getProfileUsageId() + "\" selected=\"true\">" + profileUsage + "</option>");
+        } else
+        {
+          out.println("              <option value=\"" + profileUsage.getProfileUsageId() + "\">" + profileUsage + "</option>");
+        }
+      }
+    }
+    out.println("            </select>");
+    out.println("          </td>");
+    out.println("          <td>");
+    out.println("            <input type=\"submit\" name=\"" + PARAM_SHOW + "\" value=\"View\"/>");
+    if (userSession.isAdmin())
+    {
+      out.println("            <input type=\"submit\" name=\"" + PARAM_SHOW + "\" value=\"Edit\"/>");
+    }
+    out.println("          </td>");
+    out.println("        </tr>");
+    out.println("        <tr>");
+    out.println("          <td>Compare with</td>");
+    out.println("          <td>");
+    out.println("            <select name=\"" + PARAM_PROFILE_USAGE_ID_COMPARE + "\">");
+    out.println("              <option value=\"\">select</option>");
+    {
+      for (ProfileUsage profileUsage : profileUsageList)
+      {
+        if (profileUsageCompare.getProfileUsageId() == profileUsageCompare.getProfileUsageId())
+        {
+          out.println("              <option value=\"" + profileUsage.getProfileUsageId() + "\" selected=\"true\">" + profileUsage + "</option>");
+        } else
+        {
+          out.println("              <option value=\"" + profileUsage.getProfileUsageId() + "\">" + profileUsage + "</option>");
+        }
+      }
+    }
+    out.println("            </select>");
+    out.println("          </td>");
+    out.println("          <td>");
+    String checked = "";
+    checked = comparisonType.equals("C") ? " checked=\"checked\"" : "";
+    out.println("            <input type=\"radio\" name=\"" + PARAM_COMPARISON_TYPE + "\" value=\"C\"" + checked + "> Conformance");
+    checked = comparisonType.equals("I") ? " checked=\"checked\"" : "";
+    out.println("            <input type=\"radio\" name=\"" + PARAM_COMPARISON_TYPE + "\" value=\"I\"" + checked + "> Interoperability");
+    out.println("            <input type=\"submit\" name=\"" + PARAM_SHOW + "\" value=\"" + SHOW_COMPARE + "\"/>");
+    out.println("          </td>");
+    out.println("        </tr>");
+    out.println("      </table>");
+    out.println("    </form>");
+  }
+
+  public ProfileUsage getProfileUsageCompare(HttpServletRequest req, Session dataSession)
+  {
+    ProfileUsage profileUsageCompare = null;
+    int profileUsageIdCompare = 1;
+    String profileUsageIdCompareString = req.getParameter(PARAM_PROFILE_USAGE_ID_COMPARE);
+    if (profileUsageIdCompareString != null && !profileUsageIdCompareString.equals(""))
+    {
+      profileUsageIdCompare = Integer.parseInt(profileUsageIdCompareString);
+    }
+    profileUsageCompare = (ProfileUsage) dataSession.get(ProfileUsage.class, profileUsageIdCompare);
+    return profileUsageCompare;
+  }
+
+  public void setProfileUsageSelected(UserSession userSession, ProfileUsage profileUsageSelected)
+  {
+    if (profileUsageSelected != null)
+    {
+      userSession.setProfileUsageSelected(profileUsageSelected);
+    }
+  }
+
+  public ProfileField getPorfileFieldSelected(HttpServletRequest req, Session dataSession, ProfileField profileFieldSelected)
+  {
+    if (req.getParameter(PARAM_PROFILE_FIELD_ID) != null)
+    {
+      int profileFieldId = Integer.parseInt(req.getParameter(PARAM_PROFILE_FIELD_ID));
+      profileFieldSelected = (ProfileField) dataSession.get(ProfileField.class, profileFieldId);
+    }
+    return profileFieldSelected;
+  }
+
+  public ProfileUsage getProfileUsageSelected(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    ProfileUsage profileUsageSelected = null;
+    {
       int profileUsageId = 0;
       if (req.getParameter(PARAM_PROFILE_USAGE_ID) != null && !req.getParameter(PARAM_PROFILE_USAGE_ID).equals(""))
       {
@@ -93,677 +817,24 @@ public class ProfileServlet extends HomeServlet
         profileUsageSelected = userSession.getProfileUsageSelected();
         profileUsageId = profileUsageSelected.getProfileUsageId();
       }
-
-      ProfileUsageValue profileUsageValueSelected = null;
-      ProfileField profileFieldSelected = null;
-      if (req.getParameter(PARAM_PROFILE_USAGE_VALUE_ID) != null)
-      {
-        int profileUsageValueId = Integer.parseInt(req.getParameter(PARAM_PROFILE_USAGE_VALUE_ID));
-        profileUsageValueSelected = (ProfileUsageValue) dataSession.get(ProfileUsageValue.class, profileUsageValueId);
-        profileFieldSelected = profileUsageValueSelected.getProfileField();
-        profileUsageSelected = profileUsageValueSelected.getProfileUsage();
-      }
-      if (req.getParameter(PARAM_PROFILE_FIELD_ID) != null)
-      {
-        int profileFieldId = Integer.parseInt(req.getParameter(PARAM_PROFILE_FIELD_ID));
-        profileFieldSelected = (ProfileField) dataSession.get(ProfileField.class, profileFieldId);
-      }
-
-      if (profileUsageSelected != null)
-      {
-        userSession.setProfileUsageSelected(profileUsageSelected);
-      }
-
-      ProfileUsage profileUsageCompare = null;
-      int profileUsageIdCompare = 1;
-      String profileUsageIdCompareString = req.getParameter(PARAM_PROFILE_USAGE_ID_COMPARE);
-      if (profileUsageIdCompareString != null && !profileUsageIdCompareString.equals(""))
-      {
-        profileUsageIdCompare = Integer.parseInt(profileUsageIdCompareString);
-      }
-      profileUsageCompare = (ProfileUsage) dataSession.get(ProfileUsage.class, profileUsageIdCompare);
-
-      createHeader(webSession);
-
-      String comparisonType = req.getParameter(PARAM_COMPARISON_TYPE);
-      if (comparisonType == null)
-      {
-        comparisonType = "C";
-      }
-      {
-        List<ProfileUsage> profileUsageList;
-        {
-          Query query = dataSession.createQuery("from ProfileUsage order by category, label, version");
-          profileUsageList = query.list();
-        }
-        out.println("    <h2>Compare Profiles</h2>");
-        out.println("    <form action=\"profile\" method=\"GET\">");
-        out.println("      <table border=\"1\">");
-        out.println("        <tr>");
-        out.println("          <td>Usage Profile</td>");
-        out.println("          <td>");
-        out.println("            <select name=\"" + PARAM_PROFILE_USAGE_ID + "\">");
-        out.println("              <option value=\"\">select</option>");
-        {
-          for (ProfileUsage profileUsage : profileUsageList)
-          {
-            if (profileUsageId == profileUsage.getProfileUsageId())
-            {
-              out.println("              <option value=\"" + profileUsage.getProfileUsageId() + "\" selected=\"true\">" + profileUsage + "</option>");
-            } else
-            {
-              out.println("              <option value=\"" + profileUsage.getProfileUsageId() + "\">" + profileUsage + "</option>");
-            }
-          }
-        }
-        out.println("            </select>");
-        out.println("          </td>");
-        out.println("          <td>");
-        out.println("            <input type=\"submit\" name=\"" + PARAM_SHOW + "\" value=\"View\"/>");
-        if (userSession.isAdmin())
-        {
-          out.println("            <input type=\"submit\" name=\"" + PARAM_SHOW + "\" value=\"Edit\"/>");
-        }
-        out.println("          </td>");
-        out.println("        </tr>");
-        out.println("        <tr>");
-        out.println("          <td>Compare with</td>");
-        out.println("          <td>");
-        out.println("            <select name=\"" + PARAM_PROFILE_USAGE_ID_COMPARE + "\">");
-        out.println("              <option value=\"\">select</option>");
-        {
-          for (ProfileUsage profileUsage : profileUsageList)
-          {
-            if (profileUsageIdCompare == profileUsageCompare.getProfileUsageId())
-            {
-              out.println("              <option value=\"" + profileUsage.getProfileUsageId() + "\" selected=\"true\">" + profileUsage + "</option>");
-            } else
-            {
-              out.println("              <option value=\"" + profileUsage.getProfileUsageId() + "\">" + profileUsage + "</option>");
-            }
-          }
-        }
-        out.println("            </select>");
-        out.println("          </td>");
-        out.println("          <td>");
-        String checked = "";
-        checked = comparisonType.equals("C") ? " checked=\"checked\"" : "";
-        out.println("            <input type=\"radio\" name=\"" + PARAM_COMPARISON_TYPE + "\" value=\"C\"" + checked + "> Conformance");
-        checked = comparisonType.equals("I") ? " checked=\"checked\"" : "";
-        out.println("            <input type=\"radio\" name=\"" + PARAM_COMPARISON_TYPE + "\" value=\"I\"" + checked + "> Interoperability");
-        out.println("            <input type=\"submit\" name=\"" + PARAM_SHOW + "\" value=\"" + SHOW_COMPARE + "\"/>");
-        out.println("          </td>");
-        out.println("        </tr>");
-        out.println("      </table>");
-        out.println("    </form>");
-      }
-
-      String show = req.getParameter(PARAM_SHOW);
-      if (show == null)
-      {
-        show = "";
-      }
-      if (show.equals(SHOW_COMPARE))
-      {
-        if (profileUsageCompare != null)
-        {
-          boolean compareConformance = comparisonType.equals("C");
-
-          if (compareConformance)
-          {
-            Map<CompatibilityConformance, List<ProfileUsageValue>> compatibilityMap = new HashMap<CompatibilityConformance, List<ProfileUsageValue>>();
-            List<ProfileUsageValue> profileUsageValueList;
-            {
-              Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ?");
-              query.setParameter(0, profileUsageSelected);
-              profileUsageValueList = query.list();
-            }
-            for (ProfileUsageValue profileUsageValue : profileUsageValueList)
-            {
-              ProfileUsageValue profileUsageValueConformance = null;
-              Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField = ?");
-              query.setParameter(0, profileUsageCompare);
-              query.setParameter(1, profileUsageValue.getProfileField());
-              List<ProfileUsageValue> profileUsageValueConformanceList = query.list();
-              if (profileUsageValueConformanceList.size() > 0)
-              {
-                profileUsageValueConformance = profileUsageValueConformanceList.get(0);
-              }
-              profileUsageValue.setProfileUsageValueCompare(profileUsageValueConformance);
-              if (profileUsageValueConformance != null)
-              {
-
-                CompatibilityConformance compatibility;
-                compatibility = ProfileManager.getCompatibilityConformance(profileUsageValue.getUsage(), profileUsageValueConformance.getUsage());
-                List<ProfileUsageValue> pll = compatibilityMap.get(compatibility);
-                if (pll == null)
-                {
-                  pll = new ArrayList<ProfileUsageValue>();
-                  compatibilityMap.put(compatibility, pll);
-                }
-                pll.add(profileUsageValue);
-              }
-            }
-            out.println("<h2>Conformance of " + profileUsageSelected + " in regards to " + profileUsageCompare + "</h2>");
-            out.println("<table border=\"1\" cellspacing=\"0\">");
-            out.println("  <tr>");
-            out.println("    <th>Conformance</th>");
-            out.println("    <th>Count</th>");
-            out.println("  </tr>");
-            printTotalRow(out, compatibilityMap, CompatibilityConformance.COMPATIBLE);
-            printTotalRow(out, compatibilityMap, CompatibilityConformance.ALLOWANCE);
-            printTotalRow(out, compatibilityMap, CompatibilityConformance.MAJOR_CONSTRAINT);
-            printTotalRow(out, compatibilityMap, CompatibilityConformance.CONFLICT);
-            printTotalRow(out, compatibilityMap, CompatibilityConformance.MAJOR_CONFLICT);
-            printTotalRow(out, compatibilityMap, CompatibilityConformance.UNABLE_TO_DETERMINE);
-            printTotalRow(out, compatibilityMap, CompatibilityConformance.NOT_DEFINED);
-            out.println("</table>");
-
-            printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.MAJOR_CONFLICT, profileUsageSelected, profileUsageCompare);
-            printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.CONFLICT, profileUsageSelected, profileUsageCompare);
-            printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.MAJOR_CONSTRAINT, profileUsageSelected,
-                profileUsageCompare);
-            printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.CONSTRAINT, profileUsageSelected, profileUsageCompare);
-            printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.ALLOWANCE, profileUsageSelected, profileUsageCompare);
-            printConformanceCompatibility(out, compatibilityMap, CompatibilityConformance.UNABLE_TO_DETERMINE, profileUsageSelected,
-                profileUsageCompare);
-          } else
-          {
-            Map<CompatibilityInteroperability, List<ProfileUsageValue>> compatibilityMap = new HashMap<CompatibilityInteroperability, List<ProfileUsageValue>>();
-            List<ProfileUsageValue> profileUsageValueList;
-            {
-              Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ?");
-              query.setParameter(0, profileUsageSelected);
-              profileUsageValueList = query.list();
-            }
-            for (ProfileUsageValue profileUsageValue : profileUsageValueList)
-            {
-              ProfileUsageValue profileUsageValueConformance = null;
-              Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField = ?");
-              query.setParameter(0, profileUsageCompare);
-              query.setParameter(1, profileUsageValue.getProfileField());
-              List<ProfileUsageValue> profileUsageValueConformanceList = query.list();
-              if (profileUsageValueConformanceList.size() > 0)
-              {
-                profileUsageValueConformance = profileUsageValueConformanceList.get(0);
-              }
-              profileUsageValue.setProfileUsageValueCompare(profileUsageValueConformance);
-              if (profileUsageValueConformance != null)
-              {
-                CompatibilityInteroperability compatibility;
-                compatibility = ProfileManager.getCompatibilityInteroperability(profileUsageValue, profileUsageValueConformance);
-                List<ProfileUsageValue> pll = compatibilityMap.get(compatibility);
-                if (pll == null)
-                {
-                  pll = new ArrayList<ProfileUsageValue>();
-                  compatibilityMap.put(compatibility, pll);
-                }
-                pll.add(profileUsageValue);
-              }
-            }
-
-            out.println("<h2>Interoperability of " + profileUsageSelected + " with " + profileUsageCompare + "</h2>");
-            out.println("<table border=\"1\" cellspacing=\"0\">");
-            out.println("  <tr>");
-            out.println("    <th>Conformance</th>");
-            out.println("    <th>Count</th>");
-            out.println("  </tr>");
-            printTotalRow(out, compatibilityMap, CompatibilityInteroperability.COMPATIBLE);
-            printTotalRow(out, compatibilityMap, CompatibilityInteroperability.DATA_LOSS);
-            printTotalRow(out, compatibilityMap, CompatibilityInteroperability.IF_CONFIGURED);
-            printTotalRow(out, compatibilityMap, CompatibilityInteroperability.IF_POPULATED);
-            printTotalRow(out, compatibilityMap, CompatibilityInteroperability.NO_PROBLEM);
-            printTotalRow(out, compatibilityMap, CompatibilityInteroperability.PROBLEM);
-            printTotalRow(out, compatibilityMap, CompatibilityInteroperability.MAJOR_PROBLEM);
-            out.println("</table>");
-
-            printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.MAJOR_PROBLEM, profileUsageSelected,
-                profileUsageCompare);
-            printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.PROBLEM, profileUsageSelected, profileUsageCompare);
-            printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.IF_CONFIGURED, profileUsageSelected,
-                profileUsageCompare);
-            printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.IF_POPULATED, profileUsageSelected,
-                profileUsageCompare);
-            printConformanceInteroperability(out, compatibilityMap, CompatibilityInteroperability.DATA_LOSS, profileUsageSelected,
-                profileUsageCompare);
-          }
-        }
-      } else if (show.equals(SHOW_VIEW))
-      {
-        out.println("<h2>Profile for " + profileUsageSelected + "</h2>");
-        {
-          Query query = dataSession.createQuery("from ProfileUsageValue "
-              + "where profileUsage = ? and (profileField.profileFieldType = ? or profileField.profileFieldType = ?) order by profileField.pos");
-          query.setParameter(0, profileUsageSelected);
-          query.setParameter(1, ProfileFieldType.DATA_TYPE.toString());
-          query.setParameter(2, ProfileFieldType.DATA_TYPE_FIELD.toString());
-          List<ProfileUsageValue> profileUsageValueList = query.list();
-          String lastDataTypeDef = "";
-          boolean skip = false;
-          for (ProfileUsageValue profileUsageValue : profileUsageValueList)
-          {
-            ProfileField profileField = profileUsageValue.getProfileField();
-            if (!lastDataTypeDef.equals(profileField.getDataTypeDef()))
-            {
-              if (!lastDataTypeDef.equals("") && !skip)
-              {
-                out.println("</table>");
-              }
-              out.println("<h3>" + profileField.getDataTypeDef() + " Data Type</h3>");
-              out.println("<table border=\"1\" cellspacing=\"0\">");
-              out.println("  <tr>");
-              out.println("    <th>Field Name</th>");
-              out.println("    <th>Description</th>");
-              out.println("    <th>Type</th>");
-              out.println("    <th>Usage</th>");
-              out.println("    <th>Links</th>");
-              out.println("  </tr>");
-            }
-            out.println("  <tr>");
-            out.println("    <td>" + profileField.getFieldName() + "</td>");
-            if (profileField.getType() == ProfileFieldType.DATA_TYPE_FIELD)
-            {
-              out.println("    <td>&nbsp;" + profileField.getDescription() + "</td>");
-            } else
-            {
-              out.println("    <td>" + profileField.getDescription() + "</td>");
-            }
-            out.println("    <td>" + profileField.getType() + "</td>");
-            out.println("    <td>" + profileUsageValue.getUsage() + "</td>");
-            printLink(out, profileUsageValue);
-            out.println("  </tr>");
-            lastDataTypeDef = profileField.getDataTypeDef();
-          }
-          if (!lastDataTypeDef.equals(""))
-          {
-            out.println("</table>");
-          }
-        }
-
-        {
-          Query query = dataSession.createQuery("from ProfileUsageValue "
-              + "where profileUsage = ? and profileField.profileFieldType <> ? and profileField.profileFieldType <> ? order by profileField.pos");
-          query.setParameter(0, profileUsageSelected);
-          query.setParameter(1, ProfileFieldType.DATA_TYPE.toString());
-          query.setParameter(2, ProfileFieldType.DATA_TYPE_FIELD.toString());
-          List<ProfileUsageValue> profileUsageValueList = query.list();
-
-          ProfileManager.updateMessageAcceptStatus(profileUsageValueList);
-
-          boolean skip = false;
-          String lastSegmentName = "";
-          for (ProfileUsageValue profileUsageValue : profileUsageValueList)
-          {
-            ProfileField profileField = profileUsageValue.getProfileField();
-            {
-              if (!lastSegmentName.equals(profileField.getSegmentName()))
-              {
-                if (!lastSegmentName.equals("") && !skip)
-                {
-                  out.println("</table>");
-                }
-                out.println("<h3>" + profileField.getSegmentName() + " Segment</h3>");
-                out.println("<table border=\"1\" cellspacing=\"0\">");
-                out.println("  <tr>");
-                out.println("    <th>Field</th>");
-                out.println("    <th>Description</th>");
-                out.println("    <th>Type</th>");
-                out.println("    <th>Usage</th>");
-                out.println("    <th>Links</th>");
-                out.println("    <th>Expect Error</th>");
-                out.println("    <th>Test Cases</th>");
-                out.println("  </tr>");
-              }
-              out.println("  <tr>");
-              out.println("    <td>" + profileField.getFieldName() + "</td>");
-              if (profileField.getType() == ProfileFieldType.FIELD_PART || profileField.getType() == ProfileFieldType.FIELD_SUB_PART
-                  || profileField.getType() == ProfileFieldType.FIELD_VALUE || profileField.getType() == ProfileFieldType.FIELD_PART_VALUE
-                  || profileField.getType() == ProfileFieldType.FIELD_SUB_PART_VALUE)
-              {
-                out.println("    <td>&nbsp;" + profileField.getDescription() + "</td>");
-              } else
-              {
-                out.println("    <td>" + profileField.getDescription() + "</td>");
-              }
-              out.println("    <td>" + profileField.getType() + "</td>");
-              out.println("    <td>" + profileUsageValue.getUsage() + "</td>");
-              printLink(out, profileUsageValue);
-              if (profileUsageValue.getMessageAcceptStatus() == MessageAcceptStatus.ONLY_IF_PRESENT)
-              {
-                out.println("    <td>If Empty</td>");
-              } else if (profileUsageValue.getMessageAcceptStatus() == MessageAcceptStatus.ONLY_IF_ABSENT)
-              {
-                out.println("    <td>If Valued</td>");
-              } else
-              {
-                out.println("    <td>-</td>");
-              }
-              String link = "profile?" + PARAM_SHOW + "=transforms&" + PARAM_PROFILE_USAGE_VALUE_ID + "="
-                  + profileUsageValue.getProfileUsageValueId();
-              if (!profileField.isTransformPresentDefined() || !profileField.isTransformAbsentDefined())
-              {
-                out.println("    <td><a href=\"" + link + "\">-</a></td>");
-              } else
-              {
-                out.println("    <td><a href=\"" + link + "\">Defined</a></td>");
-              }
-              out.println("  </tr>");
-              lastSegmentName = profileField.getSegmentName();
-            }
-          }
-          if (!lastSegmentName.equals(""))
-          {
-            out.println("</table>");
-          }
-
-          out.println("<h2>Notes</h2>");
-          out.println("<table border=\"1\" cellspacing=\"0\">");
-          out.println("  <tr>");
-          out.println("    <th>Field</th>");
-          out.println("    <th>Description</th>");
-          out.println("    <th>Type</th>");
-          out.println("    <th>Usage</th>");
-          out.println("    <th>Value</th>");
-          out.println("    <th>Comments</th>");
-          out.println("    <th>Notes</th>");
-          out.println("  </tr>");
-          for (ProfileUsageValue profileUsageValue : profileUsageValueList)
-          {
-            ProfileField profileField = profileUsageValue.getProfileField();
-            if (!profileUsageValue.getNotes().equals(""))
-            {
-              out.println("  <tr>");
-              out.println("    <td>" + profileField.getFieldName() + "</td>");
-              if (profileField.getType() == ProfileFieldType.FIELD_PART || profileField.getType() == ProfileFieldType.FIELD_SUB_PART
-                  || profileField.getType() == ProfileFieldType.FIELD_VALUE || profileField.getType() == ProfileFieldType.FIELD_PART_VALUE
-                  || profileField.getType() == ProfileFieldType.FIELD_SUB_PART_VALUE)
-              {
-                out.println("    <td>&nbsp;" + profileField.getDescription() + "</td>");
-              } else
-              {
-                out.println("    <td>" + profileField.getDescription() + "</td>");
-              }
-              out.println("    <td>" + profileField.getType() + "</td>");
-              out.println("    <td>" + profileUsageValue.getUsage() + "</td>");
-              out.println("    <td>" + profileUsageValue.getValue() + "</td>");
-              out.println("    <td>" + profileUsageValue.getComments() + "</td>");
-              out.println("    <td>" + profileUsageValue.getNotes() + "</td>");
-              out.println("  </tr>");
-
-            }
-          }
-          out.println("</table>");
-        }
-      } else if (show.equals(SHOW_EDIT))
-      {
-        ProfileField copyFrom = null;
-        if (action.equals("Save") || action.equals("Return"))
-        {
-          int i = 1;
-          while (req.getParameter(PARAM_PROFILE_FIELD_ID + i) != null)
-          {
-            int profileFieldId = Integer.parseInt(req.getParameter(PARAM_PROFILE_FIELD_ID + i));
-            ProfileField profileField = (ProfileField) dataSession.get(ProfileField.class, profileFieldId);
-            String usage = req.getParameter("usage" + i);
-            if (usage != null && !usage.equals(""))
-            {
-              ProfileUsageValue profileUsageValue = ProfileManager.getProfileUsageValue(dataSession, profileUsageSelected, profileField);
-              if (profileUsageValue == null)
-              {
-                profileUsageValue = new ProfileUsageValue();
-                profileUsageValue.setProfileField(profileField);
-                profileUsageValue.setProfileUsage(profileUsageSelected);
-              }
-              String enforcement = req.getParameter("enforcement" + i);
-              String implementation = req.getParameter("implementation" + i);
-              String value = req.getParameter("value" + i);
-              String comments = req.getParameter("comments" + i);
-              String notes = req.getParameter("notes" + i);
-              String linkDefinition = req.getParameter("linkDefinition" + i);
-              String linkDetail = req.getParameter("linkDetail" + i);
-              String linkClarification = req.getParameter("linkClarification" + i);
-              String linkSupplement = req.getParameter("linkSupplement" + i);
-              profileUsageValue.setUsage(Usage.readUsage(usage));
-              profileUsageValue.setEnforcement(Enforcement.readEnforcement(enforcement));
-              profileUsageValue.setImplementation(Implementation.readImplementation(implementation));
-              profileUsageValue.setValue(value);
-              profileUsageValue.setComments(comments);
-              profileUsageValue.setNotes(notes);
-              profileUsageValue.setLinkDefinition(linkDefinition);
-              profileUsageValue.setLinkDetail(linkDetail);
-              profileUsageValue.setLinkClarification(linkClarification);
-              profileUsageValue.setLinkSupplement(linkSupplement);
-              String debug = ProfileManager.determineMessageAcceptStatus(profileUsageValue, dataSession);
-              profileUsageValue.setMessageAcceptStatusDebug(debug);
-              Transaction transaction = dataSession.beginTransaction();
-              dataSession.saveOrUpdate(profileUsageValue);
-              transaction.commit();
-            }
-            i++;
-          }
-          if (action.equals("Return"))
-          {
-            ProfileField parent = profileUsageValueSelected.getProfileField().getParent();
-            if (parent == null)
-            {
-              profileUsageValueSelected = null;
-            } else
-            {
-              Query query = dataSession.createQuery("from ProfileUsageValue where profileUsage = ? and profileField = ?");
-              query.setParameter(0, profileUsageSelected);
-              query.setParameter(1, parent);
-              List<ProfileUsageValue> profileUsageValueList = query.list();
-              if (profileUsageValueList.size() > 0)
-              {
-                profileUsageValueSelected = profileUsageValueList.get(0);
-              }
-            }
-          }
-        } else if (action.equals("Copy"))
-        {
-          if (!req.getParameter(PARAM_PROFILE_FIELD_ID_COPY_FROM).equals(""))
-          {
-            int profileFieldIdCopyFrom = Integer.parseInt(req.getParameter(PARAM_PROFILE_FIELD_ID_COPY_FROM));
-            copyFrom = (ProfileField) dataSession.get(ProfileField.class, profileFieldIdCopyFrom);
-          }
-        }
-        out.println("<h2>Edit Profile for " + profileUsageSelected + "</h2>");
-        if (profileUsageValueSelected == null)
-        {
-          printEditTable(out, dataSession, profileUsageSelected, ProfileFieldType.SEGMENT, ProfileFieldType.SEGMENT_GROUP);
-        } else
-        {
-          printEditTable(out, dataSession, profileUsageValueSelected, copyFrom);
-        }
-      } else if (show.equals(SHOW_TRANSFORMS))
-      {
-        if (profileFieldSelected != null)
-        {
-          TestCaseMessage tcmFull = createTestCaseMessage(SCENARIO_FULL_RECORD_FOR_PROFILING);
-          Transformer transformer = new Transformer();
-          transformer.transform(tcmFull);
-          TestCaseMessage testCaseMessagePresent = ProfileManager.getPresentTestCase(profileFieldSelected, tcmFull);
-          TestCaseMessage testCaseMessageAbsent = ProfileManager.getAbsentTestCase(profileFieldSelected, tcmFull);
-          out.println("<h2>" + profileFieldSelected.getFieldName() + "</h2>");
-          String edit = req.getParameter("edit");
-          if (edit == null)
-          {
-            edit = "";
-          }
-          out.println("<h3>Present Test Case</h3>");
-          if (edit.equals("present"))
-          {
-            if (action.equals("Refresh") || action.equals("Save"))
-            {
-              boolean useTcmFull = req.getParameter("tcmFull") != null;
-              if (useTcmFull)
-              {
-                testCaseMessagePresent = tcmFull;
-                profileFieldSelected.setTransformsPresent(ProfileManager.USE_FULL_TEST_CASE);
-              } else
-              {
-                String additionalTransformations = req.getParameter("additionalTransformations");
-                profileFieldSelected.setTransformsPresent(additionalTransformations);
-                if (testCaseMessagePresent == tcmFull)
-                {
-                  testCaseMessagePresent = ProfileManager.getPresentTestCase(profileFieldSelected, tcmFull);
-                } else
-                {
-                  testCaseMessagePresent.setAdditionalTransformations(additionalTransformations);
-                }
-              }
-              if (action.equals("Save"))
-              {
-                Transaction transaction = dataSession.beginTransaction();
-                dataSession.update(profileFieldSelected);
-                transaction.commit();
-              }
-            }
-            String transformedMessage = null;
-            String originalMessage = formatMessage(tcmFull.getMessageText());
-            if (testCaseMessagePresent != tcmFull)
-            {
-              transformedMessage = formatMessage(transformer.transformAddition(tcmFull, testCaseMessagePresent.getAdditionalTransformations()));
-            }
-            out.println("<p>Starting Message</p>");
-            if (transformedMessage != null)
-            {
-              out.println("<pre>" + addHovers(showDiff(originalMessage, transformedMessage)) + "</pre>");
-            } else
-            {
-              out.println("<pre>" + originalMessage + "</pre>");
-            }
-            out.println("<p>Transforms</p>");
-            out.println("<form action=\"profile\" method=\"POST\">");
-            out.println("  <textarea name=\"additionalTransformations\" cols=\"70\" rows=\"10\" wrap=\"off\">"
-                + testCaseMessagePresent.getAdditionalTransformations() + "</textarea></td>");
-            out.println("  <br/>");
-            out.println("  <input type=\"checkbox\" name=\"tcmFull\" value=\"true\"" + (testCaseMessagePresent == tcmFull ? " checked" : "")
-                + "/> Use Full Message");
-            out.println("  <input type=\"hidden\" name=\"" + PARAM_SHOW + "\" value=\"" + SHOW_TRANSFORMS + "\"/>");
-            out.println(
-                "  <input type=\"hidden\" name=\"" + PARAM_PROFILE_FIELD_ID + "\" value=\"" + profileFieldSelected.getProfileFieldId() + "\"/>");
-            out.println("  <input type=\"hidden\" name=\"edit\" value=\"present\"/>");
-            out.println("  <br/>");
-            out.println("  <input type=\"submit\" name=\"action\" value=\"Refresh\"/>");
-            out.println("  <input type=\"submit\" name=\"action\" value=\"Save\"/>");
-            out.println("</form>");
-            if (testCaseMessagePresent != tcmFull)
-            {
-              out.println("<p>Final Message</p>");
-              out.println("<pre>" + addHovers(showDiff(transformedMessage, originalMessage)) + "</pre>");
-            }
-          } else
-          {
-            if (testCaseMessagePresent == tcmFull)
-            {
-              out.println("<p>Full Test Case</p>");
-            } else if (!testCaseMessagePresent.hasIssue())
-            {
-              out.println("<p>Not Defined</p>");
-            } else
-            {
-              out.println("<pre>" + testCaseMessagePresent.getAdditionalTransformations() + "</pre>");
-            }
-            String link = "profile?" + PARAM_SHOW + "=" + SHOW_TRANSFORMS + "&" + PARAM_PROFILE_FIELD_ID + "="
-                + profileFieldSelected.getProfileFieldId() + "&edit=present";
-            out.println("<p><a href=\"" + link + "\">Edit</a></p>");
-          }
-          out.println("<h3>Absent Test Case</h3>");
-          if (edit.equals("absent"))
-          {
-            if (action.equals("Refresh") || action.equals("Save"))
-            {
-              boolean useTcmFull = req.getParameter("tcmFull") != null;
-              if (useTcmFull)
-              {
-                testCaseMessagePresent = tcmFull;
-                profileFieldSelected.setTransformsAbsent(ProfileManager.USE_FULL_TEST_CASE);
-              } else
-              {
-                String additionalTransformations = req.getParameter("additionalTransformations");
-                profileFieldSelected.setTransformsAbsent(additionalTransformations);
-                if (testCaseMessageAbsent == tcmFull)
-                {
-                  testCaseMessageAbsent = ProfileManager.getAbsentTestCase(profileFieldSelected, tcmFull);
-                } else
-                {
-                  testCaseMessageAbsent.setAdditionalTransformations(additionalTransformations);
-                }
-              }
-              if (action.equals("Save"))
-              {
-                Transaction transaction = dataSession.beginTransaction();
-                dataSession.update(profileFieldSelected);
-                transaction.commit();
-              }
-            }
-            String transformedMessage = null;
-            String originalMessage = formatMessage(tcmFull.getMessageText());
-            if (testCaseMessageAbsent != tcmFull)
-            {
-              transformedMessage = formatMessage(transformer.transformAddition(tcmFull, testCaseMessageAbsent.getAdditionalTransformations()));
-            }
-            out.println("<p>Starting Message</p>");
-            if (transformedMessage != null)
-            {
-              out.println("<pre>" + addHovers(showDiff(originalMessage, transformedMessage)) + "</pre>");
-            } else
-            {
-              out.println("<pre>" + originalMessage + "</pre>");
-            }
-            out.println("<p>Transforms</p>");
-            out.println("<form action=\"profile\" method=\"POST\">");
-            out.println("  <textarea name=\"additionalTransformations\" cols=\"70\" rows=\"10\" wrap=\"off\">"
-                + testCaseMessageAbsent.getAdditionalTransformations() + "</textarea></td>");
-            out.println("  <input type=\"hidden\" name=\"" + PARAM_SHOW + "\" value=\"" + SHOW_TRANSFORMS + "\"/>");
-            out.println(
-                "  <input type=\"hidden\" name=\"" + PARAM_PROFILE_FIELD_ID + "\" value=\"" + profileFieldSelected.getProfileFieldId() + "\"/>");
-            out.println("  <input type=\"hidden\" name=\"edit\" value=\"absent\"/>");
-            out.println("  <br/>");
-            out.println("  <input type=\"checkbox\" name=\"tcmFull\" value=\"true\"" + (testCaseMessageAbsent == tcmFull ? " checked" : "")
-                + "/> Use Full Message");
-            out.println("  <br/>");
-            out.println("  <input type=\"submit\" name=\"action\" value=\"Refresh\"/>");
-            out.println("  <input type=\"submit\" name=\"action\" value=\"Save\"/>");
-            out.println("</form>");
-            if (testCaseMessageAbsent != tcmFull)
-            {
-              out.println("<p>Final Message</p>");
-              out.println("<pre>" + addHovers(showDiff(transformedMessage, originalMessage)) + "</pre>");
-            }
-          } else
-          {
-            if (testCaseMessageAbsent == tcmFull)
-            {
-              out.println("<p>Full Test Case</p>");
-            } else if (!testCaseMessageAbsent.hasIssue())
-            {
-              out.println("<p>Not Defined</p>");
-            } else
-            {
-              out.println("<pre>" + testCaseMessageAbsent.getAdditionalTransformations() + "</pre>");
-            }
-            String link = "profile?" + PARAM_SHOW + "=" + SHOW_TRANSFORMS + "&" + PARAM_PROFILE_FIELD_ID + "="
-                + profileFieldSelected.getProfileFieldId() + "&edit=absent";
-            out.println("<p><a href=\"" + link + "\">Edit</a></p>");
-          }
-        }
-      }
-
-      createFooter(webSession);
-    } finally
-    {
-      out.close();
     }
+    return profileUsageSelected;
+  }
 
+  public String getAction(HttpServletRequest req)
+  {
+    String action = req.getParameter(PARAM_ACTION);
+    if (action == null)
+    {
+      action = "";
+    }
+    return action;
   }
 
   public void printLink(PrintWriter out, ProfileUsageValue profileUsageValue) throws UnsupportedEncodingException
   {
     String link = "guide?" + GuideServlet.PARAM_PROFILE_USAGE_ID + "=" + profileUsageValue.getProfileUsage().getProfileUsageId() + "&"
-        + GuideServlet.PARAM_PROFILE_USAGE_VALUE_ID + "=" + profileUsageValue.getProfileUsageValueId() + "&" + GuideServlet.PARAM_LOCATION
-        + "=";
+        + GuideServlet.PARAM_PROFILE_USAGE_VALUE_ID + "=" + profileUsageValue.getProfileUsageValueId() + "&" + GuideServlet.PARAM_LOCATION + "=";
     out.println("    <td>");
     printLink(out, link, "Definition", profileUsageValue.getLinkDefinition());
     printLink(out, link, "Detail", profileUsageValue.getLinkDetail());
@@ -780,6 +851,7 @@ public class ProfileServlet extends HomeServlet
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void printEditTable(PrintWriter out, Session dataSession, ProfileUsageValue profileUsageValueSelected, ProfileField profileFieldCopyFrom)
       throws UnsupportedEncodingException
   {
@@ -1017,6 +1089,7 @@ public class ProfileServlet extends HomeServlet
     out.println("</form>");
   }
 
+  @SuppressWarnings("unchecked")
   private void printEditTable(PrintWriter out, Session dataSession, ProfileUsage profileUsageSelected, ProfileFieldType profileFieldType1,
       ProfileFieldType profileFieldType2) throws UnsupportedEncodingException
   {
@@ -1269,6 +1342,7 @@ public class ProfileServlet extends HomeServlet
       }
       for (int i = 0; i < line.length(); i++)
       {
+        @SuppressWarnings("unused")
         char c = line.charAt(i);
         if (line.charAt(i) == '|')
         {

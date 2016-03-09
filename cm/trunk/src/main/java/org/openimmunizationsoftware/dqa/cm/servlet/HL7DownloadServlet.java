@@ -16,6 +16,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
+@SuppressWarnings("serial")
 public class HL7DownloadServlet extends HomeServlet
 {
 
@@ -27,6 +28,7 @@ public class HL7DownloadServlet extends HomeServlet
   public static final String TYPE_QUERIES = "queries";
   public static final String TYPE_RESPONSES = "responses";
 
+  @SuppressWarnings("unchecked")
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
@@ -68,9 +70,11 @@ public class HL7DownloadServlet extends HomeServlet
         printMessages(out, type, anonymize, hidePatientId, testMessageList);
       } else
       {
-        String filename = "Test " + testConducted.getTestConductedId() + " " + type + " " + sdf.format(testConducted.getTestStartedTime()) + ".hl7.txt";
+        String filename = "Test " + testConducted.getTestConductedId() + " " + type + " " + sdf.format(testConducted.getTestStartedTime())
+            + ".hl7.txt";
         resp.setHeader("content-disposition", "attachment; filename=\"" + filename + "\"");
-        Query query = dataSession.createQuery("from TestMessage where testSection.testConducted = ? and testType = ? order by testSection.testSectionType, testPosition");
+        Query query = dataSession
+            .createQuery("from TestMessage where testSection.testConducted = ? and testType = ? order by testSection.testSectionType, testPosition");
         query.setParameter(0, testConducted);
         if (type.equals(TYPE_UPDATES) || type.equals(TYPE_ACKS))
         {
@@ -85,10 +89,11 @@ public class HL7DownloadServlet extends HomeServlet
 
     } catch (Exception e)
     {
-      e.printStackTrace();
-      throw new ServletException(e);
-    } 
-    out.close();
+      handleError(e, webSession);
+    } finally
+    {
+      out.close();
+    }
   }
 
   public void printMessages(PrintWriter out, String type, boolean anonymize, boolean hidePatientId, List<TestMessage> testMessageList)

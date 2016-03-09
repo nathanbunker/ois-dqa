@@ -30,16 +30,19 @@ public class DeleteProposedVersionThread extends LogicThread
       Transaction transaction = dataSession.beginTransaction();
       Query query = dataSession.createQuery("from CodeTableInstance where release = ?");
       query.setParameter(0, proposedReleaseVersion);
+      @SuppressWarnings("unchecked")
       List<CodeTableInstance> codeTableInstanceList = query.list();
       for (CodeTableInstance cti : codeTableInstanceList)
       {
         query = dataSession.createQuery("from CodeInstance where tableInstance = ?");
         query.setParameter(0, cti);
+        @SuppressWarnings("unchecked")
         List<CodeInstance> codeInstanceList = query.list();
         for (CodeInstance ci : codeInstanceList)
         {
           query = dataSession.createQuery("from AttributeInstance where codeInstance = ?");
           query.setParameter(0, ci);
+          @SuppressWarnings("unchecked")
           List<AttributeInstance> attributeInstanceList = query.list();
           for (AttributeInstance ai : attributeInstanceList)
           {
@@ -59,6 +62,7 @@ public class DeleteProposedVersionThread extends LogicThread
         query = dataSession.createQuery("from ReleaseVersion where majorVersionNum = ? and minorVersionNum = ? ");
         query.setParameter(0, majorVersionNum);
         query.setParameter(1, minorVersionNum);
+        @SuppressWarnings("unchecked")
         List<ReleaseVersion> releaseVersionList = query.list();
         if (releaseVersionList.size() > 0)
         {

@@ -19,7 +19,6 @@ public class MailManager
 
   private String reply = "";
   private String smtpsPassword = "";
-  private int smtpsPort = 0;
   private String smtpsUsername = "";
   private boolean useSmtps = false;
   private String address = "";
@@ -29,7 +28,7 @@ public class MailManager
     User u = UserLogic.getUser(DQA_INITIAL_USER_ID, dataSession);
     reply = u.getUserSetting(User.USER_SETTING_EMAIL_MANAGER_REPLY, "");
     smtpsPassword = u.getUserSetting(User.USER_SETTING_EMAIL_MANAGER_SMTPS_PASSWORD, "");
-    smtpsPort = u.getUserSetting(User.USER_SETTING_EMAIL_MANAGER_SMTPS_PORT, 0);
+    // smtpsPort = u.getUserSetting(User.USER_SETTING_EMAIL_MANAGER_SMTPS_PORT, 0);
     smtpsUsername = u.getUserSetting(User.USER_SETTING_EMAIL_MANAGER_SMTPS_USERNAME, "");
     useSmtps = u.getUserSetting(User.USER_SETTING_EMAIL_MANAGER_USE_SMTPS, false);
     address = u.getUserSetting(User.USER_SETTING_EMAIL_MANAGER_ADDRESS, "");

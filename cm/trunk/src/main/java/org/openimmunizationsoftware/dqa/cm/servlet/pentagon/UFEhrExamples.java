@@ -2,7 +2,6 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -12,9 +11,7 @@ import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
-import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
-import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UFEhrExamples extends PentagonBoxHelper
 {
@@ -45,6 +42,7 @@ public class UFEhrExamples extends PentagonBoxHelper
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
       query.setParameter(1, pentagonReport.getTestConducted());
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFail(out, testMessageList);
     }
@@ -56,6 +54,7 @@ public class UFEhrExamples extends PentagonBoxHelper
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_EXCEPTIONAL);
       query.setParameter(1, pentagonReport.getTestConducted());
       query.setParameter(2, RecordServletInterface.VALUE_EXCEPTIONAL_PREFIX_CERTIFIED_MESSAGE + "%");
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPass(out, testMessageList, userSession);
     }

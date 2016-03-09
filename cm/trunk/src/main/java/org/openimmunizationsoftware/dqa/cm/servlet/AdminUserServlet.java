@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -33,6 +32,7 @@ import org.openimmunizationsoftware.dqa.cm.model.User;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
+@SuppressWarnings("serial")
 public class AdminUserServlet extends BaseServlet
 {
   public AdminUserServlet() {
@@ -47,6 +47,7 @@ public class AdminUserServlet extends BaseServlet
 
   public static final String PARAM_ACTION = "action";
   public static final String PARAM_RELEASE_ID = "releaseId";
+  public static final String PARAM_VIEW = "view";
 
   public static final String ACTION_RELEASE_VERSION = "Release Version";
   public static final String ACTION_DELETE_VERSION = "Delete Version";
@@ -71,6 +72,9 @@ public class AdminUserServlet extends BaseServlet
   public static final String PARAM_REPORT_ROLE = "reportRole";
   public static final String PARAM_TEST_PARTICIPANT_ID = "testParticipantId";
 
+  public static final String VIEW_DEFAULT = "default";
+  public static final String VIEW_USER_LOGS = "userLogs";
+
   private static ReleaseNewVersionThread releaseNewVersionThread = null;
   private static DeleteProposedVersionThread deleteProposedVersionThread = null;
   private static UpdateIssueCountThread updateIssueCountThread = null;
@@ -87,191 +91,264 @@ public class AdminUserServlet extends BaseServlet
       sendToHome(req, resp);
       return;
     }
-    String action = req.getParameter(PARAM_ACTION);
-    User userBeingEdited = null;
-    if (req.getParameter(PARAM_USER_ID) != null)
+    try
     {
-      int userId = readInt(PARAM_USER_ID, req);
-      userBeingEdited = UserLogic.getUser(userId, dataSession);
+      String action = req.getParameter(PARAM_ACTION);
+      User userBeingEdited = null;
+      if (req.getParameter(PARAM_USER_ID) != null)
+      {
+        int userId = readInt(PARAM_USER_ID, req);
+        userBeingEdited = UserLogic.getUser(userId, dataSession);
+      }
+      if (action != null)
+      {
+        if (action.equals(ACTION_RELEASE_VERSION) && (releaseNewVersionThread == null || releaseNewVersionThread.isComplete()))
+        {
+          releaseVersion(req, userSession, dataSession);
+        } else if (action.equals(ACTION_UPDATE_ISSUE_COUNTS) && (updateIssueCountThread == null || updateIssueCountThread.isComplete()))
+        {
+          updateIssueCounts(req, userSession, dataSession);
+        } else if (action.equals(ACTION_DELETE_VERSION))
+        {
+          deleteVersion(req, userSession, dataSession);
+        } else if (action.equals(ACTION_SEARCH_USER))
+        {
+          searchUser(req, userSession, dataSession);
+        } else if (action.equals(ACTION_ADD_USER))
+        {
+          userBeingEdited = addUser(req, userSession, dataSession, userBeingEdited);
+        } else if (action.equals(ACTION_UPDATE_USER))
+        {
+          updateUser(req, userSession, dataSession, userBeingEdited);
+        } else if (action.equals(ACTION_RESET_PASSWORD))
+        {
+          resetPassword(userSession, dataSession, userBeingEdited);
+        } else if (action.equals(ACTION_UPDATE_REPORT_USER))
+        {
+          updateReportUser(req, userSession, dataSession, userBeingEdited);
+        }
+      }
+
+      createHeader(webSession);
+
+      String view = req.getParameter(PARAM_VIEW);
+      if (view == null)
+      {
+        view = VIEW_DEFAULT;
+      }
+
+      if (view.equals(VIEW_DEFAULT))
+      {
+        out.println("<div class=\"leftColumn\">");
+        printSearchUser(userSession);
+        printCreateUser(userSession);
+        out.println("</div>");
+
+        out.println("<div class=\"centerColumn\">");
+        printUsers(userBeingEdited, userSession);
+        out.println("</div>");
+
+        out.println("<div class=\"rightColumn\">");
+        printEditUser(userBeingEdited, userSession, req);
+        out.println("</div>");
+      }
+      else       if (view.equals(VIEW_USER_LOGS))
+      {
+        out.println("<div class=\"leftColumn\">");
+        printSearchUser(userSession);
+        printCreateUser(userSession);
+        out.println("</div>");
+
+        out.println("<div class=\"centerColumn\">");
+        printUsers(userBeingEdited, userSession);
+        out.println("</div>");
+
+        out.println("<div class=\"rightColumn\">");
+        
+        out.println("</div>");
+      }
+
+      out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
+    } catch (Exception e)
+    {
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
     }
-    if (action != null)
+
+  }
+
+  public void updateReportUser(HttpServletRequest req, UserSession userSession, Session dataSession, User userBeingEdited)
+  {
+    List<TestParticipant> testParticipantListSelected = new ArrayList<TestParticipant>(userBeingEdited.getReportUserMap().keySet());
+    for (TestParticipant testParticipant : testParticipantListSelected)
     {
-      if (action.equals(ACTION_RELEASE_VERSION) && (releaseNewVersionThread == null || releaseNewVersionThread.isComplete()))
-      {
-        ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
-        releaseNewVersionThread = new ReleaseNewVersionThread(rv, userSession.getUser());
-        releaseNewVersionThread.start();
-      } else if (action.equals(ACTION_UPDATE_ISSUE_COUNTS) && (updateIssueCountThread == null || updateIssueCountThread.isComplete()))
-      {
-        ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
-        updateIssueCountThread = new UpdateIssueCountThread(rv, userSession.getUser());
-        updateIssueCountThread.start();
-      } else if (action.equals(ACTION_DELETE_VERSION))
-      {
-        ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
-        deleteProposedVersionThread = new DeleteProposedVersionThread(userSession.getUser(), rv);
-        deleteProposedVersionThread.start();
-      } else if (action.equals(ACTION_SEARCH_USER))
-      {
-        UserSearchOptions userSearchOptions = userSession.getUserSearchOptions();
-        userSearchOptions.setEmailAddress(req.getParameter(PARAM_EMAIL_ADDRESS));
-        if (req.getParameter(PARAM_MEMBER_TYPE).equals(""))
-        {
-          userSearchOptions.setMemberType(null);
-        } else
-        {
-          userSearchOptions.setMemberType(MemberType.get(req.getParameter(PARAM_MEMBER_TYPE)));
-        }
-        userSearchOptions.setOrganization(req.getParameter(PARAM_ORGANIZATION));
-        userSearchOptions.setUserName(req.getParameter(PARAM_USER_NAME));
-        for (Application application : ApplicationLogic.getApplications(dataSession))
-        {
-          String userTypeString = req.getParameter(PARAM_USER_TYPE + "." + application.getApplicationId());
-          if (userTypeString.equals(""))
-          {
-            userSearchOptions.getApplicationUserTypeMap().remove(application);
-          } else
-          {
-            UserType userType = UserType.get(userTypeString);
-            userSearchOptions.getApplicationUserTypeMap().put(application, userType);
-          }
-        }
-      } else if (action.equals(ACTION_ADD_USER))
-      {
-        String userName = req.getParameter(PARAM_USER_NAME);
-        if (userName.equals(""))
-        {
-          userSession.setMessageError("Unable to add user, user name not specified");
-        } else
-        {
-          userBeingEdited = UserLogic.getUserWithUsername(userName, dataSession);
-          if (userBeingEdited != null)
-          {
-            userSession.setMessageError("Unable to add user, user name is already used");
-          } else
-          {
-            String applicationIdString = req.getParameter(PARAM_APPLICATION_ID);
-            String userTypeString = req.getParameter(PARAM_USER_TYPE);
-            if (applicationIdString.equals(""))
-            {
-              userSession.setMessageError("Unable to add user, application was not selected");
-            } else if (userTypeString.equals(""))
-            {
-              userSession.setMessageError("Unable to add user, user type was not selected");
-            } else
-            {
-              int applicationId = Integer.parseInt(applicationIdString);
-              Application application = ApplicationLogic.getApplication(applicationId, dataSession);
-              UserType userType = UserType.get(userTypeString);
-              userBeingEdited = new User();
-              userBeingEdited.setUserName(userName);
-              userBeingEdited.setEmailAddress(req.getParameter(PARAM_EMAIL_ADDRESS));
-              userBeingEdited.setOrganization(req.getParameter(PARAM_ORGANIZATION));
-              userBeingEdited.setPositionTitle(req.getParameter(PARAM_POSITION_TITLE));
-              userBeingEdited.setMemberTypeString(req.getParameter(PARAM_MEMBER_TYPE));
-              userBeingEdited.setPhoneNumber(req.getParameter(PARAM_PHONE_NUMBER));
-              userBeingEdited.setAdminComments(req.getParameter(PARAM_ADMIN_COMMENTS));
-              userBeingEdited.setResetPassword(true);
-              List<Application> applicationList = new ArrayList<Application>();
-              applicationList.add(application);
-              UserLogic.createUser(userBeingEdited, applicationList, userType, dataSession);
+      ReportUser reportUser = userBeingEdited.getReportUserMap().get(testParticipant);
+      String reportRoleString = req.getParameter(PARAM_REPORT_ROLE + "." + reportUser.getReportUserId());
+      reportUser.setReportRoleString(reportRoleString);
+    }
+    String testParticipantIdString = req.getParameter(PARAM_TEST_PARTICIPANT_ID);
+    String reportRoleString = req.getParameter(PARAM_REPORT_ROLE);
+    if (!testParticipantIdString.equals("") && !reportRoleString.equals(""))
+    {
+      TestParticipant testParticipant = (TestParticipant) dataSession.get(TestParticipant.class, Integer.parseInt(testParticipantIdString));
+      ReportUser reportUser = new ReportUser();
+      reportUser.setUser(userBeingEdited);
+      reportUser.setTestParticipant(testParticipant);
+      reportUser.setAuthorizedByUser(userSession.getUser());
+      reportUser.setAuthorizedDate(new Date());
+      reportUser.setReportRoleString(reportRoleString);
+      userBeingEdited.getReportUserMap().put(testParticipant, reportUser);
+    }
+    UserLogic.updateUser(userBeingEdited, dataSession);
+  }
 
-              userSession.setMessageConfirmation("User created, password is " + userBeingEdited.getPassword());
-            }
-          }
-        }
-      } else if (action.equals(ACTION_UPDATE_USER))
-      {
-        String userName = req.getParameter(PARAM_USER_NAME);
-        if (!userName.equals(userBeingEdited.getUserName()))
-        {
-          User otherUser = UserLogic.getUserWithUsername(userName, dataSession);
-          if (otherUser != null)
-          {
-            userSession.setMessageError("Unable to update user, user name is already in used by a different acount");
-          }
-        }
-        String memberTypeString = req.getParameter(PARAM_MEMBER_TYPE);
-        if (userSession.getMessageError() == null)
-        {
-          if (memberTypeString.equals(""))
-          {
-            userSession.setMessageError("Member type must be indicated. ");
-          }
-        }
-        if (userSession.getMessageError() == null)
-        {
-          String emailAddress = req.getParameter(PARAM_EMAIL_ADDRESS);
-          userBeingEdited.setEmailAddress(emailAddress);
-          userBeingEdited.setUserName(userName);
-          userBeingEdited.setOrganization(req.getParameter(PARAM_ORGANIZATION));
-          userBeingEdited.setPositionTitle(req.getParameter(PARAM_POSITION_TITLE));
-          userBeingEdited.setMemberTypeString(memberTypeString);
-          userBeingEdited.setPhoneNumber(req.getParameter(PARAM_PHONE_NUMBER));
-          userBeingEdited.setAdminComments(req.getParameter(PARAM_ADMIN_COMMENTS));
-          userBeingEdited.setResetPassword(req.getParameter(PARAM_RESET_PASSWORD) != null);
-          UserLogic.updateUser(userBeingEdited, dataSession);
+  public void resetPassword(UserSession userSession, Session dataSession, User userBeingEdited)
+  {
+    UserLogic.resetPassword(userBeingEdited, dataSession);
+    userSession.setMessageConfirmation("Password is now " + userBeingEdited.getPassword());
+  }
 
-          for (Application application : ApplicationLogic.getApplications(dataSession))
-          {
-            String userTypeString = req.getParameter(PARAM_USER_TYPE + "." + application.getApplicationId());
-            UserType userType = null;
-            if (!userTypeString.equals(""))
-            {
-              userType = UserType.get(userTypeString);
-            }
-            UserLogic.createOrUpdateApplicationUser(userBeingEdited, application, userType, dataSession);
-          }
-          userSession.setMessageConfirmation("User updated");
-        }
-      } else if (action.equals(ACTION_RESET_PASSWORD))
+  public void updateUser(HttpServletRequest req, UserSession userSession, Session dataSession, User userBeingEdited)
+  {
+    String userName = req.getParameter(PARAM_USER_NAME);
+    if (!userName.equals(userBeingEdited.getUserName()))
+    {
+      User otherUser = UserLogic.getUserWithUsername(userName, dataSession);
+      if (otherUser != null)
       {
-        UserLogic.resetPassword(userBeingEdited, dataSession);
-        userSession.setMessageConfirmation("Password is now " + userBeingEdited.getPassword());
-      } else if (action.equals(ACTION_UPDATE_REPORT_USER))
-      {
-        List<TestParticipant> testParticipantListSelected = new ArrayList<TestParticipant>(userBeingEdited.getReportUserMap().keySet());
-        for (TestParticipant testParticipant : testParticipantListSelected)
-        {
-          ReportUser reportUser = userBeingEdited.getReportUserMap().get(testParticipant);
-          String reportRoleString = req.getParameter(PARAM_REPORT_ROLE + "." + reportUser.getReportUserId());
-          reportUser.setReportRoleString(reportRoleString);
-        }
-        String testParticipantIdString = req.getParameter(PARAM_TEST_PARTICIPANT_ID);
-        String reportRoleString = req.getParameter(PARAM_REPORT_ROLE);
-        if (!testParticipantIdString.equals("") && !reportRoleString.equals(""))
-        {
-          TestParticipant testParticipant = (TestParticipant) dataSession.get(TestParticipant.class, Integer.parseInt(testParticipantIdString));
-          ReportUser reportUser = new ReportUser();
-          reportUser.setUser(userBeingEdited);
-          reportUser.setTestParticipant(testParticipant);
-          reportUser.setAuthorizedByUser(userSession.getUser());
-          reportUser.setAuthorizedDate(new Date());
-          reportUser.setReportRoleString(reportRoleString);
-          userBeingEdited.getReportUserMap().put(testParticipant, reportUser);
-        }
-        UserLogic.updateUser(userBeingEdited, dataSession);
+        userSession.setMessageError("Unable to update user, user name is already in used by a different acount");
       }
     }
+    String memberTypeString = req.getParameter(PARAM_MEMBER_TYPE);
+    if (userSession.getMessageError() == null)
+    {
+      if (memberTypeString.equals(""))
+      {
+        userSession.setMessageError("Member type must be indicated. ");
+      }
+    }
+    if (userSession.getMessageError() == null)
+    {
+      String emailAddress = req.getParameter(PARAM_EMAIL_ADDRESS);
+      userBeingEdited.setEmailAddress(emailAddress);
+      userBeingEdited.setUserName(userName);
+      userBeingEdited.setOrganization(req.getParameter(PARAM_ORGANIZATION));
+      userBeingEdited.setPositionTitle(req.getParameter(PARAM_POSITION_TITLE));
+      userBeingEdited.setMemberTypeString(memberTypeString);
+      userBeingEdited.setPhoneNumber(req.getParameter(PARAM_PHONE_NUMBER));
+      userBeingEdited.setAdminComments(req.getParameter(PARAM_ADMIN_COMMENTS));
+      userBeingEdited.setResetPassword(req.getParameter(PARAM_RESET_PASSWORD) != null);
+      UserLogic.updateUser(userBeingEdited, dataSession);
 
-    createHeader(webSession);
+      for (Application application : ApplicationLogic.getApplications(dataSession))
+      {
+        String userTypeString = req.getParameter(PARAM_USER_TYPE + "." + application.getApplicationId());
+        UserType userType = null;
+        if (!userTypeString.equals(""))
+        {
+          userType = UserType.get(userTypeString);
+        }
+        UserLogic.createOrUpdateApplicationUser(userBeingEdited, application, userType, dataSession);
+      }
+      userSession.setMessageConfirmation("User updated");
+    }
+  }
 
-    out.println("<div class=\"leftColumn\">");
-    printSearchUser(userSession);
-    printCreateUser(userSession);
-    out.println("</div>");
+  public User addUser(HttpServletRequest req, UserSession userSession, Session dataSession, User userBeingEdited)
+  {
+    String userName = req.getParameter(PARAM_USER_NAME);
+    if (userName.equals(""))
+    {
+      userSession.setMessageError("Unable to add user, user name not specified");
+    } else
+    {
+      userBeingEdited = UserLogic.getUserWithUsername(userName, dataSession);
+      if (userBeingEdited != null)
+      {
+        userSession.setMessageError("Unable to add user, user name is already used");
+      } else
+      {
+        String applicationIdString = req.getParameter(PARAM_APPLICATION_ID);
+        String userTypeString = req.getParameter(PARAM_USER_TYPE);
+        if (applicationIdString.equals(""))
+        {
+          userSession.setMessageError("Unable to add user, application was not selected");
+        } else if (userTypeString.equals(""))
+        {
+          userSession.setMessageError("Unable to add user, user type was not selected");
+        } else
+        {
+          int applicationId = Integer.parseInt(applicationIdString);
+          Application application = ApplicationLogic.getApplication(applicationId, dataSession);
+          UserType userType = UserType.get(userTypeString);
+          userBeingEdited = new User();
+          userBeingEdited.setUserName(userName);
+          userBeingEdited.setEmailAddress(req.getParameter(PARAM_EMAIL_ADDRESS));
+          userBeingEdited.setOrganization(req.getParameter(PARAM_ORGANIZATION));
+          userBeingEdited.setPositionTitle(req.getParameter(PARAM_POSITION_TITLE));
+          userBeingEdited.setMemberTypeString(req.getParameter(PARAM_MEMBER_TYPE));
+          userBeingEdited.setPhoneNumber(req.getParameter(PARAM_PHONE_NUMBER));
+          userBeingEdited.setAdminComments(req.getParameter(PARAM_ADMIN_COMMENTS));
+          userBeingEdited.setResetPassword(true);
+          List<Application> applicationList = new ArrayList<Application>();
+          applicationList.add(application);
+          UserLogic.createUser(userBeingEdited, applicationList, userType, dataSession);
 
-    out.println("<div class=\"centerColumn\">");
-    printUsers(userBeingEdited, userSession);
-    out.println("</div>");
+          userSession.setMessageConfirmation("User created, password is " + userBeingEdited.getPassword());
+        }
+      }
+    }
+    return userBeingEdited;
+  }
 
-    out.println("<div class=\"rightColumn\">");
-    printEditUser(userBeingEdited, userSession, req);
-    out.println("</div>");
+  public void releaseVersion(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
+    releaseNewVersionThread = new ReleaseNewVersionThread(rv, userSession.getUser());
+    releaseNewVersionThread.start();
+  }
 
-    out.println("    <span class=\"cmVersion\">software version " + SoftwareVersion.VERSION + "</span>");
-    createFooter(webSession);
+  public void updateIssueCounts(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
+    updateIssueCountThread = new UpdateIssueCountThread(rv, userSession.getUser());
+    updateIssueCountThread.start();
+  }
 
+  public void deleteVersion(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    ReleaseVersion rv = ReleaseVersionLogic.getReleaseVersion(readInt(PARAM_RELEASE_ID, req), dataSession);
+    deleteProposedVersionThread = new DeleteProposedVersionThread(userSession.getUser(), rv);
+    deleteProposedVersionThread.start();
+  }
+
+  public void searchUser(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    UserSearchOptions userSearchOptions = userSession.getUserSearchOptions();
+    userSearchOptions.setEmailAddress(req.getParameter(PARAM_EMAIL_ADDRESS));
+    if (req.getParameter(PARAM_MEMBER_TYPE).equals(""))
+    {
+      userSearchOptions.setMemberType(null);
+    } else
+    {
+      userSearchOptions.setMemberType(MemberType.get(req.getParameter(PARAM_MEMBER_TYPE)));
+    }
+    userSearchOptions.setOrganization(req.getParameter(PARAM_ORGANIZATION));
+    userSearchOptions.setUserName(req.getParameter(PARAM_USER_NAME));
+    for (Application application : ApplicationLogic.getApplications(dataSession))
+    {
+      String userTypeString = req.getParameter(PARAM_USER_TYPE + "." + application.getApplicationId());
+      if (userTypeString.equals(""))
+      {
+        userSearchOptions.getApplicationUserTypeMap().remove(application);
+      } else
+      {
+        UserType userType = UserType.get(userTypeString);
+        userSearchOptions.getApplicationUserTypeMap().put(application, userType);
+      }
+    }
   }
 
   public void printCreateUser(UserSession userSession)
@@ -431,6 +508,7 @@ public class AdminUserServlet extends BaseServlet
     out.println("  </table>");
   }
 
+  @SuppressWarnings("unchecked")
   public static List<User> searchUsers(UserSearchOptions userSearchOptions, Session dataSession)
   {
     List<User> userList;
@@ -451,7 +529,7 @@ public class AdminUserServlet extends BaseServlet
       first = addAnd(queryString, first);
       queryString.append("(");
       first = true;
-      for (Application application : userSearchOptions.getApplicationUserTypeMap().keySet())
+      for (int i = 0; i < userSearchOptions.getApplicationUserTypeMap().size(); i++)
       {
         first = addOr(queryString, first);
         queryString.append("(application = ? and userTypeString = ?) ");
@@ -546,6 +624,14 @@ public class AdminUserServlet extends BaseServlet
     return false;
   }
 
+  @SuppressWarnings("unchecked")
+  public void printUserLogs(User userBeingEdited, UserSession userSession, HttpServletRequest req)
+  {
+    PrintWriter out = userSession.getOut();
+    Query query = userSession.getDataSession().createSQLQuery("");
+  }
+  
+  @SuppressWarnings("unchecked")
   public void printEditUser(User userBeingEdited, UserSession userSession, HttpServletRequest req)
   {
     PrintWriter out = userSession.getOut();
