@@ -2,7 +2,6 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -13,7 +12,6 @@ import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
-import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 import org.openimmunizationsoftware.dqa.tr.model.Transform;
 
 public class UCModifications extends PentagonBoxHelper
@@ -33,6 +31,7 @@ public class UCModifications extends PentagonBoxHelper
         + "law and/or policies may prevent removal of all modifications.</p>");
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {
@@ -135,6 +134,7 @@ public class UCModifications extends PentagonBoxHelper
     TestConducted testConducted = pentagonReport.getTestConducted();
     Query query = dataSession.createQuery("from Transform where testConducted = ?");
     query.setParameter(0, testConducted);
+    @SuppressWarnings("unchecked")
     List<Transform> transformList = query.list();
     int countExpected = 0;
     for (Transform transform : transformList)

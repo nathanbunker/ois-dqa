@@ -26,6 +26,7 @@ import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 import org.openimmunizationsoftware.dqa.tr.model.TesterCommand;
 import org.openimmunizationsoftware.dqa.tr.model.TesterStatus;
 
+@SuppressWarnings("serial")
 public class ManualManageServlet extends HomeServlet
 {
 
@@ -59,10 +60,10 @@ public class ManualManageServlet extends HomeServlet
       sendToHome(req, resp);
       return;
     }
-    String view = req.getParameter(PARAM_VIEW);
-    String action = req.getParameter(PARAM_ACTION);
     try
     {
+      String view = req.getParameter(PARAM_VIEW);
+      String action = req.getParameter(PARAM_ACTION);
       if (action != null)
       {
         if (view.equals(VIEW_HL7_TESTERS) || view.equals(VIEW_HL7_REPORTS))
@@ -87,14 +88,17 @@ public class ManualManageServlet extends HomeServlet
       {
         viewHl7Testers(req, dataSession, out);
       }
-      createFooter(webSession);
+    } catch (Exception e)
+    {
+      handleError(e, webSession);
     } finally
     {
-      out.close();
+      createFooter(webSession);
     }
 
   }
 
+  @SuppressWarnings("unchecked")
   private void viewHl7Testers(HttpServletRequest req, Session dataSession, PrintWriter out)
   {
     String testerNameSelected = req.getParameter(PARAM_TESTER_NAME);
@@ -211,8 +215,7 @@ public class ManualManageServlet extends HomeServlet
       out.println("  </tr>");
       out.println("  <tr>");
       out.println("    <th class=\"pentagon\">Effective Date & Time</th>");
-      out.println(
-          "    <td class=\"pentagon\"><input type=\"input\" name=\"" + PARAM_RUN_DATE + "\" value=\"" + sdf.format(new Date()) + "\"></td>");
+      out.println("    <td class=\"pentagon\"><input type=\"input\" name=\"" + PARAM_RUN_DATE + "\" value=\"" + sdf.format(new Date()) + "\"></td>");
       out.println("  </tr>");
       out.println("  <tr class=\"pentagon\">");
       out.println("    <td class=\"pentagon\" colspan=\"2\">");
@@ -307,6 +310,7 @@ public class ManualManageServlet extends HomeServlet
     printRefreshScript(out, 30);
   }
 
+  @SuppressWarnings("unchecked")
   private void viewHl7Reports(Session dataSession, PrintWriter out)
   {
     List<TestParticipant> testParticipantList;
@@ -326,6 +330,7 @@ public class ManualManageServlet extends HomeServlet
     printRefreshScript(out, 300);
   }
 
+  @SuppressWarnings("unchecked")
   private void viewHl7Download(HttpServletRequest req, UserSession userSession, Session dataSession, PrintWriter out)
   {
     TestParticipant testParticipant = null;
@@ -484,14 +489,14 @@ public class ManualManageServlet extends HomeServlet
 
   private void doActionDelete(HttpServletRequest req, UserSession userSession, Session dataSession)
   {
-    TesterCommand testerCommand = (TesterCommand) dataSession.get(TesterCommand.class,
-        Integer.parseInt(req.getParameter(PARAM_TESTER_COMMAND_ID)));
+    TesterCommand testerCommand = (TesterCommand) dataSession.get(TesterCommand.class, Integer.parseInt(req.getParameter(PARAM_TESTER_COMMAND_ID)));
     Transaction transaction = dataSession.beginTransaction();
     dataSession.delete(testerCommand);
     transaction.commit();
     userSession.setMessageConfirmation("Command has been deleted");
   }
 
+  @SuppressWarnings("unchecked")
   public void printStatusTable(Session dataSession, PrintWriter out, List<TestParticipant> testParticipantList, String connectStatusConnected,
       String connectStatusManualReporter, String connectShow, List<TesterStatus> testerStatusList)
   {
@@ -648,11 +653,13 @@ public class ManualManageServlet extends HomeServlet
     List<TesterStatus> testerStatusList = new ArrayList<TesterStatus>();
     {
       Query query = dataSession.createQuery("select testerName from TesterStatus group by testerName order by testerName ");
+      @SuppressWarnings("unchecked")
       List<Object> testerNameList = query.list();
       for (Object testerName : testerNameList)
       {
         query = dataSession.createQuery("from TesterStatus where testerName = ? order by statusDate desc");
         query.setParameter(0, (String) testerName);
+        @SuppressWarnings("unchecked")
         List<TesterStatus> testerStatusItemList = query.list();
         if (testerStatusItemList.size() > 0)
         {

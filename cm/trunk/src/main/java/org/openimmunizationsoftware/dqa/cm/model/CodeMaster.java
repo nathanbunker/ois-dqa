@@ -2,6 +2,7 @@ package org.openimmunizationsoftware.dqa.cm.model;
 
 import java.io.Serializable;
 
+@SuppressWarnings("serial")
 public class CodeMaster implements Serializable
 {
   private int codeId = 0;

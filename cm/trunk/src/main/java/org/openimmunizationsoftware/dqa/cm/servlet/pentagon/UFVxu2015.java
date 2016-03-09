@@ -45,6 +45,7 @@ public class UFVxu2015 extends PentagonBoxHelper
 
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {

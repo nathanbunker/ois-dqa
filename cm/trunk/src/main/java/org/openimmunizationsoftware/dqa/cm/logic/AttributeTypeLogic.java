@@ -65,6 +65,7 @@ public class AttributeTypeLogic
   public static List<AttributeType> getAttributeTypeList(Session dataSession)
   {
     Query query = dataSession.createQuery("from AttributeType order by attributeLabel");
+    @SuppressWarnings("unchecked")
     List<AttributeType> attributeTypeList = query.list();
     return attributeTypeList;
   }

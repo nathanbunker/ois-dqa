@@ -112,6 +112,7 @@ public class CodeInstanceLogic
     Map<AttributeType, List<AttributeInstance>> attributeTypeToValueMap = new HashMap<AttributeType, List<AttributeInstance>>();
     Query query = dataSession.createQuery("from AttributeInstance where codeInstance = ?");
     query.setParameter(0, codeInstance);
+    @SuppressWarnings("unchecked")
     List<AttributeInstance> attributeInstanceList = query.list();
     for (AttributeInstance ai : attributeInstanceList)
     {
@@ -189,6 +190,7 @@ public class CodeInstanceLogic
     query.setParameter(0, releaseVersion);
     query.setParameter(1, codeValue + "%");
     query.setParameter(2, codeLabel + "%");
+    @SuppressWarnings("unchecked")
     List<CodeInstance> codeInstanceList = query.list();
     return codeInstanceList;
   }
@@ -198,6 +200,7 @@ public class CodeInstanceLogic
     Query query = dataSession.createQuery("from CodeInstance where code = ? and tableInstance.release = ?");
     query.setParameter(0, codeMaster);
     query.setParameter(1, releaseVersion);
+    @SuppressWarnings("unchecked")
     List<CodeInstance> codeInstanceList = query.list();
     if (codeInstanceList.size() > 0)
     {
@@ -212,6 +215,7 @@ public class CodeInstanceLogic
     query.setParameter(0, codeTable);
     query.setParameter(1, releaseVersion);
     query.setParameter(2, codeValue);
+    @SuppressWarnings("unchecked")
     List<CodeInstance> codeInstanceList = query.list();
     if (codeInstanceList.size() > 0)
     {
@@ -225,6 +229,7 @@ public class CodeInstanceLogic
     Query query = dataSession.createQuery("from CodeInstance where tableInstance = ? and code.codeValue = ?");
     query.setParameter(0, codeTableInstance);
     query.setParameter(1, codeValue);
+    @SuppressWarnings("unchecked")
     List<CodeInstance> codeInstanceList = query.list();
     if (codeInstanceList.size() > 0)
     {
@@ -237,6 +242,7 @@ public class CodeInstanceLogic
   {
     Query query = dataSession.createQuery("from AttributeInstance where codeInstance = ?");
     query.setParameter(0, codeInstance);
+    @SuppressWarnings("unchecked")
     List<AttributeInstance> attributeInstanceList = query.list();
     int issueCount = 0;
     for (AttributeInstance attributeInstance : attributeInstanceList)
@@ -269,6 +275,7 @@ public class CodeInstanceLogic
     CodeTable codeTable = codeInstance.getTableInstance().getTable();
     Query query = dataSession.createQuery("from AttributeAssigned where table = ? ");
     query.setParameter(0, codeTable);
+    @SuppressWarnings("unchecked")
     List<AttributeAssigned> attributeAssignedlIst = query.list();
     for (AttributeAssigned attributeAssigned : attributeAssignedlIst)
     {
@@ -285,6 +292,7 @@ public class CodeInstanceLogic
     query = dataSession.createQuery("from AttributeInstance where value.attributeType = ? and codeInstance = ?");
     query.setParameter(0, attributeType);
     query.setParameter(1, codeInstance);
+    @SuppressWarnings("unchecked")
     List<AttributeInstance> attributeInstanceList = query.list();
     if (attributeInstanceList.size() == 0)
     {

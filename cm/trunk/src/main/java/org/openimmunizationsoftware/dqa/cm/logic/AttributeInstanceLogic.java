@@ -1,6 +1,5 @@
 package org.openimmunizationsoftware.dqa.cm.logic;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -12,7 +11,6 @@ import org.openimmunizationsoftware.dqa.cm.model.AttributeInstance;
 import org.openimmunizationsoftware.dqa.cm.model.AttributeValue;
 import org.openimmunizationsoftware.dqa.cm.model.PositionStatus;
 import org.openimmunizationsoftware.dqa.cm.model.ReleaseVersion;
-import org.openimmunizationsoftware.dqa.cm.model.UserType;
 
 public class AttributeInstanceLogic
 {
@@ -26,6 +24,7 @@ public class AttributeInstanceLogic
     Query query = dataSession.createQuery("from AttributeInstance where codeInstance.tableInstance.release = ? and  value = ?");
     query.setParameter(0, releaseVersion);
     query.setParameter(1, attributeValue);
+    @SuppressWarnings("unchecked")
     List<AttributeInstance> attributeInstanceList = query.list();
     if (attributeInstanceList.size() > 0)
     {

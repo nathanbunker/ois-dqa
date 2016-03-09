@@ -12,7 +12,6 @@ import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.RecordServletInterface;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
-import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
@@ -46,6 +45,7 @@ public class CGoodData extends PentagonBoxHelper
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
       query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
       query.setParameter(2, pentagonReport.getTestConducted());
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFailForQuery(out, testMessageList);
     }
@@ -58,6 +58,7 @@ public class CGoodData extends PentagonBoxHelper
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_BASIC);
       query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_NOT_ACCEPTED);
       query.setParameter(2, pentagonReport.getTestConducted());
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPassForQuery(out, testMessageList);
     }
@@ -84,6 +85,7 @@ public class CGoodData extends PentagonBoxHelper
       TestSection testSection = testSectionMap.get(sectionNames);
       Query query = dataSession.createQuery("from TestMessage where testSection = ? and testType = 'query'");
       query.setParameter(0, testSection);
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       for (TestMessage testMessage : testMessageList)
       {

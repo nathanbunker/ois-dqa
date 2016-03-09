@@ -43,6 +43,7 @@ public class QFQbp2015 extends PentagonBoxHelper
               + "and testType = 'query' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT);
       query.setParameter(1, pentagonReport.getTestConducted());
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFailForQuery(out, testMessageList);
     }
@@ -54,6 +55,7 @@ public class QFQbp2015 extends PentagonBoxHelper
               + "and testType = 'query' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT);
       query.setParameter(1, pentagonReport.getTestConducted());
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPassForQuery(out, testMessageList);
     }
@@ -88,6 +90,7 @@ public class QFQbp2015 extends PentagonBoxHelper
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and testType = 'query' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_QBP_SUPPORT);
       query.setParameter(1, testConducted);
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       for (TestMessage testMessage : testMessageList)
       {

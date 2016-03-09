@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("serial")
 public class CodeInstance implements Serializable
 {
 

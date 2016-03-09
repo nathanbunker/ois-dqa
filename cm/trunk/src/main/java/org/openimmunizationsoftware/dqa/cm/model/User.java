@@ -1,13 +1,13 @@
 package org.openimmunizationsoftware.dqa.cm.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
+@SuppressWarnings("serial")
 public class User implements Serializable
 {
 

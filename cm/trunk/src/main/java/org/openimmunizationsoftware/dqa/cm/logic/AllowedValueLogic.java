@@ -14,6 +14,7 @@ public class AllowedValueLogic
     Query query = dataSession.createQuery("from AllowedValue where attributeType = ? and savedValue = ?");
     query.setParameter(0, attributeType);
     query.setParameter(1, savedValue);
+    @SuppressWarnings("unchecked")
     List<AllowedValue> allowedValueList = query.list();
     if (allowedValueList.size() > 0)
     {
@@ -26,6 +27,7 @@ public class AllowedValueLogic
   {
     Query query = dataSession.createQuery("from AllowedValue where attributeType = ? order by display_order, display_text");
     query.setParameter(0, attributeType);
+    @SuppressWarnings("unchecked")
     List<AllowedValue> allowedValueList = query.list();
     return allowedValueList;
   }

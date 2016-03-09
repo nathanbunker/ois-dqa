@@ -47,6 +47,7 @@ public class ReleaseNewVersionThread extends LogicThread
         Query query = dataSession.createQuery("from ReleaseVersion where majorVersionNum = ? and releaseStatusString = ?");
         query.setParameter(0, releaseVersion.getMajorVersionNum());
         query.setParameter(1, ReleaseStatus.CURRENT.getId());
+        @SuppressWarnings("unchecked")
         List<ReleaseVersion> releaseVersionList = query.list();
         for (ReleaseVersion rv : releaseVersionList)
         {
@@ -75,6 +76,7 @@ public class ReleaseNewVersionThread extends LogicThread
       {
         Query query = dataSession.createQuery("from CodeTableInstance where release = ? order by tableLabel");
         query.setParameter(0, releaseVersion);
+        @SuppressWarnings("unchecked")
         List<CodeTableInstance> codeTableInstanceList = query.list();
 
         out.println("<h3>Step 5</h3> ");
@@ -100,6 +102,7 @@ public class ReleaseNewVersionThread extends LogicThread
 
           query = dataSession.createQuery("from CodeInstance where tableInstance = ?");
           query.setParameter(0, cti);
+          @SuppressWarnings("unchecked")
           List<CodeInstance> codeInstanceList = query.list();
           for (CodeInstance ci : codeInstanceList)
           {
@@ -121,6 +124,7 @@ public class ReleaseNewVersionThread extends LogicThread
 
             query = dataSession.createQuery("from AttributeInstance where codeInstance = ?");
             query.setParameter(0, ci);
+            @SuppressWarnings("unchecked")
             List<AttributeInstance> attributeInstanceList = query.list();
             for (AttributeInstance ai : attributeInstanceList)
             {

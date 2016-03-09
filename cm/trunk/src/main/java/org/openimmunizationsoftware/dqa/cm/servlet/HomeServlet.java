@@ -56,6 +56,7 @@ import org.openimmunizationsoftware.dqa.cm.model.User;
 import org.openimmunizationsoftware.dqa.cm.model.UserType;
 import org.openimmunizationsoftware.dqa.tr.model.TestParticipant;
 
+@SuppressWarnings("serial")
 public class HomeServlet extends BaseServlet
 {
 
@@ -65,6 +66,10 @@ public class HomeServlet extends BaseServlet
 
   public HomeServlet() {
     super("Home");
+  }
+
+  public HomeServlet(String servletTitle) {
+    super(servletTitle);
   }
 
   protected static final String ACTION_LOGIN = "Login";
@@ -126,6 +131,8 @@ public class HomeServlet extends BaseServlet
   public static final String PARAM_POSITION_TITLE = "positionTitle";
   public static final String PARAM_PHONE_NUMBER = "phoneNumber";
 
+  public static final String PARAM_FORCE_EXCEPTION = "forceException";
+
   private String paramCodeValue = null;
   private String paramCodeLabel = null;
   private String paramUseValue = null;
@@ -149,28 +156,16 @@ public class HomeServlet extends BaseServlet
     PrintWriter out = userSession.getOut();
     try
     {
+      String forceException = req.getParameter(PARAM_FORCE_EXCEPTION);
+      if (userSession.isLoggedIn() && forceException != null && forceException.equals("A"))
+      {
+        throw new NullPointerException("Testing Exception Mechanism at Point A");
+      }
       String action = req.getParameter(PARAM_ACTION);
-      String view = req.getParameter(PARAM_VIEW);
-      if (req.getParameter(PARAM_RELEASE_ID) != null)
-      {
-        int releaseVersionId = Integer.parseInt(req.getParameter(PARAM_RELEASE_ID));
-        if (userSession.getReleaseVersion().getReleaseId() != releaseVersionId)
-        {
-          userSession.setSearchResultsWithCodeInstanceList(null);
-          userSession.setCodeTableInstance(null);
-        }
-        userSession.setReleaseVersion(ReleaseVersionLogic.getReleaseVersion(releaseVersionId, dataSession));
-      }
-      if (req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID) != null)
-      {
-        int tableInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID));
-        userSession.setCodeTableInstance(CodeTableInstanceLogic.getCodeTableInstance(tableInstanceId, dataSession));
-      }
+      setReleaseVersion(req, userSession, dataSession);
+      setCodeTableInstance(req, userSession, dataSession);
       readParams(req, userSession);
-      if (view == null)
-      {
-        view = VIEW_DEFAULT;
-      }
+      String view = getView(req);
       int applicationId = 0;
       if (req.getParameter(PARAM_APPLICATION_ID) != null)
       {
@@ -364,7 +359,8 @@ public class HomeServlet extends BaseServlet
           int codeInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_INSTANCE_ID));
           codeInstance = CodeInstanceLogic.getCodeInstance(codeInstanceId, dataSession);
 
-          int resourceId = Integer.parseInt(req.getParameter(PARAM_RESOURCE_ID));
+          // int resourceId =
+          // Integer.parseInt(req.getParameter(PARAM_RESOURCE_ID));
 
           // TODO
         } else if (action.equals(ACTION_REMOVE_SUPPORTING_INFO))
@@ -374,6 +370,11 @@ public class HomeServlet extends BaseServlet
       }
 
       createHeader(webSession);
+
+      if (userSession.isLoggedIn() && forceException != null && forceException.equals("B"))
+      {
+        throw new NullPointerException("Testing Exception Mechanism at Point B");
+      }
 
       if (view.equals(VIEW_REGISTER))
       {
@@ -585,14 +586,56 @@ public class HomeServlet extends BaseServlet
           out.println("</div>");
         }
       }
+      if (userSession.isLoggedIn() && forceException != null && forceException.equals("C"))
+      {
+        throw new NullPointerException("Testing Exception Mechanism at Point C");
+      }
     } catch (Exception e)
     {
-      e.printStackTrace();
-      out.println("<pre>");
-      e.printStackTrace(out);
-      out.println("</pre>");
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
     }
-    createFooter(webSession);
+  }
+
+  public String getView(HttpServletRequest req)
+  {
+    String view = req.getParameter(PARAM_VIEW);
+    view = setViewDefault(view);
+    return view;
+  }
+
+  public String setViewDefault(String view)
+  {
+    if (view == null)
+    {
+      view = VIEW_DEFAULT;
+    }
+    return view;
+  }
+
+  public void setCodeTableInstance(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    if (req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID) != null)
+    {
+      int tableInstanceId = Integer.parseInt(req.getParameter(PARAM_CODE_TABLE_INSTANCE_ID));
+      userSession.setCodeTableInstance(CodeTableInstanceLogic.getCodeTableInstance(tableInstanceId, dataSession));
+    }
+  }
+
+  public void setReleaseVersion(HttpServletRequest req, UserSession userSession, Session dataSession)
+  {
+    if (req.getParameter(PARAM_RELEASE_ID) != null)
+    {
+      int releaseVersionId = Integer.parseInt(req.getParameter(PARAM_RELEASE_ID));
+      if (userSession.getReleaseVersion().getReleaseId() != releaseVersionId)
+      {
+        userSession.setSearchResultsWithCodeInstanceList(null);
+        userSession.setCodeTableInstance(null);
+      }
+      userSession.setReleaseVersion(ReleaseVersionLogic.getReleaseVersion(releaseVersionId, dataSession));
+    }
   }
 
   public void addAttributeComment(String value, int attributeTypeId, String comment, CodeMaster codeMaster, UserSession userSession)
@@ -849,6 +892,7 @@ public class HomeServlet extends BaseServlet
     Query query = dataSession.createQuery("from ApplicationUser where user = ? and application = ?");
     query.setParameter(0, userSession.getUser());
     query.setParameter(1, application);
+    @SuppressWarnings("unchecked")
     List<ApplicationUser> applicationUserList = query.list();
     if (applicationUserList.size() > 0)
     {
@@ -963,6 +1007,7 @@ public class HomeServlet extends BaseServlet
     out.println("      </td>");
     out.println("    </tr>");
     Query query = userSession.getDataSession().createQuery("from TestParticipant order by connectionLabel");
+    @SuppressWarnings("unchecked")
     List<TestParticipant> testParticipantList = query.list();
     out.println("    <tr>");
     out.println("      <th>IIS</th>");
@@ -1345,8 +1390,10 @@ public class HomeServlet extends BaseServlet
         List<Resource> resourceList = SupportingInfoLogic.getResourceList(dataSession);
         for (Resource resource : resourceList)
         {
-          out.println("          <option value=\"" + resource.getResourceId() + "\"" + (false ? " selected=\"true\"" : "") + ">"
-              + resource.getDisplayLabel() + "</option>");
+          // out.println(" <option value=\"" + resource.getResourceId() + "\"" +
+          // (false ? " selected=\"true\"" : "") + ">"
+          // + resource.getDisplayLabel() + "</option>");
+          out.println("          <option value=\"" + resource.getResourceId() + "\">" + resource.getDisplayLabel() + "</option>");
         }
         out.println("          <option value=\"NEW\">--create new link--</option>");
         out.println("        </select><br/>");
@@ -1400,7 +1447,6 @@ public class HomeServlet extends BaseServlet
 
   public String getValueLabel(AttributeInstance attributeInstance, UserSession userSession)
   {
-    PrintWriter out = userSession.getOut();
     Session dataSession = userSession.getDataSession();
     AttributeType at = attributeInstance.getValue().getAttributeType();
     if (at.getAttributeFormat() == AttributeFormat.CODE_MASTER)

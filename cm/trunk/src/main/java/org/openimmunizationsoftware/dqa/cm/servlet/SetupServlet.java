@@ -13,6 +13,7 @@ import org.openimmunizationsoftware.dqa.cm.logic.UserLogic;
 import org.openimmunizationsoftware.dqa.cm.logic.thread.SetupThread;
 import org.openimmunizationsoftware.dqa.cm.model.User;
 
+@SuppressWarnings("serial")
 public class SetupServlet extends BaseServlet
 {
   public SetupServlet() {
@@ -26,28 +27,35 @@ public class SetupServlet extends BaseServlet
   {
     HttpSession webSession = setup(req, resp);
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
-    Session dataSession = userSession.getDataSession();
     PrintWriter out = userSession.getOut();
     if (!userSession.isAdmin())
     {
       sendToHome(req, resp);
       return;
     }
-    createHeader(webSession);
-    out.println("<p>This page is temporary and runs logic to setup the database intially. This will be removed once the application is"
-        + " up and running without issues. </p>");
-    if (setupLogic == null || setupLogic.isComplete())
+    try
     {
-      out.println("<form method=\"POST\" action=\"setup\">");
-      out.println("<input type=\"submit\" name=\"action\" value=\"start\">");
-      out.println("</form>");
-    }
-    if (setupLogic != null)
+      createHeader(webSession);
+      out.println("<p>This page is temporary and runs logic to setup the database intially. This will be removed once the application is"
+          + " up and running without issues. </p>");
+      if (setupLogic == null || setupLogic.isComplete())
+      {
+        out.println("<form method=\"POST\" action=\"setup\">");
+        out.println("<input type=\"submit\" name=\"action\" value=\"start\">");
+        out.println("</form>");
+      }
+      if (setupLogic != null)
+      {
+        out.println("<h1>Setup Log</h1>");
+        setupLogic.printOutput(out);
+      }
+    } catch (Exception e)
     {
-      out.println("<h1>Setup Log</h1>");
-      setupLogic.printOutput(out);
+      handleError(e, webSession);
+    } finally
+    {
+      createFooter(webSession);
     }
-    createFooter(webSession);
   }
 
   @Override
@@ -56,7 +64,6 @@ public class SetupServlet extends BaseServlet
     HttpSession webSession = setup(req, resp);
     UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
     Session dataSession = userSession.getDataSession();
-    PrintWriter out = userSession.getOut();
     if (!userSession.isAdmin())
     {
       sendToHome(req, resp);

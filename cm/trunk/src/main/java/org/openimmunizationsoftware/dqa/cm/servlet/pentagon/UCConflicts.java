@@ -105,6 +105,7 @@ public class UCConflicts extends PentagonBoxHelper
       query.setParameter(0, testConducted);
       query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING);
       query.setParameter(2, ccc.getCompatibilityConformance().toString());
+      @SuppressWarnings("unchecked")
       List<TestProfile> testProfileList = query.list();
       out.println("<table class=\"pentagon\">");
       out.println("  <tr class=\"pentagon\">");
@@ -210,6 +211,7 @@ public class UCConflicts extends PentagonBoxHelper
         + "group by tp.compatibilityConformanceString");
     query.setParameter(0, testConducted);
     query.setParameter(1, RecordServletInterface.VALUE_TEST_SECTION_TYPE_PROFILING);
+    @SuppressWarnings("unchecked")
     List<Object[]> objectsList = query.list();
     for (Object[] objects : objectsList)
     {

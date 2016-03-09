@@ -110,6 +110,7 @@ public class ProfileManager
     profileField.setFieldName(fieldName);
   }
 
+  @SuppressWarnings("unchecked")
   public static void rectifyProfileFields(Session dataSession) throws FileNotFoundException, IOException
   {
     {
@@ -383,6 +384,7 @@ public class ProfileManager
       Query query = dataSession.createQuery("from ProfileUsageValue where profileField = ? and profileUsage = ?");
       query.setParameter(0, profileField.getParent());
       query.setParameter(1, profileUsage);
+      @SuppressWarnings("unchecked")
       List<ProfileUsageValue> profileUsageValueList = query.list();
       if (profileUsageValueList.size() == 0)
       {
@@ -824,6 +826,7 @@ public class ProfileManager
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static ProfileUsageValue getProfileUsageValue(Session dataSession, ProfileUsage profileUsageSelected, ProfileField profileField)
   {
     ProfileUsageValue profileUsageValue = null;

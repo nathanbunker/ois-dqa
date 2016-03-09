@@ -41,6 +41,7 @@
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/ReportUser.hbm.xml"/> 
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/SupportingInfo.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/User.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/UserLog.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/cm/model/UserSetting.hbm.xml"/> 
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestCase.hbm.xml"/>
     <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestComment.hbm.xml"/>

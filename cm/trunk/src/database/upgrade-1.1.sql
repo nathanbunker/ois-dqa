@@ -68,3 +68,13 @@ ALTER TABLE application_user ADD COLUMN (agreement_date DATE);
 ALTER TABLE application_user ADD COLUMN (agreement_signature VARCHAR(250));
 ALTER TABLE application ADD COLUMN (agreement_id INTEGER);
 
+CREATE TABLE user_log (
+    user_log_id        INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id            INTEGER NOT NULL,
+    servlet_name       VARCHAR(250) NOT NULL,
+    request_parameters VARCHAR(2500),
+    exception_text     TEXT,
+    start_time         DATE NOT NULL,
+    end_time           DATE NOT NULL,
+    response_ms        INTEGER NOT NULL
+);

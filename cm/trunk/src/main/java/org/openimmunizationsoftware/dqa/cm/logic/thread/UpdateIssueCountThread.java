@@ -26,6 +26,7 @@ public class UpdateIssueCountThread extends LogicThread
       out.println("<h1>Updating Issue Counts</h1>");
       Query query = dataSession.createQuery("from CodeTableInstance where release = ?");
       query.setParameter(0, release);
+      @SuppressWarnings("unchecked")
       List<CodeTableInstance> codeTableInstanceList = query.list();
       for (CodeTableInstance codeTableInstance : codeTableInstanceList)
       {

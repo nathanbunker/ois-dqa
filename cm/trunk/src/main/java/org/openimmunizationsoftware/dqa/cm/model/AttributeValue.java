@@ -1,8 +1,8 @@
 package org.openimmunizationsoftware.dqa.cm.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
+@SuppressWarnings("serial")
 public class AttributeValue implements Serializable
 {
   private int valueId = 0;

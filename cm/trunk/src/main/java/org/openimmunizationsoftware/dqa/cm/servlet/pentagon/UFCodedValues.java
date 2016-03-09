@@ -2,7 +2,6 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -14,7 +13,6 @@ import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestMessage;
-import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
 public class UFCodedValues extends PentagonBoxHelper
 {
@@ -41,6 +39,7 @@ public class UFCodedValues extends PentagonBoxHelper
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus <> 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE);
       query.setParameter(1, pentagonReport.getTestConducted());
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFailCodes(out, testMessageList, userSession);
     }
@@ -51,6 +50,7 @@ public class UFCodedValues extends PentagonBoxHelper
           "from TestMessage where testSection.testSectionType = ? and testSection.testConducted = ? and resultStatus = 'PASS' and testType = 'update' order by testCaseCategory");
       query.setParameter(0, RecordServletInterface.VALUE_TEST_SECTION_TYPE_INTERMEDIATE);
       query.setParameter(1, pentagonReport.getTestConducted());
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListPassCodes(out, testMessageList, userSession);
     }

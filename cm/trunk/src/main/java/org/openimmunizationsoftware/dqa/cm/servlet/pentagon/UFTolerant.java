@@ -30,6 +30,7 @@ public class UFTolerant extends PentagonBoxHelper
         + "determine if it is possible to be tolerant of these issues. </p>");
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void printDetails(PrintWriter out, Session dataSession, PentagonReport pentagonReport, HttpSession webSession, UserSession userSession)
   {

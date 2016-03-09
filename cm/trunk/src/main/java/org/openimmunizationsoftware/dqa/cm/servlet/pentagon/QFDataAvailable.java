@@ -59,6 +59,7 @@ public class QFDataAvailable extends PentagonBoxHelper
       Query query = dataSession.createQuery("from TestMessage where testSection.testConducted = ? and testCaseAssertResult = 'MATCH' "
           + "and testType = 'query' and resultStoreStatus = 'a-nr' order by testCaseCategory");
       query.setParameter(0, pentagonReport.getTestConducted());
+      @SuppressWarnings("unchecked")
       List<TestMessage> testMessageList = query.list();
       printTestMessageListFailForQuery(out, testMessageList);
     }
@@ -107,6 +108,7 @@ public class QFDataAvailable extends PentagonBoxHelper
         "select resultStoreStatus, count(*) from TestMessage tm where tm.testSection.testConducted = ? and tm.testCaseAssertResult = 'MATCH' "
             + "and tm.testType = 'query' and (tm.resultStoreStatus = 'a-nr' or tm.resultStoreStatus = 'a-r') group by tm.resultStoreStatus");
     query.setParameter(0, testConducted);
+    @SuppressWarnings("unchecked")
     List<Object[]> objectsList = query.list();
     return objectsList;
   }

@@ -8,6 +8,7 @@ import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
 import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 
+@SuppressWarnings("serial")
 public class C_Row extends PentagonRowHelper
 {
   public C_Row(PentagonReport pentagonReport) {

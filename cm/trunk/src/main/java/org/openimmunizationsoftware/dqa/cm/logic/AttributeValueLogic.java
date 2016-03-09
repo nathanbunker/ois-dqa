@@ -22,6 +22,7 @@ public class AttributeValueLogic
     query.setParameter(0, codeMaster);
     query.setParameter(1, attributeType);
     query.setParameter(2, attributeValue);
+    @SuppressWarnings("unchecked")
     List<AttributeValue> attributeValueList = query.list();
     if (attributeValueList.size() > 0)
     {

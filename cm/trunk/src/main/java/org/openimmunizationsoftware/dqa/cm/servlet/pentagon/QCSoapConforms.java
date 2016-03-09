@@ -2,7 +2,6 @@ package org.openimmunizationsoftware.dqa.cm.servlet.pentagon;
 
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -12,7 +11,6 @@ import org.openimmunizationsoftware.dqa.cm.servlet.UserSession;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonBox;
 import org.openimmunizationsoftware.dqa.tr.model.PentagonReport;
 import org.openimmunizationsoftware.dqa.tr.model.TestConducted;
-import org.openimmunizationsoftware.dqa.tr.model.TestSection;
 import org.openimmunizationsoftware.dqa.tr.model.TransportAnalysis;
 import org.openimmunizationsoftware.dqa.tr.model.TransportOther;
 import org.openimmunizationsoftware.dqa.tr.model.TransportWsdlCdc;
@@ -41,6 +39,7 @@ public class QCSoapConforms extends PentagonBoxHelper
     {
       Query query = dataSession.createQuery("from TransportWsdlCdc where transportAnalysis.connectionLabel = ?");
       query.setParameter(0, pentagonReport.getTestConducted().getTestParticipant().getConnectionLabel());
+      @SuppressWarnings("unchecked")
       List<TransportWsdlCdc> transportWsdlCdcList = query.list();
       if (transportWsdlCdcList.size() > 0)
       {
@@ -51,6 +50,7 @@ public class QCSoapConforms extends PentagonBoxHelper
     {
       Query query = dataSession.createQuery("from TransportOther where transportAnalysis.connectionLabel = ?");
       query.setParameter(0, pentagonReport.getTestConducted().getTestParticipant().getConnectionLabel());
+      @SuppressWarnings("unchecked")
       List<TransportOther> transportOtherList = query.list();
       if (transportOtherList.size() > 0)
       {
@@ -143,6 +143,7 @@ public class QCSoapConforms extends PentagonBoxHelper
     {
       Query query = dataSession.createQuery("from TransportWsdlCdc where transportAnalysis.connectionLabel = ?");
       query.setParameter(0, testConducted.getTestParticipant().getConnectionLabel());
+      @SuppressWarnings("unchecked")
       List<TransportWsdlCdc> transportWsdlCdcList = query.list();
       if (transportWsdlCdcList.size() > 0)
       {

@@ -3,6 +3,7 @@ package org.openimmunizationsoftware.dqa.cm.model;
 import java.io.Serializable;
 import java.util.Date;
 
+@SuppressWarnings("serial")
 public class AttributeComment implements Serializable
 {
   private int attributeCommentId = 0;
