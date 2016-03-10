@@ -48,7 +48,7 @@ public class PentagonContentServlet extends PentagonServlet
         || !userSession.getUser().getApplicationUser().getApplication().isApplicationAart())
     {
       out.println("<h2>Not authorized</h2>");
-      out.println("<p>Your session has expired. Plase <a href=\"\">login to</a> start a new session. </p>");
+      out.println("<p>Your session has expired. Please <a href=\"\">login to</a> start a new session. </p>");
       out.close();
       return;
     }

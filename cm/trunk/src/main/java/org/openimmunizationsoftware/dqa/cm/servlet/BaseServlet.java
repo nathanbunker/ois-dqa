@@ -53,7 +53,7 @@ public abstract class BaseServlet extends HttpServlet
   private static String systemWideMessage = "";
   private static Set<UserActivity> userActivitySet = new HashSet<UserActivity>();
 
-  private static final String ERROR_EMAIL = "nbunker@immregistries.org";
+  protected static final String ERROR_EMAIL = "nbunker@immregistries.org";
 
   public static Set<UserActivity> getUserActivitySet()
   {
@@ -72,7 +72,7 @@ public abstract class BaseServlet extends HttpServlet
 
   protected void sendToHome(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
-    RequestDispatcher dispatcher = req.getRequestDispatcher("home");
+    RequestDispatcher dispatcher = req.getRequestDispatcher("home?" + HomeServlet.PARAM_VIEW + "=" + HomeServlet.VIEW_DEFAULT);
     dispatcher.forward(req, resp);
   }
 
@@ -238,6 +238,14 @@ public abstract class BaseServlet extends HttpServlet
     createHeader(webSession, defaultApplication);
   }
 
+  protected void createHeaderNoMenu(HttpSession webSession)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    Session dataSession = userSession.getDataSession();
+    Application defaultApplication = (Application) dataSession.get(Application.class, 1);
+    createHeaderNoMenu(webSession, defaultApplication);
+  }
+
   protected void handleError(Throwable e, HttpSession webSession)
   {
     e.printStackTrace();
@@ -361,6 +369,29 @@ public abstract class BaseServlet extends HttpServlet
       out.println("<div class=\"messageConfirmation\">" + userSession.getMessageConfirmation() + "</div>");
       userSession.setMessageConfirmation(null);
     }
+    out.println("    <div class=\"contents\">");
+    userSession.setHeaderCreated(true);
+  }
+  
+  protected void createHeaderNoMenu(HttpSession webSession, Application defaultApplication)
+  {
+    UserSession userSession = (UserSession) webSession.getAttribute(USER_SESSION);
+    PrintWriter out = userSession.getOut();
+    out.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">");
+    out.println("<html>");
+    out.println("  <head>");
+    out.println("    <meta charset=\"UTF-8\">");
+    Application application = defaultApplication;
+    ApplicationUser applicationUser = null;
+    if (userSession.getUser() != null && userSession.getUser().getApplicationUser() != null)
+    {
+      applicationUser = userSession.getUser().getApplicationUser();
+      application = applicationUser.getApplication();
+    }
+    out.println("    <title>" + application.getApplicationAcronym() + " - " + servletTitle + "</title>");
+    out.println("    <link rel=\"stylesheet\" type=\"text/css\" href=\"index.css\">");
+    out.println("  </head>");
+    out.println("  <body>");
     out.println("    <div class=\"contents\">");
     userSession.setHeaderCreated(true);
   }
