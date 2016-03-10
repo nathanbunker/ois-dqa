@@ -73,6 +73,10 @@
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.PentagonServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>FeedbackServlet</servlet-name>
+    <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.FeedbackServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>PentagonContentServlet</servlet-name>
     <servlet-class>org.openimmunizationsoftware.dqa.cm.servlet.PentagonContentServlet</servlet-class>
   </servlet>
@@ -148,6 +152,10 @@
   <servlet-mapping>
     <servlet-name>PentagonServlet</servlet-name>
     <url-pattern>/pentagon</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>FeedbackServlet</servlet-name>
+    <url-pattern>/feedback</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>PentagonContentServlet</servlet-name>

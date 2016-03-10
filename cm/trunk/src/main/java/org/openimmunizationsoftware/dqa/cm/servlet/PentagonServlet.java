@@ -213,8 +213,11 @@ public class PentagonServlet extends HomeServlet
     out.println("</svg>");
 
     out.println("<script>");
+    out.println("  var feedbackBoxName = ''; ");
+    out.println("  var feedbackTestMessageId = ''; ");
     {
       out.println("  function loadDetails(testMessageId, title) { ");
+      out.println("    feedbackTestMessageId = testMessageId; ");
       out.println("    var eMenu = document.getElementById('detailsMenu');");
       out.println("    eMenu.style.display = 'block';");
       out.println("    var e = document.getElementById('details');");
@@ -248,11 +251,34 @@ public class PentagonServlet extends HomeServlet
       out.println("  }");
     }
     {
+      out.println("  function sendFeedback() { ");
+      out.println("    var feedbackForm = document.getElementById('feedbackForm');");
+      out.println("    var feedbackSubmittedResponse = document.getElementById('feedbackSubmittedResponse');");
+      String link = "'feedback?" + FeedbackServlet.PARAM_TEST_CONDUCTED_ID + "=" + testConducted.getTestConductedId() + "&"
+          + FeedbackServlet.PARAM_FEEDBACK_TEXT + "=' + encodeURIComponent(feedbackForm." + FeedbackServlet.PARAM_FEEDBACK_TEXT + ".value) + '&"
+          + FeedbackServlet.PARAM_BOX_NAME + "=' + encodeURIComponent(feedbackBoxName) + '&"
+          + FeedbackServlet.PARAM_TEST_MESSAGE_ID + "=' + feedbackTestMessageId";
+      out.println("    feedbackSubmittedResponse.innerHTML = '<p class=\"pentagon\">Submitting...</p>'; ");
+      out.println("    var xhttp = new XMLHttpRequest(); ");
+      out.println("    xhttp.onreadystatechange = function() { ");
+      out.println("      if (xhttp.readyState == XMLHttpRequest.DONE) { ");
+      out.println("        if (xhttp.status == 200) { ");
+      out.println("          feedbackSubmittedResponse.innerHTML = xhttp.responseText; ");
+      out.println("        }");
+      out.println("      }");
+      out.println("    }");
+      out.println("    xhttp.open('GET', " + link + ", true); ");
+      out.println("    xhttp.send(null);");
+      out.println("    return false; ");
+      out.println("  }");
+    }
+    {
       out.println("  function loadBoxContentsAndSwitch(title, boxName, selector, switchTo) { ");
       out.println("     boxDetailsSelected = switchTo; ");
       out.println("     loadBoxContents(title, boxName, selector, true); ");
       out.println("  }");
       out.println("  function loadBoxContents(title, boxName, selector, showMenu) { ");
+      out.println("    feedbackBoxName = boxName; ");
       out.println("    var eMenu = document.getElementById('boxDetailsMenu');");
       out.println("    if (showMenu) { ");
       out.println("      eMenu.style.display = 'block';");
@@ -655,24 +681,33 @@ public class PentagonServlet extends HomeServlet
     {
       int posX = 900;
       int posY = 48;
-      boolean display = testMessageSelected != null;
       out.println("<div id=\"details\" style=\" position: absolute; top: " + (posY + offsetY) + "px; left: " + (posX + offsetX)
-          + "px; width: 850px; background-color: #eeeeee; border-size: 2px; border-style: solid; border-color: #9b0d28; overflow: auto;\">");
-      out.println("<a class=\"pentagonMenuLink\" onclick=\"hideReport('details')\" style=\"float: right;\" href=\"javascript: void(0); \">Close</a>");
-      out.println("<h2 class=\"pentagon\" id=\"detailsTitle\" >Beta Testing Feedback</h2>");
-      out.println("<p class=\"pentagon\">Please note that this report is not complete and needs your feedback so we can make improvements. "
-          + "You may use the information in this report, but you must know that it has limitations: </p>");
-      out.println("<ul>");
-      out.println("  <li>This report shows the results of a testing discovery process which is still evolving and improving. Expect this report to change and improve. </li>");
-      out.println("  <li>The scoring and graphics shown in the report are to focus the reader on aspects that are felt to be most critical. They are not defnitive and subject to revision and improvement as the testing process improves. </li>");
-      out.println("  <li>We need your help to make this report better. Notice a problem? Please tell us!</li>");
+          + "px; width: 600px; background-color: #eeeeee; border-size: 2px; border-style: solid; border-color: #9b0d28; overflow: auto;\">");
+      out.println("<h2 class=\"pentagon\" id=\"detailsTitle\">Beta Test Notice</h2>");
+      out.println("<p class=\"pentagon\">Access to this report has been given to you as part of a "
+          + "<a href=\"https://www.google.com/search?q=define+beta+test\" target=\"_blank\">beta test</a>. "
+          + "You may use the information in this report to guide improvements you might make to your IIS but only if you understand the "
+          + "following limitations and conditions: </p>");
+      out.println("<ul class=\"pentagon\">");
+      out.println("  <li class=\"pentagon\">This report shows the results of a testing discovery process which is still evolving and improving. "
+          + "You will see this report change as improvements are made. </li>");
+      out.println(
+          "  <li class=\"pentagon\">The scoring and graphics shown in the report are to focus the reader on aspects that are felt to be most critical for interoperability. "
+              + "While this report leverages and promotes community standards wherever possible, "
+              + "it does not represent a complete or final determination of how well the IIS supports these standards. </li>");
+      out.println(
+          "  <li class=\"pentagon\">We need your help to make this report better. Notice a problem? Have an idea that would improve this report? Please tell us!</li>");
       out.println("</ul>");
-      out.println("<h3 class=\"pentagon\" id=\"detailsTitle\" >Your Comments or Questions</h3>");
-      out.println("<form>");
-      out.println("<textarea name=\"\" cols=\"60\" rows=\"10\"></textarea>");
+      out.println("<h3 class=\"pentagon\" id=\"detailsTitle\" >Your Question or Feedback</h3>");
+      out.println("<form id=\"feedbackForm\" onSubmit=\"return sendFeedback()\" >");
+      out.println("<textarea name=\"" + FeedbackServlet.PARAM_FEEDBACK_TEXT
+          + "\" rows=\"10\" style=\"width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; \"></textarea>");
       out.println("<br/>");
-      out.println("<input name=\"submit\" type=\"submit\" value=\"Send\" />");
+      out.println(
+          "<input type=\"hidden\" name=\"" + FeedbackServlet.PARAM_TEST_CONDUCTED_ID + "\" value=\"" + testConducted.getTestConductedId() + "\" />");
+      out.println("<input name=\"submit\" type=\"submit\" value=\"Submit\"/>");
       out.println("<form>");
+      out.println("<div id=\"feedbackSubmittedResponse\"></div>");
       out.println("</div>");
     }
   }
