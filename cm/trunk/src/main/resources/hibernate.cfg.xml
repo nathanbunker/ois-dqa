@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+
+<!--
+    <property name="hibernate.connection.url">jdbc:mysql://localhost/oisptorg_cm</property>
+    <property name="hibernate.connection.username">oisptorg_cm_web</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="connection.password">SavvyTrainPendedMucked81</property>
+ -->
+
+    <property name="hibernate.connection.url">jdbc:mysql://localhost/dqacm</property>
+    <property name="hibernate.connection.username">dqacm_web</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="connection.password">SharkBaitHooHaHa</property>
+ 
+    <property name="show_sql">false</property>
+    <property name="hibernate.c3p0.acquire_increment">1</property>
+    <property name="hibernate.c3p0.idle_test_period">100</property><!--  seconds -->
+    <property name="hibernate.c3p0.timeout">100</property><!--  seconds -->
+    <property name="hibernate.c3p0.max_size">30</property>
+    <property name="hibernate.c3p0.min_size">5</property>
+    <property name="hibernate.c3p0.max_statements">10</property>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/AllowedValue.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/Agreement.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/Application.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/ApplicationUser.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/AttributeAssigned.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/AttributeInstance.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/AttributeComment.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/AttributeValue.hbm.xml"/> 
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/AttributeType.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/CodeInstance.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/CodeMaster.hbm.xml"/> 
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/CodeTable.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/CodeTableInstance.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/ReleaseVersion.hbm.xml"/> 
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/Resource.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/ReportUser.hbm.xml"/> 
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/SupportingInfo.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/User.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/UserLog.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/cm/model/UserSetting.hbm.xml"/> 
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestCase.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestComment.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestConducted.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestMessage.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestParticipant.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestProfile.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TestSection.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Comparison.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ComparisonField.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Assertion.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/AssertionField.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/AssertionIdentified.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Evaluation.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/EvaluationField.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Forecast.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ForecastField.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/PentagonBox.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/PentagonReport.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ProfileUsage.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ProfileUsageValue.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ProfileField.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/ProfileFieldValue.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TesterStatus.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TesterCommand.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/Transform.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TransformField.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TransportAnalysis.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TransportWsdlCdc.hbm.xml"/>
+    <mapping resource="org/openimmunizationsoftware/dqa/tr/model/TransportOther.hbm.xml"/>
+
+  </session-factory>
+</hibernate-configuration>
