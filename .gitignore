@@ -1,7 +1,3 @@
-hibernate.cfg.xml
-context.xml
-hibernate.cfg.xml
-users/Kevin/ois-dqa/core/branches/MN_v1.08/src/main/resources/hibernate.cfg.xml
-users/Kevin/ois-dqa/core/branches/MN_v1.08/src/main/resources/hibernate.cfg.xml
-users/Kevin/ois-dqa/webui/branches/MN_v1.08/src/main/resources/hibernate.cfg.xml
-users/Kevin/ois-dqa/webui/branches/MN_v1.08/src/main/webapp/META-INF/context.xml
+core/branches/MN_v1.08/v1_08/src/main/resources/hibernate.cfg.xml
+webui/branches/MN_v1.08/src/main/resources/hibernate.cfg.xml
+webui/branches/MN_v1.08/src/main/webapp/META-INF/context.xml
